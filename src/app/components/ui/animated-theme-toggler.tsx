@@ -1,6 +1,7 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useRef, useState, useEffect } from "react"
+import { useTheme } from "next-themes"
 import { Moon, Sun } from "lucide-react"
 import { flushSync } from "react-dom"
 
@@ -15,24 +16,15 @@ export const AnimatedThemeToggler = ({
   duration = 400,
   ...props
 }: AnimatedThemeTogglerProps) => {
-  const [isDark, setIsDark] = useState(false)
+  const { resolvedTheme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
-    const updateTheme = () => {
-      setIsDark(document.documentElement.classList.contains("dark"))
-    }
-
-    updateTheme()
-
-    const observer = new MutationObserver(updateTheme)
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    })
-
-    return () => observer.disconnect()
+    setMounted(true)
   }, [])
+
+  const isDark = resolvedTheme === "dark"
 
   const toggleTheme = useCallback(() => {
     const button = buttonRef.current
@@ -48,11 +40,15 @@ export const AnimatedThemeToggler = ({
       Math.max(y, viewportHeight - y)
     )
 
+    const newTheme = isDark ? "light" : "dark"
+
     const applyTheme = () => {
-      const newTheme = !isDark
-      setIsDark(newTheme)
-      document.documentElement.classList.toggle("dark")
-      localStorage.setItem("theme", newTheme ? "dark" : "light")
+      // Directly toggle the DOM class so it happens synchronously
+      // inside the view transition callback (flushSync doesn't help
+      // with next-themes because it applies class via useEffect)
+      document.documentElement.classList.toggle("dark", newTheme === "dark")
+      // Sync next-themes state (its useEffect will see class already matches)
+      setTheme(newTheme)
     }
 
     if (typeof document.startViewTransition !== "function") {
@@ -82,7 +78,9 @@ export const AnimatedThemeToggler = ({
         )
       })
     }
-  }, [isDark, duration])
+  }, [isDark, duration, setTheme])
+
+  if (!mounted) return <button className={cn(className)} {...props}><Moon /><span className="sr-only">Toggle theme</span></button>
 
   return (
     <button
