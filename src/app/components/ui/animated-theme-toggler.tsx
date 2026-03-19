@@ -73,6 +73,7 @@ export const AnimatedThemeToggler = ({
           {
             duration,
             easing: "ease-in-out",
+            fill: "forwards",
             pseudoElement: "::view-transition-new(root)",
           }
         )
