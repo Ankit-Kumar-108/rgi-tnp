@@ -43,11 +43,7 @@ export const AnimatedThemeToggler = ({
     const newTheme = isDark ? "light" : "dark"
 
     const applyTheme = () => {
-      // Directly toggle the DOM class so it happens synchronously
-      // inside the view transition callback (flushSync doesn't help
-      // with next-themes because it applies class via useEffect)
       document.documentElement.classList.toggle("dark", newTheme === "dark")
-      // Sync next-themes state (its useEffect will see class already matches)
       setTheme(newTheme)
     }
 

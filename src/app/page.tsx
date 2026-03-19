@@ -1,5 +1,5 @@
-"use client";
-import { motion } from "motion/react";
+"use client"
+import { motion } from "motion/react"
 import {
   Quote,
   Users,
@@ -8,16 +8,16 @@ import {
   CheckCircle,
   BadgeCheck,
   MoveRight,
-} from "lucide-react";
-import Nav from "./components/nav/nav";
-import Footer from "./components/footer/footer";
+} from "lucide-react"
+import Nav from "./components/nav/nav"
+import Footer from "./components/footer/footer"
 export default function Home() {
   const fadeIn = {
     initial: { opacity: 0, y: 20 },
     whileInView: { opacity: 1, y: 0 },
     viewport: { once: true },
     transition: { duration: 0.6 }
-  };
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -25,36 +25,38 @@ export default function Home() {
       <Nav />
       <main className="pt-20">
         {/* Hero Section */}
-        <section className="max-w-7xl mx-auto px-6 lg:px-20 py-12 lg:py-20">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="order-2 lg:order-1 flex flex-col gap-8">
-              <div className="hidden md:inline-flex items-center gap-2 bg-brand/10 text-brand px-4 py-1.5 rounded-full w-fit">
-                <BadgeCheck className="text-lg" />
-                <span className="text-xs font-bold uppercase tracking-wider">Top Rated Placement Cell</span>
+        <section className="bg-brand/5">
+          <div className="max-w-7xl mx-auto px-3 lg:px-20 py-12 lg:py-20">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div className="order-2 lg:order-1 flex flex-col gap-6 md:gap-8">
+                <div className="hidden md:inline-flex items-center gap-2 bg-brand/10 text-brand px-4 py-1.5 rounded-full w-fit">
+                  <BadgeCheck className="text-lg" />
+                  <span className="text-xs font-bold uppercase tracking-wider">Top Rated Placement Cell</span>
+                </div>
+                <h1 className="text-3xl md:text-5xl lg:text-7xl font-black leading-tight tracking-tight">
+                  Empowering Careers at <span className="text-brand">RGI</span>
+                </h1>
+                <p className="text-[14px] md:text-lg text-muted-foreground max-w-lg leading-relaxed">
+                  Connecting top-tier talent with global industry leaders. Join our legacy of excellence and secure your future with world-className opportunities.
+                </p>
+                <div className="flex flex-wrap gap-2 md:gap-4">
+                  <button className="bg-brand text-white px-6 py-2.5 rounded-xl text-base font-bold flex items-center gap-2 hover:scale-105 transition-transform">
+                    Hire from Us <MoveRight />
+                  </button>
+                  <button className="bg-background border-2 border-brand/20 text-foreground px-6 py-2.5 rounded-xl text-base font-bold hover:bg-surface transition-colors">
+                    Student Portal
+                  </button>
+                </div>
               </div>
-              <h1 className="text-5xl lg:text-7xl font-black leading-tight tracking-tight">
-                Empowering Careers at <span className="text-brand">RGI</span>
-              </h1>
-              <p className="text-lg text-muted-foreground max-w-lg leading-relaxed">
-                Connecting top-tier talent with global industry leaders. Join our legacy of excellence and secure your future with world-className opportunities.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <button className="bg-brand text-white px-8 py-4 rounded-xl text-base font-bold flex items-center gap-2 hover:scale-105 transition-transform">
-                  Hire from Us <MoveRight className="material-symbols-outlined" />
-                </button>
-                <button className="bg-background border-2 border-brand/20 text-foreground px-8 py-4 rounded-xl text-base font-bold hover:bg-surface transition-colors">
-                  Student Portal
-                </button>
-              </div>
-            </div>
-            <div className="order-1 lg:order-2 flex flex-col gap-5">
-              <div className="md:hidden inline-flex items-center gap-2 bg-brand/10 text-brand px-4 py-1.5 rounded-full w-fit">
-                <BadgeCheck className="text-lg" />
-                <span className="text-xs font-bold uppercase tracking-wider">Top Rated Placement Cell</span>
-              </div>
-              <div className="relative group">
-                <div className="absolute -inset-4 bg-brand/20 rounded-3xl blur-2xl group-hover:bg-brand/30 transition-all"></div>
-                <div className="relative h-112.5 w-full rounded-2xl bg-cover bg-center shadow-2xl overflow-hidden border-4 border-background" data-alt="Modern college campus students collaborating outdoors" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuBIVPJ6bv7Dr7lCEYqnwXx2t5FSUvVVJgGETqGWiAnivZer2aB87kt_HLiLPDt21HDlVDz8VsoaU6Ndo3QrsOqWBkHLzvp_lqpnUppw5BcFfjcLKCRAkiFxoux2y4go15GQUt0lPo3SukxGG7brmhc5VyesFUCdQe2SK_GCCXnRFTml0yTzr9G94J-eKXgGRDHi0GAUnNj4V9R1QWLhShBOwsV-arIw46WqYP6Paax2cpoZvE5npGQZscSCV3LVb_M9c0SN0zA4DA)" }}>
+              <div className="order-1 lg:order-2 flex flex-col gap-5">
+                <div className="md:hidden inline-flex items-center gap-2 bg-brand/10 text-brand px-4 py-1.5 rounded-full w-fit">
+                  <BadgeCheck className="text-lg" />
+                  <span className="text-xs font-bold uppercase tracking-wider">Top Rated Placement Cell</span>
+                </div>
+                <div className="relative group">
+                  <div className="absolute -inset-4 bg-brand/20 rounded-3xl blur-2xl group-hover:bg-brand/30 transition-all"></div>
+                  <div className="relative h-112.5 w-full rounded-2xl bg-cover bg-center shadow-2xl overflow-hidden border-4 border-background" data-alt="Modern college campus students collaborating outdoors" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuBIVPJ6bv7Dr7lCEYqnwXx2t5FSUvVVJgGETqGWiAnivZer2aB87kt_HLiLPDt21HDlVDz8VsoaU6Ndo3QrsOqWBkHLzvp_lqpnUppw5BcFfjcLKCRAkiFxoux2y4go15GQUt0lPo3SukxGG7brmhc5VyesFUCdQe2SK_GCCXnRFTml0yTzr9G94J-eKXgGRDHi0GAUnNj4V9R1QWLhShBOwsV-arIw46WqYP6Paax2cpoZvE5npGQZscSCV3LVb_M9c0SN0zA4DA)" }}>
+                  </div>
                 </div>
               </div>
             </div>
@@ -62,7 +64,7 @@ export default function Home() {
         </section>
 
         {/* Leadership Section */}
-        <section className="py-24 px-6 lg:px-20 max-w-7xl mx-auto" id="about">
+        <section className="py-24 px-3 lg:px-20 max-w-7xl mx-auto" id="about">
           <motion.div
             {...fadeIn}
             className="bg-card/80 backdrop-blur-[3px] rounded-2xl shadow-xl overflow-hidden border border-brand/5"
@@ -79,64 +81,66 @@ export default function Home() {
               <div className="lg:w-2/3 p-8 lg:p-16 flex flex-col justify-center">
                 <div className="mb-8">
                   <Quote className="text-brand w-12 h-12 mb-4" />
-                  <h2 className="text-3xl font-bold mb-2">Director&apos;s Message</h2>
+                  <h2 className="text-2xl md:text-3xl font-bold mb-2">Director&apos;s Message</h2>
                   <p className="text-brand font-semibold text-lg">Robin Samuel, Director (T&P)</p>
                 </div>
-                <p className="text-muted-foreground text-lg leading-relaxed mb-8 italic">
-                  &quot;Welcome to the gateway of professional excellence. At Radharaman Group, our commitment is to bridge the gap between academic brilliance and global corporate requirements. We don&apos;t just place students; we architect careers by fostering an environment of continuous learning and industry exposure.&quot;
+                <p className="text-muted-foreground text-[13px] md:text-lg leading-relaxed mb-8 italic">
+                  &quotWelcome to the gateway of professional excellence. At Radharaman Group, our commitment is to bridge the gap between academic brilliance and global corporate requirements. We don&apost just place students we architect careers by fostering an environment of continuous learning and industry exposure.&quot
                 </p>
-                <div className="flex gap-4">
-                  <div className="h-px bg-brand/20 flex-1 self-center"></div>
-                  <button className="text-brand font-bold hover:underline">Read Full Message</button>
-                </div>
               </div>
             </div>
           </motion.div>
         </section>
 
         {/* Placement Team Grid */}
-        <section className="max-w-7xl mx-auto px-6 lg:px-20 py-16">
+        <section className="max-w-7xl mx-auto px-3 lg:px-20 py-16">
           <div className="flex justify-between items-end mb-12">
             <div>
-              <h2 className="text-3xl font-bold mb-2" >The Placement Team</h2>
-              <p className="text-slate-500" >The dedicated minds behind our student success.</p>
+              <h2 className="text-3xl md:text-4xl font-bold mb-2" >The Placement Team</h2>
+              <p className="text-slate-500 text-xs md:text-lg" >The dedicated minds behind our student success.</p>
             </div>
-            <button className="text-brand font-bold flex items-center gap-1" >View All <ChevronRight className="text-brand" /></button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="flex items-end justify-end mb-5">
+          <button className="text-brand font-bold flex items-center gap-1 " >View All <ChevronRight className="text-brand" /></button>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 md:gap-5 gap-3">
             {/* <!-- Card 1 --> */}
-            <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-brand/5 shadow-md hover:shadow-xl transition-shadow group">
-              <div className="h-40 w-full rounded-xl bg-cover bg-top mb-4 group-hover:scale-105 transition-transform" data-alt="Female staff member profile" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuCwfoJsfJpSlw13cw9oHHcBFpUmlThTV4dahXFh0Qj0CAh37D3VkPF5Vy1WZ84fBrK27NKLkXJe9RdG7AK2_YVd56NxRE4WEisDxlGzpaHsjKPTDR4U181mIlvvE1U5v6IWNlaG_DgTioYwka5jHwh_pve2IGBpiChT2QMrlz4k151kkJSQh6DP0UchBMNC4_S69_b1AMPjNTlMUv9w1e1pD9_ibxhXkKedP9XEQnEHpH6UEZbIhd1RaiUAIFn7iUNBNm1Piuq4rA);" }}></div>
-              <h3 className="font-bold text-lg" >Dr. Anjali Sharma</h3>
-              <p className="text-brand text-sm font-medium mb-4" >Corporate Relations</p>
-              <button className="w-full py-2 rounded-lg border border-brand/20 text-xs font-bold uppercase tracking-wider hover:bg-brand hover:text-white transition-colors" >Connect</button>
+            <div className="bg-white dark:bg-slate-900 rounded-xl hover:scale-105 border overflow-hidden border-brand/5 shadow-md hover:shadow-xl transition-shadow group">
+              <div className="aspect-2.5/3 bg-cover bg-top mb-4 transition-transform" data-alt="Female staff member profile" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuCwfoJsfJpSlw13cw9oHHcBFpUmlThTV4dahXFh0Qj0CAh37D3VkPF5Vy1WZ84fBrK27NKLkXJe9RdG7AK2_YVd56NxRE4WEisDxlGzpaHsjKPTDR4U181mIlvvE1U5v6IWNlaG_DgTioYwka5jHwh_pve2IGBpiChT2QMrlz4k151kkJSQh6DP0UchBMNC4_S69_b1AMPjNTlMUv9w1e1pD9_ibxhXkKedP9XEQnEHpH6UEZbIhd1RaiUAIFn7iUNBNm1Piuq4rA)" }}></div>
+              <div className="ml-2">
+              <h3 className="font-bold text-sm md:text-lg" >Dr. Anjali Sharma</h3>
+              <p className="text-brand text-xs md:text-sm font-medium mb-4" >Corporate Relations</p>
+              </div>
             </div>
             {/* <!-- Card 2 --> */}
-            <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-brand/5 shadow-md hover:shadow-xl transition-shadow group">
-              <div className="h-40 w-full rounded-xl bg-cover bg-top mb-4 group-hover:scale-105 transition-transform" data-alt="Male staff member profile" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuAlBGcrKwosCrkAFG1qE2hMewRAhTS-EYKa7SX5VzKmhlBmcIztS0GsQ0_Rgz9VISZXklQKDWvsxaR_LvJAkVsHULlHlXfyZ4nWerTDPLdIe3qjX8LxGmJ3zuGiOPazUvP0C2eJvz1M6jzY3GQqrki-7wjTCNTNln4d3_JSSh3Es0CreOhKnzrPJfaIyqQ8jMSk_X8uCLGzJoYfiYyXC4HpIGJ7IJ-ERWVMjRjgv78yuEYpx2COfNFV579HNLl8x406i5IuTeIzAA);" }}></div>
-              <h3 className="font-bold text-lg" >Vikram Malhotra</h3>
-              <p className="text-brand text-sm font-medium mb-4" >Technical Trainer</p>
-              <button className="w-full py-2 rounded-lg border border-brand/20 text-xs font-bold uppercase tracking-wider hover:bg-brand hover:text-white transition-colors" >Connect</button>
+            <div className="bg-white dark:bg-slate-900 rounded-xl overflow-hidden border hover:scale-105 border-brand/5 shadow-md hover:shadow-xl transition-shadow group">
+              <div className="aspect-2.5/3 bg-cover bg-top mb-4 transition-transform" data-alt="Male staff member profile" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuAlBGcrKwosCrkAFG1qE2hMewRAhTS-EYKa7SX5VzKmhlBmcIztS0GsQ0_Rgz9VISZXklQKDWvsxaR_LvJAkVsHULlHlXfyZ4nWerTDPLdIe3qjX8LxGmJ3zuGiOPazUvP0C2eJvz1M6jzY3GQqrki-7wjTCNTNln4d3_JSSh3Es0CreOhKnzrPJfaIyqQ8jMSk_X8uCLGzJoYfiYyXC4HpIGJ7IJ-ERWVMjRjgv78yuEYpx2COfNFV579HNLl8x406i5IuTeIzAA)" }}></div>
+              <div className="ml-2">
+              <h3 className="font-bold text-sm md:text-lg" >Vikram Malhotra</h3>
+              <p className="text-brand text-xs md:text-sm font-medium mb-4" >Technical Trainer</p>
+            </div>
             </div>
             {/* <!-- Card 3 --> */}
-            <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-brand/5 shadow-md hover:shadow-xl transition-shadow group">
-              <div className="h-40 w-full rounded-xl bg-cover bg-top mb-4 group-hover:scale-105 transition-transform" data-alt="Female student volunteer" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuBvMtr2p2ngRt9hK1Jn6FrV4XHZlxx9MzK655JpTskmWj_hS4QAP6MX1VA4MFE8Po0VpwOr8M6vd2CZaeq3Da1fYO-6cMzMVaSOKbqJaXyP-O3kiQo3iYP7wqUb7DB_j3HahZcUqeW8hCdtz_hdJPm_ocN6cwLxwCbPVw2mnl-cwSyCjX8jq6bXiu_yHsaYt6HTLHOztoOuHm-Lym8KraBLLFh8MDKLUuBBxjG9xv1dbyZvYdy2Mqj-_EohWc67WEV4fgoYMBFSSQ);" }}></div>
-              <h3 className="font-bold text-lg" >Neha Singh</h3>
-              <p className="text-brand text-sm font-medium mb-4" >Student Lead</p>
-              <button className="w-full py-2 rounded-lg border border-brand/20 text-xs font-bold uppercase tracking-wider hover:bg-brand hover:text-white transition-colors" >Connect</button>
+            <div className="bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-brand/5 shadow-md hover:shadow-xl transition-shadow group">
+              <div className="aspect-2.5/3 bg-cover bg-top mb-4 group-hover:scale-105 transition-transform" data-alt="Female student volunteer" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuBvMtr2p2ngRt9hK1Jn6FrV4XHZlxx9MzK655JpTskmWj_hS4QAP6MX1VA4MFE8Po0VpwOr8M6vd2CZaeq3Da1fYO-6cMzMVaSOKbqJaXyP-O3kiQo3iYP7wqUb7DB_j3HahZcUqeW8hCdtz_hdJPm_ocN6cwLxwCbPVw2mnl-cwSyCjX8jq6bXiu_yHsaYt6HTLHOztoOuHm-Lym8KraBLLFh8MDKLUuBBxjG9xv1dbyZvYdy2Mqj-_EohWc67WEV4fgoYMBFSSQ)" }}></div>
+              <div className="ml-2">
+              <h3 className="font-bold text-sm md:text-lg" >Neha Singh</h3>
+              <p className="text-brand text-xs md:text-sm font-medium mb-4" >Student Lead</p>
+            </div>
             </div>
             {/* <!-- Card 4 --> */}
-            <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-brand/5 shadow-md hover:shadow-xl transition-shadow group">
-              <div className="h-40 w-full rounded-xl bg-cover bg-top mb-4 group-hover:scale-105 transition-transform" data-alt="Male student volunteer" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuDcieaOwaB_8kavE_tydgpoKCMmW8zgXo46rbL1ABkBG2Xl4Ugae-0S9ZfXIhXGD86rFKMPXpNiw_XsXOlrp4KlaL87K1DgrihXRXIQqxow3qW_fXec3xCOiOGV8TeBp5dhzAlRguHWBBmJJj2xqUdmMvJ_VwzkhQoYKarT-AjNU_9KDusbNsiA6i9S1dt0RwqUepiImzSPwAq8IzU1sXLpDl88wppHQdcrIsM3jwFOxaA3PtZXtNmtclNuTgVmxZeNOH_yFkBJFA);" }}></div>
-              <h3 className="font-bold text-lg" >Rahul Verma</h3>
-              <p className="text-brand text-sm font-medium mb-4" >Event Coordinator</p>
-              <button className="w-full py-2 rounded-lg border border-brand/20 text-xs font-bold uppercase tracking-wider hover:bg-brand hover:text-white transition-colors" >Connect</button>
+            <div className="bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-brand/5 shadow-md hover:shadow-xl transition-shadow group">
+              <div className="aspect-2.5/3 bg-cover bg-top mb-4 group-hover:scale-105 transition-transform" data-alt="Male student volunteer" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuDcieaOwaB_8kavE_tydgpoKCMmW8zgXo46rbL1ABkBG2Xl4Ugae-0S9ZfXIhXGD86rFKMPXpNiw_XsXOlrp4KlaL87K1DgrihXRXIQqxow3qW_fXec3xCOiOGV8TeBp5dhzAlRguHWBBmJJj2xqUdmMvJ_VwzkhQoYKarT-AjNU_9KDusbNsiA6i9S1dt0RwqUepiImzSPwAq8IzU1sXLpDl88wppHQdcrIsM3jwFOxaA3PtZXtNmtclNuTgVmxZeNOH_yFkBJFA)" }}></div>
+              <div className="ml-2">
+              <h3 className="font-bold text-sm md:text-lg" >Rahul Verma</h3>
+              <p className="text-brand text-xs md:text-sm font-medium mb-4" >Event Coordinator</p>
+            </div>
             </div>
           </div>
         </section>
 
         {/* Stakeholder Sections */}
-        <section className="py-24 px-6 lg:px-20 max-w-7xl mx-auto">
+        <section className="py-24 px-3 lg:px-20 max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {[
               {
@@ -184,76 +188,76 @@ export default function Home() {
 
         {/* Recruiters Section */}
         <section className="bg-brand/5 py-24" id="alumni">
-          <div className="max-w-7xl mx-auto px-6 lg:px-20">
+          <div className="max-w-7xl mx-auto px-3 lg:px-20">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold mb-4" >Voices of Success</h2>
               <p className="text-slate-500 max-w-2xl mx-auto" >Hear from our alumni who are now leading the tech world from top global corporations.</p>
             </div>
             {/* <!-- Redesigned Card 1 --> */}
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-white dark:bg-slate-900 p-10 rounded-3xl shadow-sm border border-brand/10 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center group">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-8">
+              <div className="bg-white dark:bg-slate-900 p-4 md:p-10 rounded-3xl shadow-sm border border-brand/10 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center group">
                 <div className="w-32 h-32 rounded-full bg-cover bg-center mb-6 ring-4 ring-brand/10 group-hover:ring-brand/30 transition-all" data-alt="Alumni testimonial female" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuD-4qpQG9rSHLujKoHhrbgWRAg81sFBu41MDA54QQ14Y6yYxoww19N7Hs6lybLRgvZCg5yNw-06wJ8p2GwAuZrN9ytupLwK1aRZSm47WIYXx5ld9vONPYIsuhD5KGlStRJhFuJTFHl_Hc-t-2CxveYwpsep0lUKrYPz6ghsEv9_r2NE8H2tzkba6XLY91OoOHMGHGA4iF6n7TtSxX_Dr3zeJ206-8b6lxuPWVgO5R0mihIiXboKj1OEPXe_2qH9vxxFdK4gE9e5YQ')" }}></div>
                 <div className="mb-6">
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">Sanjana Gupta</h3>
-                  <p className="text-sm text-brand font-semibold uppercase tracking-wider">SDE at Amazon</p>
+                  <h3 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white">Sanjana Gupta</h3>
+                  <p className="text-xs md:text-sm text-brand font-semibold uppercase tracking-wider">SDE at Amazon</p>
                 </div>
-                <div className="relative px-4">
-                  <Quote className="text-brand/20 text-4xl absolute -top-4 -left-2"/>
-                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed italic">"The training programs at Radharaman were pivotal in helping me crack the Amazon interview. The technical mock drills and soft skills sessions were exactly what I needed."</p>
+                <div className="relative px-1 md:px-4">
+                  <Quote className="text-brand/60  md:text-4xl absolute -top-5 -left-2" />
+                  <p className="text-slate-600 text-xs md:text-md dark:text-slate-400 leading-relaxed italic">"The training programs at Radharaman were pivotal in helping me crack the Amazon interview. The technical mock drills and soft skills sessions were exactly what I needed."</p>
                 </div>
               </div>
               {/* <!-- Redesigned Card 2 --> */}
-              <div className="bg-white dark:bg-slate-900 p-10 rounded-3xl shadow-sm border border-brand/10 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center group">
-                <div className="w-32 h-32 rounded-full bg-cover bg-center mb-6 ring-4 ring-brand/10 group-hover:ring-brand/30 transition-all" data-alt="Alumni testimonial male" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBrv34Kah0CGQEmqlZfoy65dpzIBk9AxbLDjz6yNdzXV7SPD2XQB2Vl6LLzSr3hWUzpyUnYkY9udiyz1RrCsMnK0FAWkPLW10rTDgTHD-jbPsLlY1ER_8hH0oBn-Vhtf9ZG9-1haNsor-0FPBSg92DGsUo2qhV81IDAt9ymVIHGE_UDzNtrKaKPz3AnzxDxptY3iSmBWWAmAnwg3IzYSLrPx9SKmB_EGkz6ZyzLdWxGEB2zzz8HdUZcx_6Cn5qZpfXhnWXTplGNvQ');" }}></div>
+              <div className="bg-white dark:bg-slate-900 p-4 md:p-10 rounded-3xl shadow-sm border border-brand/10 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center group">
+                <div className="w-32 h-32 rounded-full bg-cover bg-center mb-6 ring-4 ring-brand/10 group-hover:ring-brand/30 transition-all" data-alt="Alumni testimonial male" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBrv34Kah0CGQEmqlZfoy65dpzIBk9AxbLDjz6yNdzXV7SPD2XQB2Vl6LLzSr3hWUzpyUnYkY9udiyz1RrCsMnK0FAWkPLW10rTDgTHD-jbPsLlY1ER_8hH0oBn-Vhtf9ZG9-1haNsor-0FPBSg92DGsUo2qhV81IDAt9ymVIHGE_UDzNtrKaKPz3AnzxDxptY3iSmBWWAmAnwg3IzYSLrPx9SKmB_EGkz6ZyzLdWxGEB2zzz8HdUZcx_6Cn5qZpfXhnWXTplGNvQ')" }}></div>
                 <div className="mb-6">
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">Arjun Kapoor</h3>
-                  <p className="text-sm text-brand font-semibold uppercase tracking-wider">Lead Engineer at Google</p>
+                  <h3 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white">Arjun Kapoor</h3>
+                  <p className="md:text-sm text-xs text-brand font-semibold uppercase tracking-wider">Lead Engineer at Google</p>
                 </div>
-                <div className="relative px-4">
-                  <Quote className="material-symbols-outlined text-brand/20 text-4xl absolute -top-4 -left-2"/>
-                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed italic">"From campus to corporate, the transition was seamless thanks to the T&amp;P cell. They focus on holistic development, not just coding."</p>
+                <div className="relative px-1 md:px-4">
+                  <Quote className="material-symbols-outlined text-brand/60 text-4xl absolute -top-5 -left-2" />
+                  <p className="text-slate-600 md:text-md text-xs dark:text-slate-400 leading-relaxed italic">"From campus to corporate, the transition was seamless thanks to the T&ampP cell. They focus on holistic development, not just coding."</p>
                 </div>
               </div>
               {/* <!-- Redesigned Card 3 --> */}
-              <div className="bg-white dark:bg-slate-900 p-10 rounded-3xl shadow-sm border border-brand/10 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center group">
-                <div className="w-32 h-32 rounded-full bg-cover bg-center mb-6 ring-4 ring-brand/10 group-hover:ring-brand/30 transition-all" data-alt="Alumni testimonial female 2" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAdNzMEkFXCh6aRMNjJQy86ehkYbxa40o8KnpPF7c9Vub7mdqmCc3oRnfIWG-ey6P7C54GbGvHh7QLDx81w7B7c-F5tid0JSio10kM9mtaJ3LAcH_8Q-kr6RtEVMFrfIcBSTQ14pWxzCXnCXtBIV0oQsZlv4Xh51Wejwz6ZQTIZ3MPbqwIPHCr1BZue1EAByYYgWeDxd5oeP6pBPlDamFhjlt8sw_oiuaIm2RaEESu87WSmdwOfrWq6ZpqJfRgvZyNTqJRJwH7eig');" }}></div>
+              <div className="bg-white dark:bg-slate-900 p-4 md:p-10 rounded-3xl shadow-sm border border-brand/10 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center group">
+                <div className="w-32 h-32 rounded-full bg-cover bg-center mb-6 ring-4 ring-brand/10 group-hover:ring-brand/30 transition-all" data-alt="Alumni testimonial female 2" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAdNzMEkFXCh6aRMNjJQy86ehkYbxa40o8KnpPF7c9Vub7mdqmCc3oRnfIWG-ey6P7C54GbGvHh7QLDx81w7B7c-F5tid0JSio10kM9mtaJ3LAcH_8Q-kr6RtEVMFrfIcBSTQ14pWxzCXnCXtBIV0oQsZlv4Xh51Wejwz6ZQTIZ3MPbqwIPHCr1BZue1EAByYYgWeDxd5oeP6pBPlDamFhjlt8sw_oiuaIm2RaEESu87WSmdwOfrWq6ZpqJfRgvZyNTqJRJwH7eig')" }}></div>
                 <div className="mb-6">
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">Meera Iyer</h3>
-                  <p className="text-sm text-brand font-semibold uppercase tracking-wider">Analyst at Microsoft</p>
+                  <h3 className="md:text-xl text-lg font-bold text-slate-900 dark:text-white">Meera Iyer</h3>
+                  <p className="md:text-sm text-xs text-brand font-semibold uppercase tracking-wider">Analyst at Microsoft</p>
                 </div>
-                <div className="relative px-4">
-                  <Quote className="material-symbols-outlined text-brand/20 text-4xl absolute -top-4 -left-2"/>
-                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed italic">"The constant support from mentors and the wide range of visiting companies give students an unparalleled edge in the job market."</p>
+                <div className="relative px-1 md:px-4">
+                  <Quote className="material-symbols-outlined text-brand/60 text-4xl absolute -top-5 -left-2" />
+                  <p className="text-slate-600 md:text-md text-xs dark:text-slate-400 leading-relaxed italic">"The constant support from mentors and the wide range of visiting companies give students an unparalleled edge in the job market."</p>
                 </div>
               </div></div>
           </div>
         </section>
 
         {/* Memories Gallery */}
-        <section className="max-w-7xl mx-auto px-6 lg:px-20 py-24">
+        <section className="max-w-7xl mx-auto px-3 lg:px-20 py-24">
           <h2 className="text-4xl font-bold mb-12 text-center" >Life at Radharaman <span className="text-brand" >Placements</span></h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[200px]">
             <div className="col-span-2 row-span-2 rounded-2xl overflow-hidden relative group">
               <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Students celebrating job offers together" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC97PRhCgez5vt9saBg50a81NQl00I3X5oJekFcGncJ_rtn8lGAgg0R5rdfYKEJss12iI-MMSMIJO_5AAP8QVSVr4zN2sO4g-9DOSXkB3RmfbmhlPbFvFqLoOogUPSE6F3YveI_u4x8HKjtV1sfoBlbGstnVLEwiyLJLa2iTEAzgj0KRt5wgCCIJJNXoVXvwYpHWFpKlJf0wQX6LSTDrTEVnC8Aky63CuM1Q7s_mp2WIs1HYWn-q6LmaA5trwzhCtdW31OdBgx7zw" />
-              <div className="absolute inset-0 bg-linear-to-t from-brand/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+              <div className="absolute inset-0 bg-linear-to-t from-brand/70 via-brand/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
                 <p className="text-white font-bold" >Success Celebration 2023</p>
               </div>
             </div>
             <div className="rounded-2xl overflow-hidden relative group">
               <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Professional workshop session" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDh6hS3y3An0YD7BtmPrJjDJy3QqxeWstYyROERKY0bxcMmfi3NtKSgBtciSNen085rHJLes5JrTcoA5T4Vf2WNw2IM8kRVvRLyoasWkdNmfAov8REckXa_OE0be3DmEtrTvkNzzfew3SjV3XPxzdopBINZ2o5vzBcqR7jYZez5IOP6LzmIYnvjp5gPQWTS5tYpBwlhyiNkgeN9P4YOck_f3zhTSgxGGAeIEWsTG4EcdZH06oT7Si25K0FozYFtqQkSJaOn-hOc8g" />
-              <div className="absolute inset-0 bg-linear-to-t from-brand/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+              <div className="absolute inset-0 bg-linear-to-t from-brand/70 via-brand/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
                 <p className="text-white text-xs font-bold" >Industry Workshop</p>
               </div>
             </div>
             <div className="rounded-2xl overflow-hidden relative group">
               <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Group of students at career fair" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfVL3bulkTn6s12N7oW80mh_GCLiSw_N7D4kSqzKOmW9UHhtz4eYA_dhYsnps6YBYyPDyK0b-VMfNHvHKsuz-q-4Wk3Oc1PfptLnBo8ms3ccnPWg14Cr7W6TOLNLmFWLeOvI30Uq3He2J8U-RWMqUpyfHiREvsA6uZZbhREsPCNnQJdqXfkBPrrT1a4qAvXr223gUxvoPH1wBvSTbad54mHToce10X7mwyZxOZYFstCQ1mfxW6UAe08UBm07ZZmtcUgM4KOPtGiQ" />
-              <div className="absolute inset-0 bg-linear-to-t from-brand/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+              <div className="absolute inset-0 bg-linear-to-t from-brand/70 via-brand/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
                 <p className="text-white text-xs font-bold" >Career Fair</p>
               </div>
             </div>
             <div className="col-span-2 rounded-2xl overflow-hidden relative group">
               <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Corporate training meeting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTeMzT5fUnQNwQOk4-MtK4UKshACdx6vF5j3zM4xwJfWNXxO2LO9g37Nht5WGURIQCVpgw01qsuzaTli-rQkFp6_jc6PldL-Hpf43BoLX0IzXAY40OB3SudgNuAraLAVrJZjEdqdoj79narEEugwtM0OeghOU_Mggn4GTVSRHnsRfrzmzTZHeSi-9ndWU0iJYDWdBTVUAJV9uzq6lGBKYeXnGQIq1ziSdTYOhys206aN2QueMgXLfOFykuUFLCXSLK6WND8phzXg" />
-              <div className="absolute inset-0 bg-linear-to-t from-brand/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+              <div className="absolute inset-0 bg-linear-to-t from-brand/70 via-brand/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
                 <p className="text-white font-bold" >Corporate Mentorship</p>
               </div>
             </div>
@@ -261,11 +265,11 @@ export default function Home() {
         </section>
 
         {/* Feedback Section — Now theme-aware */}
-        <section className="bg-surface/30 py-24 px-6 lg:px-20 border-y border-border" id="feedback">
+        <section className="bg-surface/30 py-24 px-5 lg:px-20 border-y border-border" id="feedback">
           <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div>
-              <h2 className="text-4xl font-bold mb-6">Student & Recruiter Feedback</h2>
-              <p className="text-muted-foreground text-lg mb-10">We value your input. Whether you&apos;re a student who recently got placed or a recruiter who visited our campus, let us know about your experience.</p>
+              <h2 className="text-4xl font-bold mb-6">Feedback</h2>
+              <p className="text-muted-foreground text-sm md:text-lg mb-10">We value your input. Whether you&aposre a student who recently got placed or a recruiter who visited our campus, let us know about your experience.</p>
               <div className="space-y-8">
                 <div className="flex gap-4">
                   <div className="w-12 h-12 bg-brand/20 rounded-lg flex items-center justify-center shrink-0">
@@ -297,6 +301,7 @@ export default function Home() {
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Category</label>
                     <select className="w-full bg-surface border border-border rounded-lg focus:ring-2 focus:ring-brand p-3 text-foreground">
+                      <option disabled >Select</option>
                       <option>Student</option>
                       <option>Recruiter</option>
                       <option>Alumni</option>
@@ -323,5 +328,5 @@ export default function Home() {
       {/* Footer — Now theme-aware */}
       <Footer />
     </div>
-  );
+  )
 }
