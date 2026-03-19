@@ -47,13 +47,13 @@ export default function Footer() {
                 <p>Ratibad Road, Bhopal,</p>
                 <p>Madhya Pradesh 462044</p>
                 <p>+91 755 2477777</p>
-                <p>placements@radharamanbhopal.com</p>
+                <p>tpo@radharaman.com</p>
               </address>
             </div>
           </div>
         </div>
         <div className="max-w-7xl mx-auto pt-16 mt-16 border-t border-border text-center text-xs text-muted-foreground">
-          <p>&copy; 2024 Radharaman Group of Institutes. All rights reserved. Designed for Excellence.</p>
+          <p>&copy; 2026 Radharaman Group of Institutes. All rights reserved. Designed for Excellence.</p>
         </div>
       </footer>
   )

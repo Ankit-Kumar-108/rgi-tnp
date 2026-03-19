@@ -198,7 +198,7 @@ export default function Home() {
                   <p className="text-sm text-brand font-semibold uppercase tracking-wider">SDE at Amazon</p>
                 </div>
                 <div className="relative px-4">
-                  <span className="material-symbols-outlined text-brand/20 text-4xl absolute -top-4 -left-2">format_quote</span>
+                  <Quote className="text-brand/20 text-4xl absolute -top-4 -left-2"/>
                   <p className="text-slate-600 dark:text-slate-400 leading-relaxed italic">"The training programs at Radharaman were pivotal in helping me crack the Amazon interview. The technical mock drills and soft skills sessions were exactly what I needed."</p>
                 </div>
               </div>
@@ -210,7 +210,7 @@ export default function Home() {
                   <p className="text-sm text-brand font-semibold uppercase tracking-wider">Lead Engineer at Google</p>
                 </div>
                 <div className="relative px-4">
-                  <span className="material-symbols-outlined text-brand/20 text-4xl absolute -top-4 -left-2">format_quote</span>
+                  <Quote className="material-symbols-outlined text-brand/20 text-4xl absolute -top-4 -left-2"/>
                   <p className="text-slate-600 dark:text-slate-400 leading-relaxed italic">"From campus to corporate, the transition was seamless thanks to the T&amp;P cell. They focus on holistic development, not just coding."</p>
                 </div>
               </div>
@@ -222,7 +222,7 @@ export default function Home() {
                   <p className="text-sm text-brand font-semibold uppercase tracking-wider">Analyst at Microsoft</p>
                 </div>
                 <div className="relative px-4">
-                  <span className="material-symbols-outlined text-brand/20 text-4xl absolute -top-4 -left-2">format_quote</span>
+                  <Quote className="material-symbols-outlined text-brand/20 text-4xl absolute -top-4 -left-2"/>
                   <p className="text-slate-600 dark:text-slate-400 leading-relaxed italic">"The constant support from mentors and the wide range of visiting companies give students an unparalleled edge in the job market."</p>
                 </div>
               </div></div>
