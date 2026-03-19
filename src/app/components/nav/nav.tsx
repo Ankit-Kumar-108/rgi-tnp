@@ -25,9 +25,9 @@ export default function Nav() {
             <Link className="text-sm font-medium hover:text-brand transition-colors" href="#recruiters">Recruiters</Link>
             <Link className="text-sm font-medium hover:text-brand transition-colors" href="#memories">Memories</Link>
             <Link className="text-sm font-medium hover:text-brand transition-colors" href="#feedback">Feedback</Link>
-          <AnimatedThemeToggler />
           </div>
-          <button className="bg-brand text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-brand/90 transition-all shadow-lg shadow-brand/20">
+          <AnimatedThemeToggler />
+          <button className="bg-brand text-white px-3 py-2 rounded-lg text-sm font-bold hover:bg-brand/90 transition-all shadow-lg shadow-brand/20">
             Contact Us
           </button>
         </div>
