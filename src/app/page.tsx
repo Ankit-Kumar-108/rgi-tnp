@@ -12,12 +12,6 @@ import {
 import Nav from "./components/nav/nav"
 import Footer from "./components/footer/footer"
 export default function Home() {
-  const fadeIn = {
-    initial: { opacity: 0, y: 20 },
-    whileInView: { opacity: 1, y: 0 },
-    viewport: { once: true },
-    transition: { duration: 0.6 }
-  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -63,11 +57,10 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Leadership Section */}
-        <section className="py-24 px-3 lg:px-20 max-w-7xl mx-auto" id="about">
-          <motion.div
-            {...fadeIn}
-            className="bg-card/80 backdrop-blur-[3px] rounded-2xl shadow-xl overflow-hidden border border-brand/5"
+        {/* Director's Section */}
+        <section className="py-24 px-6 lg:px-20 max-w-7xl mx-auto" id="about">
+          <div
+            className="bg-card/80 backdrop-blur-[3px] rounded-2xl shadow-md hover:shadow-xl overflow-hidden border border-brand/5 hover:scale-105 transition-all duration-300"
           >
             <div className="flex flex-col lg:flex-row">
               <div className="lg:w-1/3 aspect-square lg:aspect-auto">
@@ -80,18 +73,45 @@ export default function Home() {
               </div>
               <div className="lg:w-2/3 p-8 lg:p-16 flex flex-col justify-center">
                 <div className="mb-8">
-                  <Quote className="text-brand w-12 h-12 mb-4" />
                   <h2 className="text-2xl md:text-3xl font-bold mb-2">Director&apos;s Message</h2>
-                  <p className="text-brand font-semibold text-lg">Robin Samuel, Director (T&P)</p>
+                  <p className="text-brand font-semibold text-lg">James Kuttappan, Director (T&P)</p>
                 </div>
+                  <Quote className="text-brand text-5xl mb-4" />
                 <p className="text-muted-foreground text-[13px] md:text-lg leading-relaxed mb-8 italic">
-                  &quotWelcome to the gateway of professional excellence. At Radharaman Group, our commitment is to bridge the gap between academic brilliance and global corporate requirements. We don&apost just place students we architect careers by fostering an environment of continuous learning and industry exposure.&quot
+                  &quot;Welcome to the gateway of professional excellence. At Radharaman Group, our commitment is to bridge the gap between academic brilliance and global corporate requirements. We don&apost just place students we architect careers by fostering an environment of continuous learning and industry exposure.&quot;
                 </p>
               </div>
             </div>
-          </motion.div>
+          </div>
         </section>
 
+        {/* Deputy Director's Section */}
+        <section className="pb-24 px-6 lg:px-20 max-w-7xl mx-auto">
+          <div
+          className="bg-white dark:bg-card/80 rounded-2xl shadow-md hover:shadow-xl overflow-hidden border border-brand/5 hover:scale-105 transition-all duration-300">
+            <div className="flex flex-col lg:flex-row-reverse">
+              <div className="lg:w-1/3 aspect-square lg:aspect-auto">
+                <img 
+                alt="Deputy Director T&amp;P" 
+                className="w-full h-full object-cover" 
+                data-alt="Professional portrait of Deputy Director in business attire" 
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIBYviOOWoEn1D6xTyYMluquzqttL4SCoQ8YTdPoSTTNYQLCqya8DiCAs66JmTJiHyRmHxUpVjA4GCYy4fhForyUeFzidpP8yNMIkHu_oaQRp9Krmp-Gz1K9nwFA-4vEgEubQQch8uCbxjl-ImtNgvWcFKvMoDY-gPzvpkp5HvSUSDe_vCwfaHUk_I7xlMHmS6Z4yoMHaYo8erwwh2Y4C_p5eHMCF4UEtWfpnKSjQrYRwDmJRAQhUxaICeli4FyMR5td48o8_nWg"
+                referrerPolicy="no-referrer" 
+                />
+              </div>
+              <div className="lg:w-2/3 p-8 lg:p-16 flex flex-col justify-center">
+                <div className="mb-8">
+                  <h2 className="text-2xl md:text-3xl font-bold mb-2">Dy Director's Message</h2>
+                  <p className="text-brand font-semibold text-lg">Robin P. Samuel, Dy Director (T&amp;P)</p>
+                </div>
+                <Quote className="text-brand text-5xl mb-4"/>
+                <p className="text-muted-foreground text-[14px] md:text-lg leading-relaxed mb-8 italic">
+                  &quot;Our focus is on the holistic development of our students. Through rigorous aptitude training, soft skills workshops, and technical certifications, we ensure our graduates are not just job-ready, but industry-leading. We value our partnerships with recruiters and strive to provide a seamless hiring experience.&quot;
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
         {/* Placement Team Grid */}
         <section className="max-w-7xl mx-auto px-3 lg:px-20 py-16">
           <div className="flex justify-between items-end mb-12">
@@ -101,40 +121,40 @@ export default function Home() {
             </div>
           </div>
           <div className="flex items-end justify-end mb-5">
-          <button className="text-brand font-bold flex items-center gap-1 " >View All <ChevronRight className="text-brand" /></button>
+            <button className="text-brand font-bold flex items-center gap-1 " >View All <ChevronRight className="text-brand" /></button>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 md:gap-5 gap-3">
             {/* <!-- Card 1 --> */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl hover:scale-105 border overflow-hidden border-brand/5 shadow-md hover:shadow-xl transition-shadow group">
+            <div className="bg-white dark:bg-slate-900 rounded-xl hover:scale-105 border overflow-hidden border-brand/5 shadow-md hover:shadow-xl transition-all duration-300">
               <div className="aspect-2.5/3 bg-cover bg-top mb-4 transition-transform" data-alt="Female staff member profile" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuCwfoJsfJpSlw13cw9oHHcBFpUmlThTV4dahXFh0Qj0CAh37D3VkPF5Vy1WZ84fBrK27NKLkXJe9RdG7AK2_YVd56NxRE4WEisDxlGzpaHsjKPTDR4U181mIlvvE1U5v6IWNlaG_DgTioYwka5jHwh_pve2IGBpiChT2QMrlz4k151kkJSQh6DP0UchBMNC4_S69_b1AMPjNTlMUv9w1e1pD9_ibxhXkKedP9XEQnEHpH6UEZbIhd1RaiUAIFn7iUNBNm1Piuq4rA)" }}></div>
               <div className="ml-2">
-              <h3 className="font-bold text-sm md:text-lg" >Dr. Anjali Sharma</h3>
-              <p className="text-brand text-xs md:text-sm font-medium mb-4" >Corporate Relations</p>
+                <h3 className="font-bold text-sm md:text-lg" >Dr. Anjali Sharma</h3>
+                <p className="text-brand text-xs md:text-sm font-medium mb-4" >Corporate Relations</p>
               </div>
             </div>
             {/* <!-- Card 2 --> */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl overflow-hidden border hover:scale-105 border-brand/5 shadow-md hover:shadow-xl transition-shadow group">
+            <div className="bg-white dark:bg-slate-900 rounded-xl overflow-hidden border hover:scale-105 border-brand/5 shadow-md hover:shadow-xl transition-all duration-300">
               <div className="aspect-2.5/3 bg-cover bg-top mb-4 transition-transform" data-alt="Male staff member profile" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuAlBGcrKwosCrkAFG1qE2hMewRAhTS-EYKa7SX5VzKmhlBmcIztS0GsQ0_Rgz9VISZXklQKDWvsxaR_LvJAkVsHULlHlXfyZ4nWerTDPLdIe3qjX8LxGmJ3zuGiOPazUvP0C2eJvz1M6jzY3GQqrki-7wjTCNTNln4d3_JSSh3Es0CreOhKnzrPJfaIyqQ8jMSk_X8uCLGzJoYfiYyXC4HpIGJ7IJ-ERWVMjRjgv78yuEYpx2COfNFV579HNLl8x406i5IuTeIzAA)" }}></div>
               <div className="ml-2">
-              <h3 className="font-bold text-sm md:text-lg" >Vikram Malhotra</h3>
-              <p className="text-brand text-xs md:text-sm font-medium mb-4" >Technical Trainer</p>
-            </div>
+                <h3 className="font-bold text-sm md:text-lg" >Vikram Malhotra</h3>
+                <p className="text-brand text-xs md:text-sm font-medium mb-4" >Technical Trainer</p>
+              </div>
             </div>
             {/* <!-- Card 3 --> */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-brand/5 shadow-md hover:shadow-xl transition-shadow group">
-              <div className="aspect-2.5/3 bg-cover bg-top mb-4 group-hover:scale-105 transition-transform" data-alt="Female student volunteer" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuBvMtr2p2ngRt9hK1Jn6FrV4XHZlxx9MzK655JpTskmWj_hS4QAP6MX1VA4MFE8Po0VpwOr8M6vd2CZaeq3Da1fYO-6cMzMVaSOKbqJaXyP-O3kiQo3iYP7wqUb7DB_j3HahZcUqeW8hCdtz_hdJPm_ocN6cwLxwCbPVw2mnl-cwSyCjX8jq6bXiu_yHsaYt6HTLHOztoOuHm-Lym8KraBLLFh8MDKLUuBBxjG9xv1dbyZvYdy2Mqj-_EohWc67WEV4fgoYMBFSSQ)" }}></div>
+            <div className="bg-white dark:bg-slate-900 rounded-xl hover:scale-105 overflow-hidden border border-brand/5 shadow-md hover:shadow-xl transition-all duration-300">
+              <div className="aspect-2.5/3 bg-cover bg-top mb-4" data-alt="Female student volunteer" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuBvMtr2p2ngRt9hK1Jn6FrV4XHZlxx9MzK655JpTskmWj_hS4QAP6MX1VA4MFE8Po0VpwOr8M6vd2CZaeq3Da1fYO-6cMzMVaSOKbqJaXyP-O3kiQo3iYP7wqUb7DB_j3HahZcUqeW8hCdtz_hdJPm_ocN6cwLxwCbPVw2mnl-cwSyCjX8jq6bXiu_yHsaYt6HTLHOztoOuHm-Lym8KraBLLFh8MDKLUuBBxjG9xv1dbyZvYdy2Mqj-_EohWc67WEV4fgoYMBFSSQ)" }}></div>
               <div className="ml-2">
-              <h3 className="font-bold text-sm md:text-lg" >Neha Singh</h3>
-              <p className="text-brand text-xs md:text-sm font-medium mb-4" >Student Lead</p>
-            </div>
+                <h3 className="font-bold text-sm md:text-lg" >Neha Singh</h3>
+                <p className="text-brand text-xs md:text-sm font-medium mb-4" >Student Lead</p>
+              </div>
             </div>
             {/* <!-- Card 4 --> */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-brand/5 shadow-md hover:shadow-xl transition-shadow group">
-              <div className="aspect-2.5/3 bg-cover bg-top mb-4 group-hover:scale-105 transition-transform" data-alt="Male student volunteer" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuDcieaOwaB_8kavE_tydgpoKCMmW8zgXo46rbL1ABkBG2Xl4Ugae-0S9ZfXIhXGD86rFKMPXpNiw_XsXOlrp4KlaL87K1DgrihXRXIQqxow3qW_fXec3xCOiOGV8TeBp5dhzAlRguHWBBmJJj2xqUdmMvJ_VwzkhQoYKarT-AjNU_9KDusbNsiA6i9S1dt0RwqUepiImzSPwAq8IzU1sXLpDl88wppHQdcrIsM3jwFOxaA3PtZXtNmtclNuTgVmxZeNOH_yFkBJFA)" }}></div>
+            <div className="bg-white dark:bg-slate-900 rounded-xl hover:scale-105 overflow-hidden border border-brand/5 shadow-md hover:shadow-xl transition-all duration-300">
+              <div className="aspect-2.5/3 bg-cover bg-top mb-4" data-alt="Male student volunteer" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuDcieaOwaB_8kavE_tydgpoKCMmW8zgXo46rbL1ABkBG2Xl4Ugae-0S9ZfXIhXGD86rFKMPXpNiw_XsXOlrp4KlaL87K1DgrihXRXIQqxow3qW_fXec3xCOiOGV8TeBp5dhzAlRguHWBBmJJj2xqUdmMvJ_VwzkhQoYKarT-AjNU_9KDusbNsiA6i9S1dt0RwqUepiImzSPwAq8IzU1sXLpDl88wppHQdcrIsM3jwFOxaA3PtZXtNmtclNuTgVmxZeNOH_yFkBJFA)" }}></div>
               <div className="ml-2">
-              <h3 className="font-bold text-sm md:text-lg" >Rahul Verma</h3>
-              <p className="text-brand text-xs md:text-sm font-medium mb-4" >Event Coordinator</p>
-            </div>
+                <h3 className="font-bold text-sm md:text-lg" >Rahul Verma</h3>
+                <p className="text-brand text-xs md:text-sm font-medium mb-4" >Event Coordinator</p>
+              </div>
             </div>
           </div>
         </section>
@@ -162,10 +182,8 @@ export default function Home() {
                 img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCXVPK8Cn5Ib2YCbG42UxeqSLconAJ1rUOAaN1WgNq91TRkd4dstErCv2ZC5I9Vw4txaPccPIgSBN4hNDoC2R2hNg84z0AuQeP_UA_j_SFjElRn4PpWfV5Vxug1jHaM5Qni6oo1BTjzSYDMIw2fHZxsckI-itXPhltlu1I666w7uWZEAp9BKR9wp-mDSLcoYJgRsjVatn0Jh1nQoSFLs0KGz6QhqxG-7VKmb8wuFaYSqMadSDDa3RPNd5_tqe-4y2BvBsIqMYa8UA"
               },
             ].map((item, i) => (
-              <motion.div
+              <div
                 key={i}
-                {...fadeIn}
-                transition={{ delay: i * 0.1 }}
                 className="relative group overflow-hidden rounded-2xl h-100"
               >
                 <img
@@ -181,7 +199,7 @@ export default function Home() {
                     {item.btn} <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </section>
