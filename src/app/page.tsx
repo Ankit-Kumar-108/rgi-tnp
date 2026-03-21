@@ -9,8 +9,8 @@ import {
   BadgeCheck,
   MoveRight,
 } from "lucide-react"
-import Nav from "./components/nav/nav"
-import Footer from "./components/footer/footer"
+import Nav from "../components/layout/nav/nav"
+import Footer from "../components/layout/footer/footer"
 export default function Home() {
 
   return (
