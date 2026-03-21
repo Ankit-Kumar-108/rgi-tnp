@@ -34,10 +34,10 @@ export default function Home() {
                   Connecting top-tier talent with global industry leaders. Join our legacy of excellence and secure your future with world-className opportunities.
                 </p>
                 <div className="flex flex-wrap gap-2 md:gap-4">
-                  <button className="bg-brand text-white px-6 py-2.5 rounded-xl text-base font-bold flex items-center gap-2 hover:scale-105 transition-transform">
-                    Hire from Us <MoveRight />
+                  <button className="bg-brand text-white px-6 py-2.5 rounded-xl text-base font-bold flex items-center gap-2 hover:scale-105 transition-transform group cursor-pointer">
+                    Hire from Us <div className="group-hover:translate-x-2 transition-all duration-300"><MoveRight/></div>
                   </button>
-                  <button className="bg-background border-2 border-brand/20 text-foreground px-6 py-2.5 rounded-xl text-base font-bold hover:bg-surface transition-colors">
+                  <button className="bg-background border-2 border-brand/20 text-foreground px-6 py-2.5 rounded-xl text-base font-bold hover:bg-surface cursor-pointer hover:scale-105 transition-all duration-300">
                     Student Portal
                   </button>
                 </div>
