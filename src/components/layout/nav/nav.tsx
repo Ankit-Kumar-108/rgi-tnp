@@ -26,9 +26,9 @@ import {
 } from "lucide-react"
 import { useState } from 'react'
 
-
 export default function Nav() {
   const [isOpen, setIsOpen] = useState(false)
+  
   const navItems = [
     { name: "Home", link: "/" },
     {
@@ -49,22 +49,23 @@ export default function Nav() {
     {
       name: "Students",
       subMenu: [
-        { name: "Register", icon: UserPlus, link: "students/student-register" },
-        { name: "Feedback", icon: MessageSquareText, link: "students/feedback" },
-        { name: "Post Memories", icon: Camera, link: "students/upload" }
+        { name: "Login", icon: UserCheck, link: "students/login" },
+        { name: "Register", icon: UserPlus, link: "students/register" },
+        { name: "Dashboard", icon: Activity, link: "students/dashboard" }
       ]
     },
     {
       name: "Recruiters",
       subMenu: [
-        { name: "Hire From Us", icon: UserCheck, link: "recruiters/hire-us" },
-        { name: "Placement Stats", icon: TrendingUp, link: "recruiters/placement-stats" }
+        { name: "Login", icon: UserCheck, link: "recruiters/login" },
+        { name: "Register", icon: UserPlus, link: "recruiters/register" },
+        { name: "Dashboard", icon: TrendingUp, link: "recruiters/dashboard" }
       ]
     },
     {
       name: "Alumni",
       subMenu: [
-        { name: "Alumni Network", icon: Network, link: "alumni/meet" },
+        { name: "Alumni Network", icon: Network, link: "alumni/alumni-network" },
         { name: "Register", icon: ClipboardList, link: "alumni/alumni-register" }
       ]
     },
@@ -72,9 +73,34 @@ export default function Nav() {
     { name: "Memories", link: "/memories" },
     { name: "Feedbacks", link: "/feedbacks" },
   ];
+
+  // Helper function to render sub-menus seamlessly in mobile view
+  const renderMobileSubMenu = (categoryName: string) => {
+    const item = navItems.find((i) => i.name === categoryName);
+    if (!item || !item.subMenu) return null;
+
+    return (
+      <div className="flex flex-col gap-3 pl-12 pb-3 pt-1">
+        {item.subMenu.map((subItem) => (
+          <Link
+            key={subItem.name}
+            href={`/${subItem.link}`}
+            onClick={() => setIsOpen(false)}
+            className="flex items-center gap-3 text-xs font-medium text-foreground/70 hover:text-brand transition-colors"
+          >
+            <subItem.icon className="size-4" />
+            {subItem.name}
+          </Link>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass-effect px-6 lg:px-20">
       <div className="max-w-7xl mx-auto flex h-20 items-center justify-between">
+        
+        {/* Logo Section */}
         <div className="flex items-center gap-3">
           <div className="text-brand">
             <img
@@ -88,13 +114,14 @@ export default function Nav() {
             <p className="text-[10px] uppercase tracking-widest text-brand font-semibold hidden md:flex">Excellence in Placement</p>
           </div>
         </div>
+
+        {/* Desktop Navigation */}
         <div className="hidden lg:flex items-center gap-5">
           {navItems.map((item) => (
             <div
               key={item.name}
               className="group relative text-sm font-medium hover:text-brand transition-colors mt-8 pb-7 cursor-pointer after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.75 after:bg-brand after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-center"
             >
-
               {item.link ? (
                 <Link href={item.link} className="flex items-center gap-1">
                   {item.name}
@@ -108,9 +135,7 @@ export default function Nav() {
                 </span>
               )}
               {item.subMenu && (
-                <div
-                  className="absolute top-full left-0 z-50 w-56 p-2 bg-background/95 backdrop-blur-md border border-border/50 shadow-2xl shadow-brand/5 rounded-xl opacity-0 invisible -translate-y-1 scale-95 origin-top-left group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 group-hover:scale-100 transition-all duration-200 ease-out"
-                >
+                <div className="absolute top-full left-0 z-50 w-56 p-2 bg-background/95 backdrop-blur-md border border-border/50 shadow-2xl shadow-brand/5 rounded-xl opacity-0 invisible -translate-y-1 scale-95 origin-top-left group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 group-hover:scale-100 transition-all duration-200 ease-out">
                   <div className="flex flex-col gap-1">
                     {item.subMenu.map((subItem) => (
                       <Link
@@ -127,75 +152,106 @@ export default function Nav() {
                   </div>
                 </div>
               )}
-
             </div>
           ))}
         </div>
+
+        {/* Right Section: Theme Toggler & Mobile Menu */}
         <div>
           <AnimatedThemeToggler />
         </div>
+
+        {/* Mobile Hamburger Navigation */}
         <div className='lg:hidden flex items-center'>
           <div
             onClick={() => setIsOpen(!isOpen)}
-            className='size-7 md:mr-15 group'>
+            className='size-7 md:mr-15 group cursor-pointer'>
             {isOpen ? (<X />) : (<Menu />)}
           </div>
-          {isOpen ? (
+          
+          {isOpen && (
             <>
-              <div className='fixed z-50 right-5 top-24 bg-background border border-brand/20 w-56 rounded-2xl flex flex-col p-2 shadow-xl shadow-brand/10'>
+              {/* Added max-h and overflow-y-auto so the menu is scrollable on smaller phones */}
+              <div className='fixed z-50 right-5 top-24 bg-background border border-brand/20 w-56 rounded-2xl flex flex-col p-2 shadow-xl shadow-brand/10 max-h-[75vh] overflow-y-auto'>
                 <div className="flex flex-col divide-y divide-brand/10">
 
-                  <div className='flex items-center gap-4 p-3 rounded-lg hover:bg-brand/5 cursor-pointer transition-colors'>
+                  {/* Home */}
+                  <Link href="/" onClick={() => setIsOpen(false)} className='flex items-center gap-4 p-3 rounded-lg hover:bg-brand/5 transition-colors'>
                     <Home className='text-brand size-5' />
                     <p className="font-medium text-sm text-foreground">Home</p>
+                  </Link>
+
+                  {/* About */}
+                  <div className="flex flex-col">
+                    <div className='flex items-center gap-4 p-3'>
+                      <Info className='text-brand size-5' />
+                      <p className="font-medium text-sm text-foreground">About</p>
+                    </div>
+                    {renderMobileSubMenu("About")}
                   </div>
 
-                  <div className='flex items-center gap-4 p-3 rounded-lg hover:bg-brand/5 cursor-pointer transition-colors'>
-                    <Info className='text-brand size-5' />
-                    <p className="font-medium text-sm text-foreground">About</p>
+                  {/* Activities */}
+                  <div className="flex flex-col">
+                    <div className='flex items-center gap-4 p-3'>
+                      <Activity className='text-brand size-5' />
+                      <p className="font-medium text-sm text-foreground">Activities</p>
+                    </div>
+                    {renderMobileSubMenu("Activities")}
                   </div>
 
-                  <div className='flex items-center gap-4 p-3 rounded-lg hover:bg-brand/5 cursor-pointer transition-colors'>
-                    <Activity className='text-brand size-5' />
-                    <p className="font-medium text-sm text-foreground">Activities</p>
+                  {/* Students */}
+                  <div className="flex flex-col">
+                    <div className='flex items-center gap-4 p-3'>
+                      <Users className='text-brand size-5' />
+                      <p className="font-medium text-sm text-foreground">Students</p>
+                    </div>
+                    {renderMobileSubMenu("Students")}
                   </div>
 
-                  <div className='flex items-center gap-4 p-3 rounded-lg hover:bg-brand/5 cursor-pointer transition-colors'>
-                    <Users className='text-brand size-5' />
-                    <p className="font-medium text-sm text-foreground">Students</p>
+                  {/* Recruiters */}
+                  <div className="flex flex-col">
+                    <div className='flex items-center gap-4 p-3'>
+                      <Briefcase className='text-brand size-5' />
+                      <p className="font-medium text-sm text-foreground">Recruiters</p>
+                    </div>
+                    {renderMobileSubMenu("Recruiters")}
                   </div>
 
-                  <div className='flex items-center gap-4 p-3 rounded-lg hover:bg-brand/5 cursor-pointer transition-colors'>
-                    <Briefcase className='text-brand size-5' />
-                    <p className="font-medium text-sm text-foreground">Recruiters</p>
+                  {/* Alumni */}
+                  <div className="flex flex-col">
+                    <div className='flex items-center gap-4 p-3'>
+                      <GraduationCap className='text-brand size-5' />
+                      <p className="font-medium text-sm text-foreground">Alumni</p>
+                    </div>
+                    {renderMobileSubMenu("Alumni")}
                   </div>
 
-                  <div className='flex items-center gap-4 p-3 rounded-lg hover:bg-brand/5 cursor-pointer transition-colors'>
-                    <GraduationCap className='text-brand size-5' />
-                    <p className="font-medium text-sm text-foreground">Alumni</p>
-                  </div>
-
-                  <div className='flex items-center gap-4 p-3 rounded-lg hover:bg-brand/5 cursor-pointer transition-colors'>
+                  {/* Memories */}
+                  <Link href="/memories" onClick={() => setIsOpen(false)} className='flex items-center gap-4 p-3 rounded-lg hover:bg-brand/5 transition-colors'>
                     <Images className='text-brand size-5' />
                     <p className="font-medium text-sm text-foreground">Memories</p>
-                  </div>
+                  </Link>
 
-                  <div className='flex items-center gap-4 p-3 rounded-lg hover:bg-brand/5 cursor-pointer transition-colors'>
+                  {/* Feedbacks */}
+                  <Link href="/feedbacks" onClick={() => setIsOpen(false)} className='flex items-center gap-4 p-3 rounded-lg hover:bg-brand/5 transition-colors'>
                     <MessageSquare className='text-brand size-5' />
                     <p className="font-medium text-sm text-foreground">Feedbacks</p>
-                  </div>
+                  </Link>
 
                 </div>
               </div>
+              
+              {/* Overlay Backdrop to close menu when clicking outside */}
               <div
-                onClick={() => setIsOpen(!isOpen)}
-                className='w-dvw h-dvh absolute left-0 top-0 z-20'></div>
+                onClick={() => setIsOpen(false)}
+                className='w-dvw h-dvh absolute left-0 top-0 z-20'
+              ></div>
             </>
-          ) : (
-            ""
           )}
 
         </div>
+        
+        {/* Desktop Contact CTA */}
         <button className="hidden -mr-20 lg:block bg-brand text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-brand/90 transition-all shadow-lg shadow-brand/20">
           Contact Us
         </button>
