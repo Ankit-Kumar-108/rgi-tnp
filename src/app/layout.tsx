@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Lexend, Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
+import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +34,18 @@ export default function RootLayout({
           bg-background text-foreground
         `}
       >
+        {/* Top Loader */}
+        <NextTopLoader
+          color="#7c3aed"
+          initialPosition={0.08}
+          crawlSpeed={200}
+          height={3}
+          crawl={true}
+          showSpinner={false}
+          easing="ease"
+          speed={200}
+          shadow="0 0 10px #7c3aed,0 0 5px #7c3aed"
+        />
         {/* 3. Wrapped with ThemeProvider */}
         <ThemeProvider 
           attribute="class" 

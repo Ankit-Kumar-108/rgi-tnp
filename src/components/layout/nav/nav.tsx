@@ -43,7 +43,7 @@ export default function Nav() {
       subMenu: [
         { name: "Achievements", icon: Trophy, link: "activities/achievements" },
         { name: "Certificates", icon: Award, link: "activities/certificates" },
-        { name: "MoU", icon: Handshake, link: "mou" }
+        { name: "MoU", icon: Handshake, link: "activities/mou" }
       ]
     },
     {
