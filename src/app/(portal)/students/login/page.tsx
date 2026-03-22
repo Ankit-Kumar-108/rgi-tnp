@@ -1,3 +1,5 @@
+"use client";
+
 import Nav from "@/components/layout/nav/nav"
 import Footer from "@/components/layout/footer/footer"
 import {
