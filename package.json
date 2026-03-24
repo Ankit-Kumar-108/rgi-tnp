@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "pages:build": "npx @cloudflare/next-on-pages@1",
     "db:generate": "prisma generate",
     "db:migrate:local": "wrangler d1 migrations apply placement-db --local",
     "db:migrate:remote": "wrangler d1 migrations apply placement-db --remote"
@@ -17,12 +18,10 @@
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "crypto": "^1.0.1",
+
     "jose": "^6.2.2",
     "jsonwebtoken": "^9.0.3",
-    "lucide": "^0.577.0",
     "lucide-react": "^0.577.0",
-    "motion": "^12.38.0",
     "next": "^15.5.2",
     "next-theme": "^0.1.5",
     "next-themes": "^0.4.6",
