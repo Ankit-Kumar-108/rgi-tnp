@@ -66,6 +66,7 @@ export default function Nav() {
       name: "Alumni",
       subMenu: [
         { name: "Alumni Network", icon: Network, link: "alumni/alumni-network" },
+        { name: "Dashboard", icon: TrendingUp, link: "alumni/dashboard" },
         { name: "Register", icon: ClipboardList, link: "alumni/alumni-register" }
       ]
     },

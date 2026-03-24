@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { 
   Bell, 
@@ -10,12 +12,24 @@ import {
   MessageSquare, 
   ChevronRight, 
   Images, 
-  Brain 
+  Brain,
+  Loader2
 } from "lucide-react";
 import Footer from "@/components/layout/footer/footer";
 import Nav from "@/components/layout/nav/nav";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function StudentDashboard() {
+  const { loading, authenticated, user } = useAuth("student", "/students/login");
+
+  if (loading || !authenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-brand" />
+      </div>
+    );
+  }
+
   return (
     <>
     <Nav/>
@@ -28,7 +42,7 @@ export default function StudentDashboard() {
         <section className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <h2 className="text-3xl font-black tracking-tight text-foreground">
-              Hello, Ankit
+              Hello, {user?.name || "Student"}
             </h2>
             <p className="text-muted-foreground font-medium text-sm mt-1">
               Focus on your next milestones. You have 2 action items today.

@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { 
   Plus, 
@@ -8,12 +10,24 @@ import {
   ArrowUpDown, 
   ExternalLink,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Loader2
 } from "lucide-react";
 import Nav from "@/components/layout/nav/nav";
 import Footer from "@/components/layout/footer/footer";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function RecruiterDashboard() {
+  const { loading, authenticated } = useAuth("recruiter", "/recruiters/login");
+
+  if (loading || !authenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-brand" />
+      </div>
+    );
+  }
+
   return (
     <>
     <Nav/>

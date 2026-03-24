@@ -1,0 +1,164 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model StudentMaster {
+  id               String @id @default(cuid())
+  enrollmentNumber String @unique
+  name             String
+  branch           String
+  batch            Float
+}
+
+model AlumniMaster {
+  id               String @id @default(cuid())
+  enrollmentNumber String @unique
+  name             String
+  branch           String
+  batch            String
+}
+
+model Admin {
+  id           String @id @default(cuid())
+  email        String @unique
+  passwordHash String
+  role         String @default("admin")
+}
+
+model Student {
+  id                           String              @id @default(cuid())
+  name                         String
+  enrollmentNumber             String              @unique
+  email                        String              @unique
+  branch                       String
+  semester                     Float
+  cgpa                         Float
+  isEmailVerified              Boolean             @default(false)
+  emailVerificationToken       String?
+  emailVerificationTokenExpiry DateTime?
+  otpAttempts                   Int                 @default(0)
+  lastOtpSentAt                  DateTime?
+  image                        String?
+  feedback                      String?
+  phoneNumber                  String
+  passwordHash                 String
+  isVerified                   Boolean             @default(false)
+  role                         String              @default("student")
+  registrations                DriveRegistration[]
+  memories                     Memory[]
+  createdAt                    DateTime            @default(now())
+  updatedAt                    DateTime            @updatedAt
+}
+
+model Alumni {
+  id                String     @id @default(cuid())
+  name              String
+  enrollmentNumber  String     @unique
+  personalEmail     String     @unique
+  passwordHash      String
+  isVerified        Boolean    @default(false)
+  isProfileComplete Boolean    @default(false)
+  currentCompany    String?
+  jobTitle          String?
+  city              String?
+  linkedInUrl       String?
+  phoneNumber       String?
+  referrals         Referral[]
+  feedback          Feedback[]
+  createdAt         DateTime   @default(now())
+}
+
+model ExternalStudent {
+  id               String  @id @default(cuid())
+  name             String
+  collegeName      String
+  enrollmentNumber String
+  email            String  @unique
+  passwordHash     String
+  resumeUrl        String
+  isScreened       Boolean @default(false)
+  branch           String
+  cgpa             Float
+
+  registrations DriveRegistration[]
+}
+
+// 4. DRIVE & INTERACTION MODELS
+model PlacementDrive {
+  id               String   @id @default(cuid())
+  companyName      String
+  roleName         String
+  jobDescription   String
+  ctc              String
+  minCGPA          Float
+  eligibleBranches String
+  driveDate        DateTime
+  driveType        String
+  status           String   @default("pending")
+  googleSheetUrl   String?
+
+  recruiterId   String
+  recruiter     Recruiter           @relation(fields: [recruiterId], references: [id])
+  registrations DriveRegistration[]
+}
+
+model DriveRegistration {
+  id      String         @id @default(cuid())
+  driveId String
+  drive   PlacementDrive @relation(fields: [driveId], references: [id])
+
+  studentId         String?
+  student           Student?         @relation(fields: [studentId], references: [id])
+  externalStudentId String?
+  externalStudent   ExternalStudent? @relation(fields: [externalStudentId], references: [id])
+
+  attended  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Recruiter {
+  id           String @id @default(cuid())
+  name         String
+  email        String @unique
+  phoneNumber  String
+  designation  String
+  company      String
+  passwordHash String
+  role         String @default("recruiter")
+
+  drives PlacementDrive[]
+}
+
+model Referral {
+  id          String @id @default(cuid())
+  companyName String
+  position    String
+  description String
+  applyLink   String
+  status      String @default("pending")
+  alumniId    String
+  alumni      Alumni @relation(fields: [alumniId], references: [id])
+}
+
+model Memory {
+  id        String   @id @default(cuid())
+  imageUrl  String
+  status    String   @default("pending_moderation")
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Feedback {
+  id       String @id @default(cuid())
+  content  String
+  rating   Int
+  alumniId String
+  alumni   Alumni @relation(fields: [alumniId], references: [id])
+}
