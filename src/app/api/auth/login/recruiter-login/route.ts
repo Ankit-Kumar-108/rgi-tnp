@@ -3,7 +3,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { recruiterLoginSchema } from "@/lib/validations/recruiter";
 import { getDb } from "@/lib/db";
 import { verifyPassword } from "@/lib/auth-utils";
-import jwt from "jsonwebtoken";
+import * as jose from "jose";
 
 export async function POST(req: NextRequest) {
     try {
@@ -29,11 +29,15 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ success: false, message: "Invalid email or password" }, { status: 401 });
         }
 
-        const token = jwt.sign(
-            { email: recruiter.email, id: recruiter.id, company: recruiter.company },
-            process.env.JWT_SECRET!,
-            { expiresIn: "7d" }
-        );
+        const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
+        const token = await new jose.SignJWT({ 
+            email: recruiter.email, 
+            id: recruiter.id, 
+            company: recruiter.company 
+        })
+            .setProtectedHeader({ alg: 'HS256' })
+            .setExpirationTime('7d')
+            .sign(secret);
 
         return NextResponse.json({ 
             success: true, 

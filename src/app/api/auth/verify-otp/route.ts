@@ -2,7 +2,7 @@ export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { otpSchema } from "@/lib/validations/student";
 import { getDb } from "@/lib/db";
-import jwt from "jsonwebtoken";
+import * as jose from "jose";
 
 export async function POST(req: NextRequest) {
     try {
@@ -50,11 +50,14 @@ export async function POST(req: NextRequest) {
             }
         })
 
-        const token = jwt.sign(
-            { email: updatedStudent.email, enrollmentNumber: updatedStudent.enrollmentNumber },
-            process.env.JWT_SECRET!,
-            { expiresIn: "7d" }
-        )
+        const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
+        const token = await new jose.SignJWT({ 
+            email: updatedStudent.email, 
+            enrollmentNumber: updatedStudent.enrollmentNumber 
+        })
+            .setProtectedHeader({ alg: 'HS256' })
+            .setExpirationTime('7d')
+            .sign(secret);
 
         return NextResponse.json({
             success: true,

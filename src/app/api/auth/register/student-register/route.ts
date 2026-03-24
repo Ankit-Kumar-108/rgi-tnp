@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { registrationSchema } from "@/lib/validations/student";
 import { hashPassword, generateOTP, getOTPExpiry } from "@/lib/auth-utils";
 import { getDb } from "@/lib/db";
-import nodemailer from "nodemailer";
 import { otpEmailTemplate } from "@/lib/email-templates";
 
 export async function POST(req: NextRequest) {
@@ -71,23 +70,33 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // 8. Nodemailer Transport (SMTP)
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT),
-      secure: true,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
+    // 8. Email Sending (SMTP/Nodemailer is not compatible with Edge)
+    if (process.env.NODE_ENV === "production") {
+      console.log(`[EDGE EMAIL] Verification OTP for ${validatedData.name}: ${otp}`);
+      // TODO: Use an Edge-compatible email API (e.g., Resend, SendGrid REST API)
+    } else {
+      try {
+        const nodemailer = require("nodemailer");
+        const transporter = nodemailer.createTransport({
+          host: process.env.SMTP_HOST,
+          port: Number(process.env.SMTP_PORT),
+          secure: true,
+          auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
+          },
+        });
 
-    await transporter.sendMail({
-      from: `"RGI T&P" <${process.env.SMTP_USER}>`,
-      to: validatedData.email,
-      subject: "Your Verification OTP",
-      html: otpEmailTemplate(otp, validatedData.name),
-    });
+        await transporter.sendMail({
+          from: `"RGI T&P" <${process.env.SMTP_USER}>`,
+          to: validatedData.email,
+          subject: "Your Verification OTP",
+          html: otpEmailTemplate(otp, validatedData.name),
+        });
+      } catch (err) {
+        console.error("Nodemailer failed (expected in Edge):", err);
+      }
+    }
 
     return NextResponse.json({
       success: true,

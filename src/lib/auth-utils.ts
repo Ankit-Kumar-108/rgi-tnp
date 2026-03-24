@@ -1,5 +1,4 @@
 import bcryptjs from 'bcryptjs';
-import crypto from 'crypto';
 
 export const hashPassword = async (password: string): Promise<string> => {
     const salt = await bcryptjs.genSalt(10);
@@ -11,15 +10,29 @@ export const verifyPassword = async (password: string, hashedPassword: string): 
 }
 
 export const generateOTP = (): string => {
-    return crypto.randomBytes(3).toString('hex').toUpperCase();
+    const buffer = new Uint8Array(3);
+    globalThis.crypto.getRandomValues(buffer);
+    return Array.from(buffer)
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('')
+        .slice(0, 6)
+        .toUpperCase();
 }
 
 export const generateVerificationToken = (): string => {
-    return crypto.randomBytes(32).toString('hex');
+    const buffer = new Uint8Array(32);
+    globalThis.crypto.getRandomValues(buffer);
+    return Array.from(buffer)
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
 }
 
 export const generateResetToken = (): string => {
-    return crypto.randomBytes(32).toString('hex');
+    const buffer = new Uint8Array(32);
+    globalThis.crypto.getRandomValues(buffer);
+    return Array.from(buffer)
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
 }
 
 export const getOTPExpiry = (): Date => {

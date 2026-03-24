@@ -3,7 +3,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { loginSchema } from "@/lib/validations/student";
 import { getDb } from "@/lib/db";
 import { verifyPassword } from "@/lib/auth-utils";
-import jwt from "jsonwebtoken";
+import * as jose from "jose";
 
 export async function POST(req: NextRequest) {
     try {
@@ -26,11 +26,14 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ success: false, message: "Invalid email or password" }, { status: 401 });
         }
 
-        const token = jwt.sign(
-            { email: student.email, enrollmentNumber: student.enrollmentNumber },
-            process.env.JWT_SECRET!,
-            { expiresIn: "7d" }
-        )
+        const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
+        const token = await new jose.SignJWT({ 
+            email: student.email, 
+            enrollmentNumber: student.enrollmentNumber 
+        })
+            .setProtectedHeader({ alg: 'HS256' })
+            .setExpirationTime('7d')
+            .sign(secret);
 
         return NextResponse.json({ success: true, message: "Login successful", 
             token: token,
