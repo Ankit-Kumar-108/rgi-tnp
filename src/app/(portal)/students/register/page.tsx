@@ -74,7 +74,7 @@ export default function StudentRegister() {
                         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 rounded-full bg-brand/5 blur-2xl z-0 pointer-events-none"></div>
                         <div className="mb-6 relative z-10 mt-68">
                             <h2 className="text-3xl font-bold tracking-tight text-foreground mb-2">Create Account</h2>
-                            <p className="text-muted-foreground text-sm">Register as a student to access the portal.</p>
+                            <p className="text-muted-foreground text-sm">Register as a Student to access the portal.</p>
                         </div>
 
                         {error && <div className="mb-3 p-3 rounded-xl bg-destructive/10 text-destructive text-sm font-medium relative z-10">{error}</div>}
