@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { alumniRegistrationSchema } from "@/lib/validations/alumni";
 import { hashPassword } from "@/lib/auth-utils";

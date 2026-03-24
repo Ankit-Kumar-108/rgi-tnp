@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { registrationSchema } from "@/lib/validations/student";
 import { hashPassword, generateOTP, getOTPExpiry } from "@/lib/auth-utils";
