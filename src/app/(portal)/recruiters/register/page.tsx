@@ -57,7 +57,7 @@ export default function RecruiterRegister() {
                     </div>
                     <div className="p-6 sm:p-10 md:p-12 flex flex-col justify-center relative max-h-[90vh] overflow-y-auto">
                         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 rounded-full bg-brand/5 blur-2xl z-0 pointer-events-none"></div>
-                        <div className="mb-6 relative z-10">
+                        <div className="mb-6 relative z-10 mt-25">
                             <h2 className="text-3xl font-bold tracking-tight text-foreground mb-2">Company Registration</h2>
                             <p className="text-muted-foreground text-sm">Register your organization to access our talent pool.</p>
                         </div>

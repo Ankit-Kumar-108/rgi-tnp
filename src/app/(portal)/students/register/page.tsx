@@ -72,7 +72,7 @@ export default function StudentRegister() {
                     {/* Right Side: Form */}
                     <div className="p-6 sm:p-10 md:p-12 flex flex-col justify-center relative max-h-[90vh] overflow-y-auto">
                         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 rounded-full bg-brand/5 blur-2xl z-0 pointer-events-none"></div>
-                        <div className="mb-6 relative z-10">
+                        <div className="mb-6 relative z-10 mt-68">
                             <h2 className="text-3xl font-bold tracking-tight text-foreground mb-2">Create Account</h2>
                             <p className="text-muted-foreground text-sm">Register as a student to access the portal.</p>
                         </div>
@@ -80,7 +80,7 @@ export default function StudentRegister() {
                         {error && <div className="mb-3 p-3 rounded-xl bg-destructive/10 text-destructive text-sm font-medium relative z-10">{error}</div>}
                         {success && <div className="mb-3 p-3 rounded-xl bg-green-500/10 text-green-600 dark:text-green-400 text-sm font-medium relative z-10">{success}</div>}
 
-                        <form className="space-y-4 relative z-10 mt-23" onSubmit={handleSubmit}>
+                        <form className="space-y-4 relative z-10" onSubmit={handleSubmit}>
                             {/* Name */}
                             <div className="space-y-1">
                                 <label className="text-sm font-semibold text-foreground">Full Name</label>

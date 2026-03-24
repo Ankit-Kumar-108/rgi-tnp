@@ -4,15 +4,19 @@ const TOKEN_KEYS: Record<string, string> = {
   student: "student_token",
   recruiter: "recruiter_token",
   alumni: "alumni_token",
+  admin: "admin_token",
+  external_student: "external_student_token",
 };
 
 const USER_KEYS: Record<string, string> = {
   student: "student_user",
   recruiter: "recruiter_user",
   alumni: "alumni_user",
+  admin: "admin_user",
+  external_student: "external_student_user",
 };
 
-export type UserRole = "student" | "recruiter" | "alumni";
+export type UserRole = "student" | "recruiter" | "alumni" | "admin" | "external_student";
 
 export const saveAuth = (role: UserRole, token: string, user: any) => {
   localStorage.setItem(TOKEN_KEYS[role], token);

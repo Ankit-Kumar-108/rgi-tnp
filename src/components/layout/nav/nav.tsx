@@ -22,7 +22,8 @@ import {
   UserCheck,
   TrendingUp,
   Network,
-  ClipboardList
+  ClipboardList,
+  Shield
 } from "lucide-react"
 import { useState } from 'react'
 
@@ -73,6 +74,7 @@ export default function Nav() {
     // Standalone items
     { name: "Memories", link: "/memories" },
     { name: "Feedbacks", link: "/feedbacks" },
+    { name: "Admin", link: "/admin/login" },
   ];
 
   // Helper function to render sub-menus seamlessly in mobile view
@@ -239,6 +241,12 @@ export default function Nav() {
                     <p className="font-medium text-sm text-foreground">Feedbacks</p>
                   </Link>
 
+                  {/* Admin */}
+                  <Link href="/admin/login" onClick={() => setIsOpen(false)} className='flex items-center gap-4 p-3 rounded-lg hover:bg-brand/5 transition-colors'>
+                    <Shield className='text-brand size-5' />
+                    <p className="font-medium text-sm text-foreground">Admin Panel</p>
+                  </Link>
+
                 </div>
               </div>
               
@@ -253,9 +261,9 @@ export default function Nav() {
         </div>
         
         {/* Desktop Contact CTA */}
-        <button className="hidden -mr-20 lg:block bg-brand text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-brand/90 transition-all shadow-lg shadow-brand/20">
+        {/* <button className="hidden -mr-20 lg:block bg-brand text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-brand/90 transition-all shadow-lg shadow-brand/20">
           Contact Us
-        </button>
+        </button> */}
       </div>
     </nav>
   )

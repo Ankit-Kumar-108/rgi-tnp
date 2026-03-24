@@ -1,0 +1,59 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getDb } from "@/lib/db";
+import * as jose from "jose";
+
+async function getRecruiterFromToken(req: NextRequest) {
+  const authHeader = req.headers.get("authorization");
+  if (!authHeader) return null;
+  const token = authHeader.replace("Bearer ", "");
+  try {
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
+    const { payload } = await jose.jwtVerify(token, secret);
+    return payload as any;
+  } catch {
+    return null;
+  }
+}
+
+// POST: Create a new drive request
+export async function POST(req: NextRequest) {
+  try {
+    const recruiter = await getRecruiterFromToken(req);
+    if (!recruiter) {
+      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = (await req.json()) as {
+      companyName: string;
+      roleName: string;
+      jobDescription: string;
+      ctc: string;
+      eligibleBranches: string;
+      minCGPA: number;
+      driveDate: string;
+      driveType: string;
+    };
+
+    const db = getDb();
+
+    const drive = await db.placementDrive.create({
+      data: {
+        companyName: body.companyName,
+        roleName: body.roleName,
+        jobDescription: body.jobDescription,
+        ctc: body.ctc,
+        eligibleBranches: body.eligibleBranches,
+        minCGPA: body.minCGPA,
+        driveDate: new Date(body.driveDate),
+        driveType: body.driveType || "Closed",
+        status: "pending",
+        recruiterId: recruiter.id,
+      },
+    });
+
+    return NextResponse.json({ success: true, message: "Drive request submitted for admin approval", drive });
+  } catch (error) {
+    console.error("Create Drive Error:", error);
+    return NextResponse.json({ success: false, message: "Failed to create drive" }, { status: 500 });
+  }
+}
