@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { generateOTP, getOTPExpiry } from "@/lib/auth-utils";
 import { otpEmailTemplate } from "@/lib/email-templates";
+import { sendEmail } from "@/lib/send-email";
 
 export async function POST(req: NextRequest) {
     try {
@@ -46,33 +47,12 @@ export async function POST(req: NextRequest) {
             }
         });
 
-        // 9. Email Sending (SMTP/Nodemailer is not compatible with Edge)
-        if (process.env.NODE_ENV === "production") {
-            console.log(`[EDGE EMAIL] Resend OTP for ${student.name}: ${newOTP}`);
-            // TODO: Use an Edge-compatible email API (e.g., Resend, SendGrid REST API)
-        } else {
-            try {
-                const nodemailer = require("nodemailer");
-                const transporter = nodemailer.createTransport({
-                    host: process.env.SMTP_HOST,
-                    port: Number(process.env.SMTP_PORT),
-                    secure: true,
-                    auth: {
-                        user: process.env.SMTP_USER,
-                        pass: process.env.SMTP_PASS,
-                    },
-                });
-
-                await transporter.sendMail({
-                    from: `"RGI T&P" <${process.env.SMTP_USER}>`,
-                    to: email,
-                    subject: "Resend OTP",
-                    html: otpEmailTemplate(newOTP, student.name)
-                });
-            } catch (err) {
-                console.error("Nodemailer resend failed (expected in Edge):", err);
-            }
-        }
+        // 9. Send OTP Email (Edge-compatible via Resend API)
+        await sendEmail({
+            to: email,
+            subject: "Resend OTP",
+            html: otpEmailTemplate(newOTP, student.name),
+        });
 
         return NextResponse.json({ success: true, message: "OTP sent successfully" }, { status: 200 });
 
