@@ -27,7 +27,7 @@ import Footer from "@/components/layout/footer/footer";
 import { useAuth } from "@/hooks/useAuth";
 import { getToken } from "@/lib/auth-client";
 
-const BRANCHES = ["CSE", "IT", "ECE", "EE", "ME", "CE"];
+const BRANCHES = ["Computer Science", "Civil", "Mechanical", "Electronics", "Electrical"] //change courese here  for filtering
 
 export default function RecruiterDashboard() {
   const { loading: authLoading, authenticated, user } = useAuth("recruiter", "/recruiters/login");
@@ -207,7 +207,7 @@ export default function RecruiterDashboard() {
                     </div>
                     <div>
                       <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Min CGPA</label>
-                      <input required type="float" step="0.1" min="0" max="10" value={form.minCGPA} onChange={(e) => setForm({ ...form, minCGPA: parseFloat(e.target.value) })}
+                      <input required type="float" step="0.1" min="0" max="10" value={form.minCGPA} onChange={(e) => setForm({ ...form, minCGPA: parseFloat(e.target.value) || 0 })}
                         className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
                     </div>
                   </div>

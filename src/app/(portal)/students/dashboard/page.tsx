@@ -8,24 +8,29 @@ import {
   Camera,
   CheckCircle,
   Clock,
-  XCircle,
-  ChevronRight,
   CalendarDays,
   Building2,
   TrendingUp,
   FileText,
-} from "lucide-react";
-import Nav from "@/components/layout/nav/nav";
-import Footer from "@/components/layout/footer/footer";
-import { useAuth } from "@/hooks/useAuth";
-import { getToken } from "@/lib/auth-client";
+} from "lucide-react"
+import Nav from "@/components/layout/nav/nav"
+import Footer from "@/components/layout/footer/footer"
+import { useAuth } from "@/hooks/useAuth"
+import { getToken } from "@/lib/auth-client"
+import JobDetailsModal from "@/components/forms/studentApplyModal/modal";
+import { Student, PlacementDrive, DriveRegistration, Memory } from "@/types";
 
 export default function StudentDashboard() {
   const { loading: authLoading, authenticated, user } = useAuth("student", "/students/login");
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [registering, setRegistering] = useState<string | null>(null);
-  const [regMsg, setRegMsg] = useState<{ id: string; msg: string; ok: boolean } | null>(null);
+  const [data, setData] = useState<{
+    student: Student;
+    drives: PlacementDrive[];
+    registrations: DriveRegistration[];
+    memories: Memory[];
+  } | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [isModalOpen, setIsModalOpen] = useState(false) 
+  const [selectedDrive, setSelectedDrive] = useState<PlacementDrive | null>(null)
 
   useEffect(() => {
     if (!authenticated) return;
@@ -47,26 +52,6 @@ export default function StudentDashboard() {
     }
   };
 
-  const registerForDrive = async (driveId: string) => {
-    setRegistering(driveId);
-    setRegMsg(null);
-    try {
-      const token = getToken("student");
-      const res = await fetch("/api/student/drives", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ driveId }),
-      });
-      const d = (await res.json()) as any;
-      setRegMsg({ id: driveId, msg: d.message, ok: d.success });
-      if (d.success) fetchDashboard();
-    } catch {
-      setRegMsg({ id: driveId, msg: "Registration failed", ok: false });
-    } finally {
-      setRegistering(null);
-    }
-  };
-
   if (authLoading || !authenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -83,6 +68,19 @@ export default function StudentDashboard() {
   return (
     <>
       <Nav />
+      {selectedDrive && (
+        <JobDetailsModal
+          drive={selectedDrive}
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedDrive(null);
+          }}
+          onSuccess={() => {
+            fetchDashboard();
+          }}
+        />
+      )}
       <div className="bg-background text-foreground antialiased font-sans min-h-screen mt-15">
         <div className="fixed bottom-0 right-0 w-96 h-96 bg-brand/5 rounded-full blur-[120px] -z-10" />
         <div className="fixed top-1/2 left-0 w-64 h-64 bg-brand/5 rounded-full blur-[100px] -z-10" />
@@ -185,9 +183,8 @@ export default function StudentDashboard() {
                               <td className="px-5 py-3.5 font-bold text-foreground">{drive.ctc}</td>
                               <td className="px-5 py-3.5 text-muted-foreground">{new Date(drive.driveDate).toLocaleDateString()}</td>
                               <td className="px-5 py-3.5">
-                                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                                  drive.driveType === "Open" ? "bg-green-500/10 text-green-600" : "bg-blue-500/10 text-blue-600"
-                                }`}>{drive.driveType}</span>
+                                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${drive.driveType === "Open" ? "bg-green-500/10 text-green-600" : "bg-blue-500/10 text-blue-600"
+                                  }`}>{drive.driveType}</span>
                               </td>
                               <td className="px-5 py-3.5 text-right">
                                 {drive.isRegistered ? (
@@ -196,15 +193,14 @@ export default function StudentDashboard() {
                                   </span>
                                 ) : (
                                   <button
-                                    onClick={() => registerForDrive(drive.id)}
-                                    disabled={registering === drive.id}
+                                    onClick={() => {
+                                      setSelectedDrive(drive);
+                                      setIsModalOpen(true);
+                                    }}
                                     className="bg-brand text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-brand/90 transition-all disabled:opacity-50"
                                   >
-                                    {registering === drive.id ? <Loader2 className="w-3 h-3 animate-spin" /> : "Register"}
+                                    Register
                                   </button>
-                                )}
-                                {regMsg && regMsg.id === drive.id && (
-                                  <p className={`text-[10px] mt-1 ${regMsg.ok ? "text-green-600" : "text-red-500"}`}>{regMsg.msg}</p>
                                 )}
                               </td>
                             </tr>
@@ -247,11 +243,10 @@ export default function StudentDashboard() {
                               <td className="px-5 py-3.5 text-muted-foreground">{reg.drive?.roleName}</td>
                               <td className="px-5 py-3.5 text-muted-foreground">{reg.drive?.driveDate ? new Date(reg.drive.driveDate).toLocaleDateString() : "-"}</td>
                               <td className="px-5 py-3.5">
-                                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold capitalize ${
-                                  reg.drive?.status === "active" ? "bg-green-500/10 text-green-600"
+                                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold capitalize ${reg.drive?.status === "active" ? "bg-green-500/10 text-green-600"
                                     : reg.drive?.status === "completed" ? "bg-blue-500/10 text-blue-600"
-                                    : "bg-muted text-muted-foreground"
-                                }`}>{reg.drive?.status}</span>
+                                      : "bg-muted text-muted-foreground"
+                                  }`}>{reg.drive?.status}</span>
                               </td>
                               <td className="px-5 py-3.5">
                                 {reg.attended ? (
@@ -288,11 +283,10 @@ export default function StudentDashboard() {
                           <img src={m.imageUrl} alt="Memory" className="w-full h-full object-cover" />
                         </div>
                         <div className="p-3">
-                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                            m.status === "approved" ? "bg-green-500/10 text-green-600"
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${m.status === "approved" ? "bg-green-500/10 text-green-600"
                               : m.status === "rejected" ? "bg-red-500/10 text-red-500"
-                              : "bg-yellow-500/10 text-yellow-600"
-                          }`}>{m.status === "pending_moderation" ? "Pending" : m.status}</span>
+                                : "bg-yellow-500/10 text-yellow-600"
+                            }`}>{m.status === "pending_moderation" ? "Pending" : m.status}</span>
                         </div>
                       </div>
                     ))}
@@ -303,6 +297,7 @@ export default function StudentDashboard() {
           )}
         </main>
       </div>
+
       <Footer />
     </>
   );

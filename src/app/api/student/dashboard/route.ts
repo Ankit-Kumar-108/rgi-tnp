@@ -1,7 +1,6 @@
 export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { getToken } from "@/lib/auth-client";
 import * as jose from "jose";
 
 async function getStudentFromToken(req: NextRequest) {
@@ -19,18 +18,19 @@ async function getStudentFromToken(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
-    const student = await getStudentFromToken(req);
-    if (!student) {
+    const studentTokenData = await getStudentFromToken(req);
+    
+    if (!studentTokenData) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
     const db = getDb();
     const studentData = await db.student.findUnique({
-      where: { id: student.id },
+      where: { enrollmentNumber: studentTokenData.enrollmentNumber },
       select: {
         id: true, name: true, enrollmentNumber: true, email: true,
         branch: true, semester: true, cgpa: true, isVerified: true,
-        image: true, phoneNumber: true,
+        image: true, phoneNumber: true, course: true, batch: true,
       },
     });
 
@@ -42,6 +42,10 @@ export async function GET(req: NextRequest) {
     const drives = await db.placementDrive.findMany({
       where: {
         status: "active",
+        OR: [
+          { course: "All" },
+          { course: { contains: studentData.course } }
+        ],
         eligibleBranches: { contains: studentData.branch },
         minCGPA: { lte: studentData.cgpa },
       },
@@ -50,7 +54,7 @@ export async function GET(req: NextRequest) {
 
     // Get student's registrations
     const registrations = await db.driveRegistration.findMany({
-      where: { studentId: studentData.id },
+      where: { student: { enrollmentNumber: studentTokenData.enrollmentNumber } },
       include: {
         drive: { select: { companyName: true, roleName: true, driveDate: true, status: true } },
       },

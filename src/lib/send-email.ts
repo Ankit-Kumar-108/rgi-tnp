@@ -14,7 +14,7 @@ export async function sendEmail({ to, subject, html, from }: SendEmailOptions): 
     return { success: false, error: "RESEND_API_KEY not configured" };
   }
 
-  const senderEmail = from || process.env.EMAIL_FROM || "onboarding@resend.dev"; // fallback
+  const senderEmail = from || process.env.EMAIL_FROM
 
   try {
     const response = await fetch("https://api.resend.com/emails", {

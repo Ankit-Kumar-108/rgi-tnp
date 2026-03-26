@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     const { driveId } = body;
     const db = getDb();
 
-    const studentData = await db.student.findUnique({ where: { id: student.id } });
+    const studentData = await db.student.findUnique({ where: { enrollmentNumber: student.enrollmentNumber } });
     if (!studentData) {
       return NextResponse.json({ success: false, message: "Student not found" }, { status: 404 });
     }
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
 
     // Check: already registered?
     const existing = await db.driveRegistration.findFirst({
-      where: { driveId, studentId: student.id },
+      where: { driveId, student: { enrollmentNumber: student.enrollmentNumber } },
     });
     if (existing) {
       return NextResponse.json({ success: false, message: "Already registered for this drive" }, { status: 409 });
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
 
     // Register
     await db.driveRegistration.create({
-      data: { driveId, studentId: student.id },
+      data: { driveId, studentId: studentData.id },
     });
 
     return NextResponse.json({ success: true, message: "Successfully registered for the drive" });
