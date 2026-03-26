@@ -4,6 +4,8 @@ export const alumniRegistrationSchema = z.object({
     name: z.string().min(1, 'Name is required').max(100),
     enrollmentNumber: z.string().min(1, 'Enrollment number is required').regex(/^[A-Za-z0-9]+$/, 'Enrollment number must be alphanumeric'),
     personalEmail: z.string().email('Invalid email address'),
+    course: z.string().min(1, 'Course is required'),
+    batch: z.string().min(1, 'Batch is required'),
     password: z.string()
         .min(8, 'Password must be at least 8 characters long')
         .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')

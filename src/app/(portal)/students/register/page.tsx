@@ -13,7 +13,7 @@ export default function StudentRegister() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [form, setForm] = useState({
-        name: "", email: "", enrollmentNumber: "", branch: "",
+        name: "", email: "", enrollmentNumber: "", branch: "", course: "",
         semester: "", cgpa: "", batch: "", phoneNumber: "",
         password: "", confirmPassword: "",
     });
@@ -34,7 +34,6 @@ export default function StudentRegister() {
                     ...form,
                     semester: Number(form.semester),
                     cgpa: Number(form.cgpa),
-                    batch: Number(form.batch),
                 }),
             });
             const data = (await res.json()) as { success?: boolean; message?: string };
@@ -49,14 +48,14 @@ export default function StudentRegister() {
 
     return (
         <div className="min-h-screen flex flex-col bg-background">
-            <Nav/>
+            <Nav />
             <main className="flex-1 flex w-full items-center justify-center p-4 sm:p-6 md:p-8 pt-24 md:pt-32 pb-12">
                 <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-background/50 backdrop-blur-sm rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl shadow-brand/10 border border-brand/10">
                     {/* Left Side */}
                     <div className="relative hidden lg:flex flex-col justify-end p-10 xl:p-12 overflow-hidden bg-brand/5">
                         <div className="absolute inset-0 bg-cover bg-center z-0 opacity-80" style={{ backgroundImage: "linear-gradient(180deg, rgba(146, 19, 236, 0.2) 0%, rgba(26, 16, 34, 0.9) 100%), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop')" }} />
                         <div className="relative z-10 text-white">
-                            <div className="mb-4 inline-flex items-center justify-center p-3 bg-brand backdrop-blur-md rounded-2xl text-brand-50 shadow-inner"><GraduationCap className="w-8 h-8"/></div>
+                            <div className="mb-4 inline-flex items-center justify-center p-3 bg-brand backdrop-blur-md rounded-2xl text-brand-50 shadow-inner"><GraduationCap className="w-8 h-8" /></div>
                             <h1 className="text-4xl font-black mb-4 leading-tight">Join Your Student Community</h1>
                             <p className="text-lg text-slate-200 font-light max-w-md">Create an account to access exclusive internships, placement drives, training resources, and track your applications.</p>
                             <div className="mt-12 flex items-center gap-4">
@@ -85,7 +84,7 @@ export default function StudentRegister() {
                             <div className="space-y-1">
                                 <label className="text-sm font-semibold text-foreground">Full Name</label>
                                 <div className="relative">
-                                    <div className={iconClass}><User className="w-5 h-5"/></div>
+                                    <div className={iconClass}><User className="w-5 h-5" /></div>
                                     <input className={inputClass} placeholder="Enter your full name" type="text" required value={form.name} onChange={update("name")} />
                                 </div>
                             </div>
@@ -93,19 +92,20 @@ export default function StudentRegister() {
                             <div className="space-y-1">
                                 <label className="text-sm font-semibold text-foreground">Email</label>
                                 <div className="relative">
-                                    <div className={iconClass}><Mail className="w-5 h-5"/></div>
+                                    <div className={iconClass}><Mail className="w-5 h-5" /></div>
                                     <input className={inputClass} placeholder="yourname@gmail.com" type="email" required value={form.email} onChange={update("email")} />
                                 </div>
                             </div>
-                            {/* Enrollment + Branch */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="space-y-1">
-                                    <label className="text-sm font-semibold text-foreground">Enrollment Number</label>
-                                    <div className="relative">
-                                        <div className={iconClass}><Hash className="w-5 h-5"/></div>
-                                        <input className={inputClass} placeholder="e.g. 0108CS211001" required value={form.enrollmentNumber} onChange={update("enrollmentNumber")} />
-                                    </div>
+                            {/* Enrollment Number */}
+                            <div className="space-y-1">
+                                <label className="text-sm font-semibold text-foreground">Enrollment Number</label>
+                                <div className="relative">
+                                    <div className={iconClass}><Hash className="w-5 h-5" /></div>
+                                    <input className={inputClass} placeholder="e.g. 0108CS211001" required value={form.enrollmentNumber} onChange={update("enrollmentNumber")} />
                                 </div>
+                            </div>
+                            {/* Branch + Course */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-1">
                                     <label className="text-sm font-semibold text-foreground">Branch</label>
                                     <select className="w-full py-3 sm:py-3.5 px-4 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all text-sm shadow-sm" required value={form.branch} onChange={update("branch")}>
@@ -117,6 +117,16 @@ export default function StudentRegister() {
                                         <option value="Electronics">Electronics</option>
                                     </select>
                                 </div>
+                                <div className="space-y-1">
+                                    <label className="text-sm font-semibold text-foreground">Course</label>
+                                    <select className="w-full py-3 sm:py-3.5 px-4 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all text-sm shadow-sm" required value={form.course} onChange={update("course")}>
+                                        <option value="">Select Course</option>
+                                        <option value="B.Tech">B.Tech</option>
+                                        <option value="M.Tech">M.Tech</option>
+                                        <option value="MBA">MBA</option>
+                                        <option value="Diploma">Diploma</option>
+                                    </select>
+                                </div>
                             </div>
                             {/* Semester + Batch + CGPA */}
                             <div className="grid grid-cols-3 gap-4">
@@ -126,7 +136,7 @@ export default function StudentRegister() {
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-sm font-semibold text-foreground">Batch</label>
-                                    <input className="w-full py-3 sm:py-3.5 px-4 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all text-sm shadow-sm" type="number" placeholder="2025" required value={form.batch} onChange={update("batch")} />
+                                    <input className="w-full py-3 sm:py-3.5 px-4 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all text-sm shadow-sm" type="text" placeholder="2024-2028" required value={form.batch} onChange={update("batch")} />
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-sm font-semibold text-foreground">CGPA</label>
@@ -137,7 +147,7 @@ export default function StudentRegister() {
                             <div className="space-y-1">
                                 <label className="text-sm font-semibold text-foreground">Phone Number</label>
                                 <div className="relative">
-                                    <div className={iconClass}><Phone className="w-5 h-5"/></div>
+                                    <div className={iconClass}><Phone className="w-5 h-5" /></div>
                                     <input className={inputClass} placeholder="10-digit phone number" required value={form.phoneNumber} onChange={update("phoneNumber")} />
                                 </div>
                             </div>
@@ -146,42 +156,42 @@ export default function StudentRegister() {
                                 <div className="space-y-1">
                                     <label className="text-sm font-semibold text-foreground">Password</label>
                                     <div className="relative">
-                                        <div className={iconClass}><LockKeyhole className="w-5 h-5"/></div>
+                                        <div className={iconClass}><LockKeyhole className="w-5 h-5" /></div>
                                         <input className={inputClass} placeholder="Min 8 chars, upper/lower/num/special" type="password" required value={form.password} onChange={update("password")} />
                                     </div>
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-sm font-semibold text-foreground">Confirm Password</label>
                                     <div className="relative">
-                                        <div className={iconClass}><LockKeyhole className="w-5 h-5"/></div>
+                                        <div className={iconClass}><LockKeyhole className="w-5 h-5" /></div>
                                         <input className={inputClass} placeholder="Re-enter password" type="password" required value={form.confirmPassword} onChange={update("confirmPassword")} />
                                     </div>
                                 </div>
                             </div>
 
                             <button className="w-full bg-brand hover:bg-brand/90 text-primary-foreground font-bold py-3.5 rounded-xl shadow-[0_4px_14px_0_rgba(var(--brand-rgb),0.39)] hover:shadow-[0_6px_20px_rgba(var(--brand-rgb),0.23)] hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 group mt-2 disabled:opacity-50 disabled:cursor-not-allowed" type="submit" disabled={loading}>
-                                {loading ? (<><Loader2 className="w-5 h-5 animate-spin" /><span>Registering...</span></>) : (<><span>Register</span><UserPlus className="w-5 h-5 group-hover:translate-x-1 transition-transform"/></>)}
+                                {loading ? (<><Loader2 className="w-5 h-5 animate-spin" /><span>Registering...</span></>) : (<><span>Register</span><UserPlus className="w-5 h-5 group-hover:translate-x-1 transition-transform" /></>)}
                             </button>
                         </form>
-                        
+
                         <div className="mt-6 pt-4 border-t border-border relative z-10">
                             <p className="text-center text-muted-foreground mb-3 text-sm">Already have an account?</p>
                             <Link href="/students/login" className="w-full py-3 sm:py-3.5 rounded-xl border-2 border-brand/20 text-brand font-bold bg-transparent hover:bg-brand/5 transition-all duration-200 flex items-center justify-center gap-2">Login Here</Link>
                         </div>
-                        
+
                         <div className="mt-8 flex flex-col items-center gap-2 relative z-10">
                             <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Official Portal of</p>
                             <span className="text-foreground font-bold text-xs sm:text-sm text-center">RADHARAMAN GROUP OF INSTITUTES</span>
                             <div className="flex gap-4 mt-2">
-                                <a className="text-muted-foreground hover:text-brand transition-colors p-2 hover:bg-brand/5 rounded-full" href="#" aria-label="Website"><Earth className="w-4 h-4"/></a>
-                                <a className="text-muted-foreground hover:text-brand transition-colors p-2 hover:bg-brand/5 rounded-full" href="#" aria-label="Share"><Share2 className="w-4 h-4"/></a>
-                                <a className="text-muted-foreground hover:text-brand transition-colors p-2 hover:bg-brand/5 rounded-full" href="#" aria-label="Information"><Info className="w-4 h-4"/></a>
+                                <a className="text-muted-foreground hover:text-brand transition-colors p-2 hover:bg-brand/5 rounded-full" href="#" aria-label="Website"><Earth className="w-4 h-4" /></a>
+                                <a className="text-muted-foreground hover:text-brand transition-colors p-2 hover:bg-brand/5 rounded-full" href="#" aria-label="Share"><Share2 className="w-4 h-4" /></a>
+                                <a className="text-muted-foreground hover:text-brand transition-colors p-2 hover:bg-brand/5 rounded-full" href="#" aria-label="Information"><Info className="w-4 h-4" /></a>
                             </div>
                         </div>
                     </div>
                 </div>
             </main>
-            <Footer/>
+            <Footer />
         </div>
     )
 }

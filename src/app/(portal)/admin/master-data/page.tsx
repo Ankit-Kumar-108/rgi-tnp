@@ -84,8 +84,11 @@ export default function AdminMasterDataPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ type: uploadType, records: preview }),
       });
-      const data = (await res.json()) as { success: boolean; message: string };
-      setResult(data);
+      const data = (await res.json()) as { success: boolean; message: string; errors?: string[] };
+      const displayMsg = data.errors?.length
+        ? `${data.message} | Errors: ${data.errors.join("; ")}`
+        : data.message;
+      setResult({ success: data.success, message: displayMsg });
       if (data.success) {
         fetchCounts();
         setPreview([]);
@@ -167,22 +170,20 @@ export default function AdminMasterDataPage() {
           <div className="flex gap-3 mb-6">
             <button
               onClick={() => { setUploadType("student"); setPreview([]); setResult(null); }}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                uploadType === "student"
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${uploadType === "student"
                   ? "bg-brand text-white shadow-lg shadow-brand/20"
                   : "bg-muted border border-border text-muted-foreground hover:text-foreground"
-              }`}
+                }`}
             >
               <GraduationCap className="w-4 h-4" />
               Student Master
             </button>
             <button
               onClick={() => { setUploadType("alumni"); setPreview([]); setResult(null); }}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                uploadType === "alumni"
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${uploadType === "alumni"
                   ? "bg-brand text-white shadow-lg shadow-brand/20"
                   : "bg-muted border border-border text-muted-foreground hover:text-foreground"
-              }`}
+                }`}
             >
               <UserCheck className="w-4 h-4" />
               Alumni Master
@@ -194,8 +195,8 @@ export default function AdminMasterDataPage() {
             <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Expected CSV Format</p>
             <code className="text-xs text-foreground font-mono">
               {uploadType === "student"
-                ? "enrollmentNumber, name, branch, batch"
-                : "enrollmentNumber, name, branch, batch"}
+                ? "enrollmentNumber, name, branch, course, batch"
+                : "enrollmentNumber, name, branch, course, batch"}
             </code>
           </div>
 
@@ -269,11 +270,10 @@ export default function AdminMasterDataPage() {
 
           {/* Result */}
           {result && (
-            <div className={`mt-4 flex items-center gap-3 px-4 py-3 rounded-xl ${
-              result.success
+            <div className={`mt-4 flex items-center gap-3 px-4 py-3 rounded-xl ${result.success
                 ? "bg-green-500/10 text-green-600"
                 : "bg-red-500/10 text-red-500"
-            }`}>
+              }`}>
               {result.success ? <CheckCircle className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
               <p className="text-sm font-medium">{result.message}</p>
             </div>

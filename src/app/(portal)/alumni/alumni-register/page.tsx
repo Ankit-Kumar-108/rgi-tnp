@@ -13,11 +13,11 @@ export default function AlumniRegistration() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [form, setForm] = useState({
-        name: "", enrollmentNumber: "", personalEmail: "",
+        name: "", enrollmentNumber: "", personalEmail: "", course: "", batch: "",
         password: "", confirmPassword: "",
     });
 
-    const update = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    const update = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
         setForm(prev => ({ ...prev, [field]: e.target.value }));
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -100,6 +100,23 @@ export default function AlumniRegistration() {
                                     <input className={inputClass} placeholder="your.email@gmail.com" type="email" required value={form.personalEmail} onChange={update("personalEmail")} />
                                 </div>
                             </div>
+                            {/* Course + Batch */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-foreground">Course</label>
+                                    <select className="w-full py-3 sm:py-3.5 px-4 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all text-sm shadow-sm" required value={form.course} onChange={update("course")}>
+                                        <option value="">Select Course</option>
+                                        <option value="B.Tech">B.Tech</option>
+                                        <option value="M.Tech">M.Tech</option>
+                                        <option value="MBA">MBA</option>
+                                        <option value="Diploma">Diploma</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-foreground">Batch</label>
+                                    <input className="w-full py-3 sm:py-3.5 px-4 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all text-sm shadow-sm" type="text" placeholder="e.g. 2021-2025" required value={form.batch} onChange={update("batch")} />
+                                </div>
+                            </div>
                             {/* Password */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-2">
@@ -125,7 +142,7 @@ export default function AlumniRegistration() {
                         
                         <div className="mt-8 pt-6 border-t border-border relative z-10">
                             <p className="text-center text-muted-foreground mb-4 text-sm">Already have an account?</p>
-                            <Link href="/alumni/alumni-register" className="w-full py-3 sm:py-3.5 rounded-xl border-2 border-brand/20 text-brand font-bold bg-transparent hover:bg-brand/5 transition-all duration-200 flex items-center justify-center gap-2">Login Here</Link>
+                            <Link href="/alumni/login" className="w-full py-3 sm:py-3.5 rounded-xl border-2 border-brand/20 text-brand font-bold bg-transparent hover:bg-brand/5 transition-all duration-200 flex items-center justify-center gap-2">Login Here</Link>
                         </div>
                         
                         <div className="mt-10 flex flex-col items-center gap-2 relative z-10">

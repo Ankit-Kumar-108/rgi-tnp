@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     const body = (await req.json()) as { content: string; rating: number };
     const db = getDb();
 
-    const feedback = await db.feedback.create({
+    const feedback = await db.alumniFeedback.create({
       data: {
         content: body.content,
         rating: body.rating,

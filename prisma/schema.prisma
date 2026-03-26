@@ -13,13 +13,15 @@ model StudentMaster {
   enrollmentNumber String @unique
   name             String
   branch           String
-  batch            Float
+  course           String
+  batch            String
 }
 
 model AlumniMaster {
   id               String @id @default(cuid())
   enrollmentNumber String @unique
   name             String
+  course           String
   branch           String
   batch            String
 }
@@ -46,12 +48,15 @@ model Student {
   lastOtpSentAt                  DateTime?
   image                        String?
   feedback                      String?
+  batch                        String
   phoneNumber                  String
+  course                       String
   passwordHash                 String
   isVerified                   Boolean             @default(false)
   role                         String              @default("student")
   registrations                DriveRegistration[]
   memories                     Memory[]
+  studentFeedbacks             StudentFeedback[]
   createdAt                    DateTime            @default(now())
   updatedAt                    DateTime            @updatedAt
 }
@@ -69,8 +74,10 @@ model Alumni {
   city              String?
   linkedInUrl       String?
   phoneNumber       String?
+  batch             String
+  course            String
   referrals         Referral[]
-  feedback          Feedback[]
+  alumniFeedbacks   AlumniFeedback[]
   createdAt         DateTime   @default(now())
 }
 
@@ -85,7 +92,11 @@ model ExternalStudent {
   isScreened       Boolean @default(false)
   branch           String
   cgpa             Float
-
+  course           String
+  batch            String
+  phoneNumber      String
+  isVerified       Boolean             @default(false)
+  role             String              @default("external_student")
   registrations DriveRegistration[]
 }
 
@@ -97,12 +108,14 @@ model PlacementDrive {
   jobDescription   String
   ctc              String
   minCGPA          Float
+  minBatch         String
+  maxBatch         String
+  course           String
   eligibleBranches String
   driveDate        DateTime
   driveType        String
   status           String   @default("pending")
   googleSheetUrl   String?
-
   recruiterId   String
   recruiter     Recruiter           @relation(fields: [recruiterId], references: [id])
   registrations DriveRegistration[]
@@ -132,7 +145,8 @@ model Recruiter {
   passwordHash String
   role         String @default("recruiter")
 
-  drives PlacementDrive[]
+  drives              PlacementDrive[]
+  corporateFeedbacks  CorporateFeedback[]
 }
 
 model Referral {
@@ -155,10 +169,26 @@ model Memory {
   createdAt DateTime @default(now())
 }
 
-model Feedback {
+model AlumniFeedback {
   id       String @id @default(cuid())
   content  String
   rating   Int
   alumniId String
   alumni   Alumni @relation(fields: [alumniId], references: [id])
+}
+
+model StudentFeedback {
+  id        String  @id @default(cuid())
+  content   String
+  rating    Int
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id])
+}
+
+model CorporateFeedback {
+  id          String    @id @default(cuid())
+  content     String
+  rating      Int
+  recruiterId String
+  recruiter   Recruiter @relation(fields: [recruiterId], references: [id])
 }

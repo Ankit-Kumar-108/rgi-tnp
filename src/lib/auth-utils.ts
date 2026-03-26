@@ -1,12 +1,47 @@
-import bcryptjs from 'bcryptjs';
+// Edge-compatible password hashing using Web Crypto API (PBKDF2)
+const ITERATIONS = 100000;
+const KEY_LENGTH = 64;
 
-export const hashPassword = async (password: string): Promise<string> => {
-    const salt = await bcryptjs.genSalt(10);
-    return await bcryptjs.hash(password, salt);
+function bufferToHex(buffer: ArrayBuffer): string {
+  return Array.from(new Uint8Array(buffer))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
 }
 
-export const verifyPassword = async (password: string, hashedPassword: string): Promise<boolean> => {
-    return await bcryptjs.compare(password, hashedPassword);
+function hexToBuffer(hex: string): Uint8Array<ArrayBuffer> {
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
+  }
+  return bytes;
+}
+
+export const hashPassword = async (password: string): Promise<string> => {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const encoder = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', encoder.encode(password), 'PBKDF2', false, ['deriveBits']
+  );
+  const hash = await crypto.subtle.deriveBits(
+    { name: 'PBKDF2', salt, iterations: ITERATIONS, hash: 'SHA-256' },
+    keyMaterial, KEY_LENGTH * 8
+  );
+  return `${ITERATIONS}.${bufferToHex(salt.buffer)}.${bufferToHex(hash)}`;
+}
+
+export const verifyPassword = async (password: string, storedHash: string): Promise<boolean> => {
+  const [iterStr, saltHex, hashHex] = storedHash.split('.');
+  const iterations = parseInt(iterStr);
+  const salt = hexToBuffer(saltHex);
+  const encoder = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', encoder.encode(password), 'PBKDF2', false, ['deriveBits']
+  );
+  const hash = await crypto.subtle.deriveBits(
+    { name: 'PBKDF2', salt, iterations, hash: 'SHA-256' },
+    keyMaterial, KEY_LENGTH * 8
+  );
+  return bufferToHex(hash) === hashHex;
 }
 
 export const generateOTP = (): string => {

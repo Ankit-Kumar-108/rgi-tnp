@@ -31,8 +31,11 @@ export async function POST(req: NextRequest) {
         enrollmentNumber: validatedData.enrollmentNumber,
         email: validatedData.email,
         branch: validatedData.branch,
+        course: validatedData.course,
+        batch: validatedData.batch,
         cgpa: validatedData.cgpa,
         resumeUrl: validatedData.resumeUrl,
+        phoneNumber: validatedData.phoneNumber,
         passwordHash: passwordHash,
       },
     });

@@ -46,6 +46,9 @@ export default function RecruiterDashboard() {
     ctc: "",
     eligibleBranches: "" as string,
     minCGPA: 0,
+    minBatch: "",
+    maxBatch: "",
+    course: "B.Tech",
     driveDate: "",
     driveType: "Closed",
   });
@@ -89,7 +92,7 @@ export default function RecruiterDashboard() {
       setFormMsg({ msg: d.message, ok: d.success });
       if (d.success) {
         setShowForm(false);
-        setForm({ companyName: user?.company || "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, driveDate: "", driveType: "Closed" });
+        setForm({ companyName: user?.company || "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed" });
         fetchDashboard();
       }
     } catch {
@@ -204,7 +207,7 @@ export default function RecruiterDashboard() {
                     </div>
                     <div>
                       <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Min CGPA</label>
-                      <input required type="number" step="0.1" min="0" max="10" value={form.minCGPA} onChange={(e) => setForm({ ...form, minCGPA: parseFloat(e.target.value) })}
+                      <input required type="float" step="0.1" min="0" max="10" value={form.minCGPA} onChange={(e) => setForm({ ...form, minCGPA: parseFloat(e.target.value) })}
                         className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
                     </div>
                   </div>
@@ -221,6 +224,31 @@ export default function RecruiterDashboard() {
                           className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${form.eligibleBranches.includes(b) ? "bg-brand text-white" : "bg-muted border border-border text-muted-foreground"}`}
                         >{b}</button>
                       ))}
+                    </div>
+                  </div>
+                  {/* Course */}
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Course</label>
+                    <select required value={form.course} onChange={(e) => setForm({ ...form, course: e.target.value })}
+                      className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none">
+                      <option value="B.Tech">B.Tech</option>
+                      <option value="M.Tech">M.Tech</option>
+                      <option value="MBA">MBA</option>
+                      <option value="Diploma">Diploma</option>
+                      <option value="All">All Courses</option>
+                    </select>
+                  </div>
+                  {/* Batch Range */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Min Batch (From)</label>
+                      <input required value={form.minBatch} onChange={(e) => setForm({ ...form, minBatch: e.target.value })}
+                        placeholder="e.g. 2021" className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Max Batch (To)</label>
+                      <input required value={form.maxBatch} onChange={(e) => setForm({ ...form, maxBatch: e.target.value })}
+                        placeholder="e.g. 2025" className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">

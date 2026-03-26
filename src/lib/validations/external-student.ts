@@ -6,8 +6,11 @@ export const externalStudentRegistrationSchema = z.object({
     enrollmentNumber: z.string().min(1, 'Enrollment number is required'),
     email: z.string().email('Invalid email address'),
     branch: z.string().min(1, 'Branch is required'),
+    course: z.string().min(1, 'Course is required'),
+    batch: z.string().min(1, 'Batch is required'),
     cgpa: z.coerce.number().min(0, 'CGPA must be a positive number').max(10, 'CGPA cannot be more than 10'),
     resumeUrl: z.string().url('Invalid URL format for resume'),
+    phoneNumber: z.string().min(10, 'Phone number must be at least 10 digits').max(15),
     password: z.string()
         .min(8, 'Password must be at least 8 characters long')
         .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')

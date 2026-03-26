@@ -13,6 +13,7 @@ export const registrationSchema = z.object({
         .min(1, 'Enrollment number is required')
         .regex(/^[A-Za-z0-9]+$/, 'Enrollment number must be alphanumeric'),
     branch: z.enum(['Computer Science', 'Mechanical', 'Electrical', 'Civil', 'Electronics']),
+    course: z.string().min(1, 'Course is required'),
     semester: z.coerce
         .number()
         .int()
@@ -22,10 +23,7 @@ export const registrationSchema = z.object({
         .number()
         .min(0, 'CGPA must be a positive number')
         .max(10, 'CGPA cannot be more than 10'),
-    batch: z.coerce
-        .number()
-        .int()
-        .min(2000, 'Batch year must be after 2000'),
+    batch: z.string().min(1, 'Batch is required'),
     phoneNumber: z
         .string()
         .min(10, 'Phone number must be at least 10 digits')

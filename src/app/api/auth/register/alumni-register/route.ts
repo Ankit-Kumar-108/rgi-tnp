@@ -57,8 +57,10 @@ export async function POST(req: NextRequest) {
         name: validatedData.name,
         enrollmentNumber: validatedData.enrollmentNumber,
         personalEmail: validatedData.personalEmail,
+        course: validatedData.course,
+        batch: validatedData.batch,
         passwordHash: passwordHash,
-        isVerified: false, // Maybe manual admin verification is required
+        isVerified: false,
       },
     });
 

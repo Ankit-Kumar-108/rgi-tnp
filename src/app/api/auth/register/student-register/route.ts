@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
         enrollmentNumber: validatedData.enrollmentNumber,
         name: validatedData.name,
         branch: validatedData.branch,
+        course: validatedData.course,
         batch: validatedData.batch,
       },
     });
@@ -62,8 +63,10 @@ export async function POST(req: NextRequest) {
         enrollmentNumber: validatedData.enrollmentNumber,
         email: validatedData.email,
         branch: validatedData.branch,
+        course: validatedData.course,
         semester: validatedData.semester,
         cgpa: validatedData.cgpa,
+        batch: validatedData.batch,
         phoneNumber: validatedData.phoneNumber,
         passwordHash: passwordHash,
         isVerified: false,

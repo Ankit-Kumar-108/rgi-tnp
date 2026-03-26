@@ -3,6 +3,10 @@ export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 
+function generateId() {
+  return crypto.randomUUID().replace(/-/g, "").slice(0, 25);
+}
+
 // POST: Upload CSV data for StudentMaster or AlumniMaster
 export async function POST(req: NextRequest) {
   try {
@@ -22,56 +26,48 @@ export async function POST(req: NextRequest) {
 
     let created = 0;
     let skipped = 0;
+    const errors: string[] = [];
+    const table = type === "student" ? "StudentMaster" : type === "alumni" ? "AlumniMaster" : null;
 
-    if (type === "student") {
-      for (const record of records) {
-        try {
-          await db.studentMaster.upsert({
-            where: { enrollmentNumber: record.enrollmentNumber },
-            update: {
-              name: record.name,
-              branch: record.branch,
-              batch: parseFloat(record.batch),
-            },
-            create: {
-              enrollmentNumber: record.enrollmentNumber,
-              name: record.name,
-              branch: record.branch,
-              batch: parseFloat(record.batch),
-            },
-          });
-          created++;
-        } catch {
-          skipped++;
-        }
-      }
-    } else if (type === "alumni") {
-      for (const record of records) {
-        try {
-          await db.alumniMaster.upsert({
-            where: { enrollmentNumber: record.enrollmentNumber },
-            update: {
-              name: record.name,
-              branch: record.branch,
-              batch: record.batch,
-            },
-            create: {
-              enrollmentNumber: record.enrollmentNumber,
-              name: record.name,
-              branch: record.branch,
-              batch: record.batch,
-            },
-          });
-          created++;
-        } catch {
-          skipped++;
-        }
-      }
-    } else {
+    if (!table) {
       return NextResponse.json(
         { success: false, message: "Invalid type" },
         { status: 400 }
       );
+    }
+
+    for (const item of records) {
+      try {
+        const enrollmentNumber = (item.enrollmentNumber || item["Enrollment Number"] || "").trim();
+        const name = (item.name || item["Name"] || "").trim();
+        const branch = (item.branch || item["Branch"] || "").trim();
+        const course = (item.course || item["Course"] || "").trim();
+        const batch = String(item.batch || item["Batch"] || "").trim();
+
+        if (!enrollmentNumber || !name) {
+          skipped++;
+          if (errors.length < 3) errors.push(`Missing enrollmentNumber or name`);
+          continue;
+        }
+
+        await db.$executeRawUnsafe(
+          `INSERT OR REPLACE INTO "${table}" ("id", "enrollmentNumber", "name", "branch", "course", "batch")
+           VALUES (COALESCE((SELECT "id" FROM "${table}" WHERE "enrollmentNumber" = ?), ?), ?, ?, ?, ?, ?)`,
+          generateId(),
+          enrollmentNumber,
+          enrollmentNumber,
+          name,
+          branch,
+          course,
+          batch
+        );
+        created++;
+      } catch (err: any) {
+        const msg = err?.message || String(err);
+        console.error(`Skipped ${type}:`, msg);
+        if (errors.length < 3) errors.push(msg);
+        skipped++;
+      }
     }
 
     return NextResponse.json({
@@ -79,11 +75,12 @@ export async function POST(req: NextRequest) {
       message: `Processed ${records.length} records: ${created} created/updated, ${skipped} skipped`,
       created,
       skipped,
+      ...(errors.length > 0 && { errors }),
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Master Data Upload Error:", error);
     return NextResponse.json(
-      { success: false, message: "Upload failed" },
+      { success: false, message: error?.message || "Upload failed" },
       { status: 500 }
     );
   }

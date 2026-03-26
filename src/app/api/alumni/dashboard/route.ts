@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
     });
 
     // Get feedback
-    const feedbacks = await db.feedback.findMany({
+    const feedbacks = await db.alumniFeedback.findMany({
       where: { alumniId: alumni.id },
     });
 

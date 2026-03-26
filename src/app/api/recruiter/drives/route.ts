@@ -31,6 +31,9 @@ export async function POST(req: NextRequest) {
       ctc: string;
       eligibleBranches: string;
       minCGPA: number;
+      minBatch: string;
+      maxBatch: string;
+      course: string;
       driveDate: string;
       driveType: string;
     };
@@ -45,10 +48,13 @@ export async function POST(req: NextRequest) {
         ctc: body.ctc,
         eligibleBranches: body.eligibleBranches,
         minCGPA: body.minCGPA,
+        minBatch: body.minBatch,
+        maxBatch: body.maxBatch,
+        course: body.course,
         driveDate: new Date(body.driveDate),
         driveType: body.driveType || "Closed",
         status: "pending",
-        recruiterId: recruiter.id,
+        recruiter: { connect: { id: recruiter.id } },
       },
     });
 
