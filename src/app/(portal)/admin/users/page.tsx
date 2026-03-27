@@ -40,6 +40,8 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [branch, setBranch] = useState("");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
     if (!authenticated) return;
@@ -54,12 +56,51 @@ export default function AdminUsersPage() {
       if (search) params.set("search", search);
       const res = await fetch(`/api/admin/users?${params}`);
       const data = (await res.json()) as { success: boolean; users: any[] };
-      if (data.success) setUsers(data.users);
+      if (data.success) {
+          setUsers(data.users);
+          setSelectedIds(new Set());
+      }
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleBulkAction = async (action: "approve" | "delete") => {
+      if (selectedIds.size === 0) return;
+      if (action === "delete" && !confirm(`Are you sure you want to delete ${selectedIds.size} student(s)?`)) return;
+
+      setActionLoading(true);
+      try {
+          const res = await fetch("/api/admin/users", {
+              method: action === "delete" ? "DELETE" : "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ ids: Array.from(selectedIds), action }),
+          });
+          const data = await res.json() as any;
+          if (data.success) fetchUsers();
+          else alert(data.message || "Action failed");
+      } catch (err) {
+          console.error(err);
+      } finally {
+          setActionLoading(false);
+      }
+  };
+
+  const toggleSelection = (id: string) => {
+      const newSelected = new Set(selectedIds);
+      if (newSelected.has(id)) newSelected.delete(id);
+      else newSelected.add(id);
+      setSelectedIds(newSelected);
+  };
+
+  const toggleAll = () => {
+      if (selectedIds.size === users.length && users.length > 0) {
+          setSelectedIds(new Set());
+      } else {
+          setSelectedIds(new Set(users.map(u => u.id)));
+      }
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -87,10 +128,34 @@ export default function AdminUsersPage() {
             <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center">
               <Shield className="w-5 h-5 text-brand" />
             </div>
-            <h1 className="text-lg font-black text-foreground tracking-tight">
-              User Management
-            </h1>
+            <div>
+                <h1 className="text-lg font-black text-foreground tracking-tight">
+                User Management
+                </h1>
+            </div>
           </div>
+          
+          {/* Action Dashboard for External Students */}
+          {activeTab === "external" && selectedIds.size > 0 && (
+            <div className="flex items-center gap-2 bg-muted/50 p-2 rounded-xl border border-border animate-in fade-in slide-in-from-bottom-2 ml-auto">
+              <span className="text-xs font-bold text-muted-foreground px-2">
+                {selectedIds.size} Selected
+              </span>
+              <button 
+                onClick={() => handleBulkAction("approve")}
+                disabled={actionLoading}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500/10 text-green-600 hover:bg-green-500/20 text-xs font-bold rounded-lg transition-colors">
+                <UserCheck className="w-3.5 h-3.5" />
+                Approve
+              </button>
+              <button 
+                onClick={() => handleBulkAction("delete")}
+                disabled={actionLoading}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-500 hover:bg-red-500/20 text-xs font-bold rounded-lg transition-colors">
+                 Delete
+              </button>
+            </div>
+          )}
         </div>
       </header>
 
@@ -194,24 +259,52 @@ export default function AdminUsersPage() {
                     )}
                     {activeTab === "external" && (
                       <>
+                        <th className="px-5 py-3 w-12 text-left">
+                           <input 
+                             type="checkbox" 
+                             className="w-4 h-4 rounded border-border text-brand focus:ring-brand accent-brand cursor-pointer"
+                             checked={selectedIds.size > 0 && selectedIds.size === users.length}
+                             onChange={toggleAll}
+                           />
+                        </th>
                         <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Name</th>
                         <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">College</th>
                         <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Branch</th>
                         <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">CGPA</th>
-                        <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Screened</th>
+                         <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Verified</th>
                       </>
                     )}
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((user: any, i: number) => (
+                  {users.map((user: any, i: number) => {
+                     const isSelected = activeTab === "external" && selectedIds.has(user.id);
+                     return (
                     <tr
                       key={user.id || i}
-                      className="border-b border-border/50 hover:bg-muted/30 transition-colors"
+                      className={`border-b border-border/50 transition-colors ${isSelected ? "bg-brand/5" : "hover:bg-muted/30"}`}
+                      onClick={(e) => {
+                          if (activeTab === "external" && (e.target as HTMLElement).tagName !== "INPUT" && (e.target as HTMLElement).tagName !== "BUTTON") {
+                              toggleSelection(user.id);
+                          }
+                      }}
                     >
                       {activeTab === "student" && (
                         <>
-                          <td className="px-5 py-3.5 font-medium text-foreground">{user.name}</td>
+                          <td className="px-5 py-3.5">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full overflow-hidden bg-muted flex-shrink-0 border border-border">
+                                {user.profileImageUrl ? (
+                                  <img src={user.profileImageUrl} alt="" className="w-full h-full object-cover" />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-muted-foreground uppercase bg-surface">
+                                    {user.name?.charAt(0)}
+                                  </div>
+                                )}
+                              </div>
+                              <span className="font-medium text-foreground">{user.name}</span>
+                            </div>
+                          </td>
                           <td className="px-5 py-3.5 text-muted-foreground font-mono text-xs">{user.enrollmentNumber}</td>
                           <td className="px-5 py-3.5 text-muted-foreground">{user.email}</td>
                           <td className="px-5 py-3.5 text-muted-foreground">{user.branch}</td>
@@ -225,7 +318,20 @@ export default function AdminUsersPage() {
                       )}
                       {activeTab === "alumni" && (
                         <>
-                          <td className="px-5 py-3.5 font-medium text-foreground">{user.name}</td>
+                          <td className="px-5 py-3.5">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full overflow-hidden bg-muted flex-shrink-0 border border-border">
+                                {user.profileImageUrl ? (
+                                  <img src={user.profileImageUrl} alt="" className="w-full h-full object-cover" />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-muted-foreground uppercase bg-surface">
+                                    {user.name?.charAt(0)}
+                                  </div>
+                                )}
+                              </div>
+                              <span className="font-medium text-foreground">{user.name}</span>
+                            </div>
+                          </td>
                           <td className="px-5 py-3.5 text-muted-foreground">{user.personalEmail}</td>
                           <td className="px-5 py-3.5 text-muted-foreground">{user.currentCompany || "—"}</td>
                           <td className="px-5 py-3.5 text-muted-foreground">{user.jobTitle || "—"}</td>
@@ -243,19 +349,40 @@ export default function AdminUsersPage() {
                       )}
                       {activeTab === "external" && (
                         <>
-                          <td className="px-5 py-3.5 font-medium text-foreground">{user.name}</td>
+                          <td className="px-5 py-3.5 w-12 text-left">
+                            <input 
+                              type="checkbox" 
+                              className="w-4 h-4 rounded border-border text-brand focus:ring-brand accent-brand cursor-pointer"
+                              checked={isSelected}
+                              onChange={() => toggleSelection(user.id)}
+                            />
+                          </td>
+                          <td className="px-5 py-3.5">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-lg overflow-hidden bg-muted flex-shrink-0 border border-border">
+                                {user.profileImageUrl ? (
+                                  <img src={user.profileImageUrl} alt="" className="w-full h-full object-cover" />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-muted-foreground uppercase bg-surface">
+                                    {user.name?.charAt(0)}
+                                  </div>
+                                )}
+                              </div>
+                              <span className="font-medium text-foreground">{user.name}</span>
+                            </div>
+                          </td>
                           <td className="px-5 py-3.5 text-muted-foreground">{user.collegeName}</td>
                           <td className="px-5 py-3.5 text-muted-foreground">{user.branch}</td>
                           <td className="px-5 py-3.5 font-bold text-foreground">{user.cgpa}</td>
                           <td className="px-5 py-3.5">
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${user.isScreened ? "bg-green-500/10 text-green-600" : "bg-yellow-500/10 text-yellow-600"}`}>
-                              {user.isScreened ? "Screened" : "Pending"}
-                            </span>
+                             <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${user.isVerified ? "bg-green-500/10 text-green-600" : "bg-yellow-500/10 text-yellow-600"}`}>
+                               {user.isVerified ? "Verified" : "Pending"}
+                             </span>
                           </td>
                         </>
                       )}
                     </tr>
-                  ))}
+                  )})}
                 </tbody>
               </table>
             </div>

@@ -33,6 +33,7 @@ export async function GET(req: NextRequest) {
           semester: true,
           cgpa: true,
           isVerified: true,
+          profileImageUrl: true,
           createdAt: true,
         },
         orderBy: { createdAt: "desc" },
@@ -52,6 +53,7 @@ export async function GET(req: NextRequest) {
           currentCompany: true,
           jobTitle: true,
           city: true,
+          profileImageUrl: true,
           createdAt: true,
         },
         orderBy: { createdAt: "desc" },
@@ -85,7 +87,8 @@ export async function GET(req: NextRequest) {
           email: true,
           branch: true,
           cgpa: true,
-          isScreened: true,
+          isVerified: true,
+          profileImageUrl: true,
         },
         take: 100,
       });
@@ -102,5 +105,50 @@ export async function GET(req: NextRequest) {
       { success: false, message: "Failed to fetch users" },
       { status: 500 }
     );
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const { ids, action } = (await req.json()) as any;
+    if (!ids || !Array.isArray(ids) || action !== "approve") {
+      return NextResponse.json({ success: false, message: "Invalid request payload" }, { status: 400 });
+    }
+
+    const db = getDb();
+    await db.externalStudent.updateMany({
+      where: { id: { in: ids } },
+      data: { isVerified: true },
+    });
+
+    return NextResponse.json({ success: true, message: "Users approved successfully" });
+  } catch (error) {
+    console.error("Admin Users PATCH Error:", error);
+    return NextResponse.json({ success: false, message: "Failed to update users" }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const { ids, action } = (await req.json()) as any;
+    if (!ids || !Array.isArray(ids) || action !== "delete") {
+      return NextResponse.json({ success: false, message: "Invalid request payload" }, { status: 400 });
+    }
+
+    const db = getDb();
+    
+    // Also delete any existing registrations for these external students to maintain referential integrity
+    await db.driveRegistration.deleteMany({
+      where: { externalStudentId: { in: ids } },
+    });
+    
+    await db.externalStudent.deleteMany({
+      where: { id: { in: ids } },
+    });
+
+    return NextResponse.json({ success: true, message: "Users deleted successfully" });
+  } catch (error) {
+    console.error("Admin Users DELETE Error:", error);
+    return NextResponse.json({ success: false, message: "Failed to delete users" }, { status: 500 });
   }
 }

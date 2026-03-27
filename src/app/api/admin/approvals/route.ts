@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
 
     if (type === "external") {
       const externals = await db.externalStudent.findMany({
-        where: { isScreened: false },
+        where: { isVerified: false },
         select: {
           id: true, name: true, collegeName: true, branch: true, cgpa: true,
           email: true, enrollmentNumber: true, resumeUrl: true,
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
     } else if (type === "external") {
       await db.externalStudent.update({
         where: { id },
-        data: { isScreened: true },
+        data: { isVerified: true },
       });
     } else if (type === "memories") {
       await db.memory.update({

@@ -8,6 +8,9 @@ export interface Student {
   cgpa: number;
   course: string;
   batch: string;
+  profileImageUrl?: string;
+  resumeUrl?: string;
+  isVerified: boolean;
 }
 
 export interface PlacementDrive {
@@ -18,7 +21,7 @@ export interface PlacementDrive {
   ctc: string;
   minCGPA: number;
   eligibleBranches: string;
-  driveDate: string;
+  driveDate: string | Date;
   driveType: string;
   status: string;
   isRegistered?: boolean;

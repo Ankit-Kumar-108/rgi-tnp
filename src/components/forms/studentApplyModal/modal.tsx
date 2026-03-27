@@ -13,7 +13,19 @@ import {
 } from "lucide-react";
 import { PlacementDrive } from "@/types";
 
-export default function JobDetailsModal({ drive, isOpen, onClose, onSuccess }: { drive: PlacementDrive; isOpen: boolean; onClose: () => void; onSuccess: () => void }) {
+export default function JobDetailsModal({ 
+  drive, 
+  isOpen, 
+  onClose, 
+  onSuccess,
+  role = "student"
+}: { 
+  drive: PlacementDrive; 
+  isOpen: boolean; 
+  onClose: () => void; 
+  onSuccess: () => void;
+  role?: "student" | "external_student"
+}) {
     const [registering, setRegistering] = useState(false)
     const [regMsg, setRegMsg] = useState<{ text: string; ok: boolean } | null>(null)
 
@@ -38,8 +50,9 @@ export default function JobDetailsModal({ drive, isOpen, onClose, onSuccess }: {
         setRegistering(true);
         setRegMsg(null);
         try {
-            const token = getToken("student");
-            const res = await fetch("/api/student/drives", {
+            const token = getToken(role);
+            const endpoint = role === "external_student" ? "/api/external/dashboard" : "/api/student/drives";
+            const res = await fetch(endpoint, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
                 body: JSON.stringify({ driveId: drive.id }),

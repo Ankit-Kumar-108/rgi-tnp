@@ -23,13 +23,41 @@ import {
   TrendingUp,
   Network,
   ClipboardList,
-  Shield
+  Shield,
+  Earth
 } from "lucide-react"
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { isLoggedIn, logout, type UserRole } from '@/lib/auth-client'
+import { usePathname, useRouter } from 'next/navigation'
+import { LogOut } from 'lucide-react'
 
 export default function Nav() {
   const [isOpen, setIsOpen] = useState(false)
-  
+  const router = useRouter()
+  const pathname = usePathname()
+  const [loggedInRoles, setLoggedInRoles] = useState<UserRole[]>([])
+
+  useEffect(() => {
+    const roles: UserRole[] = ["student", "recruiter", "alumni", "admin", "external_student"];
+    const active = roles.filter(role => isLoggedIn(role));
+    setLoggedInRoles(active);
+  }, [pathname]);
+
+  const handleLogout = () => {
+    loggedInRoles.forEach(role => logout(role));
+    setLoggedInRoles([]);
+    router.push("/");
+    router.refresh();
+  };
+
+  const getRoleFromCategory = (cat: string): UserRole | null => {
+    if (cat === "Students") return "student";
+    if (cat === "Recruiters") return "recruiter";
+    if (cat === "External") return "external_student";
+    if (cat === "Alumni") return "alumni";
+    return null;
+  };
+
   const navItems = [
     { name: "Home", link: "/" },
     {
@@ -50,31 +78,40 @@ export default function Nav() {
     {
       name: "Students",
       subMenu: [
-        { name: "Login", icon: UserCheck, link: "students/login" },
-        { name: "Register", icon: UserPlus, link: "students/register" },
-        { name: "Dashboard", icon: Activity, link: "students/dashboard" }
+        { name: "Login", icon: UserCheck, link: "students/login", hideIfLoggedIn: true },
+        { name: "Register", icon: UserPlus, link: "students/register", hideIfLoggedIn: true },
+        { name: "Dashboard", icon: Activity, link: "students/dashboard", showIfLoggedInOnly: true }
       ]
     },
     {
       name: "Recruiters",
       subMenu: [
-        { name: "Login", icon: UserCheck, link: "recruiters/login" },
-        { name: "Register", icon: UserPlus, link: "recruiters/register" },
-        { name: "Dashboard", icon: TrendingUp, link: "recruiters/dashboard" }
+        { name: "Login", icon: UserCheck, link: "recruiters/login", hideIfLoggedIn: true },
+        { name: "Register", icon: UserPlus, link: "recruiters/register", hideIfLoggedIn: true },
+        { name: "Dashboard", icon: TrendingUp, link: "recruiters/dashboard", showIfLoggedInOnly: true }
+      ]
+    },
+    {
+      name: "External",
+      subMenu: [
+        { name: "Login", icon: UserCheck, link: "external-students/login", hideIfLoggedIn: true },
+        { name: "Register", icon: UserPlus, link: "external-students/register", hideIfLoggedIn: true },
+        { name: "Dashboard", icon: TrendingUp, link: "students/external-dashboard", showIfLoggedInOnly: true }
       ]
     },
     {
       name: "Alumni",
       subMenu: [
+        { name: "Login", icon: UserCheck, link: "alumni/login", hideIfLoggedIn: true },
+        { name: "Register", icon: ClipboardList, link: "alumni/alumni-register", hideIfLoggedIn: true },
         { name: "Alumni Network", icon: Network, link: "alumni/alumni-network" },
-        { name: "Dashboard", icon: TrendingUp, link: "alumni/dashboard" },
-        { name: "Register", icon: ClipboardList, link: "alumni/alumni-register" }
+        { name: "Dashboard", icon: TrendingUp, link: "alumni/dashboard", showIfLoggedInOnly: true },
       ]
     },
     // Standalone items
     { name: "Memories", link: "/memories" },
     { name: "Feedbacks", link: "/feedbacks" },
-    { name: "Admin", link: "/admin/login" },
+    { name: "Admin", link: "/admin/login", hideIfLoggedIn: true },
   ];
 
   // Helper function to render sub-menus seamlessly in mobile view
@@ -82,9 +119,17 @@ export default function Nav() {
     const item = navItems.find((i) => i.name === categoryName);
     if (!item || !item.subMenu) return null;
 
+    const role = getRoleFromCategory(categoryName);
+    const isRoleLoggedIn = role && loggedInRoles.includes(role);
+    const isAnyLoggedIn = loggedInRoles.length > 0;
+
     return (
       <div className="flex flex-col gap-3 pl-12 pb-3 pt-1">
-        {item.subMenu.map((subItem) => (
+        {item.subMenu.filter(sub => {
+          if (sub.hideIfLoggedIn && isAnyLoggedIn) return false;
+          if (sub.showIfLoggedInOnly && !isRoleLoggedIn) return false;
+          return true;
+        }).map((subItem) => (
           <Link
             key={subItem.name}
             href={`/${subItem.link}`}
@@ -102,7 +147,7 @@ export default function Nav() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass-effect px-6 lg:px-20">
       <div className="max-w-7xl mx-auto flex h-20 items-center justify-between">
-        
+
         {/* Logo Section */}
         <div className="flex items-center gap-3">
           <div className="text-brand">
@@ -140,7 +185,15 @@ export default function Nav() {
               {item.subMenu && (
                 <div className="absolute top-full left-0 z-50 w-56 p-2 bg-background/95 backdrop-blur-md border border-border/50 shadow-2xl shadow-brand/5 rounded-xl opacity-0 invisible -translate-y-1 scale-95 origin-top-left group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 group-hover:scale-100 transition-all duration-200 ease-out">
                   <div className="flex flex-col gap-1">
-                    {item.subMenu.map((subItem) => (
+                    {item.subMenu.filter(sub => {
+                      const role = getRoleFromCategory(item.name);
+                      const isRoleLoggedIn = role && loggedInRoles.includes(role);
+                      const isAnyLoggedIn = loggedInRoles.length > 0;
+
+                      if (sub.hideIfLoggedIn && isAnyLoggedIn) return false;
+                      if (sub.showIfLoggedInOnly && !isRoleLoggedIn) return false;
+                      return true;
+                    }).map((subItem) => (
                       <Link
                         href={`/${subItem.link}`}
                         key={subItem.name}
@@ -159,19 +212,38 @@ export default function Nav() {
           ))}
         </div>
 
-        {/* Right Section: Theme Toggler & Mobile Menu */}
-        <div>
+        {/* Right Section: Theme Toggler & Logout & Mobile Menu */}
+        <div className="flex items-center gap-4">
           <AnimatedThemeToggler />
+          {loggedInRoles.length > 0 && (
+            <button
+              onClick={handleLogout}
+              className="hidden lg:flex items-center gap-2 bg-destructive/10 text-destructive px-4 py-2 rounded-xl text-xs font-bold hover:bg-destructive/20 transition-all shadow-sm"
+              title="Logout from all sessions"
+            >
+              <LogOut className="size-4" />
+              Logout
+            </button>
+          )}
         </div>
 
         {/* Mobile Hamburger Navigation */}
-        <div className='lg:hidden flex items-center'>
+        <div className='lg:hidden flex items-center gap-4'>
+          {loggedInRoles.length > 0 && (
+            <button
+              onClick={handleLogout}
+              className="flex items-center justify-center p-2 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"
+              title="Logout"
+            >
+              <LogOut className="size-5" />
+            </button>
+          )}
           <div
             onClick={() => setIsOpen(!isOpen)}
-            className='size-7 md:mr-15 group cursor-pointer'>
+            className='size-7 cursor-pointer'>
             {isOpen ? (<X />) : (<Menu />)}
           </div>
-          
+
           {isOpen && (
             <>
               {/* Added max-h and overflow-y-auto so the menu is scrollable on smaller phones */}
@@ -220,6 +292,15 @@ export default function Nav() {
                     {renderMobileSubMenu("Recruiters")}
                   </div>
 
+                  {/* External Students */}
+                  <div className="flex flex-col">
+                    <div className='flex items-center gap-4 p-3'>
+                      <Earth className='text-brand size-5' />
+                      <p className="font-medium text-sm text-foreground">External</p>
+                    </div>
+                    {renderMobileSubMenu("External")}
+                  </div>
+
                   {/* Alumni das */}
                   <div className="flex flex-col">
                     <div className='flex items-center gap-4 p-3'>
@@ -249,7 +330,7 @@ export default function Nav() {
 
                 </div>
               </div>
-              
+
               {/* Overlay Backdrop to close menu when clicking outside */}
               <div
                 onClick={() => setIsOpen(false)}
@@ -259,7 +340,7 @@ export default function Nav() {
           )}
 
         </div>
-        
+
         {/* Desktop Contact CTA */}
         {/* <button className="hidden -mr-20 lg:block bg-brand text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-brand/90 transition-all shadow-lg shadow-brand/20">
           Contact Us

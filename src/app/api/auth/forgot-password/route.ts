@@ -39,12 +39,36 @@ export async function POST(req: NextRequest) {
       await db.student.update({
         where: { email },
         data: {
-          emailVerificationToken: resetTokenHash,
-          emailVerificationTokenExpiry: expiry,
+          resetPasswordToken: resetTokenHash,
+          resetPasswordTokenExpiry: expiry,
+        },
+      });
+    } else if (role === "external_student") {
+      const externalStudent = await db.externalStudent.findUnique({ where: { email } });
+      if (!externalStudent) {
+        return NextResponse.json({ success: true, message: "If an account exists, a reset link was sent." });
+      }
+      await db.externalStudent.update({
+        where: { email },
+        data: {
+          resetPasswordToken: resetTokenHash,
+          resetPasswordTokenExpiry: expiry,
+        },
+      });
+    } else if (role === "alumni") {
+      const alumni = await db.alumni.findUnique({ where: { personalEmail: email } });
+      if (!alumni) {
+        return NextResponse.json({ success: true, message: "If an account exists, a reset link was sent." });
+      }
+      await db.alumni.update({
+        where: { personalEmail: email },
+        data: {
+          resetPasswordToken: resetTokenHash,
+          resetPasswordTokenExpiry: expiry,
         },
       });
     } else {
-      return NextResponse.json({ success: true, message: "If an account exists, a reset link was sent." });
+      return NextResponse.json({ success: false, message: "Invalid role specified." }, { status: 400 });
     }
 
     const resetUrl = `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/reset-password?token=${resetToken}&role=${role}`;

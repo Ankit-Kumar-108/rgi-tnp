@@ -29,17 +29,25 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Not found" }, { status: 404 });
     }
 
-    // Only show open & active drives if screened
+    // Only show open & active drives if verified (unfiltered by eligibility, handled on frontend)
     let drives: any[] = [];
-    if (student.isScreened) {
+    let archivedDrives: any[] = [];
+    
+    if (student.isVerified) {
       drives = await db.placementDrive.findMany({
         where: {
           status: "active",
           driveType: "Open",
-          eligibleBranches: { contains: student.branch },
-          minCGPA: { lte: student.cgpa },
         },
         orderBy: { driveDate: "asc" },
+      });
+      
+      archivedDrives = await db.placementDrive.findMany({
+        where: {
+          status: "completed",
+          driveType: "Open"
+        },
+        orderBy: { driveDate: "desc" }
       });
     }
 
@@ -57,9 +65,10 @@ export async function GET(req: NextRequest) {
       student: {
         id: student.id, name: student.name, collegeName: student.collegeName,
         branch: student.branch, cgpa: student.cgpa, email: student.email,
-        isScreened: student.isScreened,
+        isVerified: student.isVerified, resumeUrl: student.resumeUrl,
       },
       drives: drives.map((d: any) => ({ ...d, isRegistered: registeredDriveIds.includes(d.id) })),
+      archivedDrives: archivedDrives.map((d: any) => ({ ...d, isRegistered: registeredDriveIds.includes(d.id) })),
       registrations,
     });
   } catch (error) {
@@ -80,8 +89,8 @@ export async function POST(req: NextRequest) {
     const db = getDb();
 
     const student = await db.externalStudent.findUnique({ where: { id: ext.id } });
-    if (!student || !student.isScreened) {
-      return NextResponse.json({ success: false, message: "You must be screened by admin first" }, { status: 403 });
+    if (!student || !student.isVerified) {
+      return NextResponse.json({ success: false, message: "You must be verified by admin first" }, { status: 403 });
     }
 
     const drive = await db.placementDrive.findUnique({ where: { id: body.driveId } });

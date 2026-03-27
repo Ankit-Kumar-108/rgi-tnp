@@ -1,4 +1,3 @@
-// Client-side auth token helpers (localStorage)
 
 const TOKEN_KEYS: Record<string, string> = {
   student: "student_token",
@@ -31,7 +30,13 @@ export const getToken = (role: UserRole): string | null => {
 export const getUser = (role: UserRole): any | null => {
   if (typeof window === "undefined") return null;
   const user = localStorage.getItem(USER_KEYS[role]);
-  return user ? JSON.parse(user) : null;
+  if (!user || user === "undefined" || user === "null") return null;
+  try {
+    return JSON.parse(user);
+  } catch (e) {
+    console.error(`Error parsing user from localStorage for role ${role}:`, e);
+    return null;
+  }
 };
 
 export const isLoggedIn = (role: UserRole): boolean => {

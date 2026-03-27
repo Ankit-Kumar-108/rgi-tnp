@@ -29,10 +29,9 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ success: false, message: "Invalid email or password" }, { status: 401 });
         }
         
-        // Optionally check if they are screened
-        // if (!externalStudent.isScreened) {
-        //     return NextResponse.json({ success: false, message: "Your profile is pending admin screening" }, { status: 403 });
-        // }
+        if (!externalStudent.isVerified) {
+             return NextResponse.json({ success: false, message: "Your email is not verified. Please check your inbox for the verification link." }, { status: 403 });
+         }
 
         const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
         const token = await new jose.SignJWT({ 
@@ -52,7 +51,7 @@ export async function POST(req: NextRequest) {
                 id: externalStudent.id,
                 name: externalStudent.name,
                 email: externalStudent.email,
-                isScreened: externalStudent.isScreened,
+                isVerified: externalStudent.isVerified,
             }
          }, { status: 200 });
 

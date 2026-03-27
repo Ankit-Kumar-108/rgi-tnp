@@ -43,6 +43,53 @@ export const otpEmailTemplate = (otp: string, name: string): string => {
   `;
 };
 
+export const externalVerificationEmailTemplate = (name: string, verificationLink: string): string => {
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="UTF-8">
+        <style>
+          body { font-family: Arial, sans-serif; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: #9213ec; color: white; padding: 20px; text-align: center; border-radius: 8px; }
+          .content { padding: 20px; background: #f5f5f5; margin: 20px 0; border-radius: 8px; }
+          .button { display: inline-block; background: #9213ec; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; margin: 20px 0; font-weight: bold; }
+          .timer { color: #d32f2f; font-weight: bold; }
+          .footer { text-align: center; color: #666; font-size: 12px; margin-top: 20px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Verify Your Email - RGI TnP Portal</h1>
+          </div>
+          
+          <div class="content">
+            <p>Hi ${name},</p>
+            <p>Thank you for registering as an external student with RGI Training & Placement Portal. To activate your account, please verify your email address by clicking the button below:</p>
+            
+            <div style="text-align: center;">
+              <a href="${verificationLink}" class="button">Verify Email Address</a>
+            </div>
+            
+            <p class="timer">⏰ This link expires in 30 minutes</p>
+            
+            <p>If the button doesn't work, you can copy and paste this link into your browser:</p>
+            <p style="word-break: break-all; color: #9213ec; font-size: 12px;">${verificationLink}</p>
+            
+            <p>If you didn't register for this account, you can safely ignore this email.</p>
+          </div>
+          
+          <div class="footer">
+            <p>© 2024 RGI Training & Placement. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+};
+
 export const verificationSuccessTemplate = (name: string): string => {
   return `
     <!DOCTYPE html>

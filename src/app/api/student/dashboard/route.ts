@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
       select: {
         id: true, name: true, enrollmentNumber: true, email: true,
         branch: true, semester: true, cgpa: true, isVerified: true,
-        image: true, phoneNumber: true, course: true, batch: true,
+        profileImageUrl: true, phoneNumber: true, course: true, batch: true,
       },
     });
 
@@ -38,18 +38,18 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Student not found" }, { status: 404 });
     }
 
-    // Get eligible active drives
+    // Get all active drives (eligibility handled on frontend)
     const drives = await db.placementDrive.findMany({
       where: {
         status: "active",
-        OR: [
-          { course: "All" },
-          { course: { contains: studentData.course } }
-        ],
-        eligibleBranches: { contains: studentData.branch },
-        minCGPA: { lte: studentData.cgpa },
       },
       orderBy: { driveDate: "asc" },
+    });
+
+    // Get archived/completed drives
+    const archivedDrives = await db.placementDrive.findMany({
+      where: { status: "completed" },
+      orderBy: { driveDate: "desc" },
     });
 
     // Get student's registrations
@@ -73,6 +73,10 @@ export async function GET(req: NextRequest) {
       success: true,
       student: studentData,
       drives: drives.map((d: any) => ({
+        ...d,
+        isRegistered: registeredDriveIds.includes(d.id),
+      })),
+      archivedDrives: archivedDrives.map((d: any) => ({
         ...d,
         isRegistered: registeredDriveIds.includes(d.id),
       })),

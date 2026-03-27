@@ -51,6 +51,7 @@ export default function RecruiterDashboard() {
     course: "B.Tech",
     driveDate: "",
     driveType: "Closed",
+    jobType: "Full-Time",
   });
 
   useEffect(() => {
@@ -92,7 +93,7 @@ export default function RecruiterDashboard() {
       setFormMsg({ msg: d.message, ok: d.success });
       if (d.success) {
         setShowForm(false);
-        setForm({ companyName: user?.company || "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed" });
+        setForm({ companyName: user?.company || "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full-Time" });
         fetchDashboard();
       }
     } catch {
@@ -207,8 +208,17 @@ export default function RecruiterDashboard() {
                     </div>
                     <div>
                       <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Min CGPA</label>
-                      <input required type="float" step="0.1" min="0" max="10" value={form.minCGPA} onChange={(e) => setForm({ ...form, minCGPA: parseFloat(e.target.value) || 0 })}
+                      <input required type="number" step="0.1" min="0" max="10" value={form.minCGPA} onChange={(e) => setForm({ ...form, minCGPA: parseFloat(e.target.value) || 0 })}
                         className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Job Type</label>
+                      <select required value={form.jobType} onChange={(e) => setForm({ ...form, jobType: e.target.value })}
+                        className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none">
+                        <option value="Full-Time">Full-Time</option>
+                        <option value="Internship">Internship</option>
+                        <option value="Contract">Contract</option>
+                      </select>
                     </div>
                   </div>
                   <div>

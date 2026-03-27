@@ -2,7 +2,7 @@
 
 import Nav from "@/components/layout/nav/nav"
 import Footer from "@/components/layout/footer/footer"
-import { Building2, Mail, LockKeyhole, Earth, Info, Share2, Briefcase, User, Phone, BadgeCheck, Loader2 } from "lucide-react"
+import { Building2, Mail, LockKeyhole, Earth, Info, Share2, Briefcase, User, Phone, BadgeCheck, Loader2, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -16,6 +16,8 @@ export default function RecruiterRegister() {
         name: "", email: "", phoneNumber: "", designation: "",
         company: "", password: "", confirmPassword: "",
     });
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const update = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
         setForm(prev => ({ ...prev, [field]: e.target.value }));
@@ -38,7 +40,7 @@ export default function RecruiterRegister() {
         } catch { setError("Something went wrong."); } finally { setLoading(false); }
     };
 
-    const inputClass = "w-full pl-11 pr-4 py-3 sm:py-3.5 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all placeholder:text-muted-foreground text-sm sm:text-base shadow-sm";
+    const inputClass = "w-full pl-11 pr-12 py-3 sm:py-3.5 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all placeholder:text-muted-foreground text-sm sm:text-base shadow-sm";
     const iconClass = "absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground";
 
     return (
@@ -57,7 +59,7 @@ export default function RecruiterRegister() {
                     </div>
                     <div className="p-6 sm:p-10 md:p-12 flex flex-col justify-center relative max-h-[90vh] overflow-y-auto">
                         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 rounded-full bg-brand/5 blur-2xl z-0 pointer-events-none"></div>
-                        <div className="mb-6 relative z-10 mt-25">
+                        <div className="mb-6 relative z-10">
                             <h2 className="text-3xl font-bold tracking-tight text-foreground mb-2">Company Registration</h2>
                             <p className="text-muted-foreground text-sm">Register your organization to access our talent pool.</p>
                         </div>
@@ -113,15 +115,29 @@ export default function RecruiterRegister() {
                                 <div className="space-y-1">
                                     <label className="text-sm font-semibold text-foreground">Password</label>
                                     <div className="relative">
-                                        <div className={iconClass}><LockKeyhole className="w-5 h-5"/></div>
-                                        <input className={inputClass} placeholder="Min 8 chars" type="password" required value={form.password} onChange={update("password")} />
+                                        <div className={iconClass}><LockKeyhole className="w-5 h-5" /></div>
+                                        <input className={inputClass} placeholder="Min 8 chars" type={showPassword ? "text" : "password"} required value={form.password} onChange={update("password")} />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-brand transition-colors"
+                                        >
+                                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                        </button>
                                     </div>
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-sm font-semibold text-foreground">Confirm Password</label>
                                     <div className="relative">
-                                        <div className={iconClass}><LockKeyhole className="w-5 h-5"/></div>
-                                        <input className={inputClass} placeholder="Re-enter password" type="password" required value={form.confirmPassword} onChange={update("confirmPassword")} />
+                                        <div className={iconClass}><LockKeyhole className="w-5 h-5" /></div>
+                                        <input className={inputClass} placeholder="Re-enter password" type={showConfirmPassword ? "text" : "password"} required value={form.confirmPassword} onChange={update("confirmPassword")} />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-brand transition-colors"
+                                        >
+                                            {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                        </button>
                                     </div>
                                 </div>
                             </div>

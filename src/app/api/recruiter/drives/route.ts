@@ -36,6 +36,8 @@ export async function POST(req: NextRequest) {
       course: string;
       driveDate: string;
       driveType: string;
+      jobType: string;
+      isRegistered?: boolean;
     };
 
     const db = getDb();
@@ -53,6 +55,7 @@ export async function POST(req: NextRequest) {
         course: body.course,
         driveDate: new Date(body.driveDate),
         driveType: body.driveType || "Closed",
+        jobType: body.jobType || "Full-Time",
         status: "pending",
         recruiter: { connect: { id: recruiter.id } },
       },

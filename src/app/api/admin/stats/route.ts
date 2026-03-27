@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
       db.placementDrive.count({ where: { status: "active" } }),
       db.referral.count({ where: { status: "pending" } }),
       db.memory.count({ where: { status: "pending_moderation" } }),
-      db.externalStudent.count({ where: { isScreened: false } }),
+      db.externalStudent.count({ where: { isVerified: false } }),
     ]);
 
     const pendingApprovals =
@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
         pendingDrives,
         pendingReferrals,
         pendingMemories,
-        pendingExternalScreening,
+        pendingExternalScreening: pendingExternalScreening,
       },
     });
   } catch (error: any) {

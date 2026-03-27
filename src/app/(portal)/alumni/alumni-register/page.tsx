@@ -2,10 +2,11 @@
 
 import Nav from "@/components/layout/nav/nav"
 import Footer from "@/components/layout/footer/footer"
-import { LogIn, Mail, LockKeyhole, Earth, Info, Share2, Hash, User, Loader2, UserPlus } from "lucide-react"
+import { LogIn, Mail, LockKeyhole, Earth, Info, Share2, Hash, User, Loader2, UserPlus, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { uploadFileToR2 } from "@/lib/upload-r2"
 
 export default function AlumniRegistration() {
     const router = useRouter();
@@ -16,6 +17,22 @@ export default function AlumniRegistration() {
         name: "", enrollmentNumber: "", personalEmail: "", course: "", batch: "",
         password: "", confirmPassword: "",
     });
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    
+    const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            if (file.size > 5 * 1024 * 1024) {
+                setError("Image must be smaller than 5MB");
+                return;
+            }
+            setProfileImageFile(file);
+        }
+    };
+
 
     const update = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
         setForm(prev => ({ ...prev, [field]: e.target.value }));
@@ -26,10 +43,14 @@ export default function AlumniRegistration() {
         if (form.password !== form.confirmPassword) { setError("Passwords do not match"); return; }
         setLoading(true);
         try {
+            let profileImageUrl = "";
+            if (profileImageFile) {
+                profileImageUrl = await uploadFileToR2(profileImageFile, "profiles");
+            }
             const res = await fetch("/api/auth/register/alumni-register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(form),
+                body: JSON.stringify({...form, profileImageUrl}),
             });
             const data = (await res.json()) as { success?: boolean; message?: string };
             if (!res.ok || !data.success) { setError(data.message || "Registration failed"); return; }
@@ -38,7 +59,7 @@ export default function AlumniRegistration() {
         } catch { setError("Something went wrong."); } finally { setLoading(false); }
     };
 
-    const inputClass = "w-full pl-11 pr-4 py-3 sm:py-3.5 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all placeholder:text-muted-foreground text-sm sm:text-base shadow-sm";
+    const inputClass = "w-full pl-11 pr-12 py-3 sm:py-3.5 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all placeholder:text-muted-foreground text-sm sm:text-base shadow-sm";
     const iconClass = "absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground";
 
     return (
@@ -117,20 +138,39 @@ export default function AlumniRegistration() {
                                     <input className="w-full py-3 sm:py-3.5 px-4 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all text-sm shadow-sm" type="text" placeholder="e.g. 2021-2025" required value={form.batch} onChange={update("batch")} />
                                 </div>
                             </div>
+                            {/* Profile Image */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-foreground">Profile Picture (Optional)</label>
+                                <input type="file" accept="image/*" onChange={handleFileChange} className="w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand/10 file:text-brand hover:file:bg-brand/20 cursor-pointer" />
+                            </div>
                             {/* Password */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <label className="text-sm font-semibold text-foreground">Password</label>
                                     <div className="relative">
-                                        <div className={iconClass}><LockKeyhole className="w-5 h-5"/></div>
-                                        <input className={inputClass} placeholder="Create a password" type="password" required value={form.password} onChange={update("password")} />
+                                        <div className={iconClass}><LockKeyhole className="w-5 h-5" /></div>
+                                        <input className={inputClass} placeholder="Create a password" type={showPassword ? "text" : "password"} required value={form.password} onChange={update("password")} />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-brand transition-colors"
+                                        >
+                                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                        </button>
                                     </div>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-semibold text-foreground">Confirm Password</label>
                                     <div className="relative">
-                                        <div className={iconClass}><LockKeyhole className="w-5 h-5"/></div>
-                                        <input className={inputClass} placeholder="Re-enter password" type="password" required value={form.confirmPassword} onChange={update("confirmPassword")} />
+                                        <div className={iconClass}><LockKeyhole className="w-5 h-5" /></div>
+                                        <input className={inputClass} placeholder="Re-enter password" type={showConfirmPassword ? "text" : "password"} required value={form.confirmPassword} onChange={update("confirmPassword")} />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-brand transition-colors"
+                                        >
+                                            {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                        </button>
                                     </div>
                                 </div>
                             </div>

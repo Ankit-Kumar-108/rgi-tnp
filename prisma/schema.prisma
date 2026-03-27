@@ -44,10 +44,14 @@ model Student {
   isEmailVerified              Boolean             @default(false)
   emailVerificationToken       String?
   emailVerificationTokenExpiry DateTime?
-  otpAttempts                   Int                 @default(0)
-  lastOtpSentAt                  DateTime?
-  image                        String?
-  feedback                      String?
+  resetPasswordToken           String?
+  resetPasswordTokenExpiry     DateTime?
+  otpAttempts                  Int                 @default(0)
+  lastOtpSentAt                DateTime?
+  profileImageUrl              String?
+  resumeUrl                    String?
+  memoriesImageUrl             String?
+  feedback                     String?
   batch                        String
   phoneNumber                  String
   course                       String
@@ -62,14 +66,19 @@ model Student {
 }
 
 model Alumni {
-  id                String     @id @default(cuid())
+  id                String           @id @default(cuid())
   name              String
-  enrollmentNumber  String     @unique
-  personalEmail     String     @unique
+  enrollmentNumber  String           @unique
+  personalEmail     String           @unique
   passwordHash      String
-  isVerified        Boolean    @default(false)
-  isProfileComplete Boolean    @default(false)
+  isVerified        Boolean          @default(false)
+  emailVerificationToken       String?
+  emailVerificationTokenExpiry DateTime?
+  resetPasswordToken           String?
+  resetPasswordTokenExpiry     DateTime?
+  isProfileComplete Boolean          @default(false)
   currentCompany    String?
+  profileImageUrl    String
   jobTitle          String?
   city              String?
   linkedInUrl       String?
@@ -78,47 +87,53 @@ model Alumni {
   course            String
   referrals         Referral[]
   alumniFeedbacks   AlumniFeedback[]
-  createdAt         DateTime   @default(now())
+  createdAt         DateTime         @default(now())
 }
 
 model ExternalStudent {
-  id               String  @id @default(cuid())
+  id               String              @id @default(cuid())
   name             String
   collegeName      String
   enrollmentNumber String
-  email            String  @unique
+  email            String              @unique
   passwordHash     String
+  profileImageUrl  String
+  feedback         String?
   resumeUrl        String
-  isScreened       Boolean @default(false)
   branch           String
   cgpa             Float
   course           String
   batch            String
   phoneNumber      String
-  isVerified       Boolean             @default(false)
-  role             String              @default("external_student")
-  registrations DriveRegistration[]
+  isVerified                   Boolean             @default(false)
+  emailVerificationToken       String?
+  emailVerificationTokenExpiry DateTime?
+  resetPasswordToken           String?
+  resetPasswordTokenExpiry     DateTime?
+  role                         String              @default("external_student")
+  registrations                DriveRegistration[]
 }
 
 // 4. DRIVE & INTERACTION MODELS
 model PlacementDrive {
-  id               String   @id @default(cuid())
+  id               String              @id @default(cuid())
   companyName      String
   roleName         String
   jobDescription   String
   ctc              String
   minCGPA          Float
+  jobType           String
   minBatch         String
   maxBatch         String
   course           String
   eligibleBranches String
   driveDate        DateTime
   driveType        String
-  status           String   @default("pending")
+  status           String              @default("pending")
   googleSheetUrl   String?
-  recruiterId   String
-  recruiter     Recruiter           @relation(fields: [recruiterId], references: [id])
-  registrations DriveRegistration[]
+  recruiterId      String
+  recruiter        Recruiter           @relation(fields: [recruiterId], references: [id])
+  registrations    DriveRegistration[]
 }
 
 model DriveRegistration {
@@ -132,6 +147,7 @@ model DriveRegistration {
   externalStudent   ExternalStudent? @relation(fields: [externalStudentId], references: [id])
 
   attended  Boolean  @default(false)
+  status    String   @default("Applied")
   createdAt DateTime @default(now())
 }
 
@@ -145,8 +161,8 @@ model Recruiter {
   passwordHash String
   role         String @default("recruiter")
 
-  drives              PlacementDrive[]
-  corporateFeedbacks  CorporateFeedback[]
+  drives             PlacementDrive[]
+  corporateFeedbacks CorporateFeedback[]
 }
 
 model Referral {

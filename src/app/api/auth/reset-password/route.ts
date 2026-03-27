@@ -35,8 +35,8 @@ export async function POST(req: NextRequest) {
     if (role === "student") {
       const student = await db.student.findFirst({
         where: {
-          emailVerificationToken: tokenHash,
-          emailVerificationTokenExpiry: { gt: new Date() },
+          resetPasswordToken: tokenHash,
+          resetPasswordTokenExpiry: { gt: new Date() },
         },
       });
 
@@ -49,12 +49,54 @@ export async function POST(req: NextRequest) {
         where: { id: student.id },
         data: {
           passwordHash,
-          emailVerificationToken: null,
-          emailVerificationTokenExpiry: null,
+          resetPasswordToken: null,
+          resetPasswordTokenExpiry: null,
+        },
+      });
+    } else if (role === "external_student") {
+      const externalStudent = await db.externalStudent.findFirst({
+        where: {
+          resetPasswordToken: tokenHash,
+          resetPasswordTokenExpiry: { gt: new Date() },
+        },
+      });
+
+      if (!externalStudent) {
+        return NextResponse.json({ success: false, message: "Invalid or expired reset token" }, { status: 400 });
+      }
+
+      const passwordHash = await hashPassword(password);
+      await db.externalStudent.update({
+        where: { id: externalStudent.id },
+        data: {
+          passwordHash,
+          resetPasswordToken: null,
+          resetPasswordTokenExpiry: null,
+        },
+      });
+    } else if (role === "alumni") {
+      const alumni = await db.alumni.findFirst({
+        where: {
+          resetPasswordToken: tokenHash,
+          resetPasswordTokenExpiry: { gt: new Date() },
+        },
+      });
+
+      if (!alumni) {
+        return NextResponse.json({ success: false, message: "Invalid or expired reset token" }, { status: 400 });
+      }
+
+      const passwordHash = await hashPassword(password);
+      await db.alumni.update({
+        where: { id: alumni.id },
+        data: {
+          passwordHash,
+          resetPasswordToken: null,
+          resetPasswordTokenExpiry: null,
         },
       });
     } else {
-      return NextResponse.json({ success: false, message: "Password reset not supported for this role yet" }, { status: 400 });
+      return NextResponse.json({ success: false, message: "Invalid role specified" }, { status: 400 });
     }
 
     return NextResponse.json({ success: true, message: "Password reset successfully. You can now log in." });

@@ -14,6 +14,9 @@ import {
   CheckCircle,
   Clock,
   XCircle,
+  Linkedin,
+  MapPin,
+  Phone,
 } from "lucide-react";
 import Nav from "@/components/layout/nav/nav";
 import Footer from "@/components/layout/footer/footer";
@@ -36,6 +39,18 @@ export default function AlumniDashboard() {
   const [submittingFb, setSubmittingFb] = useState(false);
   const [fbMsg, setFbMsg] = useState<{ msg: string; ok: boolean } | null>(null);
 
+  // Profile Form
+  const [profileForm, setProfileForm] = useState({
+    currentCompany: "",
+    jobTitle: "",
+    city: "",
+    linkedInUrl: "",
+    phoneNumber: "",
+  });
+  const [submittingProfile, setSubmittingProfile] = useState(false);
+  const [profileMsg, setProfileMsg] = useState<{ msg: string; ok: boolean } | null>(null);
+  const [showProfileForm, setShowProfileForm] = useState(false);
+
   useEffect(() => {
     if (!authenticated) return;
     fetchDashboard();
@@ -48,7 +63,18 @@ export default function AlumniDashboard() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const d = (await res.json()) as any;
-      if (d.success) setData(d);
+      if (d.success) {
+        setData(d);
+        if (d.alumni) {
+          setProfileForm({
+            currentCompany: d.alumni.currentCompany || "",
+            jobTitle: d.alumni.jobTitle || "",
+            city: d.alumni.city || "",
+            linkedInUrl: d.alumni.linkedInUrl || "",
+            phoneNumber: d.alumni.phoneNumber || "",
+          });
+        }
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -104,6 +130,30 @@ export default function AlumniDashboard() {
     }
   };
 
+  const handleSubmitProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmittingProfile(true);
+    setProfileMsg(null);
+    try {
+      const token = getToken("alumni");
+      const res = await fetch("/api/alumni/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(profileForm),
+      });
+      const d = (await res.json()) as any;
+      setProfileMsg({ msg: d.message, ok: d.success });
+      if (d.success) {
+        fetchDashboard();
+        setTimeout(() => setShowProfileForm(false), 2000);
+      }
+    } catch {
+      setProfileMsg({ msg: "Update failed", ok: false });
+    } finally {
+      setSubmittingProfile(false);
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "published": return "bg-green-500/10 text-green-600";
@@ -141,13 +191,99 @@ export default function AlumniDashboard() {
             <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground leading-tight">
               Welcome back, <span className="text-brand">{user?.name || alumni?.name || "Alumni"}</span>
             </h1>
-            {alumni && (
-              <p className="text-muted-foreground mt-2 text-sm">
-                {alumni.currentCompany && `${alumni.jobTitle} at ${alumni.currentCompany}`}
-                {alumni.city && ` • ${alumni.city}`}
-              </p>
-            )}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-2">
+              {alumni && (
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-muted-foreground text-sm font-medium">
+                  {alumni.currentCompany && (
+                    <span className="flex items-center gap-1.5 bg-muted/50 px-3 py-1 rounded-full border border-border">
+                      <Briefcase className="w-3.5 h-3.5 text-brand" /> {alumni.jobTitle} at {alumni.currentCompany}
+                    </span>
+                  )}
+                  {alumni.city && (
+                    <span className="flex items-center gap-1.5 bg-muted/50 px-3 py-1 rounded-full border border-border">
+                      <MapPin className="w-3.5 h-3.5 text-brand" /> {alumni.city}
+                    </span>
+                  )}
+                  {alumni.linkedInUrl && (
+                    <a href={alumni.linkedInUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 bg-brand/5 text-brand hover:bg-brand/10 px-3 py-1 rounded-full border border-brand/20 transition-colors">
+                      <Linkedin className="w-3.5 h-3.5" /> LinkedIn Profile
+                    </a>
+                  )}
+                </div>
+              )}
+              <button 
+                onClick={() => setShowProfileForm(!showProfileForm)}
+                className="inline-flex items-center gap-2 text-sm font-bold text-brand hover:text-brand/80 transition-colors"
+              >
+                {showProfileForm ? "Cancel Edit" : "Update Profile"}
+                <ChevronRight className={`w-4 h-4 transition-transform ${showProfileForm ? "rotate-90" : ""}`} />
+              </button>
+            </div>
           </section>
+
+          {/* Profile Form (Collapsible) */}
+          {showProfileForm && (
+            <section className="bg-card rounded-[2rem] p-8 shadow-xl border-2 border-brand/20 animate-in fade-in slide-in-from-top-4 duration-300">
+              <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
+                <div className="p-2 bg-brand/10 rounded-lg text-brand"><GraduationCap className="w-5 h-5"/></div>
+                Professional Details
+              </h2>
+              <form onSubmit={handleSubmitProfile} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Current Company</label>
+                    <input required value={profileForm.currentCompany} onChange={(e) => setProfileForm({ ...profileForm, currentCompany: e.target.value })}
+                      className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
+                      placeholder="e.g. Microsoft" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Job Title</label>
+                    <input required value={profileForm.jobTitle} onChange={(e) => setProfileForm({ ...profileForm, jobTitle: e.target.value })}
+                      className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
+                      placeholder="e.g. Senior Engineer" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">City</label>
+                    <input required value={profileForm.city} onChange={(e) => setProfileForm({ ...profileForm, city: e.target.value })}
+                      className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
+                      placeholder="e.g. Bangalore" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">LinkedIn URL</label>
+                    <div className="relative">
+                      <Linkedin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <input value={profileForm.linkedInUrl} onChange={(e) => setProfileForm({ ...profileForm, linkedInUrl: e.target.value })}
+                        className="w-full bg-muted pl-11 pr-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
+                        placeholder="https://linkedin.com/in/..." />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Phone Number</label>
+                    <div className="relative">
+                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <input value={profileForm.phoneNumber} onChange={(e) => setProfileForm({ ...profileForm, phoneNumber: e.target.value })}
+                        className="w-full bg-muted pl-11 pr-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
+                        placeholder="10-digit number" />
+                    </div>
+                  </div>
+                </div>
+                {profileMsg && <p className={`text-sm font-medium ${profileMsg.ok ? "text-green-600" : "text-red-500"}`}>{profileMsg.msg}</p>}
+                <div className="flex gap-4">
+                  <button type="submit" disabled={submittingProfile}
+                    className="bg-brand text-primary-foreground px-8 py-3.5 rounded-xl font-bold hover:scale-105 transition-transform shadow-lg shadow-brand/20 disabled:opacity-50 flex items-center gap-2"
+                  >
+                    {submittingProfile ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                    Save Profile changes
+                  </button>
+                  <button type="button" onClick={() => setShowProfileForm(false)}
+                    className="bg-muted text-foreground px-8 py-3.5 rounded-xl font-bold hover:bg-muted/80 transition-colors"
+                  >
+                    Discard
+                  </button>
+                </div>
+              </form>
+            </section>
+          )}
 
           {/* Stats */}
           {!loading && (

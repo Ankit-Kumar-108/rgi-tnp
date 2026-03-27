@@ -11,6 +11,7 @@ import {
 } from "lucide-react"
 import Nav from "../components/layout/nav/nav"
 import Footer from "../components/layout/footer/footer"
+import Link from "next/link"
 export default function Home() {
 
   return (
@@ -34,12 +35,16 @@ export default function Home() {
                   Connecting top-tier talent with global industry leaders. Join our legacy of excellence and secure your future with world-className opportunities.
                 </p>
                 <div className="flex flex-wrap gap-2 md:gap-4">
-                  <button className="bg-brand text-white px-6 py-2.5 rounded-xl text-base font-bold flex items-center gap-2 hover:scale-105 transition-transform group cursor-pointer">
-                    Hire from Us <div className="group-hover:translate-x-2 transition-all duration-300"><MoveRight/></div>
-                  </button>
-                  <button className="bg-background border-2 border-brand/20 text-foreground px-6 py-2.5 rounded-xl text-base font-bold hover:bg-surface cursor-pointer hover:scale-105 transition-all duration-300">
-                    Student Portal
-                  </button>
+                  <Link href="/recruiters/register">
+                    <button className="bg-brand text-white px-6 py-2.5 rounded-xl text-base font-bold flex items-center gap-2 hover:scale-105 transition-transform group cursor-pointer">
+                      Hire from Us <div className="group-hover:translate-x-2 transition-all duration-300"><MoveRight/></div>
+                    </button>
+                  </Link>
+                  <Link href="/students/login">
+                    <button className="bg-background border-2 border-brand/20 text-foreground px-6 py-2.5 rounded-xl text-base font-bold hover:bg-surface cursor-pointer hover:scale-105 transition-all duration-300">
+                      Student Portal
+                    </button>
+                  </Link>
                 </div>
               </div>
               <div className="order-1 lg:order-2 flex flex-col gap-5">
@@ -167,18 +172,21 @@ export default function Home() {
                 title: "For Students",
                 desc: "Access placement portals, training resources, and mock interviews.",
                 btn: "Student Login",
+                link: "/students/login",
                 img: "https://lh3.googleusercontent.com/aida-public/AB6AXuDHKr33DbqDXOMcpZm0eMAJC5hjINXKljRdpGE23wNRXATHdX_uVdvJaILEzettWwTjc9BWymhXDOYI_650EsS_i0zchK4OoTbpD3ndPFnNxLxdCF63EBJoNiCCVSrNQv6Jy1B9anPQOjf661YqpcO_Vv3jiDM3lerHVtgOkzlrDxdvfD6BCKyMcsbXKB6bSe2Nr8DpKx4WhmMlfra-ARFgb-dwelBAbgMMBlvGFb2H_KWrVuCFc2LPDyUp5jEnsr4vjuUk0Ugunw"
               },
               {
                 title: "For Recruiters",
                 desc: "Hire top-tier talent and schedule campus recruitment drives.",
                 btn: "Recruitment Portal",
+                link: "/recruiters/login",
                 img: "https://lh3.googleusercontent.com/aida-public/AB6AXuDI3AGXNcBdGYNnQC6rTAaVBW9jOcMUXZsclcq6racWYLm5CE51KLDmOpDGPCxuImcM64dL2yzo6NbPLi48ZGWDbKHoFsShQDhbrE5a7AB3Zd8-pI96vVUd3FZTMPRviTnSNrE15dg2CaGTu0tUKxb1hlgBFuIC6cJtb84L7Ow3753HPwNwP6bA_O2xDRTynWdRvy2_Sg5QaKwnaMJ2Px55UQMeQgWIUjAwYZp1wYe3HE1klyE8JAZxIZgDs4FtUY1BduXqQblkAQ"
               },
               {
                 title: "For Alumni",
                 desc: "Mentor the next batch and stay connected with your alma mater.",
                 btn: "Connect Now",
+                link: "/alumni/alumni-register",
                 img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCXVPK8Cn5Ib2YCbG42UxeqSLconAJ1rUOAaN1WgNq91TRkd4dstErCv2ZC5I9Vw4txaPccPIgSBN4hNDoC2R2hNg84z0AuQeP_UA_j_SFjElRn4PpWfV5Vxug1jHaM5Qni6oo1BTjzSYDMIw2fHZxsckI-itXPhltlu1I666w7uWZEAp9BKR9wp-mDSLcoYJgRsjVatn0Jh1nQoSFLs0KGz6QhqxG-7VKmb8wuFaYSqMadSDDa3RPNd5_tqe-4y2BvBsIqMYa8UA"
               },
             ].map((item, i) => (
@@ -192,12 +200,12 @@ export default function Home() {
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent"></div>
-                <div className="absolute bottom-0 p-8">
+                <div className="absolute bottom-0 p-8 w-full">
                   <h3 className="text-white text-2xl font-bold mb-2">{item.title}</h3>
                   <p className="text-slate-300 text-sm mb-4">{item.desc}</p>
-                  <button className="text-brand font-bold flex items-center gap-2">
+                  <Link href={item.link} className="text-brand font-bold flex items-center gap-2 hover:translate-x-2 transition-transform w-fit">
                     {item.btn} <ArrowRight className="w-4 h-4" />
-                  </button>
+                  </Link>
                 </div>
               </div>
             ))}

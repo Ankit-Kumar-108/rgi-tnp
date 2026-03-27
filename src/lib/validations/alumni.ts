@@ -13,6 +13,7 @@ export const alumniRegistrationSchema = z.object({
         .regex(/[0-9]/, 'Password must contain at least one number')
         .regex(/[@$!%*?&]/, 'Password must contain at least one special character'),
     confirmPassword: z.string(),
+    profileImageUrl: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
     path: ['confirmPassword'],

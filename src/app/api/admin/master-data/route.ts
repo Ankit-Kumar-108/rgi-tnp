@@ -53,13 +53,13 @@ export async function POST(req: NextRequest) {
         await db.$executeRawUnsafe(
           `INSERT OR REPLACE INTO "${table}" ("id", "enrollmentNumber", "name", "branch", "course", "batch")
            VALUES (COALESCE((SELECT "id" FROM "${table}" WHERE "enrollmentNumber" = ?), ?), ?, ?, ?, ?, ?)`,
-          generateId(),
-          enrollmentNumber,
-          enrollmentNumber,
-          name,
-          branch,
-          course,
-          batch
+          enrollmentNumber, // ? #1
+          generateId(),     // ? #2
+          enrollmentNumber, // ? #3
+          name,             // ? #4
+          branch,           // ? #5
+          course,           // ? #6
+          batch             // ? #7
         );
         created++;
       } catch (err: any) {

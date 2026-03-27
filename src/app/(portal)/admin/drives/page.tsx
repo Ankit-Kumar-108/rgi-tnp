@@ -176,7 +176,14 @@ export default function AdminDrivesPage() {
                       </td>
                       <td className="px-5 py-3.5 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          {drive.status === "active" && (
+                          <Link
+                             href={`/admin/drives/${drive.id}/participants`}
+                             className="p-1.5 rounded-lg bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 transition-colors"
+                             title="View Participants"
+                          >
+                             <Users className="w-4 h-4" />
+                          </Link>
+                           {drive.status === "active" && (
                             <button
                               onClick={() => handleAction(drive.id, "close")}
                               disabled={actionLoading === drive.id}
