@@ -1,3 +1,4 @@
+"use client"
 export const runtime = 'edge'
 import React, { useEffect, useState, useMemo } from "react";
 import {
