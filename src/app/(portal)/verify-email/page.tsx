@@ -1,15 +1,17 @@
 "use client";
 
-import React, { useEffect, useState, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import React, { useEffect, useState, Suspense, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { CheckCircle, XCircle, Loader2, ArrowRight, Mail } from "lucide-react";
 import Link from "next/link";
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [message, setMessage] = useState("");
+  
+  // CRITICAL FIX: Prevents the API from firing twice in React Strict Mode
+  const hasAttempted = useRef(false);
 
   const token = searchParams?.get("token");
   const email = searchParams?.get("email");
@@ -22,6 +24,10 @@ function VerifyEmailContent() {
       return;
     }
 
+    // If we already tried verifying, stop here.
+    if (hasAttempted.current) return;
+    hasAttempted.current = true;
+
     const verify = async () => {
       try {
         const res = await fetch("/api/auth/verify-email", {
@@ -29,7 +35,8 @@ function VerifyEmailContent() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ token, email, role }),
         });
-        const data = await res.json() as any
+        const data = await res.json() as any;
+        
         if (data.success) {
           setStatus("success");
           setMessage(data.message);
@@ -44,7 +51,7 @@ function VerifyEmailContent() {
     };
 
     verify();
-  }, [token, email]);
+  }, [token, email, role]); // Added role to dependencies
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-6">
@@ -74,7 +81,7 @@ function VerifyEmailContent() {
           <div className="space-y-3">
             <Link
               href="/students/login"
-              className="flex items-center justify-center gap-2 w-full py-3 bg-brand text-white rounded-xl font-bold hover:bg-brand/90 transition-all shadow-lg shadow-brand/20 group"
+              className="flex items-center justify-center gap-2 w-full py-3 bg-brand text-primary-foreground rounded-xl font-bold hover:bg-brand/90 transition-all shadow-lg shadow-brand/20 group"
             >
               Go to Login
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -103,6 +110,7 @@ function VerifyEmailContent() {
   );
 }
 
+// Your Suspense boundary is perfect!
 export default function VerifyEmailPage() {
   return (
     <Suspense fallback={

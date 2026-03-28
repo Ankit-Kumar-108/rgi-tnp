@@ -1,175 +1,124 @@
 "use client";
 
-import Nav from "@/components/layout/nav/nav"
-import Footer from "@/components/layout/footer/footer"
-import { LockKeyhole, Loader2, KeyRound, ChevronLeft, Eye, EyeOff } from "lucide-react"
-import Link from "next/link"
-import { useState, useEffect } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import React, { useEffect, useState, Suspense, useRef } from "react";
+import { useSearchParams } from "next/navigation";
+import { CheckCircle, XCircle, Loader2, ArrowRight, Mail } from "lucide-react";
+import Link from "next/link";
 
-export default function ResetPassword() {
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const token = searchParams.get("token");
-    const role = searchParams.get("role");
+function VerifyEmailContent() {
+  const searchParams = useSearchParams();
+  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
+  const [message, setMessage] = useState("");
+  
+  // CRITICAL FIX: Prevents the API from firing twice in React Strict Mode
+  const hasAttempted = useRef(false);
 
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
-    
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const token = searchParams?.get("token");
+  const email = searchParams?.get("email");
+  const role = searchParams?.get("role");
 
-    useEffect(() => {
-        if (!token || !role) {
-            setError("Invalid or missing reset token. Please request a new password reset link.");
-        }
-    }, [token, role]);
+  useEffect(() => {
+    if (!token || !email) {
+      setStatus("error");
+      setMessage("Invalid verification link. Please check your email again.");
+      return;
+    }
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError("");
-        setSuccess("");
+    // If we already tried verifying, stop here.
+    if (hasAttempted.current) return;
+    hasAttempted.current = true;
+
+    const verify = async () => {
+      try {
+        const res = await fetch("/api/auth/verify-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token, email, role }),
+        });
+        const data = await res.json() as any;
         
-        if (!token || !role) {
-            setError("Missing token or role in the URL");
-            return;
+        if (data.success) {
+          setStatus("success");
+          setMessage(data.message);
+        } else {
+          setStatus("error");
+          setMessage(data.message || "Verification failed");
         }
-
-        if (password !== confirmPassword) {
-            setError("Passwords do not match");
-            return;
-        }
-
-        if (password.length < 8) {
-            setError("Password must be at least 8 characters long");
-            return;
-        }
-
-        setLoading(true);
-
-        try {
-            const res = await fetch("/api/auth/reset-password", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ token, role, password }),
-            });
-            const data = (await res.json()) as any;
-
-            if (!res.ok || !data.success) {
-                setError(data.message || "Something went wrong");
-                return;
-            }
-
-            setSuccess("Password has been reset successfully! Redirecting to login...");
-            
-            // Redirect based on role
-            setTimeout(() => {
-                if (role === "student") router.push("/students/login");
-                else if (role === "external_student") router.push("/external-students/login");
-                else if (role === "alumni") router.push("/alumni/login");
-                else router.push("/");
-            }, 3000);
-
-        } catch {
-            setError("Network error. Please try again.");
-        } finally {
-            setLoading(false);
-        }
+      } catch (err) {
+        setStatus("error");
+        setMessage("An error occurred during verification. Please try again later.");
+      }
     };
 
-    return (
-        <div className="min-h-screen flex flex-col bg-background">
-            <Nav />
-            <main className="flex-1 flex w-full items-center justify-center p-4 sm:p-6 md:p-8 pt-24 md:pt-32 pb-12">
-                <div className="w-full max-w-md bg-background/50 backdrop-blur-sm rounded-3xl overflow-hidden shadow-2xl shadow-brand/10 border border-brand/10 p-8 relative">
-                    <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 rounded-full bg-brand/5 blur-2xl z-0 pointer-events-none"></div>
-                    
-                    <div className="relative z-10 flex flex-col items-center text-center mb-8">
-                        <div className="w-16 h-16 bg-brand/10 rounded-2xl flex items-center justify-center text-brand mb-4">
-                            <KeyRound className="w-8 h-8" />
-                        </div>
-                        <h1 className="text-2xl font-bold text-foreground">Set New Password</h1>
-                        <p className="text-muted-foreground text-sm mt-2">
-                            Please create a strong password that you do not use on other websites.
-                        </p>
-                    </div>
+    verify();
+  }, [token, email, role]); // Added role to dependencies
 
-                    {error && <div className="mb-4 p-3 rounded-xl bg-destructive/10 text-destructive text-sm font-medium">{error}</div>}
-                    {success && <div className="mb-4 p-3 rounded-xl bg-green-500/10 text-green-600 dark:text-green-400 text-sm font-medium">{success}</div>}
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background p-6">
+      <div className="fixed inset-0 overflow-hidden -z-10">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-brand/5 rounded-full blur-[120px] translate-y-1/2 -translate-x-1/2" />
+      </div>
 
-                    {!success && (!token || !role) ? (
-                        <div className="mt-8 text-center relative z-10 pt-6">
-                            <Link href="/forgot-password" className="inline-flex items-center gap-2 text-sm font-medium text-brand hover:text-brand/80 transition-colors">
-                                <ChevronLeft className="w-4 h-4" /> Go back to Forgot Password
-                            </Link>
-                        </div>
-                    ) : null}
-
-                    {(!error || error === "") && !success && token && role ? (
-                        <form className="space-y-5 relative z-10" onSubmit={handleSubmit}>
-                            <div className="space-y-2">
-                                <label className="text-sm font-semibold text-foreground">New Password</label>
-                                <div className="relative">
-                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">
-                                        <LockKeyhole className="w-5 h-5"/>
-                                    </div>
-                                    <input 
-                                        className="w-full pl-11 pr-12 py-3 sm:py-3.5 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all text-sm" 
-                                        placeholder="Min 8 characters" 
-                                        type={showPassword ? "text" : "password"} 
-                                        required
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-brand transition-colors"
-                                    >
-                                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-sm font-semibold text-foreground">Confirm New Password</label>
-                                <div className="relative">
-                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">
-                                        <LockKeyhole className="w-5 h-5"/>
-                                    </div>
-                                    <input 
-                                        className="w-full pl-11 pr-12 py-3 sm:py-3.5 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all text-sm" 
-                                        placeholder="Re-enter password" 
-                                        type={showConfirmPassword ? "text" : "password"} 
-                                        required
-                                        value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-brand transition-colors"
-                                    >
-                                        {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                    </button>
-                                </div>
-                            </div>
-
-                            <button 
-                                className="w-full bg-brand hover:bg-brand/90 text-primary-foreground font-bold py-3.5 rounded-xl shadow-[0_4px_14px_0_rgba(var(--brand-rgb),0.39)] hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 group disabled:opacity-50" 
-                                type="submit"
-                                disabled={loading}
-                            >
-                                {loading ? (<><Loader2 className="w-5 h-5 animate-spin" /><span>Saving...</span></>) : <span>Reset Password</span>}
-                            </button>
-                        </form>
-                    ) : null}
-                </div>
-            </main>
-            <Footer />
+      <div className="max-w-md w-full bg-card/50 backdrop-blur-xl border border-border p-8 rounded-3xl shadow-2xl text-center">
+        <div className="w-20 h-20 bg-brand/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          {status === "loading" && <Loader2 className="w-10 h-10 text-brand animate-spin" />}
+          {status === "success" && <CheckCircle className="w-10 h-10 text-green-500" />}
+          {status === "error" && <XCircle className="w-10 h-10 text-red-500" />}
         </div>
-    );
+
+        <h1 className="text-2xl font-black text-foreground mb-3 tracking-tight">
+          {status === "loading" && "Verifying Email..."}
+          {status === "success" && "Successfully Verified!"}
+          {status === "error" && "Verification Failed"}
+        </h1>
+
+        <p className="text-muted-foreground text-sm mb-8 leading-relaxed">
+          {message || "Please wait while we confirm your email address and activate your account."}
+        </p>
+
+        {status !== "loading" && (
+          <div className="space-y-3">
+            <Link
+              href="/students/login"
+              className="flex items-center justify-center gap-2 w-full py-3 bg-brand text-primary-foreground rounded-xl font-bold hover:bg-brand/90 transition-all shadow-lg shadow-brand/20 group"
+            >
+              Go to Login
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            
+            {status === "error" && (
+              <button
+                onClick={() => window.location.reload()}
+                className="text-muted-foreground hover:text-foreground text-xs font-medium transition-colors"
+                style={{ background: "none", border: "none", cursor: "pointer" }}
+              >
+                Try Again
+              </button>
+            )}
+          </div>
+        )}
+
+        {status === "loading" && (
+          <div className="flex items-center justify-center gap-2 text-muted-foreground text-xs animate-pulse">
+            <Mail className="w-3 h-3" />
+            Security Check in Progress
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Your Suspense boundary is perfect!
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-brand" />
+      </div>
+    }>
+      <VerifyEmailContent />
+    </Suspense>
+  );
 }
