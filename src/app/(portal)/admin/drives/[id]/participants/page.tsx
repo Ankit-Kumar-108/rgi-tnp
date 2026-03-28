@@ -25,7 +25,7 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
   const [drive, setDrive] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
-  
+
   // Selection and Filtering
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState("");
@@ -55,15 +55,15 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
 
   const handleStatusUpdate = async (newStatus: string) => {
     if (selectedIds.size === 0) return;
-    
+
     setActionLoading(true);
     try {
       const res = await fetch(`/api/admin/drives/${id}/participants`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          registrationIds: Array.from(selectedIds), 
-          status: newStatus 
+        body: JSON.stringify({
+          registrationIds: Array.from(selectedIds),
+          status: newStatus
         }),
       });
       const data = await res.json() as any
@@ -93,8 +93,8 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
   const filteredParticipants = useMemo(() => {
     return participants.filter(p => {
       const u = p.student || p.externalStudent;
-      const matchesSearch = u?.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            u?.enrollmentNumber?.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = u?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        u?.enrollmentNumber?.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStatus = statusFilter === "All" || p.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
@@ -125,7 +125,7 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
         `"${u.resumeUrl || "Not Provided"}"`
       ].join(",");
     });
-    
+
     const csvContent = [headers.join(","), ...rows].join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -162,12 +162,12 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
               <p className="text-xs text-muted-foreground">Manage candidates for {drive?.companyName || "this drive"}</p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-3">
             {drive?.googleSheetUrl && (
-              <a 
-                href={drive.googleSheetUrl} 
-                target="_blank" 
+              <a
+                href={drive.googleSheetUrl}
+                target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500/10 text-green-600 hover:bg-green-500/20 text-xs font-bold rounded-lg transition-colors"
                 title="Open Google Sheet"
@@ -176,7 +176,7 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
                 Sheet
               </a>
             )}
-            <button 
+            <button
               onClick={exportToCSV}
               disabled={filteredParticipants.length === 0}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-brand text-white hover:bg-brand/90 text-xs font-bold rounded-lg transition-colors disabled:opacity-50"
@@ -185,28 +185,28 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
               Export CSV
             </button>
           </div>
-          
+
           {/* Action Dashboard */}
           {selectedIds.size > 0 && (
             <div className="flex items-center gap-2 bg-muted/50 p-2 rounded-xl border border-border animate-in fade-in slide-in-from-bottom-2">
               <span className="text-xs font-bold text-muted-foreground px-2">
                 {selectedIds.size} Selected
               </span>
-              <button 
+              <button
                 onClick={() => handleStatusUpdate("Shortlisted")}
                 disabled={actionLoading}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-yellow-500/10 text-yellow-600 hover:bg-yellow-500/20 text-xs font-bold rounded-lg transition-colors">
                 <ArrowRightCircle className="w-3.5 h-3.5" />
                 Shortlist
               </button>
-              <button 
+              <button
                 onClick={() => handleStatusUpdate("Selected")}
                 disabled={actionLoading}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500/10 text-green-600 hover:bg-green-500/20 text-xs font-bold rounded-lg transition-colors">
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 Select
               </button>
-              <button 
+              <button
                 onClick={() => handleStatusUpdate("Rejected")}
                 disabled={actionLoading}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-500 hover:bg-red-500/20 text-xs font-bold rounded-lg transition-colors">
@@ -219,14 +219,14 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-8">
-        
+
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6 items-center justify-between">
           <div className="relative w-full sm:w-96">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input 
-              type="text" 
-              placeholder="Search by name or enrollment..." 
+            <input
+              type="text"
+              placeholder="Search by name or enrollment..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-4 py-2 bg-card border border-border rounded-xl text-sm focus:outline-none focus:border-brand"
@@ -238,11 +238,10 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
               <button
                 key={status}
                 onClick={() => setStatusFilter(status)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-colors ${
-                  statusFilter === status 
-                  ? "bg-brand text-primary-foreground shadow-md" 
-                  : "bg-card border border-border text-foreground hover:border-brand/50"
-                }`}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-colors ${statusFilter === status
+                    ? "bg-brand text-primary-foreground shadow-md"
+                    : "bg-card border border-border text-foreground hover:border-brand/50"
+                  }`}
               >
                 {status}
               </button>
@@ -268,8 +267,8 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
                 <thead>
                   <tr className="bg-muted/30 border-b border-border">
                     <th className="px-5 py-4 w-12 text-left">
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         className="w-4 h-4 rounded border-border text-brand focus:ring-brand accent-brand cursor-pointer"
                         checked={selectedIds.size > 0 && selectedIds.size === filteredParticipants.length}
                         onChange={toggleAll}
@@ -285,10 +284,10 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
                   {filteredParticipants.map((reg) => {
                     const user = reg.student || reg.externalStudent || {};
                     const isSelected = selectedIds.has(reg.id);
-                    
+
                     return (
-                      <tr 
-                        key={reg.id} 
+                      <tr
+                        key={reg.id}
                         className={`border-b border-border/50 transition-colors ${isSelected ? "bg-brand/5" : "hover:bg-muted/20"}`}
                         onClick={(e) => {
                           // Prevent toggling when clicking buttons or inputs directly
@@ -298,8 +297,8 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
                         }}
                       >
                         <td className="px-5 py-4 w-12 text-left">
-                          <input 
-                            type="checkbox" 
+                          <input
+                            type="checkbox"
                             className="w-4 h-4 rounded border-border text-brand focus:ring-brand accent-brand cursor-pointer"
                             checked={isSelected}
                             onChange={() => toggleSelection(reg.id)}
@@ -337,9 +336,9 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
                                 {user.cgpa} CGPA
                               </span>
                               {user.resumeUrl && (
-                                <a 
-                                  href={user.resumeUrl} 
-                                  target="_blank" 
+                                <a
+                                  href={user.resumeUrl}
+                                  target="_blank"
                                   rel="noopener noreferrer"
                                   onClick={e => e.stopPropagation()}
                                   className="text-[10px] font-bold px-2 py-0.5 bg-blue-500/10 text-blue-600 rounded-md hover:bg-blue-500/20 flex items-center gap-1 transition-colors"
@@ -354,12 +353,11 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
                           {new Date(reg.createdAt).toLocaleDateString()}
                         </td>
                         <td className="px-5 py-4 text-right">
-                          <span className={`inline-flex py-1 px-3 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                            reg.status === "Selected" ? "bg-green-500/10 text-green-600" :
-                            reg.status === "Rejected" ? "bg-red-500/10 text-red-500" :
-                            reg.status === "Shortlisted" ? "bg-yellow-500/10 text-yellow-600" :
-                            "bg-muted text-foreground"
-                          }`}>
+                          <span className={`inline-flex py-1 px-3 rounded-full text-[10px] font-black uppercase tracking-wider ${reg.status === "Selected" ? "bg-green-500/10 text-green-600" :
+                              reg.status === "Rejected" ? "bg-red-500/10 text-red-500" :
+                                reg.status === "Shortlisted" ? "bg-yellow-500/10 text-yellow-600" :
+                                  "bg-muted text-foreground"
+                            }`}>
                             {reg.status || "Applied"}
                           </span>
                         </td>

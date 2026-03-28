@@ -1,6 +1,7 @@
 import React from "react";
 import { getToken } from "@/lib/auth-client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
     X,
     FileText,
@@ -18,14 +19,19 @@ export default function JobDetailsModal({
   isOpen, 
   onClose, 
   onSuccess,
-  role = "student"
+  role = "student",
+  publicMode = false,
+  readonly = false
 }: { 
   drive: PlacementDrive; 
   isOpen: boolean; 
   onClose: () => void; 
   onSuccess: () => void;
-  role?: "student" | "external_student"
+  role?: "student" | "external_student" | "admin" | "recruiter";
+  publicMode?: boolean;
+  readonly?: boolean;
 }) {
+    const router = useRouter();
     const [registering, setRegistering] = useState(false)
     const [regMsg, setRegMsg] = useState<{ text: string; ok: boolean } | null>(null)
 
@@ -47,6 +53,11 @@ export default function JobDetailsModal({
         return null;
 
     const registerForDrive = async () => {
+        if (publicMode) {
+            router.push("/external-students/login");
+            return;
+        }
+        
         setRegistering(true);
         setRegMsg(null);
         try {
@@ -253,26 +264,28 @@ export default function JobDetailsModal({
                 </div>
 
                 {/* Sticky Footer CTA */}
-                <div className="px-6 py-5 md:px-8 bg-background border-t border-border flex items-center justify-between gap-6 shrink-0 rounded-b-[2.5rem]">
-                    <div className="hidden sm:block">
-                        <p className="text-sm font-bold text-foreground">Active Placement Drive</p>
-                        <p className="text-xs text-brand font-medium mt-0.5">Register in {getDaysLeft()}</p>
-                    </div>
-                    <div className="flex-1 sm:flex-none flex flex-col sm:flex-row items-center gap-4">
-                        {regMsg && (
-                            <span className={`text-[10px] font-bold uppercase tracking-widest ${regMsg.ok ? "text-green-500" : "text-red-500"}`}>
-                                {regMsg.text}
-                            </span>
-                        )}
-                        <button
-                            onClick={() => registerForDrive()}
-                            disabled={registering}
-                            className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-brand text-primary-foreground font-black shadow-lg shadow-brand/30 hover:shadow-brand/40 transition-all active:scale-95 flex items-center justify-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                            {registering ? "Registering..." : (regMsg?.ok ? "Registered" : "Apply for Role")}
-                            <ArrowRight className="w-4 h-4" />
-                        </button>
-                    </div>
-                </div>
+                {!readonly && (
+                  <div className="px-6 py-5 md:px-8 bg-background border-t border-border flex items-center justify-between gap-6 shrink-0 rounded-b-[2.5rem]">
+                      <div className="hidden sm:block">
+                          <p className="text-sm font-bold text-foreground">Active Placement Drive</p>
+                          <p className="text-xs text-brand font-medium mt-0.5">Register in {getDaysLeft()}</p>
+                      </div>
+                      <div className="flex-1 sm:flex-none flex flex-col sm:flex-row items-center gap-4">
+                          {regMsg && (
+                              <span className={`text-[10px] font-bold uppercase tracking-widest ${regMsg.ok ? "text-green-500" : "text-red-500"}`}>
+                                  {regMsg.text}
+                              </span>
+                          )}
+                          <button
+                              onClick={() => registerForDrive()}
+                              disabled={registering}
+                              className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-brand text-primary-foreground font-black shadow-lg shadow-brand/30 hover:shadow-brand/40 transition-all active:scale-95 flex items-center justify-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                              {publicMode ? "Login to Apply" : registering ? "Registering..." : (regMsg?.ok ? "Registered" : "Apply for Role")}
+                              <ArrowRight className="w-4 h-4" />
+                          </button>
+                      </div>
+                  </div>
+                )}
 
             </div>
         </div>

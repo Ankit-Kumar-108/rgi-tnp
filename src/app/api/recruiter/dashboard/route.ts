@@ -27,7 +27,10 @@ export async function GET(req: NextRequest) {
 
     // Get recruiter's drives with registration counts
     const drives = await db.placementDrive.findMany({
-      where: { recruiterId: recruiter.id },
+      where: { 
+        recruiterId: recruiter.id,
+        status: { not: "archived" }
+      },
       include: {
         _count: { select: { registrations: true } },
         registrations: {

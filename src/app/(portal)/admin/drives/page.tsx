@@ -12,8 +12,16 @@ import {
   RotateCcw,
   Calendar,
   Users,
+  Eye,
+  Edit,
+  Trash2,
+  X,
+  Plus,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import JobDetailsModal from "@/components/forms/studentApplyModal/modal";
+
+const BRANCHES = ["CSE", "IT", "ECE", "ME", "CE", "EE"];
 import Link from "next/link";
 
 export default function AdminDrivesPage() {
@@ -21,6 +29,15 @@ export default function AdminDrivesPage() {
   const [drives, setDrives] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  const [editDriveId, setEditDriveId] = useState<string | null>(null);
+  const [viewDrive, setViewDrive] = useState<any | null>(null);
+  const [showForm, setShowForm] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [formMsg, setFormMsg] = useState<{ msg: string; ok: boolean } | null>(null);
+  const [form, setForm] = useState({
+    companyName: "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full-Time"
+  });
 
   useEffect(() => {
     if (!authenticated) return;
@@ -40,7 +57,32 @@ export default function AdminDrivesPage() {
     }
   };
 
-  const handleAction = async (id: string, action: "close" | "reopen") => {
+  const handleSubmitDrive = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editDriveId) return;
+    setSubmitting(true);
+    setFormMsg(null);
+    try {
+      const res = await fetch("/api/admin/drives", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, id: editDriveId, minCGPA: parseFloat(String(form.minCGPA)) }),
+      });
+      const d = (await res.json()) as any;
+      setFormMsg({ msg: d.message, ok: d.success });
+      if (d.success) {
+        setTimeout(() => setShowForm(false), 1000);
+        setEditDriveId(null);
+        fetchDrives();
+      }
+    } catch {
+      setFormMsg({ msg: "Update failed", ok: false });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleAction = async (id: string, action: "close" | "reopen" | "archive") => {
     setActionLoading(id);
     try {
       const res = await fetch("/api/admin/drives", {
@@ -77,6 +119,133 @@ export default function AdminDrivesPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      {viewDrive && (
+        <JobDetailsModal
+          drive={viewDrive}
+          isOpen={true}
+          onClose={() => setViewDrive(null)}
+          onSuccess={() => {}}
+          role="admin"
+          readonly={true}
+        />
+      )}
+
+      {/* Drive Edit Modal */}
+      {showForm && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex flex-col items-center justify-center p-4" onClick={() => setShowForm(false)}>
+          <div className="bg-card rounded-2xl border border-border shadow-2xl max-w-lg w-full p-6 max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-bold text-foreground">Edit Drive Details</h3>
+              <button onClick={() => setShowForm(false)} className="text-muted-foreground hover:text-foreground"><X className="w-5 h-5" /></button>
+            </div>
+            <form onSubmit={handleSubmitDrive} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Company Name</label>
+                  <input required value={form.companyName} onChange={(e) => setForm({ ...form, companyName: e.target.value })}
+                    className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Role</label>
+                  <input required value={form.roleName} onChange={(e) => setForm({ ...form, roleName: e.target.value })}
+                    className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Job Description</label>
+                <textarea required value={form.jobDescription} onChange={(e) => setForm({ ...form, jobDescription: e.target.value })} rows={3}
+                  className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">CTC / Stipend</label>
+                  <input required value={form.ctc} onChange={(e) => setForm({ ...form, ctc: e.target.value })}
+                    className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" placeholder="e.g. 7 LPA" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Min CGPA</label>
+                  <input required type="number" step="0.1" min="0" max="10" value={form.minCGPA} onChange={(e) => setForm({ ...form, minCGPA: parseFloat(e.target.value) || 0 })}
+                    className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Job Type</label>
+                  <select required value={form.jobType} onChange={(e) => setForm({ ...form, jobType: e.target.value })}
+                    className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none">
+                    <option value="Full-Time">Full-Time</option>
+                    <option value="Internship">Internship</option>
+                    <option value="Contract">Contract</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Eligible Branches</label>
+                <div className="flex flex-wrap gap-2">
+                  {BRANCHES.map((b) => (
+                    <button key={b} type="button"
+                      onClick={() => {
+                        const arr = form.eligibleBranches ? form.eligibleBranches.split(",") : [];
+                        const updated = arr.includes(b) ? arr.filter((x) => x !== b) : [...arr, b];
+                        setForm({ ...form, eligibleBranches: updated.join(",") });
+                      }}
+                      className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${form.eligibleBranches.includes(b) ? "bg-brand text-white" : "bg-muted border border-border text-muted-foreground"}`}
+                    >{b}</button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Course</label>
+                <select required value={form.course} onChange={(e) => setForm({ ...form, course: e.target.value })}
+                  className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none">
+                  <option value="B.Tech">B.Tech</option>
+                  <option value="M.Tech">M.Tech</option>
+                  <option value="MBA">MBA</option>
+                  <option value="Diploma">Diploma</option>
+                  <option value="All">All Courses</option>
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Min Batch (From)</label>
+                  <input required value={form.minBatch} onChange={(e) => setForm({ ...form, minBatch: e.target.value })}
+                    placeholder="e.g. 2021" className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Max Batch (To)</label>
+                  <input required value={form.maxBatch} onChange={(e) => setForm({ ...form, maxBatch: e.target.value })}
+                    placeholder="e.g. 2025" className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Drive Date</label>
+                  <input required type="date" value={form.driveDate} onChange={(e) => setForm({ ...form, driveDate: e.target.value })}
+                    className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Drive Type</label>
+                  <div className="flex gap-2">
+                    {["Closed", "Open"].map((t) => (
+                      <button key={t} type="button" onClick={() => setForm({ ...form, driveType: t })}
+                        className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all ${form.driveType === t ? "bg-brand text-white" : "bg-muted border border-border text-muted-foreground"}`}
+                      >{t} Campus</button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              {formMsg && (
+                <p className={`text-sm font-medium ${formMsg.ok ? "text-green-600" : "text-red-500"}`}>{formMsg.msg}</p>
+              )}
+              <button type="submit" disabled={submitting}
+                className="w-full bg-brand text-white py-3 rounded-xl font-bold hover:bg-brand/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Edit className="w-4 h-4" />}
+                {submitting ? "Updating..." : "Update Drive Details"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-xl border-b border-border">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center gap-4">
@@ -176,6 +345,38 @@ export default function AdminDrivesPage() {
                       </td>
                       <td className="px-5 py-3.5 text-right">
                         <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => setViewDrive(drive)}
+                            className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted/50 transition-colors"
+                            title="View Details"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setEditDriveId(drive.id);
+                              setForm({
+                                companyName: drive.companyName,
+                                roleName: drive.roleName,
+                                jobDescription: drive.jobDescription,
+                                ctc: drive.ctc,
+                                eligibleBranches: drive.eligibleBranches,
+                                minCGPA: drive.minCGPA,
+                                minBatch: drive.minBatch,
+                                maxBatch: drive.maxBatch,
+                                course: drive.course || "B.Tech",
+                                driveDate: new Date(drive.driveDate).toISOString().split('T')[0],
+                                driveType: drive.driveType,
+                                jobType: drive.jobType || "Full-Time"
+                              });
+                              setFormMsg(null);
+                              setShowForm(true);
+                            }}
+                            className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted/50 transition-colors"
+                            title="Edit Drive"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
                           <Link
                              href={`/admin/drives/${drive.id}/participants`}
                              className="p-1.5 rounded-lg bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 transition-colors"
@@ -203,6 +404,18 @@ export default function AdminDrivesPage() {
                               <RotateCcw className="w-4 h-4" />
                             </button>
                           )}
+                          <button
+                            onClick={() => {
+                              if (confirm("Are you sure you want to archive this drive?")) {
+                                handleAction(drive.id, "archive");
+                              }
+                            }}
+                            disabled={actionLoading === drive.id}
+                            className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors disabled:opacity-50"
+                            title="Archive / Delete Drive"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
                       </td>
                     </tr>

@@ -21,8 +21,11 @@ import {
   Building2,
   CalendarDays,
   X,
+  Eye,
+  Edit,
 } from "lucide-react";
 import Nav from "@/components/layout/nav/nav";
+import JobDetailsModal from "@/components/forms/studentApplyModal/modal";
 import Footer from "@/components/layout/footer/footer";
 import { useAuth } from "@/hooks/useAuth";
 import { getToken } from "@/lib/auth-client";
@@ -51,8 +54,10 @@ export default function RecruiterDashboard() {
     course: "B.Tech",
     driveDate: "",
     driveType: "Closed",
-    jobType: "Full-Time",
+    jobType: "Full-Time"
   });
+  const [editDriveId, setEditDriveId] = useState<string | null>(null);
+  const [viewDrive, setViewDrive] = useState<any | null>(null);
 
   useEffect(() => {
     if (!authenticated) return;
@@ -84,16 +89,20 @@ export default function RecruiterDashboard() {
     setFormMsg(null);
     try {
       const token = getToken("recruiter");
+      const method = editDriveId ? "PUT" : "POST";
+      const bodyData = editDriveId ? { ...form, id: editDriveId, minCGPA: parseFloat(String(form.minCGPA)) } : { ...form, minCGPA: parseFloat(String(form.minCGPA)) };
+
       const res = await fetch("/api/recruiter/drives", {
-        method: "POST",
+        method,
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ ...form, minCGPA: parseFloat(String(form.minCGPA)) }),
+        body: JSON.stringify(bodyData),
       });
       const d = (await res.json()) as any;
       setFormMsg({ msg: d.message, ok: d.success });
       if (d.success) {
-        setShowForm(false);
+        setTimeout(() => setShowForm(false), 1000);
         setForm({ companyName: user?.company || "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full-Time" });
+        setEditDriveId(null);
         fetchDashboard();
       }
     } catch {
@@ -127,6 +136,16 @@ export default function RecruiterDashboard() {
   return (
     <>
       <Nav />
+      {viewDrive && (
+        <JobDetailsModal
+          drive={viewDrive}
+          isOpen={true}
+          onClose={() => setViewDrive(null)}
+          onSuccess={() => { }}
+          role="recruiter"
+          readonly={true}
+        />
+      )}
       <div className="bg-background text-foreground antialiased font-sans flex flex-col min-h-screen mt-15">
         <main className="p-6 md:p-8 max-w-6xl mx-auto w-full space-y-8 flex-1">
           {/* Header */}
@@ -141,7 +160,12 @@ export default function RecruiterDashboard() {
               {user?.company && <p className="text-sm text-muted-foreground mt-1">{user.company}</p>}
             </div>
             <button
-              onClick={() => setShowForm(true)}
+              onClick={() => {
+                setEditDriveId(null);
+                setForm({ companyName: user?.company || "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full-Time" });
+                setFormMsg(null);
+                setShowForm(true);
+              }}
               className="bg-brand text-white font-bold px-6 py-2.5 rounded-xl flex items-center gap-2 hover:bg-brand/90 transition-all shadow-lg shadow-brand/20 text-sm"
             >
               <Plus className="w-4 h-4" /> Submit Drive Request
@@ -179,7 +203,7 @@ export default function RecruiterDashboard() {
             <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={() => setShowForm(false)}>
               <div className="bg-card rounded-2xl border border-border shadow-2xl max-w-lg w-full p-6 max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-bold text-foreground">Submit Drive Request</h3>
+                  <h3 className="text-lg font-bold text-foreground">{editDriveId ? "Edit Drive Details" : "Submit Drive Request"}</h3>
                   <button onClick={() => setShowForm(false)} className="text-muted-foreground hover:text-foreground"><X className="w-5 h-5" /></button>
                 </div>
                 <form onSubmit={handleSubmitDrive} className="space-y-4">
@@ -207,9 +231,23 @@ export default function RecruiterDashboard() {
                         className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" placeholder="e.g. 7 LPA" />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Min CGPA</label>
-                      <input required type="number" step="0.1" min="0" max="10" value={form.minCGPA} onChange={(e) => setForm({ ...form, minCGPA: parseFloat(e.target.value) || 0 })}
-                        className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
+                      <label htmlFor="minCGPA" className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">
+                        Min CGPA
+                      </label>
+                      <input
+                        id="minCGPA"
+                        required
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        max="10"
+                        value={form.minCGPA.toString()}
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value);
+                          setForm({ ...form, minCGPA: isNaN(val) ? 0 : val });
+                        }}
+                        className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none"
+                      />
                     </div>
                     <div>
                       <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Job Type</label>
@@ -284,8 +322,8 @@ export default function RecruiterDashboard() {
                   <button type="submit" disabled={submitting}
                     className="w-full bg-brand text-white py-3 rounded-xl font-bold hover:bg-brand/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                   >
-                    {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-                    {submitting ? "Submitting..." : "Submit for Approval"}
+                    {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : editDriveId ? null : <Plus className="w-4 h-4" />}
+                    {submitting ? (editDriveId ? "Updating..." : "Submitting...") : (editDriveId ? "Update Drive Details" : "Submit for Approval")}
                   </button>
                 </form>
               </div>
@@ -332,14 +370,48 @@ export default function RecruiterDashboard() {
                             <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold capitalize ${getStatusBadge(drive.status)}`}>{drive.status}</span>
                           </td>
                           <td className="px-5 py-3.5 text-right">
-                            {drive.registrationCount > 0 && (
+                            <div className="flex items-center justify-end gap-3">
                               <button
-                                onClick={() => setSelectedDrive(selectedDrive?.id === drive.id ? null : drive)}
-                                className="text-brand text-xs font-bold hover:underline flex items-center gap-1 ml-auto"
+                                onClick={() => setViewDrive(drive)}
+                                className="text-muted-foreground hover:text-brand transition-colors"
+                                title="View Details"
                               >
-                                {selectedDrive?.id === drive.id ? "Close" : "View Applicants"} <ChevronRight className="w-3 h-3" />
+                                <Eye className="w-4 h-4" />
                               </button>
-                            )}
+                              <button
+                                onClick={() => {
+                                  setEditDriveId(drive.id);
+                                  setForm({
+                                    companyName: drive.companyName,
+                                    roleName: drive.roleName,
+                                    jobDescription: drive.jobDescription,
+                                    ctc: drive.ctc,
+                                    eligibleBranches: drive.eligibleBranches,
+                                    minCGPA: drive.minCGPA,
+                                    minBatch: drive.minBatch,
+                                    maxBatch: drive.maxBatch,
+                                    course: drive.course || "B.Tech",
+                                    driveDate: new Date(drive.driveDate).toISOString().split('T')[0],
+                                    driveType: drive.driveType,
+                                    jobType: drive.jobType || "Full-Time"
+                                  });
+                                  setFormMsg(null);
+                                  setShowForm(true);
+                                }}
+                                className="text-muted-foreground hover:text-brand transition-colors"
+                                title="Edit Drive"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              {drive.registrationCount > 0 && (
+                                <button
+                                  onClick={() => setSelectedDrive(selectedDrive?.id === drive.id ? null : drive)}
+                                  className="text-brand text-xs font-bold hover:underline flex items-center gap-1 ml-2"
+                                >
+                                  {selectedDrive?.id === drive.id ? "Close" : "Applicants"} <ChevronRight className="w-3 h-3" />
+                                </button>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       ))}

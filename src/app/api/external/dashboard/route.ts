@@ -29,27 +29,22 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Not found" }, { status: 404 });
     }
 
-    // Only show open & active drives if verified (unfiltered by eligibility, handled on frontend)
-    let drives: any[] = [];
-    let archivedDrives: any[] = [];
-    
-    if (student.isVerified) {
-      drives = await db.placementDrive.findMany({
-        where: {
-          status: "active",
-          driveType: "Open",
-        },
-        orderBy: { driveDate: "asc" },
-      });
-      
-      archivedDrives = await db.placementDrive.findMany({
-        where: {
-          status: "completed",
-          driveType: "Open"
-        },
-        orderBy: { driveDate: "desc" }
-      });
-    }
+    // Show all open & active drives regardless of verification status
+    const drives = await db.placementDrive.findMany({
+      where: {
+        status: "active",
+        driveType: "Open",
+      },
+      orderBy: { driveDate: "asc" },
+    });
+
+    const archivedDrives = await db.placementDrive.findMany({
+      where: {
+        status: "completed",
+        driveType: "Open"
+      },
+      orderBy: { driveDate: "desc" }
+    });
 
     const registrations = await db.driveRegistration.findMany({
       where: { externalStudentId: student.id },
@@ -66,6 +61,7 @@ export async function GET(req: NextRequest) {
         id: student.id, name: student.name, collegeName: student.collegeName,
         branch: student.branch, cgpa: student.cgpa, email: student.email,
         isVerified: student.isVerified, resumeUrl: student.resumeUrl,
+        profileImageUrl: student.profileImageUrl,
       },
       drives: drives.map((d: any) => ({ ...d, isRegistered: registeredDriveIds.includes(d.id) })),
       archivedDrives: archivedDrives.map((d: any) => ({ ...d, isRegistered: registeredDriveIds.includes(d.id) })),
@@ -90,7 +86,7 @@ export async function POST(req: NextRequest) {
 
     const student = await db.externalStudent.findUnique({ where: { id: ext.id } });
     if (!student || !student.isVerified) {
-      return NextResponse.json({ success: false, message: "You must be verified by admin first" }, { status: 403 });
+      return NextResponse.json({ success: false, message: "You must verify your email before registering." }, { status: 403 });
     }
 
     const drive = await db.placementDrive.findUnique({ where: { id: body.driveId } });

@@ -363,9 +363,14 @@ export default function StudentDashboard() {
                               </td>
                               <td className="px-5 py-3.5 text-right">
                                 {(() => {
-                                  const isEligible = (drive.course === "All" || drive.course?.includes(student?.course)) && 
-                                                     drive.eligibleBranches?.includes(student?.branch) && 
-                                                     (student?.cgpa || 0) >= drive.minCGPA;
+                                  let ineligibilityReason = "";
+                                  if (drive.course !== "All" && !drive.course?.includes(student?.course)) {
+                                    ineligibilityReason = "Course mismatch";
+                                  } else if (!drive.eligibleBranches?.includes(student?.branch)) {
+                                    ineligibilityReason = "Branch mismatch";
+                                  } else if ((student?.cgpa || 0) < drive.minCGPA) {
+                                    ineligibilityReason = "Low CGPA";
+                                  }
 
                                   if (drive.isRegistered) {
                                     return (
@@ -374,8 +379,13 @@ export default function StudentDashboard() {
                                       </span>
                                     );
                                   }
-                                  if (!isEligible) {
-                                    return <span className="inline-flex items-center gap-1 text-red-500 text-xs font-bold"><XCircle className="w-4 h-4" /> Ineligible</span>;
+                                  if (ineligibilityReason) {
+                                    return (
+                                      <div className="flex flex-col items-end">
+                                        <span className="inline-flex items-center gap-1 text-red-500 text-xs font-bold"><XCircle className="w-4 h-4" /> Ineligible</span>
+                                        <span className="text-[10px] text-muted-foreground">{ineligibilityReason}</span>
+                                      </div>
+                                    );
                                   }
                                   return (
                                     <button

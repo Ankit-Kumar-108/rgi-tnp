@@ -67,3 +67,63 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, message: "Failed to create drive" }, { status: 500 });
   }
 }
+
+// PUT: Update an existing drive request
+export async function PUT(req: NextRequest) {
+  try {
+    const recruiter = await getRecruiterFromToken(req);
+    if (!recruiter) {
+      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = (await req.json()) as {
+      id: string;
+      companyName: string;
+      roleName: string;
+      jobDescription: string;
+      ctc: string;
+      eligibleBranches: string;
+      minCGPA: number;
+      minBatch: string;
+      maxBatch: string;
+      course: string;
+      driveDate: string;
+      driveType: string;
+      jobType: string;
+    };
+
+    const db = getDb();
+
+    // Ensure the drive actually belongs to this recruiter
+    const existingDrive = await db.placementDrive.findUnique({
+      where: { id: body.id },
+    });
+
+    if (!existingDrive || existingDrive.recruiterId !== recruiter.id) {
+      return NextResponse.json({ success: false, message: "Unauthorized to edit this drive" }, { status: 403 });
+    }
+
+    const updatedDrive = await db.placementDrive.update({
+      where: { id: body.id },
+      data: {
+        companyName: body.companyName,
+        roleName: body.roleName,
+        jobDescription: body.jobDescription,
+        ctc: body.ctc,
+        eligibleBranches: body.eligibleBranches,
+        minCGPA: body.minCGPA,
+        minBatch: body.minBatch,
+        maxBatch: body.maxBatch,
+        course: body.course,
+        driveDate: new Date(body.driveDate),
+        driveType: body.driveType || existingDrive.driveType,
+        jobType: body.jobType || existingDrive.jobType,
+      },
+    });
+
+    return NextResponse.json({ success: true, message: "Drive updated successfully", drive: updatedDrive });
+  } catch (error) {
+    console.error("Update Drive Error:", error);
+    return NextResponse.json({ success: false, message: "Failed to update drive" }, { status: 500 });
+  }
+}

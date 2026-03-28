@@ -10,8 +10,6 @@ import {
   AlertTriangle,
   XCircle,
   CalendarDays,
-  Camera,
-  CheckCircle2,
   FileText,
   Upload,
   Loader2,
@@ -19,22 +17,28 @@ import {
 import Nav from "@/components/layout/nav/nav";
 import Footer from "@/components/layout/footer/footer";
 import { useAuth } from "@/hooks/useAuth";
-import { getToken } from "@/lib/auth-client";
+import { getToken, logout } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import { LogOut } from "lucide-react";
 import { uploadFileToR2 } from "@/lib/upload-r2";
 import { PlacementDrive } from "@prisma/client";
 import JobDetailsModal from "@/components/forms/studentApplyModal/modal";
 
 export default function ExternalStudentDashboard() {
+  const router = useRouter();
   const { loading: authLoading, authenticated, user } = useAuth("external_student", "/students/login");
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [registering, setRegistering] = useState<string | null>(null);
-  const [regMsg, setRegMsg] = useState<{ id: string; msg: string; ok: boolean } | null>(null);
 
   useEffect(() => {
     if (!authenticated) return;
     fetchDashboard();
   }, [authenticated]);
+
+  const handleLogout = () => {
+    logout("external_student");
+    router.push("/");
+  };
 
   const fetchDashboard = async () => {
     try {
@@ -132,22 +136,33 @@ export default function ExternalStudentDashboard() {
                     )}
                   </div>
                 </div>
-                
+
               </div>
 
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-600 text-xs font-bold uppercase tracking-widest mb-4">
                   <GraduationCap className="w-4 h-4" /> External Student
                 </div>
-                <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground leading-tight">
-                  Welcome, <span className="text-brand">{user?.name || student?.name || "Student"}</span>
-                </h1>
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center w-full">
+                  <div>
+                    <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground leading-tight">
+                      Welcome, <span className="text-brand">{user?.name || student?.name || "Student"}</span>
+                    </h1>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 bg-destructive/10 text-destructive px-5 py-2.5 rounded-2xl text-sm font-bold hover:bg-destructive/20 transition-all shadow-sm border border-destructive/10"
+                  >
+                    <LogOut className="size-4" />
+                    Logout
+                  </button>
+                </div>
                 {student && (
                   <p className="text-muted-foreground mt-2 text-sm flex items-center gap-2">
                     <Building2 className="w-4 h-4" /> {student.collegeName} • {student.branch} • CGPA {student.cgpa}
                   </p>
                 )}
-                
+
                 <div className="mt-4 flex flex-wrap items-center gap-3">
                   {student?.resumeUrl ? (
                     <a href={student.resumeUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-brand/10 text-brand rounded-xl font-bold hover:bg-brand/20 transition-colors text-sm">
@@ -183,8 +198,8 @@ export default function ExternalStudentDashboard() {
                 <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-2xl p-5 flex items-center gap-4">
                   <AlertTriangle className="w-8 h-8 text-yellow-500 flex-shrink-0" />
                   <div>
-                    <p className="font-bold text-yellow-600">Profile Pending Verification</p>
-                    <p className="text-sm text-muted-foreground">Your profile and resume are being verified by the admin. You'll be able to register for drives once verified.</p>
+                    <p className="font-bold text-yellow-600">Email Verification Required</p>
+                    <p className="text-sm text-muted-foreground">Please verify your email address to register for drives.</p>
                   </div>
                 </div>
               )}
@@ -217,67 +232,80 @@ export default function ExternalStudentDashboard() {
               </section>
 
               {/* Open Drives */}
-              {student?.isVerified && (
-                <section>
-                  <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-                    <CalendarDays className="w-5 h-5 text-brand" /> Open Campus Drives
-                  </h2>
-                  {drives.length === 0 ? (
-                    <div className="bg-card rounded-2xl border border-border p-8 text-center text-muted-foreground">
-                      <Briefcase className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                      <p className="font-medium">No open drives available</p>
-                    </div>
-                  ) : (
-                    <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
-                          <thead>
-                            <tr className="bg-muted/50 border-b border-border">
-                              <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Company</th>
-                              <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Role</th>
-                              <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">CTC</th>
-                              <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Date</th>
-                              <th className="text-right px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Action</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {drives.map((drive: any) => (
-                              <tr key={drive.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
-                                <td className="px-5 py-3.5">
-                                  <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-brand/10 rounded-lg flex items-center justify-center"><Building2 className="w-4 h-4 text-brand" /></div>
-                                    <span className="font-medium text-foreground">{drive.companyName}</span>
-                                  </div>
-                                </td>
-                                <td className="px-5 py-3.5 text-muted-foreground">{drive.roleName}</td>
-                                <td className="px-5 py-3.5 font-bold text-foreground">{drive.ctc}</td>
-                                <td className="px-5 py-3.5 text-muted-foreground">{new Date(drive.driveDate).toLocaleDateString()}</td>
-                                <td className="px-5 py-3.5 text-right">
-                                  {(() => {
-                                    const isEligible = drive.eligibleBranches?.includes(student?.branch) && (student?.cgpa || 0) >= drive.minCGPA;
-                                    
-                                    if (drive.isRegistered) {
-                                      return <span className="inline-flex items-center gap-1 text-green-600 text-xs font-bold"><CheckCircle className="w-4 h-4" /> Registered</span>;
-                                    }
-                                    if (!isEligible) {
-                                      return <span className="inline-flex items-center gap-1 text-red-500 text-xs font-bold"><XCircle className="w-4 h-4" /> Ineligible</span>;
-                                    }
+              <section>
+                <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+                  <CalendarDays className="w-5 h-5 text-brand" /> Open Campus Drives
+                </h2>
+                {drives.length === 0 ? (
+                  <div className="bg-card rounded-2xl border border-border p-8 text-center text-muted-foreground">
+                    <Briefcase className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                    <p className="font-medium">No open drives available</p>
+                  </div>
+                ) : (
+                  <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="bg-muted/50 border-b border-border">
+                            <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Company</th>
+                            <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Role</th>
+                            <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">CTC</th>
+                            <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Date</th>
+                            <th className="text-right px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {drives.map((drive: any) => (
+                            <tr key={drive.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                              <td className="px-5 py-3.5">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-8 h-8 bg-brand/10 rounded-lg flex items-center justify-center"><Building2 className="w-4 h-4 text-brand" /></div>
+                                  <span className="font-medium text-foreground">{drive.companyName}</span>
+                                </div>
+                              </td>
+                              <td className="px-5 py-3.5 text-muted-foreground">{drive.roleName}</td>
+                              <td className="px-5 py-3.5 font-bold text-foreground">{drive.ctc}</td>
+                              <td className="px-5 py-3.5 text-muted-foreground">{new Date(drive.driveDate).toLocaleDateString()}</td>
+                              <td className="px-5 py-3.5 text-right">
+                                {(() => {
+                                  let ineligibilityReason = "";
+                                  if (drive.course !== "All" && !drive.course?.includes(student?.course)) {
+                                    ineligibilityReason = "Course mismatch";
+                                  } else if (!drive.eligibleBranches?.includes(student?.branch)) {
+                                    ineligibilityReason = "Branch mismatch";
+                                  } else if ((student?.cgpa || 0) < drive.minCGPA) {
+                                    ineligibilityReason = "Low CGPA";
+                                  }
+
+                                  if (drive.isRegistered) {
+                                    return <span className="inline-flex items-center gap-1 text-green-600 text-xs font-bold"><CheckCircle className="w-4 h-4" /> Registered</span>;
+                                  }
+                                  if (ineligibilityReason) {
                                     return (
-                                      <button onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
-                                        className="bg-brand text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-brand/90 transition-all disabled:opacity-50"
-                                      >View Details</button>
+                                      <div className="flex flex-col items-end">
+                                        <span className="inline-flex items-center gap-1 text-red-500 text-xs font-bold"><XCircle className="w-4 h-4" /> Ineligible</span>
+                                        <span className="text-[10px] text-muted-foreground">{ineligibilityReason}</span>
+                                      </div>
                                     );
-                                  })()}
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
+                                  }
+                                  if (!student?.isVerified) {
+                                    return <span className="inline-flex items-center gap-1 text-yellow-600 text-xs font-bold"><AlertTriangle className="w-4 h-4" /> Verify Email to Apply</span>;
+                                  }
+                                  return (
+                                    <button onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
+                                      className="bg-brand text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-brand/90 transition-all disabled:opacity-50"
+                                    >View Details</button>
+                                  );
+                                })()}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
-                  )}
-                </section>
-              )}
+                  </div>
+                )}
+              </section>
 
               {/* Registrations */}
               {registrations.length > 0 && (
@@ -302,12 +330,11 @@ export default function ExternalStudentDashboard() {
                               <td className="px-5 py-3.5 text-muted-foreground">{r.drive?.roleName}</td>
                               <td className="px-5 py-3.5 text-muted-foreground">{r.drive?.driveDate ? new Date(r.drive.driveDate).toLocaleDateString() : "-"}</td>
                               <td className="px-5 py-3.5">
-                                <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider ${
-                                  r.status === "Selected" ? "bg-green-500/10 text-green-600" :
-                                  r.status === "Rejected" ? "bg-red-500/10 text-red-500" :
-                                  r.status === "Shortlisted" ? "bg-yellow-500/10 text-yellow-600" :
-                                  "bg-muted text-muted-foreground"
-                                }`}>
+                                <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider ${r.status === "Selected" ? "bg-green-500/10 text-green-600" :
+                                    r.status === "Rejected" ? "bg-red-500/10 text-red-500" :
+                                      r.status === "Shortlisted" ? "bg-yellow-500/10 text-yellow-600" :
+                                        "bg-muted text-muted-foreground"
+                                  }`}>
                                   {r.status || "Applied"}
                                 </span>
                               </td>
