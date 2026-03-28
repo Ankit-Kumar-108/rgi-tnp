@@ -1,5 +1,5 @@
+export const runtime = 'edge'
 "use client";
-
 import React, { useEffect, useState, useMemo } from "react";
 import {
   ArrowLeft,
