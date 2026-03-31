@@ -29,6 +29,11 @@ export async function sendEmail({ to, subject, html, from }: SendEmailOptions): 
         to: [{ email: to }],
         subject: subject,
         htmlContent: html,
+
+        headers: {
+        "List-Unsubscribe": "<https://ankit.dpdns.org/unsubscribe>",
+        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
+      }
       }),
     });
 
