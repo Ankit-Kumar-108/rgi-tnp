@@ -31,9 +31,9 @@ export async function sendEmail({ to, subject, html, from }: SendEmailOptions): 
         htmlContent: html,
 
         headers: {
-        "List-Unsubscribe": "<https://ankit.dpdns.org/unsubscribe>",
-        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
-      }
+          "List-Unsubscribe": `<https://ankit.dpdns.org/api/unsubscribe?email=${to}>`,
+          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
+        }
       }),
     });
 
