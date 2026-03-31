@@ -7,38 +7,39 @@ interface SendEmailOptions {
 }
 
 export async function sendEmail({ to, subject, html, from }: SendEmailOptions): Promise<{ success: boolean; error?: string }> {
-  const apiKey = process.env.RESEND_API_KEY;
+  const apiKey = process.env.BREVO_API_KEY;
 
   if (!apiKey) {
-    console.warn("[EMAIL] RESEND_API_KEY not set. Skipping email send.");
-    return { success: false, error: "RESEND_API_KEY not configured" };
+    console.warn("[EMAIL] BREVO_API_KEY not set. Skipping email send.");
+    return { success: false, error: "BREVO_API_KEY not configured" };
   }
 
   const senderEmail = from || process.env.EMAIL_FROM
 
   try {
-    const response = await fetch("https://api.resend.com/emails", {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
+        "api-key": apiKey,
+        "accept": "application/json",
+        "content-type": "application/json",
       },
       body: JSON.stringify({
-        from: `RGI T&P <${senderEmail}>`,
-        to: [to],
-        subject,
-        html,
+        sender: { email: senderEmail, name: "RGI T&P" },
+        to: [{ email: to }],
+        subject: subject,
+        htmlContent: html,
       }),
     });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      console.error("[EMAIL] Resend API error:", response.status, errorData);
-      return { success: false, error: `Resend API error: ${response.status}` };
+      console.error("[EMAIL] Brevo API error:", response.status, errorData);
+      return { success: false, error: `Brevo API error: ${response.status}` };
     }
 
-    const data = (await response.json()) as { id: string };
-    console.log("[EMAIL] Sent successfully, id:", data.id);
+    const data = (await response.json()) as { messageId: string };
+    console.log("[EMAIL] Sent successfully, id:", data.messageId);
     return { success: true };
   } catch (error) {
     console.error("[EMAIL] Failed to send:", error);
