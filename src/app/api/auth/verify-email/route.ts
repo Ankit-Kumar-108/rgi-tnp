@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { isTokenExpired } from "@/lib/auth-utils";
 import { sendEmail } from "@/lib/send-email";
-import { verificationSuccessTemplate, adminVerificationNotifyTemplate } from "@/lib/email-templates";
+import { verificationSuccessTemplate } from "@/lib/email-templates";
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,18 +16,18 @@ export async function POST(req: NextRequest) {
 
     const db = getDb();
 
-    // Helper to verify and update
+    // Helper to verify and update — returns `newlyVerified` flag to prevent duplicate welcome emails
     const verifyUser = async (user: any, model: any, targetEmailField: string, flagField: string) => {
       if (user[flagField]) {
-        return { success: true, message: "Email already verified" };
+        return { success: true, newlyVerified: false, message: "Email already verified" };
       }
 
       if (!user.emailVerificationToken || user.emailVerificationToken !== token) {
-        return { success: false, message: "Invalid verification token" };
+        return { success: false, newlyVerified: false, message: "Invalid verification token" };
       }
 
       if (user.emailVerificationTokenExpiry && isTokenExpired(user.emailVerificationTokenExpiry)) {
-        return { success: false, message: "Verification token expired" };
+        return { success: false, newlyVerified: false, message: "Verification token expired" };
       }
 
       const updateData: any = {
@@ -36,7 +36,6 @@ export async function POST(req: NextRequest) {
         emailVerificationTokenExpiry: null,
       };
       
-      // Special case for Student: set both isEmailVerified and isVerified
       if (model === db.student) {
         updateData.isVerified = true;
       }
@@ -46,7 +45,7 @@ export async function POST(req: NextRequest) {
         data: updateData,
       });
 
-      return { success: true, message: "Email verified successfully! You can now log in.", userName: user.name };
+      return { success: true, newlyVerified: true, message: "Email verified successfully! You can now log in.", userName: user.name };
     };
 
     const sendWelcomeEmail = async (toEmail: string, name: string) => {
@@ -61,40 +60,26 @@ export async function POST(req: NextRequest) {
       }
     };
 
-    const sendAdminNotification = async (userName: string, userEmail: string, userRole: string) => {
-      try {
-        const adminEmail = process.env.GMAIL_USER;
-        if (!adminEmail) return;
-        await sendEmail({
-          to: adminEmail,
-          subject: `New User Verified: ${userName} (${userRole})`,
-          html: adminVerificationNotifyTemplate(userName, userEmail, userRole),
-        });
-      } catch (e) {
-        console.warn("[EMAIL] Admin notification failed (non-critical):", e);
-      }
-    };
-
     // 1. Try if role is provided
     if (role === "student") {
       const u = await db.student.findUnique({ where: { email } });
       if (u) {
         const res = await verifyUser(u, db.student, "email", "isEmailVerified");
-        if (res.success) { await sendWelcomeEmail(email, res.userName || u.name); await sendAdminNotification(res.userName || u.name, email, "student"); }
+        if (res.newlyVerified) await sendWelcomeEmail(email, res.userName || u.name);
         return NextResponse.json(res, { status: res.success ? 200 : 400 });
       }
     } else if (role === "external_student") {
       const u = await db.externalStudent.findUnique({ where: { email } });
       if (u) {
         const res = await verifyUser(u, db.externalStudent, "email", "isVerified");
-        if (res.success) { await sendWelcomeEmail(email, res.userName || u.name); await sendAdminNotification(res.userName || u.name, email, "external_student"); }
+        if (res.newlyVerified) await sendWelcomeEmail(email, res.userName || u.name);
         return NextResponse.json(res, { status: res.success ? 200 : 400 });
       }
     } else if (role === "alumni") {
       const u = await db.alumni.findUnique({ where: { personalEmail: email } });
       if (u) {
         const res = await verifyUser(u, db.alumni, "personalEmail", "isVerified");
-        if (res.success) { await sendWelcomeEmail(email, res.userName || u.name); await sendAdminNotification(res.userName || u.name, email, "alumni"); }
+        if (res.newlyVerified) await sendWelcomeEmail(email, res.userName || u.name);
         return NextResponse.json(res, { status: res.success ? 200 : 400 });
       }
     }
@@ -103,21 +88,21 @@ export async function POST(req: NextRequest) {
     const student = await db.student.findUnique({ where: { email } });
     if (student) {
       const res = await verifyUser(student, db.student, "email", "isEmailVerified");
-      if (res.success) { await sendWelcomeEmail(email, res.userName || student.name); await sendAdminNotification(res.userName || student.name, email, "student"); }
+      if (res.newlyVerified) await sendWelcomeEmail(email, res.userName || student.name);
       return NextResponse.json(res, { status: res.success ? 200 : 400 });
     }
 
     const external = await db.externalStudent.findUnique({ where: { email } });
     if (external) {
       const res = await verifyUser(external, db.externalStudent, "email", "isVerified");
-      if (res.success) { await sendWelcomeEmail(email, res.userName || external.name); await sendAdminNotification(res.userName || external.name, email, "external_student"); }
+      if (res.newlyVerified) await sendWelcomeEmail(email, res.userName || external.name);
       return NextResponse.json(res, { status: res.success ? 200 : 400 });
     }
 
     const alumni = await db.alumni.findUnique({ where: { personalEmail: email } });
     if (alumni) {
       const res = await verifyUser(alumni, db.alumni, "personalEmail", "isVerified");
-      if (res.success) { await sendWelcomeEmail(email, res.userName || alumni.name); await sendAdminNotification(res.userName || alumni.name, email, "alumni"); }
+      if (res.newlyVerified) await sendWelcomeEmail(email, res.userName || alumni.name);
       return NextResponse.json(res, { status: res.success ? 200 : 400 });
     }
 
