@@ -32,10 +32,10 @@ export default function UnsubscribePage() {
         <div className="bg-purple-50 rounded-xl p-4 border border-purple-100 mb-8">
           <p className="text-sm text-purple-800 font-medium mb-1">Contact Admin at:</p>
           <a 
-            href="mailto:admin@ankit.dpdns.org" 
+            href="mailto:admin@ankitdevprojects.qzz.io" 
             className="text-lg font-bold text-purple-600 hover:text-purple-700 transition-colors"
           >
-            admin@ankit.dpdns.org
+            admin@ankitdevprojects.qzz.io
           </a>
         </div>
 

@@ -29,7 +29,7 @@ export async function sendEmail({ to, subject, html, from }: SendEmailOptions): 
         subject: subject,
         html: html,
         headers: {
-          "List-Unsubscribe": `<https://ankit.dpdns.org/api/unsubscribe?email=${to}>`,
+          "List-Unsubscribe": `<https://ankitdevprojects.qzz.io/api/unsubscribe?email=${to}>`,
           "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
         }
       }),

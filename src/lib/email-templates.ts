@@ -32,7 +32,7 @@ const baseLayout = (content: string, title: string): string => {
             <p>© 2026 RGI Training & Placement. All rights reserved.</p>
             <p>Radharaman Group of Institutes, Bhopal</p>
             <p>You received this email because you are registered on our portal. <br>
-            <a href="https://ankit.dpdns.org/unsubscribe">Unsubscribe</a> from these alerts.</p>
+            <a href="https://ankitdevprojects.qzz.io/unsubscribe">Unsubscribe</a> from these alerts.</p>
           </div>
         </div>
       </body>
@@ -78,7 +78,7 @@ export const verificationSuccessTemplate = (name: string): string => {
       <li>Campus memory gallery</li>
     </ul>
     <div style="text-align: center;">
-      <a href="https://ankit.dpdns.org/portal/dashboard" class="button">Go to Dashboard</a>
+      <a href="https://ankitdevprojects.qzz.io/portal/dashboard" class="button">Go to Dashboard</a>
     </div>
   `;
   return baseLayout(content, "Welcome to RGI TnP!");
