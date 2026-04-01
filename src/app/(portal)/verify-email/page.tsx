@@ -2,15 +2,16 @@
 
 import React, { useEffect, useState, Suspense, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-import { CheckCircle, XCircle, Loader2, ArrowRight, Mail } from "lucide-react";
+import { CheckCircle, XCircle, Loader2, ArrowRight, Mail, RefreshCw } from "lucide-react";
 import Link from "next/link";
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [message, setMessage] = useState("");
+  const [resending, setResending] = useState(false);
+  const [resendMessage, setResendMessage] = useState("");
   
-  // CRITICAL FIX: Prevents the API from firing twice in React Strict Mode
   const hasAttempted = useRef(false);
 
   const token = searchParams?.get("token");
@@ -24,7 +25,6 @@ function VerifyEmailContent() {
       return;
     }
 
-    // If we already tried verifying, stop here.
     if (hasAttempted.current) return;
     hasAttempted.current = true;
 
@@ -51,7 +51,38 @@ function VerifyEmailContent() {
     };
 
     verify();
-  }, [token, email, role]); // Added role to dependencies
+  }, [token, email, role]);
+
+  const handleResend = async () => {
+    if (!email || resending) return;
+    setResending(true);
+    setResendMessage("");
+
+    try {
+      const res = await fetch("/api/auth/resend-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, role: role || "student" }),
+      });
+      const data = await res.json() as any;
+
+      if (data.success) {
+        setResendMessage("✓ New verification link sent! Check your email.");
+      } else {
+        setResendMessage(data.message || "Failed to resend. Try again later.");
+      }
+    } catch {
+      setResendMessage("Network error. Please try again.");
+    } finally {
+      setResending(false);
+    }
+  };
+
+  const getLoginHref = () => {
+    if (role === "external_student") return "/external-students/login";
+    if (role === "alumni") return "/alumni/login";
+    return "/students/login";
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-6">
@@ -77,24 +108,46 @@ function VerifyEmailContent() {
           {message || "Please wait while we confirm your email address and activate your account."}
         </p>
 
-        {status !== "loading" && (
+        {status === "success" && (
           <div className="space-y-3">
             <Link
-              href="/students/login"
+              href={getLoginHref()}
               className="flex items-center justify-center gap-2 w-full py-3 bg-brand text-primary-foreground rounded-xl font-bold hover:bg-brand/90 transition-all shadow-lg shadow-brand/20 group"
             >
               Go to Login
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-            
-            {status === "error" && (
+          </div>
+        )}
+
+        {status === "error" && (
+          <div className="space-y-3">
+            <Link
+              href={getLoginHref()}
+              className="flex items-center justify-center gap-2 w-full py-3 bg-brand text-primary-foreground rounded-xl font-bold hover:bg-brand/90 transition-all shadow-lg shadow-brand/20 group"
+            >
+              Go to Login
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+
+            {email && (
               <button
-                onClick={() => window.location.reload()}
-                className="text-muted-foreground hover:text-foreground text-xs font-medium transition-colors"
-                style={{ background: "none", border: "none", cursor: "pointer" }}
+                onClick={handleResend}
+                disabled={resending}
+                className="flex items-center justify-center gap-2 w-full py-3 border border-brand/20 text-brand rounded-xl font-semibold hover:bg-brand/5 transition-all disabled:opacity-50"
               >
-                Try Again
+                {resending ? (
+                  <><Loader2 className="w-4 h-4 animate-spin" /> Sending...</>
+                ) : (
+                  <><RefreshCw className="w-4 h-4" /> Resend Verification Email</>
+                )}
               </button>
+            )}
+
+            {resendMessage && (
+              <p className={`text-xs font-medium ${resendMessage.startsWith("✓") ? "text-green-600 dark:text-green-400" : "text-red-500"}`}>
+                {resendMessage}
+              </p>
             )}
           </div>
         )}
@@ -110,7 +163,6 @@ function VerifyEmailContent() {
   );
 }
 
-// Your Suspense boundary is perfect!
 export default function VerifyEmailPage() {
   return (
     <Suspense fallback={

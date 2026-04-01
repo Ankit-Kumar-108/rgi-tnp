@@ -1,57 +1,73 @@
 "use client";
 
-import React, { useEffect, useState, Suspense, useRef } from "react";
-import { useSearchParams } from "next/navigation";
-import { CheckCircle, XCircle, Loader2, ArrowRight, Mail } from "lucide-react";
+import React, { useState, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { CheckCircle, XCircle, Loader2, KeyRound, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 
-function VerifyEmailContent() {
+function ResetPasswordContent() {
   const searchParams = useSearchParams();
-  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
+  const router = useRouter();
+  const [status, setStatus] = useState<"form" | "loading" | "success" | "error">("form");
   const [message, setMessage] = useState("");
-  
-  // CRITICAL FIX: Prevents the API from firing twice in React Strict Mode
-  const hasAttempted = useRef(false);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const token = searchParams?.get("token");
-  const email = searchParams?.get("email");
-  const role = searchParams?.get("role");
+  const role = searchParams?.get("role") || "student";
 
-  useEffect(() => {
-    if (!token || !email) {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (password.length < 8) {
+      setMessage("Password must be at least 8 characters");
       setStatus("error");
-      setMessage("Invalid verification link. Please check your email again.");
       return;
     }
 
-    // If we already tried verifying, stop here.
-    if (hasAttempted.current) return;
-    hasAttempted.current = true;
+    if (password !== confirmPassword) {
+      setMessage("Passwords do not match");
+      setStatus("error");
+      return;
+    }
 
-    const verify = async () => {
-      try {
-        const res = await fetch("/api/auth/verify-email", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token, email, role }),
-        });
-        const data = await res.json() as any;
-        
-        if (data.success) {
-          setStatus("success");
-          setMessage(data.message);
-        } else {
-          setStatus("error");
-          setMessage(data.message || "Verification failed");
-        }
-      } catch (err) {
+    if (!token) {
+      setMessage("Invalid reset link. Please request a new one.");
+      setStatus("error");
+      return;
+    }
+
+    setStatus("loading");
+    setMessage("");
+
+    try {
+      const res = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, password, role }),
+      });
+      const data = await res.json() as any;
+
+      if (data.success) {
+        setStatus("success");
+        setMessage(data.message || "Password reset successfully!");
+      } else {
         setStatus("error");
-        setMessage("An error occurred during verification. Please try again later.");
+        setMessage(data.message || "Reset failed. The link may have expired.");
       }
-    };
+    } catch {
+      setStatus("error");
+      setMessage("An error occurred. Please try again later.");
+    }
+  };
 
-    verify();
-  }, [token, email, role]); // Added role to dependencies
+  const getLoginHref = () => {
+    if (role === "external_student") return "/external-students/login";
+    if (role === "alumni") return "/alumni/login";
+    return "/students/login";
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-6">
@@ -64,61 +80,108 @@ function VerifyEmailContent() {
         <div className="w-20 h-20 bg-brand/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
           {status === "loading" && <Loader2 className="w-10 h-10 text-brand animate-spin" />}
           {status === "success" && <CheckCircle className="w-10 h-10 text-green-500" />}
-          {status === "error" && <XCircle className="w-10 h-10 text-red-500" />}
+          {(status === "form" || status === "error") && <KeyRound className="w-10 h-10 text-brand" />}
         </div>
 
         <h1 className="text-2xl font-black text-foreground mb-3 tracking-tight">
-          {status === "loading" && "Verifying Email..."}
-          {status === "success" && "Successfully Verified!"}
-          {status === "error" && "Verification Failed"}
+          {status === "loading" && "Resetting Password..."}
+          {status === "success" && "Password Reset!"}
+          {(status === "form" || status === "error") && "Set New Password"}
         </h1>
 
-        <p className="text-muted-foreground text-sm mb-8 leading-relaxed">
-          {message || "Please wait while we confirm your email address and activate your account."}
-        </p>
-
-        {status !== "loading" && (
-          <div className="space-y-3">
+        {status === "success" ? (
+          <div className="space-y-4">
+            <p className="text-muted-foreground text-sm leading-relaxed">{message}</p>
             <Link
-              href="/students/login"
-              className="flex items-center justify-center gap-2 w-full py-3 bg-brand text-primary-foreground rounded-xl font-bold hover:bg-brand/90 transition-all shadow-lg shadow-brand/20 group"
+              href={getLoginHref()}
+              className="flex items-center justify-center gap-2 w-full py-3 bg-brand text-primary-foreground rounded-xl font-bold hover:bg-brand/90 transition-all shadow-lg shadow-brand/20"
             >
               Go to Login
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-            
-            {status === "error" && (
-              <button
-                onClick={() => window.location.reload()}
-                className="text-muted-foreground hover:text-foreground text-xs font-medium transition-colors"
-                style={{ background: "none", border: "none", cursor: "pointer" }}
-              >
-                Try Again
-              </button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4 text-left">
+            {status === "error" && message && (
+              <div className="p-3 rounded-xl bg-destructive/10 text-destructive text-sm font-medium text-center">
+                {message}
+              </div>
             )}
-          </div>
-        )}
 
-        {status === "loading" && (
-          <div className="flex items-center justify-center gap-2 text-muted-foreground text-xs animate-pulse">
-            <Mail className="w-3 h-3" />
-            Security Check in Progress
-          </div>
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-foreground">New Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className="w-full px-4 py-3 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all text-sm pr-12"
+                  placeholder="Enter new password (min 8 characters)"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={8}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-foreground">Confirm Password</label>
+              <div className="relative">
+                <input
+                  type={showConfirm ? "text" : "password"}
+                  className="w-full px-4 py-3 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all text-sm pr-12"
+                  placeholder="Confirm new password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm(!showConfirm)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={status === "loading"}
+              className="w-full py-3 bg-brand text-primary-foreground rounded-xl font-bold hover:bg-brand/90 transition-all shadow-lg shadow-brand/20 disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {status === "loading" ? (
+                <><Loader2 className="w-4 h-4 animate-spin" /> Resetting...</>
+              ) : (
+                "Reset Password"
+              )}
+            </button>
+
+            <div className="text-center pt-2">
+              <Link href={getLoginHref()} className="text-xs text-muted-foreground hover:text-brand transition-colors font-medium">
+                Back to Login
+              </Link>
+            </div>
+          </form>
         )}
       </div>
     </div>
   );
 }
 
-// Your Suspense boundary is perfect!
-export default function VerifyEmailPage() {
+export default function ResetPasswordPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="w-8 h-8 animate-spin text-brand" />
       </div>
     }>
-      <VerifyEmailContent />
+      <ResetPasswordContent />
     </Suspense>
   );
 }

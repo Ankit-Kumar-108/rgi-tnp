@@ -49,8 +49,6 @@ export async function sendEmail({ to, subject, html, from }: SendEmailOptions): 
       `Subject: =?utf-8?B?${base64Subject}?=`,
       `MIME-Version: 1.0`,
       `Content-Type: text/html; charset=utf-8`,
-      `List-Unsubscribe: <https://ankitdevprojects.qzz.io/api/unsubscribe?email=${to}>`,
-      `List-Unsubscribe-Post: List-Unsubscribe=One-Click`,
       '',
       html,
     ].join('\r\n');
@@ -63,7 +61,7 @@ export async function sendEmail({ to, subject, html, from }: SendEmailOptions): 
       .replace(/=+$/, '');
 
     // 3. Send email using Gmail REST API
-    const sendResponse = await fetch("https://gmail.googleapis.com/upload/gmail/v1/users/me/messages/send", {
+    const sendResponse = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${access_token}`,

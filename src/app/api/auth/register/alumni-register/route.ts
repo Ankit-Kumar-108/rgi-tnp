@@ -4,6 +4,7 @@ import { alumniRegistrationSchema } from "@/lib/validations/alumni";
 import { hashPassword, generateVerificationToken, getresetTokenExpiry } from "@/lib/auth-utils";
 import { getDb } from "@/lib/db";
 import { sendEmail } from "@/lib/send-email";
+import { verificationEmailTemplate } from "@/lib/email-templates";
 
 export async function POST(req: NextRequest) {
   try {
@@ -78,19 +79,7 @@ export async function POST(req: NextRequest) {
     await sendEmail({
       to: validatedData.personalEmail,
       subject: "Verify Your Email - RGI TnP Portal",
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 24px;">
-          <h2 style="color: #9213ec;">Welcome back to RGI!</h2>
-          <p>Hi ${validatedData.name},</p>
-          <p>Thank you for joining the RGI Alumni Network. Please verify your email to activate your account:</p>
-          <a href="${verificationLink}" style="display:inline-block;background:#9213ec;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold;margin:16px 0;">
-            Verify Email Address
-          </a>
-          <p>If the button doesn't work, copy and paste this link into your browser:</p>
-          <p>${verificationLink}</p>
-          <p>This link will expire in 30 minutes.</p>
-        </div>
-      `,
+      html: verificationEmailTemplate(validatedData.name, verificationLink),
     });
 
     return NextResponse.json({

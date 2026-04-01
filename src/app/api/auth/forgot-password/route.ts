@@ -2,6 +2,7 @@ export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { sendEmail } from "@/lib/send-email";
+import { passwordResetEmailTemplate } from "@/lib/email-templates";
 import { generateResetToken, getresetTokenExpiry } from "@/lib/auth-utils";
 
 function bufferToHex(buffer: ArrayBuffer): string {
@@ -31,11 +32,14 @@ export async function POST(req: NextRequest) {
     const resetTokenHash = await sha256(resetToken);
     const expiry = getresetTokenExpiry();
 
+    let userName = "User";
+
     if (role === "student") {
       const student = await db.student.findUnique({ where: { email } });
       if (!student) {
         return NextResponse.json({ success: true, message: "If an account exists, a reset link was sent." });
       }
+      userName = student.name;
       await db.student.update({
         where: { email },
         data: {
@@ -48,6 +52,7 @@ export async function POST(req: NextRequest) {
       if (!externalStudent) {
         return NextResponse.json({ success: true, message: "If an account exists, a reset link was sent." });
       }
+      userName = externalStudent.name;
       await db.externalStudent.update({
         where: { email },
         data: {
@@ -60,6 +65,7 @@ export async function POST(req: NextRequest) {
       if (!alumni) {
         return NextResponse.json({ success: true, message: "If an account exists, a reset link was sent." });
       }
+      userName = alumni.name;
       await db.alumni.update({
         where: { personalEmail: email },
         data: {
@@ -71,21 +77,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Invalid role specified." }, { status: 400 });
     }
 
-    const resetUrl = `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/reset-password?token=${resetToken}&role=${role}`;
+    const host = req.headers.get("host");
+    const protocol = host?.includes("localhost") ? "http" : "https";
+    const resetUrl = `${protocol}://${host}/reset-password?token=${resetToken}&role=${role}`;
 
     await sendEmail({
       to: email,
       subject: "Password Reset — RGI T&P Portal",
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 24px;">
-          <h2 style="color: #9213ec;">Reset Your Password</h2>
-          <p>You requested a password reset. Click the button below within 30 minutes:</p>
-          <a href="${resetUrl}" style="display:inline-block;background:#9213ec;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold;margin:16px 0;">
-            Reset Password
-          </a>
-          <p>If you did not request this, ignore this email.</p>
-        </div>
-      `,
+      html: passwordResetEmailTemplate(userName, resetUrl),
     });
 
     return NextResponse.json({ success: true, message: "If an account exists, a reset link was sent." });

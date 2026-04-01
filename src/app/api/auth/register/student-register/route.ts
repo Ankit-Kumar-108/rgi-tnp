@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { registrationSchema } from "@/lib/validations/student";
 import { hashPassword, generateVerificationToken, getresetTokenExpiry } from "@/lib/auth-utils";
 import { getDb } from "@/lib/db";
-import { otpEmailTemplate } from "@/lib/email-templates";
+import { verificationEmailTemplate } from "@/lib/email-templates";
 import { sendEmail } from "@/lib/send-email";
 
 
@@ -86,19 +86,7 @@ export async function POST(req: NextRequest) {
     await sendEmail({
       to: validatedData.email,
       subject: "Verify Your Email - RGI TnP Portal",
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 24px;">
-          <h2 style="color: #9213ec;">Welcome to RGI T&P Portal!</h2>
-          <p>Hi ${validatedData.name},</p>
-          <p>Please click the button below to verify your email address and activate your student account:</p>
-          <a href="${verificationLink}" style="display:inline-block;background:#9213ec;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold;margin:16px 0;">
-            Verify Email Address
-          </a>
-          <p>If the button doesn't work, copy and paste this link into your browser:</p>
-          <p>${verificationLink}</p>
-          <p>This link will expire in 30 minutes.</p>
-        </div>
-      `,
+      html: verificationEmailTemplate(validatedData.name, verificationLink),
     });
 
     return NextResponse.json({

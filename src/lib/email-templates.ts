@@ -16,7 +16,6 @@ const baseLayout = (content: string, title: string): string => {
           .button { display: inline-block; background: #9213ec; color: #ffffff !important; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; margin: 20px 0; }
           .success-badge { background: #4caf50; color: white; padding: 12px; border-radius: 8px; text-align: center; font-weight: bold; }
           .timer { color: #d32f2f; font-weight: bold; background: #ffebee; padding: 5px 10px; border-radius: 4px; display: inline-block; }
-          .otp-box { font-size: 32px; font-weight: bold; color: #9213ec; text-align: center; padding: 25px; background: #f3e5f5; border-radius: 8px; margin: 20px 0; letter-spacing: 8px; border: 1px dashed #9213ec; }
           a { color: #9213ec; }
         </style>
       </head>
@@ -29,10 +28,8 @@ const baseLayout = (content: string, title: string): string => {
             ${content}
           </div>
           <div class="footer">
-            <p>© 2026 RGI Training & Placement. All rights reserved.</p>
+            <p>&copy; 2026 RGI Training &amp; Placement. All rights reserved.</p>
             <p>Radharaman Group of Institutes, Bhopal</p>
-            <p>You received this email because you are registered on our portal. <br>
-            <a href="https://ankitdevprojects.qzz.io/unsubscribe">Unsubscribe</a> from these alerts.</p>
           </div>
         </div>
       </body>
@@ -40,37 +37,45 @@ const baseLayout = (content: string, title: string): string => {
   `;
 };
 
-// 2. THE SPECIFIC TEMPLATES (Now much shorter!)
+// 2. THE SPECIFIC TEMPLATES
 
-export const otpEmailTemplate = (otp: string, name: string): string => {
-  const content = `
-    <p>Hi <strong>${name}</strong>,</p>
-    <p>Thank you for registering with <strong>RGI Training & Placement Portal</strong>. Use the code below to verify your email address:</p>
-    <div class="otp-box">${otp}</div>
-    <p style="text-align: center;"><span class="timer">⏰ Valid for 10 minutes only</span></p>
-    <p><strong>Security Tip:</strong> Never share your OTP with anyone. RGI staff will never ask for this code.</p>
-  `;
-  return baseLayout(content, "Email Verification");
-};
-
-export const externalVerificationEmailTemplate = (name: string, verificationLink: string): string => {
+// Used by: student-register, external-student-register, alumni-register, resend-verification
+export const verificationEmailTemplate = (name: string, verificationLink: string): string => {
   const content = `
     <p>Hi ${name},</p>
-    <p>To activate your external student account on the RGI TnP Portal, please click the button below:</p>
+    <p>To activate your account on the <strong>RGI TnP Portal</strong>, please click the button below:</p>
     <div style="text-align: center;">
       <a href="${verificationLink}" class="button">Verify Email Address</a>
     </div>
-    <p class="timer">⏰ This link expires in 30 minutes</p>
+    <p class="timer">&#9200; This link expires in 30 minutes</p>
     <p>If the button doesn't work, copy this link: <br>
     <span style="word-break: break-all; font-size: 11px; color: #9213ec;">${verificationLink}</span></p>
+    <p><strong>Security Tip:</strong> Never share this link with anyone. RGI staff will never ask for it.</p>
   `;
   return baseLayout(content, "Verify Your Account");
 };
 
+// Used by: forgot-password
+export const passwordResetEmailTemplate = (name: string, resetLink: string): string => {
+  const content = `
+    <p>Hi ${name},</p>
+    <p>We received a request to reset your password for the <strong>RGI TnP Portal</strong>.</p>
+    <div style="text-align: center;">
+      <a href="${resetLink}" class="button">Reset Password</a>
+    </div>
+    <p class="timer">&#9200; This link expires in 30 minutes</p>
+    <p>If the button doesn't work, copy this link: <br>
+    <span style="word-break: break-all; font-size: 11px; color: #9213ec;">${resetLink}</span></p>
+    <p>If you did not request this, you can safely ignore this email. Your password will not change.</p>
+  `;
+  return baseLayout(content, "Reset Your Password");
+};
+
+// Used by: verify-email (sent after successful verification)
 export const verificationSuccessTemplate = (name: string): string => {
   const content = `
     <p>Hi ${name},</p>
-    <div class="success-badge">Verification Successful! ✓</div>
+    <div class="success-badge">Verification Successful! &#10003;</div>
     <p>Your account is now active. You can now access:</p>
     <ul>
       <li>Placement drive registrations</li>
@@ -84,6 +89,7 @@ export const verificationSuccessTemplate = (name: string): string => {
   return baseLayout(content, "Welcome to RGI TnP!");
 };
 
+// Used by: future drive registration feature
 export const driveRegistrationTemplate = (name: string, companyName: string, date: string, role: string): string => {
   const content = `
     <p>Hi ${name},</p>

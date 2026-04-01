@@ -4,7 +4,7 @@ import { externalStudentRegistrationSchema } from "@/lib/validations/external-st
 import { hashPassword, generateVerificationToken, getresetTokenExpiry } from "@/lib/auth-utils";
 import { getDb } from "@/lib/db";
 import { sendEmail } from "@/lib/send-email";
-import { externalVerificationEmailTemplate } from "@/lib/email-templates";
+import { verificationEmailTemplate } from "@/lib/email-templates";
 
 export async function POST(req: NextRequest) {
   try {
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     await sendEmail({
       to: validatedData.email,
       subject: "Verify Your Email - RGI TnP Portal",
-      html: externalVerificationEmailTemplate(validatedData.name, verificationLink),
+      html: verificationEmailTemplate(validatedData.name, verificationLink),
     });
 
     return NextResponse.json(
