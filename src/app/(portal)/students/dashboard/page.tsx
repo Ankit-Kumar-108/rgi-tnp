@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import {
   Loader2,
-  GraduationCap,
   Briefcase,
   TrendingUp,
   Camera,
@@ -16,12 +15,15 @@ import {
   Upload,
   XCircle,
   FileText,
+  LogOut
 } from "lucide-react"
 import Nav from "@/components/layout/nav/nav"
 import Footer from "@/components/layout/footer/footer"
 import { useAuth } from "@/hooks/useAuth"
 import { getToken } from "@/lib/auth-client"
 import JobDetailsModal from "@/components/forms/studentApplyModal/modal";
+import { logout } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 import { Student, PlacementDrive, DriveRegistration, Memory } from "@/types";
 import { uploadFileToR2 } from "@/lib/upload-r2";
 import { Camera as CameraIcon } from "lucide-react";
@@ -41,10 +43,17 @@ export default function StudentDashboard() {
   const [memUploading, setMemUploading] = useState(false);
   const [resumeUploading, setResumeUploading] = useState(false);
 
+  const router = useRouter();
+
   useEffect(() => {
     if (!authenticated) return;
     fetchDashboard();
   }, [authenticated]);
+
+  const handleLogout = () => {
+    logout("student");
+    router.push("/");
+  };
 
   const fetchDashboard = async () => {
     try {
@@ -59,6 +68,41 @@ export default function StudentDashboard() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const getEligibilityData = (drive: any, student: any) => {
+    let reason = "";
+    if (drive.course !== "All" && !drive.course?.includes(student?.course)) reason = "Course Ineligible";
+    else if (!drive.eligibleBranches?.includes(student?.branch)) reason = "Branch Ineligible";
+    else if ((student?.cgpa || 0) < drive.minCGPA) reason = "CGPA too low";
+
+    if (drive.isRegistered) {
+      return {
+        actionElement: <span className="inline-flex items-center gap-1 text-green-600 text-xs font-bold"><CheckCircle className="w-4 h-4" /> Registered</span>
+      };
+    }
+
+    if (reason) {
+      return {
+        actionElement: (
+          <div className="flex flex-col items-end">
+            <span className="inline-flex items-center gap-1 text-red-500 text-xs font-bold"><XCircle className="w-4 h-4" /> Ineligible</span>
+            <span className="text-[10px] text-muted-foreground leading-none mt-1">{reason}</span>
+          </div>
+        )
+      };
+    }
+
+    return {
+      actionElement: (
+        <button
+          onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
+          className="bg-brand text-white px-5 py-2 rounded-xl text-xs font-bold hover:bg-brand/90 transition-all active:scale-95"
+        >
+          Register
+        </button>
+      )
+    };
   };
 
   const handleResumeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -163,10 +207,16 @@ export default function StudentDashboard() {
 
         <main className="p-6 md:p-10 max-w-7xl mx-auto space-y-10">
           {/* Header */}
-          <section className="pt-4 md:pt-8">
-            <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground leading-tight">
+          <section className="pt-4 md:pt-8 flex justify-between items-end">
+            <h1 className="text-2xl md:text-4xl lg:text-5xl font-black tracking-tight text-foreground leading-tight">
               Welcome, <span className="text-brand">{student?.name || "Student"}</span>
             </h1>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 bg-destructive/10 text-destructive px-5 py-2.5 rounded-2xl text-sm font-bold hover:bg-destructive/20 transition-all shadow-sm border border-destructive/10"
+            >
+              <LogOut className="size-4" /> Logout
+            </button>
           </section>
 
           {loading ? (
@@ -209,7 +259,7 @@ export default function StudentDashboard() {
                         {/* Verified Badge */}
                         <div className="absolute bottom-4 bg-background right-0 md:right-4 size-10 rounded-full flex shrink-0 items-center justify-center">
                           {user?.isVerified ? (
-                            <BadgeCheck className={`size-11 text-center text-brand`} />
+                            <BadgeCheck className={`size-11 text-center text-green-500`} />
                           ) : (
                             <BadgeAlert className={`size-11 text-center text-red-500`} />
                           )}
@@ -235,19 +285,19 @@ export default function StudentDashboard() {
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-0 pt-6 border-t border-border">
                           <div className="md:pr-6 md:border-r border-border">
                             <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Current CGPA</p>
-                            <p className="text-2xl font-bold text-brand">{student?.cgpa}</p>
+                            <p className="text-xl md:text-2xl font-bold text-brand">{student?.cgpa}</p>
                           </div>
                           <div className="md:px-6 md:border-r border-border">
                             <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Branch</p>
-                            <p className="text-lg font-bold text-foreground leading-tight">{student?.branch}</p>
+                            <p className="text-md md:text-lg font-bold text-foreground leading-tight">{student?.branch}</p>
                           </div>
                           <div className="md:px-6 md:border-r border-border">
                             <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Semester</p>
-                            <p className="text-2xl font-bold text-foreground">{student?.semester}</p>
+                            <p className="text-xl md:text-2xl font-bold text-foreground">{student?.semester}</p>
                           </div>
                           <div className="md:px-6 md:border-r border-border">
                             <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Course</p>
-                            <p className="text-2xl font-bold text-foreground">{student?.course}</p>
+                            <p className="text-xl md:text-2xl font-bold text-foreground">{student?.course}</p>
                           </div>
                         </div>
 
@@ -323,89 +373,94 @@ export default function StudentDashboard() {
                   <CalendarDays className="w-5 h-5 text-brand" />
                   Upcoming Drives
                 </h2>
+
                 {drives.length === 0 ? (
                   <div className="bg-card rounded-2xl border border-border p-8 text-center text-muted-foreground">
                     <Briefcase className="w-12 h-12 mx-auto mb-3 opacity-30" />
                     <p className="font-medium">No eligible drives available right now</p>
-                    <p className="text-xs mt-1">Check back later for new opportunities</p>
                   </div>
                 ) : (
-                  <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
-                    <div className="overflow-x-auto">
+                  <>
+                    {/* MOBILE VIEW: Grid of Cards (Visible only on small screens) */}
+                    <div className="grid grid-cols-1 gap-4 md:hidden">
+                      {drives.map((drive: any) => {
+                        const { actionElement } = getEligibilityData(drive, student);
+                        return (
+                          <div key={drive.id} className="bg-card border border-border rounded-2xl p-5 shadow-sm space-y-4">
+                            <div className="flex items-start justify-between">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center shrink-0">
+                                  <Building2 className="w-5 h-5 text-brand" />
+                                </div>
+                                <div>
+                                  <h3 className="font-bold text-foreground leading-tight">{drive.companyName}</h3>
+                                  <p className="text-xs text-muted-foreground">{drive.roleName}</p>
+                                </div>
+                              </div>
+                              <span className={`text-[10px] px-2 py-1 rounded-full font-bold ${drive.driveType === "Open" ? "bg-green-500/10 text-green-600" : "bg-blue-500/10 text-blue-600"}`}>
+                                {drive.driveType}
+                              </span>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4 py-2 border-y border-border/50">
+                              <div>
+                                <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">CTC</p>
+                                <p className="text-sm font-bold text-foreground">{drive.ctc}</p>
+                              </div>
+                              <div>
+                                <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">Date</p>
+                                <p className="text-sm font-bold text-foreground">{new Date(drive.driveDate).toLocaleDateString()}</p>
+                              </div>
+                            </div>
+
+                            <div className="flex justify-end pt-1">
+                              {actionElement}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* DESKTOP VIEW: Standard Table (Hidden on small screens) */}
+                    <div className="hidden md:block bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
                       <table className="w-full text-sm">
-                        <thead>
-                          <tr className="bg-muted/50 border-b border-border">
-                            <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Company</th>
-                            <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Role</th>
-                            <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">CTC</th>
-                            <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Date</th>
-                            <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Type</th>
-                            <th className="text-right px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Action</th>
+                        <thead className="bg-muted/50 border-b border-border">
+                          <tr className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                            <th className="text-left px-5 py-3">Company</th>
+                            <th className="text-left px-5 py-3">Role</th>
+                            <th className="text-left px-5 py-3">CTC</th>
+                            <th className="text-left px-5 py-3">Date</th>
+                            <th className="text-left px-5 py-3">Type</th>
+                            <th className="text-right px-5 py-3">Action</th>
                           </tr>
                         </thead>
-                        <tbody>
-                          {drives.map((drive: any) => (
-                            <tr key={drive.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
-                              <td className="px-5 py-3.5">
-                                <div className="flex items-center gap-3">
-                                  <div className="w-8 h-8 bg-brand/10 rounded-lg flex items-center justify-center">
+                        <tbody className="divide-y divide-border/50">
+                          {drives.map((drive: any) => {
+                            const { actionElement } = getEligibilityData(drive, student);
+                            return (
+                              <tr key={drive.id} className="hover:bg-muted/30 transition-colors">
+                                <td className="px-5 py-3.5">
+                                  <div className="flex items-center gap-3">
                                     <Building2 className="w-4 h-4 text-brand" />
+                                    <span className="font-medium">{drive.companyName}</span>
                                   </div>
-                                  <span className="font-medium text-foreground">{drive.companyName}</span>
-                                </div>
-                              </td>
-                              <td className="px-5 py-3.5 text-muted-foreground">{drive.roleName}</td>
-                              <td className="px-5 py-3.5 font-bold text-foreground">{drive.ctc}</td>
-                              <td className="px-5 py-3.5 text-muted-foreground">{new Date(drive.driveDate).toLocaleDateString()}</td>
-                              <td className="px-5 py-3.5">
-                                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${drive.driveType === "Open" ? "bg-green-500/10 text-green-600" : "bg-blue-500/10 text-blue-600"
-                                  }`}>{drive.driveType}</span>
-                              </td>
-                              <td className="px-5 py-3.5 text-right">
-                                {(() => {
-                                  let ineligibilityReason = "";
-                                  if (drive.course !== "All" && !drive.course?.includes(student?.course)) {
-                                    ineligibilityReason = "Course mismatch";
-                                  } else if (!drive.eligibleBranches?.includes(student?.branch)) {
-                                    ineligibilityReason = "Branch mismatch";
-                                  } else if ((student?.cgpa || 0) < drive.minCGPA) {
-                                    ineligibilityReason = "Low CGPA";
-                                  }
-
-                                  if (drive.isRegistered) {
-                                    return (
-                                      <span className="inline-flex items-center gap-1 text-green-600 text-xs font-bold">
-                                        <CheckCircle className="w-4 h-4" /> Registered
-                                      </span>
-                                    );
-                                  }
-                                  if (ineligibilityReason) {
-                                    return (
-                                      <div className="flex flex-col items-end">
-                                        <span className="inline-flex items-center gap-1 text-red-500 text-xs font-bold"><XCircle className="w-4 h-4" /> Ineligible</span>
-                                        <span className="text-[10px] text-muted-foreground">{ineligibilityReason}</span>
-                                      </div>
-                                    );
-                                  }
-                                  return (
-                                    <button
-                                      onClick={() => {
-                                        setSelectedDrive(drive);
-                                        setIsModalOpen(true);
-                                      }}
-                                      className="bg-brand text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-brand/90 transition-all disabled:opacity-50"
-                                    >
-                                      Register
-                                    </button>
-                                  );
-                                })()}
-                              </td>
-                            </tr>
-                          ))}
+                                </td>
+                                <td className="px-5 py-3.5 text-muted-foreground">{drive.roleName}</td>
+                                <td className="px-5 py-3.5 font-bold">{drive.ctc}</td>
+                                <td className="px-5 py-3.5 text-muted-foreground">{new Date(drive.driveDate).toLocaleDateString()}</td>
+                                <td className="px-5 py-3.5">
+                                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${drive.driveType === "Open" ? "bg-green-500/10 text-green-600" : "bg-blue-500/10 text-blue-600"}`}>
+                                    {drive.driveType}
+                                  </span>
+                                </td>
+                                <td className="px-5 py-3.5 text-right">{actionElement}</td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
                       </table>
                     </div>
-                  </div>
+                  </>
                 )}
               </section>
 
@@ -415,92 +470,192 @@ export default function StudentDashboard() {
                   <FileText className="w-5 h-5 text-brand" />
                   My Registrations
                 </h2>
+
                 {registrations.length === 0 ? (
                   <div className="bg-card rounded-2xl border border-border p-8 text-center text-muted-foreground">
                     <p className="font-medium">No registrations yet</p>
                     <p className="text-xs mt-1">Register for a drive from the list above</p>
                   </div>
                 ) : (
-                  <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead>
-                          <tr className="bg-muted/50 border-b border-border">
-                            <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Company</th>
-                            <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Role</th>
-                            <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Date</th>
-                            <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Action Status</th>
-                            <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Drive Status</th>
-                            <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Attendance</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {registrations.map((reg: any) => (
-                            <tr key={reg.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
-                              <td className="px-5 py-3.5 font-medium text-foreground">{reg.drive?.companyName}</td>
-                              <td className="px-5 py-3.5 text-muted-foreground">{reg.drive?.roleName}</td>
-                              <td className="px-5 py-3.5 text-muted-foreground">{reg.drive?.driveDate ? new Date(reg.drive.driveDate).toLocaleDateString() : "-"}</td>
-                              <td className="px-5 py-3.5">
-                                <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider ${
-                                  reg.status === "Selected" ? "bg-green-500/10 text-green-600" :
-                                  reg.status === "Rejected" ? "bg-red-500/10 text-red-500" :
+                  <>
+                    {/* MOBILE VIEW: Cards */}
+                    <div className="grid grid-cols-1 gap-4 md:hidden">
+                      {registrations.map((reg: any) => (
+                        <div key={reg.id} className="bg-card border border-border rounded-2xl p-5 shadow-sm space-y-4">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h3 className="font-bold text-foreground leading-tight">{reg.drive?.companyName}</h3>
+                              <p className="text-xs text-muted-foreground">{reg.drive?.roleName}</p>
+                            </div>
+                            <span className={`text-[10px] px-2 py-1 rounded-full font-bold capitalize ${reg.drive?.status === "active" ? "bg-green-500/10 text-green-600" :
+                              reg.drive?.status === "completed" ? "bg-blue-500/10 text-blue-600" :
+                                "bg-muted text-muted-foreground"
+                              }`}>
+                              {reg.drive?.status}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center justify-between py-3 border-y border-border/50">
+                            <div className="space-y-1">
+                              <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">Action Status</p>
+                              <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider ${reg.status === "Selected" ? "bg-green-500/10 text-green-600" :
+                                reg.status === "Rejected" ? "bg-red-500/10 text-red-500" :
                                   reg.status === "Shortlisted" ? "bg-yellow-500/10 text-yellow-600" :
-                                  "bg-muted text-muted-foreground"
+                                    "bg-muted text-muted-foreground"
                                 }`}>
-                                  {reg.status || "Applied"}
+                                {reg.status || "Applied"}
+                              </span>
+                            </div>
+                            <div className="text-right space-y-1">
+                              <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">Attendance</p>
+                              {reg.attended ? (
+                                <span className="text-green-600 text-xs font-bold flex items-center justify-end gap-1">
+                                  <CheckCircle className="w-3.5 h-3.5" /> Present
                                 </span>
-                              </td>
-                              <td className="px-5 py-3.5">
-                                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold capitalize ${reg.drive?.status === "active" ? "bg-green-500/10 text-green-600"
-                                  : reg.drive?.status === "completed" ? "bg-blue-500/10 text-blue-600"
-                                    : "bg-muted text-muted-foreground"
-                                  }`}>{reg.drive?.status}</span>
-                              </td>
-                              <td className="px-5 py-3.5">
-                                {reg.attended ? (
-                                  <span className="text-green-600 text-xs font-bold flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5" /> Present</span>
-                                ) : (
-                                  <span className="text-muted-foreground text-xs font-bold flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Upcoming</span>
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                              ) : (
+                                <span className="text-muted-foreground text-xs font-bold flex items-center justify-end gap-1">
+                                  <Clock className="w-3.5 h-3.5" /> Upcoming
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <p className="text-[10px] text-muted-foreground italic">
+                            Drive Date: {reg.drive?.driveDate ? new Date(reg.drive.driveDate).toLocaleDateString() : "-"}
+                          </p>
+                        </div>
+                      ))}
                     </div>
-                  </div>
+
+                    {/* DESKTOP VIEW: Table */}
+                    <div className="hidden md:block bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm text-left">
+                          <thead>
+                            <tr className="bg-muted/50 border-b border-border text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                              <th className="px-5 py-4">Company & Role</th>
+                              <th className="px-5 py-4">Date</th>
+                              <th className="px-5 py-4">Action Status</th>
+                              <th className="px-5 py-4">Drive Status</th>
+                              <th className="px-5 py-4 text-right">Attendance</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-border/50">
+                            {registrations.map((reg: any) => (
+                              <tr key={reg.id} className="hover:bg-muted/30 transition-colors">
+                                <td className="px-5 py-3.5">
+                                  <p className="font-medium text-foreground">{reg.drive?.companyName}</p>
+                                  <p className="text-xs text-muted-foreground">{reg.drive?.roleName}</p>
+                                </td>
+                                <td className="px-5 py-3.5 text-muted-foreground">
+                                  {reg.drive?.driveDate ? new Date(reg.drive.driveDate).toLocaleDateString() : "-"}
+                                </td>
+                                <td className="px-5 py-3.5">
+                                  <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider ${reg.status === "Selected" ? "bg-green-500/10 text-green-600" :
+                                    reg.status === "Rejected" ? "bg-red-500/10 text-red-500" :
+                                      reg.status === "Shortlisted" ? "bg-yellow-500/10 text-yellow-600" :
+                                        "bg-muted text-muted-foreground"
+                                    }`}>
+                                    {reg.status || "Applied"}
+                                  </span>
+                                </td>
+                                <td className="px-5 py-3.5">
+                                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold capitalize ${reg.drive?.status === "active" ? "bg-green-500/10 text-green-600" :
+                                    reg.drive?.status === "completed" ? "bg-blue-500/10 text-blue-600" :
+                                      "bg-muted text-muted-foreground"
+                                    }`}>
+                                    {reg.drive?.status}
+                                  </span>
+                                </td>
+                                <td className="px-5 py-3.5 text-right">
+                                  {reg.attended ? (
+                                    <span className="text-green-600 text-xs font-bold inline-flex items-center gap-1">
+                                      <CheckCircle className="w-3.5 h-3.5" /> Present
+                                    </span>
+                                  ) : (
+                                    <span className="text-muted-foreground text-xs font-bold inline-flex items-center gap-1">
+                                      <Clock className="w-3.5 h-3.5" /> Upcoming
+                                    </span>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </>
                 )}
               </section>
 
               {/* Archived Drives */}
               {archivedDrives.length > 0 && (
-                <section>
-                  <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2 opacity-70">
+                <section className="opacity-70 hover:opacity-100 transition-opacity duration-300">
+                  <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
                     <CalendarDays className="w-5 h-5 text-brand" />
                     Archived Drives History
                   </h2>
-                  <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden opacity-70">
+
+                  {/* MOBILE VIEW: Compact List */}
+                  <div className="grid grid-cols-1 gap-3 md:hidden">
+                    {archivedDrives.map((drive: any) => (
+                      <div key={drive.id} className="bg-card/50 border border-border rounded-xl p-4 flex justify-between items-center">
+                        <div className="space-y-1">
+                          <h3 className="text-sm font-bold text-foreground truncate max-w-[150px]">
+                            {drive.companyName}
+                          </h3>
+                          <p className="text-[10px] text-muted-foreground">
+                            {drive.roleName} • {new Date(drive.driveDate).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div>
+                          {drive.isRegistered ? (
+                            <span className="bg-brand/10 text-brand text-[9px] px-2 py-0.5 rounded-full font-bold">
+                              Registered
+                            </span>
+                          ) : (
+                            <span className="bg-muted text-muted-foreground text-[9px] px-2 py-0.5 rounded-full font-bold">
+                              Missed
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* DESKTOP VIEW: Clean Table */}
+                  <div className="hidden md:block bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="bg-muted/50 border-b border-border">
-                            <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Company</th>
-                            <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Role</th>
-                            <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Date</th>
-                            <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Status</th>
+                          <tr className="bg-muted/50 border-b border-border text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                            <th className="text-left px-5 py-3">Company</th>
+                            <th className="text-left px-5 py-3">Role</th>
+                            <th className="text-left px-5 py-3">Date</th>
+                            <th className="text-right px-5 py-3">Status</th>
                           </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="divide-y divide-border/40">
                           {archivedDrives.map((drive: any) => (
-                            <tr key={drive.id} className="border-b border-border/50">
-                              <td className="px-5 py-3.5 font-medium text-foreground">{drive.companyName}</td>
-                              <td className="px-5 py-3.5 text-muted-foreground">{drive.roleName}</td>
-                              <td className="px-5 py-3.5 text-muted-foreground">{new Date(drive.driveDate).toLocaleDateString()}</td>
-                              <td className="px-5 py-3.5">
+                            <tr key={drive.id} className="hover:bg-muted/20 transition-colors">
+                              <td className="px-5 py-3.5 font-medium text-foreground">
+                                {drive.companyName}
+                              </td>
+                              <td className="px-5 py-3.5 text-muted-foreground">
+                                {drive.roleName}
+                              </td>
+                              <td className="px-5 py-3.5 text-muted-foreground">
+                                {new Date(drive.driveDate).toLocaleDateString()}
+                              </td>
+                              <td className="px-5 py-3.5 text-right">
                                 {drive.isRegistered ? (
-                                  <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider bg-brand/10 text-brand">Registered</span>
+                                  <span className="bg-brand/10 text-brand text-[10px] px-2 py-0.5 rounded-full font-bold">
+                                    Registered
+                                  </span>
                                 ) : (
-                                  <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider bg-muted text-muted-foreground">Not Registered</span>
+                                  <span className="bg-muted text-muted-foreground text-[10px] px-2 py-0.5 rounded-full font-bold">
+                                    Not Registered
+                                  </span>
                                 )}
                               </td>
                             </tr>
@@ -511,7 +666,6 @@ export default function StudentDashboard() {
                   </div>
                 </section>
               )}
-
               {/* Memories Section */}
               <section>
                 <div className="flex items-center justify-between mb-4">

@@ -134,7 +134,7 @@ export default function ExternalStudentRegister() {
             }
 
             setSuccess("Registration successful! Check your email to verify your account.");
-            setTimeout(() => router.push(`/external-students/login`), 2000);
+            setTimeout(() => router.push(`/external-students/login`), 1000);
         } catch {
             setError("Something went wrong.");
         } finally {
@@ -397,6 +397,12 @@ export default function ExternalStudentRegister() {
                                         <option value="Electrical">Electrical</option>
                                         <option value="Mechanical">Mechanical</option>
                                         <option value="Civil">Civil</option>
+                                        <option value="Digital Communication">Digital Communication</option>
+                                        <option value="Power Systems">Power Systems</option>
+                                        <option value="Thermal Engineering">Thermal Engineering</option>
+                                        <option value="Marketing">Marketing</option>
+                                        <option value="Finance">Finance</option>
+                                        <option value="Human Resource">Human Resource</option>
                                     </select>
                                 </div>
                                 <div className="space-y-1">
@@ -407,7 +413,6 @@ export default function ExternalStudentRegister() {
                                         <option value="M.Tech">M.Tech</option>
                                         <option value="MBA">MBA</option>
                                         <option value="Diploma">Diploma</option>
-                                        <option value="B.Com">B.Com</option>
                                     </select>
                                 </div>
                             </div>

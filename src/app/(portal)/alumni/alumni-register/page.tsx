@@ -10,7 +10,6 @@ import {
     Camera,
     UploadCloud,
     GraduationCap,
-    Phone,
     Hash,
     Earth,
     Info,
@@ -19,15 +18,13 @@ import {
     Loader2,
     Eye,
     EyeOff,
-    FileText,
-    CheckCircle2
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { uploadFileToR2 } from "@/lib/upload-r2";
 
-export default function StudentRegister() {
+export default function AlumniRegister() {
     const router = useRouter();
 
     // Form & Request State
@@ -35,8 +32,8 @@ export default function StudentRegister() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [form, setForm] = useState({
-        name: "", email: "", enrollmentNumber: "", branch: "", course: "",
-        semester: "", cgpa: "", batch: "", phoneNumber: "",
+        name: "", personalEmail: "", enrollmentNumber: "",
+        course: "", batch: "",
         password: "", confirmPassword: "",
     });
 
@@ -44,22 +41,18 @@ export default function StudentRegister() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isProfileImgModalOpen, setIsProfileImgModalOpen] = useState(false);
-    const [isResumePreviewOpen, setIsResumePreviewOpen] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
 
     // File Management States
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
     const [imgPreviewURL, setImgPreviewURL] = useState<string | null>(null);
-    const [resumeFile, setResumeFile] = useState<File | null>(null);
-    const [resumePreviewURL, setResumePreviewURL] = useState<string | null>(null);
 
     // --- Helper Functions ---
 
     const update = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
         setForm(prev => ({ ...prev, [field]: e.target.value }));
 
-    // Validates and sets the profile image from the modal
     const handleFileSelection = (selectedFile: File) => {
         if (!selectedFile.type.startsWith("image/")) {
             setError("Please upload a valid image file.");
@@ -71,25 +64,7 @@ export default function StudentRegister() {
         }
         setProfileImageFile(selectedFile);
         setImgPreviewURL(URL.createObjectURL(selectedFile));
-        setError(""); // Clear error when successful
-    };
-
-    // Validates and sets the resume
-    const handleResumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            if (file.type !== "application/pdf") {
-                setError("Please upload a PDF file for your resume.");
-                return;
-            }
-            if (file.size > 5 * 1024 * 1024) {
-                setError("Resume must be smaller than 5MB");
-                return;
-            }
-            setResumeFile(file);
-            setResumePreviewURL(URL.createObjectURL(file));
-            setError(""); // Clear error when successful
-        }
+        setError("");
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -105,25 +80,17 @@ export default function StudentRegister() {
             setError("Please upload a profile image to continue."); 
             return; 
         }
-        if (!resumeFile) { 
-            setError("Please upload your resume to continue."); 
-            return; 
-        }
 
         setLoading(true);
         try {
             const profileImageUrl = await uploadFileToR2(profileImageFile, "profiles");
-            const resumeUrl = await uploadFileToR2(resumeFile, "resumes");
 
-            const res = await fetch("/api/auth/register/student-register", {
+            const res = await fetch("/api/auth/register/alumni-register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     ...form,
-                    semester: Number(form.semester),
-                    cgpa: Number(form.cgpa),
                     profileImageUrl,
-                    resumeUrl 
                 }),
             });
             const data = (await res.json()) as { success?: boolean; message?: string };
@@ -133,8 +100,8 @@ export default function StudentRegister() {
                 return; 
             }
             
-            setSuccess("Registration successful! Check your email for the OTP.");
-            setTimeout(() => router.push(`/students/login`), 2000);
+            setSuccess("Registration successful! Check your email for the verification link.");
+            setTimeout(() => router.push(`/alumni/login`), 1000);
         } catch { 
             setError("Something went wrong."); 
         } finally { 
@@ -163,7 +130,7 @@ export default function StudentRegister() {
                             <button
                                 onClick={() => {
                                     setIsProfileImgModalOpen(false);
-                                    if (!profileImageFile) setImgPreviewURL(null); // Revert if cancelled
+                                    if (!profileImageFile) setImgPreviewURL(null);
                                 }}
                                 className="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground hover:text-foreground shrink-0"
                             >
@@ -179,7 +146,7 @@ export default function StudentRegister() {
                                 >
                                     <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 sm:border-[6px] border-background shadow-xl overflow-hidden bg-muted">
                                         <img
-                                            alt="Student portrait preview"
+                                            alt="Alumni portrait preview"
                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                             src={imgPreviewURL || "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=800&auto=format&fit=crop"}
                                         />
@@ -255,52 +222,9 @@ export default function StudentRegister() {
                 </div>
             )}
 
-            {/* --- Resume PDF Preview Modal Overlay --- */}
-            {isResumePreviewOpen && resumePreviewURL && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-md">
-                    <div className="w-full max-w-5xl bg-card rounded-[1.5rem] sm:rounded-[2rem] shadow-2xl overflow-hidden ring-1 ring-border flex flex-col h-[90vh] relative">
-                        
-                        <div className="absolute -top-24 -right-24 w-64 h-64 bg-brand/10 rounded-full blur-[80px] pointer-events-none -z-10"></div>
-
-                        <div className="px-6 py-5 md:px-8 md:py-6 flex justify-between items-center border-b border-border bg-muted/30 relative z-10">
-                            <div>
-                                <h2 className="text-xl md:text-2xl font-bold text-foreground tracking-tight">Resume Preview</h2>
-                                <p className="text-muted-foreground text-xs md:text-sm mt-1">{resumeFile?.name}</p>
-                            </div>
-                            <button
-                                type="button"
-                                onClick={() => setIsResumePreviewOpen(false)}
-                                className="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground hover:text-foreground shrink-0"
-                            >
-                                <X className="w-5 h-5" />
-                            </button>
-                        </div>
-
-                        <div className="flex-1 w-full bg-muted/20 p-4 md:p-6 relative z-10">
-                            <iframe 
-                                src={`${resumePreviewURL}#toolbar=0`} 
-                                className="w-full h-full rounded-xl shadow-sm border border-border bg-white" 
-                                title="Resume Preview"
-                            />
-                        </div>
-
-                        <div className="px-6 py-4 md:px-8 md:py-5 border-t border-border bg-background flex justify-end relative z-10">
-                            <button
-                                type="button"
-                                onClick={() => setIsResumePreviewOpen(false)}
-                                className="px-8 py-3 bg-brand text-primary-foreground rounded-xl font-bold text-sm shadow-lg shadow-brand/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
-                            >
-                                Looks Good
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
             {/* --- Main Registration Content --- */}
             <main className="flex-1 flex w-full items-center justify-center p-4 sm:p-6 sm:mt-10 md:mt-0 pt-24 md:pt-32 pb-12 lg:h-screen lg:max-h-screen lg:py-24">
                 
-                {/* CRITICAL FIX: Changed lg:overflow-hidden to just overflow-hidden to ensure mobile constraints are also respected */}
                 <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-background/50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-2xl shadow-brand/10 border border-brand/10 lg:h-[85vh] lg:max-h-[800px] mt-10 overflow-hidden">
                     
                     {/* Left Decorative Side (Hidden on Mobile) */}
@@ -310,15 +234,15 @@ export default function StudentRegister() {
                             <div className="mb-4 inline-flex items-center justify-center p-3 bg-brand backdrop-blur-md rounded-2xl shadow-inner">
                                 <GraduationCap className="w-8 h-8" />
                             </div>
-                            <h1 className="text-4xl font-black mb-4 leading-tight">Join Your Student Community</h1>
-                            <p className="text-lg text-slate-200 font-light max-w-md">Create an account to access exclusive internships, placement drives, training resources, and track your applications.</p>
+                            <h1 className="text-4xl font-black mb-4 leading-tight">Join Your Alumni Community</h1>
+                            <p className="text-lg text-slate-200 font-light max-w-md">Create an account to access exclusive opportunities, networking, and stay connected with your alma mater.</p>
                             <div className="mt-12 flex items-center gap-4">
                                 <div className="flex -space-x-4">
-                                    <img className="w-11 h-11 rounded-full border-2 border-slate-900 object-cover relative z-30" alt="Student 1" src="https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=100&h=100&fit=crop" />
-                                    <img className="w-11 h-11 rounded-full border-2 border-slate-900 object-cover relative z-20" alt="Student 2" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop" />
-                                    <img className="w-11 h-11 rounded-full border-2 border-slate-900 object-cover relative z-10" alt="Student 3" src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=100&h=100&fit=crop" />
+                                    <img className="w-11 h-11 rounded-full border-2 border-slate-900 object-cover relative z-30" alt="Alumni 1" src="https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=100&h=100&fit=crop" />
+                                    <img className="w-11 h-11 rounded-full border-2 border-slate-900 object-cover relative z-20" alt="Alumni 2" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop" />
+                                    <img className="w-11 h-11 rounded-full border-2 border-slate-900 object-cover relative z-10" alt="Alumni 3" src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=100&h=100&fit=crop" />
                                 </div>
-                                <span className="text-sm font-medium text-white/90">Join 1,000+ students already registered</span>
+                                <span className="text-sm font-medium text-white/90">Join 500+ alumni already registered</span>
                             </div>
                         </div>
                     </div>
@@ -334,12 +258,11 @@ export default function StudentRegister() {
                             `
                         }} />
 
-                        {/* This absolute element with negative margin was the original culprit */}
                         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 rounded-full bg-brand/5 blur-2xl z-0 pointer-events-none"></div>
                         
                         <div className="mb-6 relative z-10">
                             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mb-1 sm:mb-2">Create Account</h2>
-                            <p className="text-muted-foreground text-xs sm:text-sm">Register as a Student to access the portal.</p>
+                            <p className="text-muted-foreground text-xs sm:text-sm">Register as an Alumni to access the portal.</p>
                         </div>
 
                         {error && <div className="mb-4 p-3 rounded-xl bg-destructive/10 text-destructive text-sm font-medium relative z-10 border border-destructive/20">{error}</div>}
@@ -376,10 +299,10 @@ export default function StudentRegister() {
                             </div>
                             
                             <div className="space-y-1">
-                                <label className="text-xs sm:text-sm font-semibold text-foreground">Email</label>
+                                <label className="text-xs sm:text-sm font-semibold text-foreground">Personal Email</label>
                                 <div className="relative">
                                     <div className={iconClass}><Mail className="w-4 h-4 sm:w-5 sm:h-5" /></div>
-                                    <input className={inputClass} placeholder="yourname@gmail.com" type="email" required value={form.email} onChange={update("email")} />
+                                    <input className={inputClass} placeholder="yourname@gmail.com" type="email" required value={form.personalEmail} onChange={update("personalEmail")} />
                                 </div>
                             </div>
                             
@@ -387,22 +310,11 @@ export default function StudentRegister() {
                                 <label className="text-xs sm:text-sm font-semibold text-foreground">Enrollment Number</label>
                                 <div className="relative">
                                     <div className={iconClass}><Hash className="w-4 h-4 sm:w-5 sm:h-5" /></div>
-                                    <input className={inputClass} placeholder="e.g. 0108CS211001" required value={form.enrollmentNumber.toUpperCase()} onChange={update("enrollmentNumber")} />
+                                    <input className={inputClass} placeholder="e.g. 0158CS211001" required value={form.enrollmentNumber.toUpperCase()} onChange={update("enrollmentNumber")} />
                                 </div>
                             </div>
                             
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                                <div className="space-y-1">
-                                    <label className="text-xs sm:text-sm font-semibold text-foreground">Branch</label>
-                                    <select className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} required value={form.branch} onChange={update("branch")}>
-                                        <option value="">Select Branch</option>
-                                        <option value="Computer Science">Computer Science</option>
-                                        <option value="Electronics">Electronics</option>
-                                        <option value="Electrical">Electrical</option>
-                                        <option value="Mechanical">Mechanical</option>
-                                        <option value="Civil">Civil</option>
-                                    </select>
-                                </div>
                                 <div className="space-y-1">
                                     <label className="text-xs sm:text-sm font-semibold text-foreground">Course</label>
                                     <select className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} required value={form.course} onChange={update("course")}>
@@ -411,77 +323,12 @@ export default function StudentRegister() {
                                         <option value="M.Tech">M.Tech</option>
                                         <option value="MBA">MBA</option>
                                         <option value="Diploma">Diploma</option>
-                                        <option value="B.Com">B.Com</option>
                                     </select>
-                                </div>
-                            </div>
-                            
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                                <div className="space-y-1">
-                                    <label className="text-xs sm:text-sm font-semibold text-foreground">Semester</label>
-                                    <input className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} type="number" min="1" max="8" placeholder="1-8" required value={form.semester} onChange={update("semester")} />
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-xs sm:text-sm font-semibold text-foreground">Batch</label>
-                                    <input className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} type="text" placeholder="2024-2028" required value={form.batch} onChange={update("batch")} />
+                                    <input className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} type="text" placeholder="e.g. 2020-2024" required value={form.batch} onChange={update("batch")} />
                                 </div>
-                                <div className="space-y-1">
-                                    <label className="text-xs sm:text-sm font-semibold text-foreground">CGPA</label>
-                                    <input className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} type="number" step="0.01" min="0" max="10" placeholder="8.5" required value={form.cgpa} onChange={update("cgpa")} />
-                                </div>
-                            </div>
-                            
-                            <div className="space-y-1">
-                                <label className="text-xs sm:text-sm font-semibold text-foreground">Phone Number</label>
-                                <div className="relative">
-                                    <div className={iconClass}><Phone className="w-4 h-4 sm:w-5 sm:h-5" /></div>
-                                    <input className={inputClass} placeholder="10-digit number" required value={form.phoneNumber} onChange={update("phoneNumber")} />
-                                </div>
-                            </div>
-
-                            {/* --- Resume Upload Field --- */}
-                            <div className="space-y-1">
-                                <label className="text-xs sm:text-sm font-semibold text-foreground">Resume (PDF, max 5MB) *</label>
-                                {resumeFile ? (
-                                    <div className="flex items-center justify-between p-3 rounded-xl border border-brand/30 bg-brand/5">
-                                        <div className="flex items-center gap-3 overflow-hidden">
-                                            <div className="p-2 bg-brand/10 rounded-lg text-brand shrink-0">
-                                                <FileText className="w-4 h-4" />
-                                            </div>
-                                            <div className="truncate">
-                                                <p className="text-sm font-bold text-foreground truncate">{resumeFile.name}</p>
-                                                <p className="text-xs text-muted-foreground">{(resumeFile.size / 1024 / 1024).toFixed(2)} MB</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-2 shrink-0">
-                                            <button
-                                                type="button"
-                                                onClick={() => setIsResumePreviewOpen(true)}
-                                                className="p-2 text-brand hover:bg-brand/10 rounded-lg transition-colors flex items-center gap-1 text-xs font-bold"
-                                            >
-                                                <Eye className="w-4 h-4" /> <span className="hidden sm:inline">Preview</span>
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    setResumeFile(null);
-                                                    setResumePreviewURL(null);
-                                                }}
-                                                className="p-2 text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
-                                            >
-                                                <X className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <input 
-                                        type="file" 
-                                        accept=".pdf" 
-                                        required 
-                                        onChange={handleResumeChange} 
-                                        className="w-full text-xs sm:text-sm text-muted-foreground file:mr-3 sm:file:mr-4 file:py-1.5 sm:file:py-2 file:px-3 sm:file:px-4 file:rounded-xl file:border-0 file:text-xs sm:file:text-sm file:font-bold file:bg-brand/10 file:text-brand hover:file:bg-brand/20 cursor-pointer border border-dashed border-border p-2 rounded-xl transition-all hover:border-brand/50" 
-                                    />
-                                )}
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-1 sm:pt-2">
@@ -526,7 +373,7 @@ export default function StudentRegister() {
 
                         <div className="mt-5 sm:mt-6 pt-4 border-t border-border relative z-10 shrink-0">
                             <p className="text-center text-muted-foreground mb-2 sm:mb-3 text-xs sm:text-sm">Already have an account?</p>
-                            <Link href="/students/login" className="w-full py-2.5 sm:py-3.5 rounded-xl border-2 border-brand/20 text-brand font-bold bg-transparent hover:bg-brand/5 transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base">Login Here</Link>
+                            <Link href="/alumni/login" className="w-full py-2.5 sm:py-3.5 rounded-xl border-2 border-brand/20 text-brand font-bold bg-transparent hover:bg-brand/5 transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base">Login Here</Link>
                         </div>
 
                         {/* Footer Info Box */}

@@ -180,9 +180,12 @@ export default function JobDetailsModal({
                                     </div>
                                     <div className="p-5 rounded-2xl bg-muted/50 border border-border group hover:border-brand/30 transition-colors sm:col-span-2">
                                         <p className="text-[10px] font-bold text-brand uppercase tracking-wider mb-3">
-                                            Required Expertise
+                                            Eligible Courses
                                         </p>
-                                       
+                                        <p className="text-lg font-bold text-foreground">
+                                            {drive.course === "All" ? "All" : (drive.course?.split(',') || []).map(course => course.trim()).join(', ')}
+                                        </p>
+                                        <p className="text-xs text-muted-foreground mt-1">Eligible candidates only.</p>
                                     </div>
                                 </div>
                             </section>

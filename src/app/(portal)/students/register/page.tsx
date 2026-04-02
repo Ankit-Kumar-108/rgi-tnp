@@ -123,7 +123,7 @@ export default function StudentRegister() {
                     semester: Number(form.semester),
                     cgpa: Number(form.cgpa),
                     profileImageUrl,
-                    resumeUrl // Assuming backend accepts this for internal students too
+                    resumeUrl 
                 }),
             });
             const data = (await res.json()) as { success?: boolean; message?: string };
@@ -133,8 +133,8 @@ export default function StudentRegister() {
                 return; 
             }
             
-            setSuccess("Registration successful! Check your email for the OTP.");
-            setTimeout(() => router.push(`/students/login`), 2000);
+            setSuccess("Registration successful! Check your email for the verification link.");
+            setTimeout(() => router.push(`/students/login`), 1000);
         } catch { 
             setError("Something went wrong."); 
         } finally { 
@@ -401,6 +401,12 @@ export default function StudentRegister() {
                                         <option value="Electrical">Electrical</option>
                                         <option value="Mechanical">Mechanical</option>
                                         <option value="Civil">Civil</option>
+                                        <option value="Digital Communication">Digital Communication</option>
+                                        <option value="Power Systems">Power Systems</option>
+                                        <option value="Thermal Engineering">Thermal Engineering</option>
+                                        <option value="Marketing">Marketing</option>
+                                        <option value="Finance">Finance</option>
+                                        <option value="Human Resource">Human Resource</option>
                                     </select>
                                 </div>
                                 <div className="space-y-1">
@@ -411,7 +417,6 @@ export default function StudentRegister() {
                                         <option value="M.Tech">M.Tech</option>
                                         <option value="MBA">MBA</option>
                                         <option value="Diploma">Diploma</option>
-                                        <option value="B.Com">B.Com</option>
                                     </select>
                                 </div>
                             </div>

@@ -31,6 +31,7 @@ export async function GET(req: NextRequest) {
         id: true, name: true, enrollmentNumber: true, email: true,
         branch: true, semester: true, cgpa: true, isVerified: true,
         profileImageUrl: true, phoneNumber: true, course: true, batch: true,
+        resumeUrl:true,
       },
     });
 

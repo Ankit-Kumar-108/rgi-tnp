@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
     const drives = await db.placementDrive.findMany({
       where: {
         status: "active",
-        driveType: "Open",
+        driveType: { in: ["Open", "Pool"] },
       },
       orderBy: { driveDate: "asc" },
     });
@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
     const archivedDrives = await db.placementDrive.findMany({
       where: {
         status: "completed",
-        driveType: "Open"
+        driveType: { in: ["Open", "Pool"] }
       },
       orderBy: { driveDate: "desc" }
     });
@@ -62,6 +62,7 @@ export async function GET(req: NextRequest) {
         branch: student.branch, cgpa: student.cgpa, email: student.email,
         isVerified: student.isVerified, resumeUrl: student.resumeUrl,
         profileImageUrl: student.profileImageUrl,
+        course: student.course, batch: student.batch,
       },
       drives: drives.map((d: any) => ({ ...d, isRegistered: registeredDriveIds.includes(d.id) })),
       archivedDrives: archivedDrives.map((d: any) => ({ ...d, isRegistered: registeredDriveIds.includes(d.id) })),
@@ -90,7 +91,7 @@ export async function POST(req: NextRequest) {
     }
 
     const drive = await db.placementDrive.findUnique({ where: { id: body.driveId } });
-    if (!drive || drive.status !== "active" || drive.driveType !== "Open") {
+    if (!drive || drive.status !== "active" || !["Open", "Pool"].includes(drive.driveType)) {
       return NextResponse.json({ success: false, message: "Drive not available" }, { status: 400 });
     }
 

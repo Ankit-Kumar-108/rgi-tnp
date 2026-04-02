@@ -24,6 +24,7 @@ export interface PlacementDrive {
   driveDate: string | Date;
   driveType: string;
   status: string;
+  course: string;
   isRegistered?: boolean;
 }
 

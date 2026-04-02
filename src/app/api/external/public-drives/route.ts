@@ -10,7 +10,7 @@ export async function GET() {
     const openDrives = await db.placementDrive.findMany({
       where: {
         status: "active",
-        driveType: "Open",
+        driveType: { in: ["Open", "Pool"] },
       },
       orderBy: { driveDate: "asc" },
       select: {

@@ -6,7 +6,6 @@ import {
   Shield,
   ArrowLeft,
   Loader2,
-  Settings,
   BarChart3,
   XCircle,
   RotateCcw,
@@ -21,7 +20,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import JobDetailsModal from "@/components/forms/studentApplyModal/modal";
 
-const BRANCHES = ["CSE", "IT", "ECE", "ME", "CE", "EE"];
+const BRANCHES = ["Computer Science", "Civil", "Mechanical", "Electronics", "Electrical", "Power Systems", "Digital Communication", "Thermal Engineering", "Marketing", "Finance", "Human Resource"];
 import Link from "next/link";
 
 export default function AdminDrivesPage() {
@@ -124,7 +123,7 @@ export default function AdminDrivesPage() {
           drive={viewDrive}
           isOpen={true}
           onClose={() => setViewDrive(null)}
-          onSuccess={() => {}}
+          onSuccess={() => { }}
           role="admin"
           readonly={true}
         />
@@ -177,6 +176,27 @@ export default function AdminDrivesPage() {
                   </select>
                 </div>
               </div>
+              {/* Course */}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Course</label>
+                <div className="flex flex-wrap gap-2">
+                  {["B.Tech", "M.Tech", "MBA", "Diploma", "All"].map((c) => (
+                    <button key={c} type="button"
+                      onClick={() => {
+                        if (c === "All") {
+                          setForm({ ...form, course: "All" });
+                          return;
+                        }
+                        let arr = form.course ? form.course.split(",") : [];
+                        if (arr.includes("All")) arr = [];
+                        const updated = arr.includes(c) ? arr.filter((x) => x !== c) : [...arr, c];
+                        setForm({ ...form, course: updated.join(",") });
+                      }}
+                      className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${(form.course === "All" && c === "All") || (form.course && form.course.includes(c) && form.course !== "All") ? "bg-brand text-white" : "bg-muted border border-border text-muted-foreground"}`}
+                    >{c === "All" ? "All Courses" : c}</button>
+                  ))}
+                </div>
+              </div>
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Eligible Branches</label>
                 <div className="flex flex-wrap gap-2">
@@ -191,17 +211,6 @@ export default function AdminDrivesPage() {
                     >{b}</button>
                   ))}
                 </div>
-              </div>
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Course</label>
-                <select required value={form.course} onChange={(e) => setForm({ ...form, course: e.target.value })}
-                  className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none">
-                  <option value="B.Tech">B.Tech</option>
-                  <option value="M.Tech">M.Tech</option>
-                  <option value="MBA">MBA</option>
-                  <option value="Diploma">Diploma</option>
-                  <option value="All">All Courses</option>
-                </select>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -224,7 +233,7 @@ export default function AdminDrivesPage() {
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Drive Type</label>
                   <div className="flex gap-2">
-                    {["Closed", "Open"].map((t) => (
+                    {["Closed", "Open", "Pool"].map((t) => (
                       <button key={t} type="button" onClick={() => setForm({ ...form, driveType: t })}
                         className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all ${form.driveType === t ? "bg-brand text-white" : "bg-muted border border-border text-muted-foreground"}`}
                       >{t} Campus</button>
@@ -378,13 +387,13 @@ export default function AdminDrivesPage() {
                             <Edit className="w-4 h-4" />
                           </button>
                           <Link
-                             href={`/admin/drives/${drive.id}/participants`}
-                             className="p-1.5 rounded-lg bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 transition-colors"
-                             title="View Participants"
+                            href={`/admin/drives/${drive.id}/participants`}
+                            className="p-1.5 rounded-lg bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 transition-colors"
+                            title="View Participants"
                           >
-                             <Users className="w-4 h-4" />
+                            <Users className="w-4 h-4" />
                           </Link>
-                           {drive.status === "active" && (
+                          {drive.status === "active" && (
                             <button
                               onClick={() => handleAction(drive.id, "close")}
                               disabled={actionLoading === drive.id}
