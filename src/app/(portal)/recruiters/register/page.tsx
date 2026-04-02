@@ -141,6 +141,7 @@ export default function RecruiterRegister() {
                                     </div>
                                 </div>
                             </div>
+                            <p className="text-xs text-muted-foreground mt-1">Password must be at least 8 characters with 1 uppercase, 1 lowercase, and 1 number.</p>
 
                             <button className="w-full bg-brand hover:bg-brand/90 text-primary-foreground font-bold py-3.5 rounded-xl shadow-[0_4px_14px_0_rgba(var(--brand-rgb),0.39)] hover:shadow-[0_6px_20px_rgba(var(--brand-rgb),0.23)] hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 group mt-2 disabled:opacity-50 disabled:cursor-not-allowed" type="submit" disabled={loading}>
                                 {loading ? (<><Loader2 className="w-5 h-5 animate-spin" /><span>Registering...</span></>) : (<><span>Register Organization</span><Building2 className="w-5 h-5 group-hover:translate-x-1 transition-transform"/></>)}

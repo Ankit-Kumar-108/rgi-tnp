@@ -17,16 +17,22 @@ import {
   Linkedin,
   MapPin,
   Phone,
+  LogOut,
+  RefreshCw,
 } from "lucide-react";
 import Nav from "@/components/layout/nav/nav";
 import Footer from "@/components/layout/footer/footer";
 import { useAuth } from "@/hooks/useAuth";
-import { getToken } from "@/lib/auth-client";
+import { getToken, logout } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function AlumniDashboard() {
   const { loading: authLoading, authenticated, user } = useAuth("alumni", "/alumni/alumni-register");
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const router = useRouter();
 
   // Referral form
   const [refForm, setRefForm] = useState({ companyName: "", position: "", description: "", applyLink: "" });
@@ -58,6 +64,7 @@ export default function AlumniDashboard() {
 
   const fetchDashboard = async () => {
     try {
+      setFetchError(null);
       const token = getToken("alumni");
       const res = await fetch("/api/alumni/dashboard", {
         headers: { Authorization: `Bearer ${token}` },
@@ -74,12 +81,21 @@ export default function AlumniDashboard() {
             phoneNumber: d.alumni.phoneNumber || "",
           });
         }
+      } else {
+        setFetchError("Failed to load dashboard data.");
       }
     } catch (err) {
       console.error(err);
+      setFetchError("Network error. Please check your connection.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLogout = () => {
+    if (!window.confirm("Are you sure you want to logout?")) return;
+    logout("alumni");
+    router.push("/alumni/alumni-register");
   };
 
   const handleSubmitReferral = async (e: React.FormEvent) => {
@@ -218,6 +234,12 @@ export default function AlumniDashboard() {
                 {showProfileForm ? "Cancel Edit" : "Update Profile"}
                 <ChevronRight className={`w-4 h-4 transition-transform ${showProfileForm ? "rotate-90" : ""}`} />
               </button>
+              <button
+                onClick={handleLogout}
+                className="inline-flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-red-500 border border-border px-4 py-2 rounded-xl transition-all hover:border-red-500/30"
+              >
+                <LogOut className="w-4 h-4" /> Logout
+              </button>
             </div>
           </section>
 
@@ -286,7 +308,7 @@ export default function AlumniDashboard() {
           )}
 
           {/* Stats */}
-          {!loading && (
+          {!loading && !fetchError && (
             <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-card rounded-[2rem] p-6 shadow-sm flex items-center justify-between border border-border hover:-translate-y-1 transition-transform">
                 <div>
@@ -312,8 +334,21 @@ export default function AlumniDashboard() {
             </section>
           )}
 
+          {/* Error State */}
+          {!loading && fetchError && (
+            <div className="flex flex-col items-center justify-center py-16 gap-4">
+              <p className="text-destructive font-bold text-lg">{fetchError}</p>
+              <button
+                onClick={() => { setLoading(true); fetchDashboard(); }}
+                className="flex items-center gap-2 px-6 py-3 bg-brand text-primary-foreground rounded-xl font-bold text-sm hover:bg-brand/90 transition-all"
+              >
+                <RefreshCw className="w-4 h-4" /> Retry
+              </button>
+            </div>
+          )}
+
           {/* Action Cards */}
-          {!loading && (
+          {!loading && !fetchError && (
             <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Referral Form (spans 2) */}
               <div className="lg:col-span-2 bg-card rounded-[2rem] p-8 shadow-sm border border-border">
@@ -392,7 +427,7 @@ export default function AlumniDashboard() {
           )}
 
           {/* Referrals Table */}
-          {!loading && referrals.length > 0 && (
+          {!loading && !fetchError && referrals.length > 0 && (
             <section className="space-y-4">
               <h2 className="text-2xl font-bold text-foreground">My Referrals</h2>
               <div className="overflow-hidden rounded-[2rem] bg-card shadow-sm border border-border">

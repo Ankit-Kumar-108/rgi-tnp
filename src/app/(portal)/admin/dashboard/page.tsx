@@ -17,11 +17,13 @@ import {
   Loader2,
   ChevronRight,
   Shield,
+  RefreshCw,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { logout } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { toast } from "sonner";
 
 interface Stats {
   totalStudents: number;
@@ -40,17 +42,21 @@ export default function AdminDashboard() {
   const { loading: authLoading, authenticated } = useAuth("admin", "/admin/login");
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     if (!authenticated) return;
     const fetchStats = async () => {
       try {
+        setFetchError(null);
         const res = await fetch("/api/admin/stats");
         const data = (await res.json()) as { success: boolean; stats: Stats };
         if (data.success) setStats(data.stats);
+        else setFetchError("Failed to load dashboard data");
       } catch (err) {
         console.error(err);
+        setFetchError("Network error. Please check your connection.");
       } finally {
         setLoading(false);
       }
@@ -59,6 +65,7 @@ export default function AdminDashboard() {
   }, [authenticated]);
 
   const handleLogout = () => {
+    if (!window.confirm("Are you sure you want to logout?")) return;
     logout("admin");
     router.push("/admin/login");
   };
@@ -161,6 +168,16 @@ export default function AdminDashboard() {
           {loading ? (
             <div className="flex justify-center py-12">
               <Loader2 className="w-6 h-6 animate-spin text-brand" />
+            </div>
+          ) : fetchError ? (
+            <div className="flex flex-col items-center justify-center py-12 gap-4">
+              <p className="text-destructive font-bold text-lg">{fetchError}</p>
+              <button
+                onClick={() => { setLoading(true); const fetchStats = async () => { try { setFetchError(null); const res = await fetch("/api/admin/stats"); const data = (await res.json()) as { success: boolean; stats: Stats }; if (data.success) setStats(data.stats); else setFetchError("Failed to load"); } catch { setFetchError("Network error"); } finally { setLoading(false); } }; fetchStats(); }}
+                className="flex items-center gap-2 px-6 py-3 bg-brand text-primary-foreground rounded-xl font-bold text-sm hover:bg-brand/90 transition-all"
+              >
+                <RefreshCw className="w-4 h-4" /> Retry
+              </button>
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">

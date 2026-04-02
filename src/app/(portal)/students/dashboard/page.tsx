@@ -15,18 +15,18 @@ import {
   Upload,
   XCircle,
   FileText,
-  LogOut
+  LogOut,
+  RefreshCw
 } from "lucide-react"
 import Nav from "@/components/layout/nav/nav"
 import Footer from "@/components/layout/footer/footer"
 import { useAuth } from "@/hooks/useAuth"
-import { getToken } from "@/lib/auth-client"
+import { getToken, logout } from "@/lib/auth-client"
 import JobDetailsModal from "@/components/forms/studentApplyModal/modal";
-import { logout } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { Student, PlacementDrive, DriveRegistration, Memory } from "@/types";
 import { uploadFileToR2 } from "@/lib/upload-r2";
-import { Camera as CameraIcon } from "lucide-react";
+import { toast } from "sonner";
 
 export default function StudentDashboard() {
   const { loading: authLoading, authenticated, user } = useAuth("student", "/students/login");
@@ -38,6 +38,7 @@ export default function StudentDashboard() {
     memories: Memory[];
   } | null>(null)
   const [loading, setLoading] = useState(true)
+  const [fetchError, setFetchError] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedDrive, setSelectedDrive] = useState<PlacementDrive | null>(null)
   const [memUploading, setMemUploading] = useState(false);
@@ -51,20 +52,24 @@ export default function StudentDashboard() {
   }, [authenticated]);
 
   const handleLogout = () => {
+    if (!window.confirm("Are you sure you want to logout?")) return;
     logout("student");
     router.push("/");
   };
 
   const fetchDashboard = async () => {
     try {
+      setFetchError(null);
       const token = getToken("student");
       const res = await fetch("/api/student/dashboard", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const d = (await res.json()) as any;
       if (d.success) setData(d);
+      else setFetchError(d.message || "Failed to load dashboard");
     } catch (err) {
       console.error(err);
+      setFetchError("Network error. Please check your connection and try again.");
     } finally {
       setLoading(false);
     }
@@ -120,14 +125,14 @@ export default function StudentDashboard() {
       });
       const d = await res.json() as any;
       if (d.success) {
-        alert("Resume updated successfully!");
+        toast.success("Resume updated successfully!");
         fetchDashboard();
       } else {
         throw new Error(d.message);
       }
     } catch (err: any) {
       console.error(err);
-      alert("Resume upload failed: " + err.message);
+      toast.error("Resume upload failed: " + err.message);
     } finally {
       setResumeUploading(false);
     }
@@ -138,7 +143,7 @@ export default function StudentDashboard() {
     if (!file) return;
 
     if (file.size > 10 * 1024 * 1024) { // 10MB for memories
-      alert("Image must be smaller than 10MB");
+      toast.error("Image must be smaller than 10MB");
       return;
     }
 
@@ -158,14 +163,14 @@ export default function StudentDashboard() {
 
       const d = await res.json() as any
       if (d.success) {
-        alert("Memory uploaded! It will appear after moderation.");
+        toast.success("Memory uploaded! It will appear after moderation.");
         fetchDashboard();
       } else {
         throw new Error(d.message);
       }
     } catch (err: any) {
       console.error(err);
-      alert("Memory upload failed: " + err.message);
+      toast.error("Memory upload failed: " + err.message);
     } finally {
       setMemUploading(false);
     }
@@ -222,6 +227,16 @@ export default function StudentDashboard() {
           {loading ? (
             <div className="flex justify-center py-20">
               <Loader2 className="w-10 h-10 animate-spin text-brand" />
+            </div>
+          ) : fetchError ? (
+            <div className="flex flex-col items-center justify-center py-20 gap-4">
+              <p className="text-destructive font-bold text-lg">{fetchError}</p>
+              <button
+                onClick={() => { setLoading(true); fetchDashboard(); }}
+                className="flex items-center gap-2 px-6 py-3 bg-brand text-primary-foreground rounded-xl font-bold text-sm hover:bg-brand/90 transition-all"
+              >
+                <RefreshCw className="w-4 h-4" /> Retry
+              </button>
             </div>
           ) : (
             <>
@@ -356,15 +371,6 @@ export default function StudentDashboard() {
                     <p className="text-[10px] font-bold uppercase tracking-wider mt-1 opacity-80">Attended</p>
                   </div>
                 </section>
-              )}
-
-              {loading ? (
-                <div className="flex justify-center py-20">
-                  <Loader2 className="w-8 h-8 animate-spin text-brand" />
-                </div>
-              ) : (
-                <>
-                </>
               )}
 
               {/* Upcoming Drives */}
@@ -670,7 +676,7 @@ export default function StudentDashboard() {
               <section>
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
-                    <CameraIcon className="w-5 h-5 text-brand" />
+                    <Camera className="w-5 h-5 text-brand" />
                     My Memories
                   </h2>
                   <label className="flex items-center gap-2 px-4 py-2 bg-brand/10 text-brand rounded-xl text-xs font-bold hover:bg-brand/20 transition-all cursor-pointer">

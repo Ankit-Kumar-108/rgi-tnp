@@ -46,7 +46,7 @@ export default function Testimonials() {
                   </span>
                 </div>
                 <blockquote className="text-2xl md:text-4xl font-bold text-background mb-6 leading-tight italic">
-                  "The curriculum at Amethyst Prism wasn't just about learning code;
+                  "The curriculum at RGI wasn't just about learning code;
                   it was about building the mindset of a leader. Three years later,
                   I'm leading a team of 40 at a Fortune 500 company."
                 </blockquote>
@@ -254,7 +254,7 @@ export default function Testimonials() {
                 <BadgeCheck className="w-5 h-5 text-brand fill-current" />
               </div>
               <p className="text-background/80 text-sm leading-relaxed mb-6">
-                "Amethyst graduates possess a unique blend of technical depth and
+                "RGI graduates possess a unique blend of technical depth and
                 soft skills. They integrate into our corporate culture seamlessly
                 and start contributing immediately."
               </p>

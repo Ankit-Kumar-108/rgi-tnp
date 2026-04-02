@@ -14,7 +14,8 @@ import {
   Loader2,
   BadgeCheck,
   BadgeAlert,
-  LogOut
+  LogOut,
+  RefreshCw
 } from "lucide-react";
 import Nav from "@/components/layout/nav/nav";
 import Footer from "@/components/layout/footer/footer";
@@ -24,12 +25,14 @@ import { useRouter } from "next/navigation";
 import { uploadFileToR2 } from "@/lib/upload-r2";
 import { PlacementDrive } from "@prisma/client";
 import JobDetailsModal from "@/components/forms/studentApplyModal/modal";
+import { toast } from "sonner";
 
 export default function ExternalStudentDashboard() {
   const router = useRouter();
   const { loading: authLoading, authenticated, user } = useAuth("external_student", "/external-students/login");
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authenticated) return;
@@ -37,6 +40,7 @@ export default function ExternalStudentDashboard() {
   }, [authenticated]);
 
   const handleLogout = () => {
+    if (!window.confirm("Are you sure you want to logout?")) return;
     logout("external_student");
     router.push("/");
   };
@@ -78,14 +82,17 @@ export default function ExternalStudentDashboard() {
 
   const fetchDashboard = async () => {
     try {
+      setFetchError(null);
       const token = getToken("external_student");
       const res = await fetch("/api/external/dashboard", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const d = (await res.json()) as any;
       if (d.success) setData(d);
+      else setFetchError(d.message || "Failed to load dashboard");
     } catch (err) {
       console.error(err);
+      setFetchError("Network error. Please check your connection and try again.");
     } finally {
       setLoading(false);
     }
@@ -108,14 +115,14 @@ export default function ExternalStudentDashboard() {
       });
       const d = await res.json() as any;
       if (d.success) {
-        alert("Resume updated successfully!");
+        toast.success("Resume updated successfully!");
         fetchDashboard();
       } else {
         throw new Error(d.message);
       }
     } catch (err: any) {
       console.error(err);
-      alert("Resume upload failed: " + err.message);
+      toast.error("Resume upload failed: " + err.message);
     } finally {
       setResumeUploading(false);
     }
@@ -173,6 +180,16 @@ export default function ExternalStudentDashboard() {
           {loading ? (
             <div className="flex justify-center py-20">
               <Loader2 className="w-10 h-10 animate-spin text-brand" />
+            </div>
+          ) : fetchError ? (
+            <div className="flex flex-col items-center justify-center py-20 gap-4">
+              <p className="text-destructive font-bold text-lg">{fetchError}</p>
+              <button
+                onClick={() => { setLoading(true); fetchDashboard(); }}
+                className="flex items-center gap-2 px-6 py-3 bg-brand text-primary-foreground rounded-xl font-bold text-sm hover:bg-brand/90 transition-all"
+              >
+                <RefreshCw className="w-4 h-4" /> Retry
+              </button>
             </div>
           ) : (
             <>

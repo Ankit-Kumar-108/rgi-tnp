@@ -520,6 +520,10 @@ export default function StudentRegister() {
                                 </div>
                             </div>
 
+                            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 px-1">
+                                Password must contain: uppercase letter, lowercase letter, number, and special character (@$!%*?&)
+                            </p>
+
                             <button className="w-full bg-brand hover:bg-brand/90 text-primary-foreground font-bold py-3 sm:py-3.5 rounded-xl shadow-[0_4px_14px_0_rgba(var(--brand-rgb),0.39)] hover:shadow-[0_6px_20px_rgba(var(--brand-rgb),0.23)] flex items-center justify-center gap-2 group mt-4 sm:mt-6 disabled:opacity-50 transition-all text-sm sm:text-base shrink-0" type="submit" disabled={loading}>
                                 {loading ? (
                                     <><Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" /><span>Registering...</span></>

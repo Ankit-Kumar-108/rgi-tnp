@@ -9,7 +9,7 @@ import { sendEmail } from "@/lib/send-email";
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    const body = await req.json() as Record<string, unknown>;
 
     const db = getDb();
 
@@ -71,6 +71,7 @@ export async function POST(req: NextRequest) {
         phoneNumber: validatedData.phoneNumber,
         passwordHash: passwordHash,
         profileImageUrl: validatedData.profileImageUrl || undefined,
+        resumeUrl: (body.resumeUrl as string) || undefined,
         isVerified: false,
         isEmailVerified: false,
         emailVerificationToken: verificationToken,

@@ -117,10 +117,10 @@ export default function JobDetailsModal({
                             <div className="space-y-2">
                                 <div className="flex flex-wrap items-center gap-2">
                                     <span className="px-3 py-1 rounded-full bg-brand/10 text-brand text-[10px] font-bold uppercase tracking-widest">
-                                        {/* {drive.driveJobType || "Full-Time"} future me drive type change krna hai */} Full Time
+                                        {drive.jobType || "Full-Time"}
                                     </span>
                                     <span className="px-3 py-1 rounded-full bg-muted text-muted-foreground text-[10px] font-bold uppercase tracking-widest">
-                                        {drive.driveType || "Open"} Campus {/* future me drive type change krna hai */}
+                                        {drive.driveType || "Open"} Campus
                                     </span>
                                     <span className="px-3 py-1 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 text-[10px] font-bold uppercase tracking-widest">
                                         {drive.ctc}
@@ -236,29 +236,29 @@ export default function JobDetailsModal({
                                 </div>
                             </div>
 
-                            {/* Hiring Process Info */}
+                            {/* Drive Quick Info */}
                             <div className="p-6 rounded-3xl bg-brand/5 border border-brand/20">
                                 <h4 className="text-[10px] font-black uppercase tracking-widest text-brand mb-5">
-                                    Hiring Process
+                                    What to Expect
                                 </h4>
                                 <ul className="space-y-4 text-sm font-medium text-foreground">
                                     <li className="flex items-center gap-3">
                                         <span className="w-6 h-6 rounded-full bg-brand text-primary-foreground text-[10px] font-bold flex items-center justify-center shrink-0">
-                                            1
+                                            ₹
                                         </span>
-                                        Assessment
+                                        CTC: {drive.ctc}
                                     </li>
                                     <li className="flex items-center gap-3">
                                         <span className="w-6 h-6 rounded-full bg-brand text-primary-foreground text-[10px] font-bold flex items-center justify-center shrink-0">
-                                            2
+                                            ✓
                                         </span>
-                                        Technical Interviews (3)
+                                        Min CGPA: {drive.minCGPA}
                                     </li>
                                     <li className="flex items-center gap-3">
                                         <span className="w-6 h-6 rounded-full bg-brand text-primary-foreground text-[10px] font-bold flex items-center justify-center shrink-0">
-                                            3
+                                            📋
                                         </span>
-                                        HR Discussion
+                                        {drive.jobType || "Full-Time"} Role
                                     </li>
                                 </ul>
                             </div>

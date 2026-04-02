@@ -102,6 +102,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Already registered" }, { status: 409 });
     }
 
+    // Course eligibility check
+    if (drive.course !== "All" && !drive.course.includes(student.course)) {
+      return NextResponse.json({ success: false, message: "Course not eligible" }, { status: 403 });
+    }
     if (!drive.eligibleBranches.includes(student.branch)) {
       return NextResponse.json({ success: false, message: "Branch not eligible" }, { status: 403 });
     }

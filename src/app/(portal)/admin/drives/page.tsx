@@ -22,6 +22,7 @@ import JobDetailsModal from "@/components/forms/studentApplyModal/modal";
 
 const BRANCHES = ["Computer Science", "Civil", "Mechanical", "Electronics", "Electrical", "Power Systems", "Digital Communication", "Thermal Engineering", "Marketing", "Finance", "Human Resource"];
 import Link from "next/link";
+import { toast } from "sonner";
 
 export default function AdminDrivesPage() {
   const { loading: authLoading, authenticated } = useAuth("admin", "/admin/login");
@@ -200,6 +201,13 @@ export default function AdminDrivesPage() {
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Eligible Branches</label>
                 <div className="flex flex-wrap gap-2">
+                  <button type="button"
+                    onClick={() => {
+                      const allSelected = BRANCHES.every(b => form.eligibleBranches.includes(b));
+                      setForm({ ...form, eligibleBranches: allSelected ? "" : BRANCHES.join(",") });
+                    }}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${BRANCHES.every(b => form.eligibleBranches.includes(b)) ? "bg-brand text-white" : "bg-muted border border-border text-muted-foreground"}`}
+                  >All Branches</button>
                   {BRANCHES.map((b) => (
                     <button key={b} type="button"
                       onClick={() => {
@@ -341,7 +349,7 @@ export default function AdminDrivesPage() {
                       </td>
                       <td className="px-5 py-3.5 text-muted-foreground">{drive.roleName}</td>
                       <td className="px-5 py-3.5">
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${drive.driveType === "Open" ? "bg-green-500/10 text-green-600" : "bg-blue-500/10 text-blue-600"}`}>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${drive.driveType === "Open" ? "bg-green-500/10 text-green-600" : drive.driveType === "Pool" ? "bg-amber-500/10 text-amber-600" : "bg-blue-500/10 text-blue-600"}`}>
                           {drive.driveType}
                         </span>
                       </td>
@@ -415,7 +423,7 @@ export default function AdminDrivesPage() {
                           )}
                           <button
                             onClick={() => {
-                              if (confirm("Are you sure you want to archive this drive?")) {
+                              if (window.confirm("Are you sure you want to archive this drive? This action cannot be undone.")) {
                                 handleAction(drive.id, "archive");
                               }
                             }}

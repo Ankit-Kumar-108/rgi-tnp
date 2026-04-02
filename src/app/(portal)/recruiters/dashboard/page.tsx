@@ -13,12 +13,16 @@ import {
   X,
   Eye,
   Edit,
+  LogOut,
+  RefreshCw,
 } from "lucide-react";
 import Nav from "@/components/layout/nav/nav";
 import JobDetailsModal from "@/components/forms/studentApplyModal/modal";
 import Footer from "@/components/layout/footer/footer";
 import { useAuth } from "@/hooks/useAuth";
-import { getToken } from "@/lib/auth-client";
+import { getToken, logout } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const BRANCHES = ["Computer Science", "Civil", "Mechanical", "Electronics", "Electrical", "Power Systems", "Digital Communication", "Thermal Engineering", "Marketing", "Finance", "Human Resource"] //change courese here  for filtering
 
@@ -26,7 +30,9 @@ export default function RecruiterDashboard() {
   const { loading: authLoading, authenticated, user } = useAuth("recruiter", "/recruiters/login");
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [formMsg, setFormMsg] = useState<{ msg: string; ok: boolean } | null>(null);
   const [selectedDrive, setSelectedDrive] = useState<any>(null);
@@ -60,17 +66,26 @@ export default function RecruiterDashboard() {
 
   const fetchDashboard = async () => {
     try {
+      setFetchError(null);
       const token = getToken("recruiter");
       const res = await fetch("/api/recruiter/dashboard", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const d = (await res.json()) as any;
       if (d.success) setData(d);
+      else setFetchError("Failed to load dashboard data.");
     } catch (err) {
       console.error(err);
+      setFetchError("Network error. Please check your connection.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLogout = () => {
+    if (!window.confirm("Are you sure you want to logout?")) return;
+    logout("recruiter");
+    router.push("/recruiters/login");
   };
 
   const handleSubmitDrive = async (e: React.FormEvent) => {
@@ -84,10 +99,12 @@ export default function RecruiterDashboard() {
 
       if(!form.eligibleBranches){
         setFormMsg({ msg: "Please select eligible branches", ok: false });
+        setSubmitting(false);
         return;
       }
       if(!form.course){
         setFormMsg({ msg: "Please select at least one course", ok: false });
+        setSubmitting(false);
         return;
       }
 
@@ -147,6 +164,18 @@ export default function RecruiterDashboard() {
       )}
       <div className="bg-background text-foreground antialiased font-sans flex flex-col min-h-screen mt-15">
         <main className="p-6 md:p-8 max-w-6xl mx-auto w-full space-y-8 flex-1">
+          {/* Error state */}
+          {fetchError && !loading && (
+            <div className="flex flex-col items-center justify-center py-16 gap-4">
+              <p className="text-destructive font-bold text-lg">{fetchError}</p>
+              <button
+                onClick={() => { setLoading(true); fetchDashboard(); }}
+                className="flex items-center gap-2 px-6 py-3 bg-brand text-primary-foreground rounded-xl font-bold text-sm hover:bg-brand/90 transition-all"
+              >
+                <RefreshCw className="w-4 h-4" /> Retry
+              </button>
+            </div>
+          )}
           {/* Header */}
           <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
@@ -158,6 +187,13 @@ export default function RecruiterDashboard() {
               </h1>
               {user?.company && <p className="text-sm text-muted-foreground mt-1">{user.company}</p>}
             </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold border border-border text-muted-foreground hover:text-red-500 hover:border-red-500/30 transition-all"
+              >
+                <LogOut className="w-4 h-4" /> Logout
+              </button>
             <button
               onClick={() => {
                 setEditDriveId(null);
@@ -169,6 +205,7 @@ export default function RecruiterDashboard() {
             >
               <Plus className="w-4 h-4" /> Submit Drive Request
             </button>
+            </div>
           </section>
 
           {/* Stats */}
@@ -283,6 +320,13 @@ export default function RecruiterDashboard() {
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Eligible Branches</label>
                     <div className="flex flex-wrap gap-2">
+                      <button type="button"
+                        onClick={() => {
+                          const allSelected = BRANCHES.every(b => form.eligibleBranches.includes(b));
+                          setForm({ ...form, eligibleBranches: allSelected ? "" : BRANCHES.join(",") });
+                        }}
+                        className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${BRANCHES.every(b => form.eligibleBranches.includes(b)) ? "bg-brand text-white" : "bg-muted border border-border text-muted-foreground"}`}
+                      >All Branches</button>
                       {BRANCHES.map((b) => (
                         <button key={b} type="button"
                           onClick={() => {
@@ -371,7 +415,7 @@ export default function RecruiterDashboard() {
                           <td className="px-5 py-3.5 font-medium text-foreground">{drive.companyName}</td>
                           <td className="px-5 py-3.5 text-muted-foreground">{drive.roleName}</td>
                           <td className="px-5 py-3.5">
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${drive.driveType === "Open" ? "bg-green-500/10 text-green-600" : "bg-blue-500/10 text-blue-600"}`}>{drive.driveType}</span>
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${drive.driveType === "Open" ? "bg-green-500/10 text-green-600" : drive.driveType === "Pool" ? "bg-amber-500/10 text-amber-600" : "bg-blue-500/10 text-blue-600"}`}>{drive.driveType}</span>
                           </td>
                           <td className="px-5 py-3.5 text-muted-foreground">{new Date(drive.driveDate).toLocaleDateString()}</td>
                           <td className="px-5 py-3.5 font-bold text-foreground">{drive.registrationCount}</td>

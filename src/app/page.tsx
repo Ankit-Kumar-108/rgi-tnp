@@ -32,7 +32,7 @@ export default function Home() {
                   Empowering Careers at <span className="text-brand">RGI</span>
                 </h1>
                 <p className="text-[14px] md:text-lg text-muted-foreground max-w-lg leading-relaxed">
-                  Connecting top-tier talent with global industry leaders. Join our legacy of excellence and secure your future with world-className opportunities.
+                  Connecting top-tier talent with global industry leaders. Join our legacy of excellence and secure your future with world-class opportunities.
                 </p>
                 <div className="flex flex-wrap gap-2 md:gap-4">
                   <Link href="/recruiters/register">

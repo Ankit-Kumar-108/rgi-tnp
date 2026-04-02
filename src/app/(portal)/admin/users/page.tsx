@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
+import { toast } from "sonner";
 
 type TabKey = "student" | "alumni" | "recruiter" | "external";
 
@@ -31,6 +32,12 @@ const BRANCHES = [
   "Electrical",
   "Civil",
   "Electronics",
+  "Digital Communication",
+  "Power Systems",
+  "Thermal Engineering",
+  "Marketing",
+  "Finance",
+  "Human Resource",
 ];
 
 export default function AdminUsersPage() {
@@ -80,7 +87,7 @@ export default function AdminUsersPage() {
           });
           const data = await res.json() as any;
           if (data.success) fetchUsers();
-          else alert(data.message || "Action failed");
+          else toast.error(data.message || "Action failed");
       } catch (err) {
           console.error(err);
       } finally {

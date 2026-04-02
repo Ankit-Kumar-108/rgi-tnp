@@ -20,6 +20,7 @@ export interface PlacementDrive {
   jobDescription: string;
   ctc: string;
   minCGPA: number;
+  jobType: string;
   eligibleBranches: string;
   driveDate: string | Date;
   driveType: string;
