@@ -227,7 +227,7 @@ export default function AlumniDashboard() {
                   )}
                 </div>
               )}
-              <button 
+              <button
                 onClick={() => setShowProfileForm(!showProfileForm)}
                 className="inline-flex items-center gap-2 text-sm font-bold text-brand hover:text-brand/80 transition-colors"
               >
@@ -247,7 +247,7 @@ export default function AlumniDashboard() {
           {showProfileForm && (
             <section className="bg-card rounded-[2rem] p-8 shadow-xl border-2 border-brand/20 animate-in fade-in slide-in-from-top-4 duration-300">
               <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
-                <div className="p-2 bg-brand/10 rounded-lg text-brand"><GraduationCap className="w-5 h-5"/></div>
+                <div className="p-2 bg-brand/10 rounded-lg text-brand"><GraduationCap className="w-5 h-5" /></div>
                 Professional Details
               </h2>
               <form onSubmit={handleSubmitProfile} className="space-y-6">
