@@ -29,9 +29,10 @@ export async function GET(req: NextRequest) {
       where: { enrollmentNumber: studentTokenData.enrollmentNumber },
       select: {
         id: true, name: true, enrollmentNumber: true, email: true,
-        branch: true, semester: true, cgpa: true, isVerified: true,
+        branch: true, semester: true, cgpa: true, isEmailVerified: true,
         profileImageUrl: true, phoneNumber: true, course: true, batch: true,
-        resumeUrl:true,
+        resumeUrl: true, tenthPercentage: true, twelfthPercentage: true,
+        activeBacklog: true, linkedinUrl: true, githubUrl: true,
       },
     });
 

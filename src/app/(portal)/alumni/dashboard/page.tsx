@@ -12,8 +12,6 @@ import {
   ChevronRight,
   Briefcase,
   CheckCircle,
-  Clock,
-  XCircle,
   Linkedin,
   MapPin,
   Phone,
@@ -50,8 +48,10 @@ export default function AlumniDashboard() {
     currentCompany: "",
     jobTitle: "",
     city: "",
+    country: "",
     linkedInUrl: "",
     phoneNumber: "",
+    about: "",
   });
   const [submittingProfile, setSubmittingProfile] = useState(false);
   const [profileMsg, setProfileMsg] = useState<{ msg: string; ok: boolean } | null>(null);
@@ -77,8 +77,10 @@ export default function AlumniDashboard() {
             currentCompany: d.alumni.currentCompany || "",
             jobTitle: d.alumni.jobTitle || "",
             city: d.alumni.city || "",
+            country: d.alumni.country || "",
             linkedInUrl: d.alumni.linkedInUrl || "",
             phoneNumber: d.alumni.phoneNumber || "",
+            about: d.alumni.about || "",
           });
         }
       } else {
@@ -252,6 +254,22 @@ export default function AlumniDashboard() {
               </h2>
               <form onSubmit={handleSubmitProfile} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="space-y-2 lg:col-span-3">
+                    <label
+                      htmlFor="about"
+                      className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1"
+                    >
+                      Tell Us About Yourself
+                    </label>
+                    <textarea
+                      id="about"
+                      value={profileForm.about}
+                      onChange={(e) => setProfileForm({ ...profileForm, about: e.target.value })}
+                      className="w-full bg-muted px-5 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground resize-none leading-relaxed"
+                      placeholder="A brief introduction about your career journey..."
+                      rows={4}
+                    />
+                  </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Current Company</label>
                     <input required value={profileForm.currentCompany} onChange={(e) => setProfileForm({ ...profileForm, currentCompany: e.target.value })}
@@ -271,6 +289,12 @@ export default function AlumniDashboard() {
                       placeholder="e.g. Bangalore" />
                   </div>
                   <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Country</label>
+                    <input value={profileForm.country} onChange={(e) => setProfileForm({ ...profileForm, country: e.target.value })}
+                      className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
+                      placeholder="e.g. India" />
+                  </div>
+                  <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">LinkedIn URL</label>
                     <div className="relative">
                       <Linkedin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -280,7 +304,7 @@ export default function AlumniDashboard() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Phone Number</label>
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Phone Number (Kept Private)</label>
                     <div className="relative">
                       <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <input value={profileForm.phoneNumber} onChange={(e) => setProfileForm({ ...profileForm, phoneNumber: e.target.value })}

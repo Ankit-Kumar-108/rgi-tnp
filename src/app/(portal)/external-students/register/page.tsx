@@ -33,7 +33,7 @@ export default function ExternalStudentRegister() {
     const [success, setSuccess] = useState("");
     const [form, setForm] = useState({
         name: "", email: "", collegeName: "", enrollmentNumber: "", branch: "", course: "",
-        cgpa: "", batch: "", phoneNumber: "", password: "", confirmPassword: "",
+        cgpa: "", batch: "", semester: "", phoneNumber: "", password: "", confirmPassword: "",
     });
 
     // UI Toggle States
@@ -417,10 +417,19 @@ export default function ExternalStudentRegister() {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
                                 <div className="space-y-1">
                                     <label className="text-xs sm:text-sm font-semibold text-foreground">Batch</label>
                                     <input className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} type="text" placeholder="e.g. 2024-2028" required value={form.batch} onChange={update("batch")} />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-xs sm:text-sm font-semibold text-foreground">Semester</label>
+                                    <select className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} required value={form.semester} onChange={update("semester")}>
+                                        <option value="">Select</option>
+                                        {[1,2,3,4,5,6,7,8].map(s => (
+                                            <option key={s} value={s}>{s}</option>
+                                        ))}
+                                    </select>
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-xs sm:text-sm font-semibold text-foreground">CGPA</label>

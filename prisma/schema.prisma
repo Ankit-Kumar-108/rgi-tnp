@@ -39,15 +39,14 @@ model Student {
   enrollmentNumber             String              @unique
   email                        String              @unique
   branch                       String
-  semester                     Float
+  semester                     Int
   cgpa                         Float
   isEmailVerified              Boolean             @default(false)
+  isVerified                   Boolean             @default(false)
   emailVerificationToken       String?
   emailVerificationTokenExpiry DateTime?
   resetPasswordToken           String?
   resetPasswordTokenExpiry     DateTime?
-  otpAttempts                  Int                 @default(0)
-  lastOtpSentAt                DateTime?
   profileImageUrl              String?
   resumeUrl                    String?
   memoriesImageUrl             String?
@@ -56,7 +55,11 @@ model Student {
   phoneNumber                  String
   course                       String
   passwordHash                 String
-  isVerified                   Boolean             @default(false)
+  linkedinUrl                  String?
+  githubUrl                    String?
+  tenthPercentage                Float
+  twelfthPercentage             Float
+  activeBacklog                 Int                @default(0)
   role                         String              @default("student")
   registrations                DriveRegistration[]
   memories                     Memory[]
@@ -81,13 +84,18 @@ model Alumni {
   profileImageUrl    String
   jobTitle          String?
   city              String?
+  country           String?
   linkedInUrl       String?
   phoneNumber       String?
+  privacyJson       Json?
+  branch            String
+  about             String?
   batch             String
   course            String
   referrals         Referral[]
   alumniFeedbacks   AlumniFeedback[]
-  createdAt         DateTime         @default(now())
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
 }
 
 model ExternalStudent {
@@ -99,9 +107,15 @@ model ExternalStudent {
   passwordHash     String
   profileImageUrl  String
   feedback         String?
+  semester         Int
+  linkedinUrl      String?
+  githubUrl        String?
   resumeUrl        String
   branch           String
+  tenthPercentage    Float
+  twelfthPercentage Float
   cgpa             Float
+  activeBacklog     Int                 @default(0)
   course           String
   batch            String
   phoneNumber      String

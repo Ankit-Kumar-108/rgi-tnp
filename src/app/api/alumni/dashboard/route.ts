@@ -28,8 +28,10 @@ export async function GET(req: NextRequest) {
       where: { id: alumni.id },
       select: {
         id: true, name: true, enrollmentNumber: true, personalEmail: true,
-        currentCompany: true, jobTitle: true, city: true, linkedInUrl: true,
-        phoneNumber: true, isProfileComplete: true, isVerified: true,
+        currentCompany: true, jobTitle: true, city: true, country: true,
+        linkedInUrl: true, phoneNumber: true, isProfileComplete: true,
+        isVerified: true, about: true, branch: true, batch: true,
+        course: true, profileImageUrl: true, privacyJson: true,
       },
     });
 

@@ -23,8 +23,13 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
-    const { profileImageUrl, resumeUrl } = (await req.json()) as any;
-    if (!profileImageUrl && !resumeUrl) {
+    const { profileImageUrl, resumeUrl, tenthPercentage, twelfthPercentage,
+      activeBacklog, linkedinUrl, githubUrl, semester
+    } = (await req.json()) as any;
+
+    if (!profileImageUrl && !resumeUrl && tenthPercentage === undefined && 
+        twelfthPercentage === undefined && activeBacklog === undefined &&
+        linkedinUrl === undefined && githubUrl === undefined && semester === undefined) {
       return NextResponse.json({ success: false, message: "Missing update data" }, { status: 400 });
     }
 
@@ -34,7 +39,13 @@ export async function PATCH(req: NextRequest) {
       where: { id: studentTokenData.id },
       data: { 
         ...(profileImageUrl && { profileImageUrl }),
-        ...(resumeUrl && { resumeUrl })
+        ...(resumeUrl && { resumeUrl }),
+        ...(tenthPercentage !== undefined && { tenthPercentage: parseFloat(tenthPercentage) }),
+        ...(twelfthPercentage !== undefined && { twelfthPercentage: parseFloat(twelfthPercentage) }),
+        ...(activeBacklog !== undefined && { activeBacklog: parseInt(activeBacklog) }),
+        ...(linkedinUrl !== undefined && { linkedinUrl }),
+        ...(githubUrl !== undefined && { githubUrl }),
+        ...(semester !== undefined && { semester: parseInt(semester) }),
       }
     });
 

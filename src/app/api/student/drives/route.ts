@@ -46,6 +46,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Already registered for this drive" }, { status: 409 });
     }
 
+    // Check: batch eligible?
+    const studentBatchNum = parseInt(studentData.batch.split('-').pop() || "0", 10);
+    const minBatchNum = parseInt(drive.minBatch.split('-').pop() || "0", 10);
+    const maxBatchNum = parseInt(drive.maxBatch.split('-').pop() || "0", 10);
+    if (!isNaN(studentBatchNum) && !isNaN(minBatchNum) && !isNaN(maxBatchNum) && (studentBatchNum < minBatchNum || studentBatchNum > maxBatchNum)) {
+      return NextResponse.json({ success: false, message: `Your batch is not eligible. Eligible range: ${drive.minBatch} to ${drive.maxBatch}` }, { status: 403 });
+    }
+
     // Check: branch eligible?
     if (!drive.eligibleBranches.includes(studentData.branch)) {
       return NextResponse.json({ success: false, message: "Your branch is not eligible for this drive" }, { status: 403 });

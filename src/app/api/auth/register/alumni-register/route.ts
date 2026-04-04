@@ -61,6 +61,7 @@ export async function POST(req: NextRequest) {
         name: validatedData.name,
         enrollmentNumber: validatedData.enrollmentNumber,
         personalEmail: validatedData.personalEmail,
+        branch: validatedData.branch,
         course: validatedData.course,
         batch: validatedData.batch,
         passwordHash: passwordHash,

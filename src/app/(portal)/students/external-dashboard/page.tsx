@@ -15,7 +15,10 @@ import {
   BadgeCheck,
   BadgeAlert,
   LogOut,
-  RefreshCw
+  RefreshCw,
+  ChevronRight,
+  Linkedin,
+  Github,
 } from "lucide-react";
 import Nav from "@/components/layout/nav/nav";
 import Footer from "@/components/layout/footer/footer";
@@ -23,7 +26,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { getToken, logout } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { uploadFileToR2 } from "@/lib/upload-r2";
-import { PlacementDrive } from "@prisma/client";
+import { PlacementDrive } from "@/types";
 import JobDetailsModal from "@/components/forms/studentApplyModal/modal";
 import { toast } from "sonner";
 
@@ -33,6 +36,18 @@ export default function ExternalStudentDashboard() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
+
+  // Complete Profile Form
+  const [showProfileForm, setShowProfileForm] = useState(false);
+  const [submittingProfile, setSubmittingProfile] = useState(false);
+  const [profileMsg, setProfileMsg] = useState<{ msg: string; ok: boolean } | null>(null);
+  const [profileForm, setProfileForm] = useState({
+    tenthPercentage: "",
+    twelfthPercentage: "",
+    activeBacklog: "0",
+    linkedinUrl: "",
+    githubUrl: "",
+  });
 
   useEffect(() => {
     if (!authenticated) return;
@@ -50,6 +65,12 @@ export default function ExternalStudentDashboard() {
     if (drive.course !== "All" && !drive.course?.includes(student?.course)) reason = "Course Ineligible";
     else if (!drive.eligibleBranches?.includes(student?.branch)) reason = "Branch Ineligible";
     else if ((student?.cgpa || 0) < drive.minCGPA) reason = "CGPA too low";
+    else if (student?.batch && drive.minBatch && drive.maxBatch) {
+      const sBatch = parseInt(student.batch.split('-').pop(), 10);
+      const minB = parseInt(drive.minBatch.split('-').pop(), 10);
+      const maxB = parseInt(drive.maxBatch.split('-').pop(), 10);
+      if (sBatch < minB || sBatch > maxB) reason = "Batch Ineligible";
+    }
 
     if (drive.isRegistered) {
       return {
@@ -88,13 +109,48 @@ export default function ExternalStudentDashboard() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const d = (await res.json()) as any;
-      if (d.success) setData(d);
+      if (d.success) {
+        setData(d);
+        if (d.student) {
+          setProfileForm({
+            tenthPercentage: d.student.tenthPercentage?.toString() || "",
+            twelfthPercentage: d.student.twelfthPercentage?.toString() || "",
+            activeBacklog: d.student.activeBacklog?.toString() || "0",
+            linkedinUrl: d.student.linkedinUrl || "",
+            githubUrl: d.student.githubUrl || "",
+          });
+        }
+      }
       else setFetchError(d.message || "Failed to load dashboard");
     } catch (err) {
       console.error(err);
       setFetchError("Network error. Please check your connection and try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSubmitProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmittingProfile(true);
+    setProfileMsg(null);
+    try {
+      const token = getToken("external_student");
+      const res = await fetch("/api/external/update-profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ profileImageUrl: data?.student?.profileImageUrl, ...profileForm }),
+      });
+      const d = (await res.json()) as any;
+      setProfileMsg({ msg: d.message, ok: d.success });
+      if (d.success) {
+        fetchDashboard();
+        setTimeout(() => setShowProfileForm(false), 2000);
+      }
+    } catch {
+      setProfileMsg({ msg: "Update failed", ok: false });
+    } finally {
+      setSubmittingProfile(false);
     }
   };
 
@@ -165,17 +221,93 @@ export default function ExternalStudentDashboard() {
         <main className="p-6 md:p-10 max-w-7xl mx-auto space-y-10">
 
           {/* Main Welcome Header */}
-          <section className="pt-4 md:pt-8 flex justify-between items-end">
+          <section className="pt-4 md:pt-8 flex flex-col md:flex-row justify-between md:items-end gap-4">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight text-foreground leading-tight">
               Welcome, <span className="text-brand">{student?.name || "Student"}</span>
             </h1>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 bg-destructive/10 text-destructive px-5 py-2.5 rounded-2xl text-sm font-bold hover:bg-destructive/20 transition-all shadow-sm border border-destructive/10"
-            >
-              <LogOut className="size-4" /> Logout
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowProfileForm(!showProfileForm)}
+                className="inline-flex items-center gap-2 text-sm font-bold text-brand hover:text-brand/80 transition-colors border border-brand/20 px-4 py-2.5 rounded-2xl bg-brand/5 hover:bg-brand/10"
+              >
+                {showProfileForm ? "Cancel Edit" : "Complete Profile"}
+                <ChevronRight className={`w-4 h-4 transition-transform ${showProfileForm ? "rotate-90" : ""}`} />
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 bg-destructive/10 text-destructive px-5 py-2.5 rounded-2xl text-sm font-bold hover:bg-destructive/20 transition-all shadow-sm border border-destructive/10"
+              >
+                <LogOut className="size-4" /> Logout
+              </button>
+            </div>
           </section>
+
+          {/* Complete Profile Form (Collapsible) */}
+          {showProfileForm && (
+            <section className="bg-card rounded-[2rem] p-8 shadow-xl border-2 border-brand/20 animate-in fade-in slide-in-from-top-4 duration-300">
+              <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
+                <div className="p-2 bg-brand/10 rounded-lg text-brand"><FileText className="w-5 h-5" /></div>
+                Academic &amp; Professional Details
+              </h2>
+              <form onSubmit={handleSubmitProfile} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">10th Percentage</label>
+                    <input type="number" step="0.01" min="0" max="100"
+                      value={profileForm.tenthPercentage} onChange={(e) => setProfileForm({ ...profileForm, tenthPercentage: e.target.value })}
+                      className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
+                      placeholder="e.g. 85.50" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">12th Percentage</label>
+                    <input type="number" step="0.01" min="0" max="100"
+                      value={profileForm.twelfthPercentage} onChange={(e) => setProfileForm({ ...profileForm, twelfthPercentage: e.target.value })}
+                      className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
+                      placeholder="e.g. 78.30" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Active Backlogs</label>
+                    <input type="number" min="0" max="20"
+                      value={profileForm.activeBacklog} onChange={(e) => setProfileForm({ ...profileForm, activeBacklog: e.target.value })}
+                      className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
+                      placeholder="0" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">LinkedIn URL</label>
+                    <div className="relative">
+                      <Linkedin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <input value={profileForm.linkedinUrl} onChange={(e) => setProfileForm({ ...profileForm, linkedinUrl: e.target.value })}
+                        className="w-full bg-muted pl-11 pr-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
+                        placeholder="https://linkedin.com/in/..." />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">GitHub URL</label>
+                    <div className="relative">
+                      <Github className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <input value={profileForm.githubUrl} onChange={(e) => setProfileForm({ ...profileForm, githubUrl: e.target.value })}
+                        className="w-full bg-muted pl-11 pr-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
+                        placeholder="https://github.com/..." />
+                    </div>
+                  </div>
+                </div>
+                {profileMsg && <p className={`text-sm font-medium ${profileMsg.ok ? "text-green-600" : "text-red-500"}`}>{profileMsg.msg}</p>}
+                <div className="flex gap-4">
+                  <button type="submit" disabled={submittingProfile}
+                    className="bg-brand text-primary-foreground px-8 py-3.5 rounded-xl font-bold hover:scale-105 transition-transform shadow-lg shadow-brand/20 disabled:opacity-50 flex items-center gap-2"
+                  >
+                    {submittingProfile ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                    Save Profile
+                  </button>
+                  <button type="button" onClick={() => setShowProfileForm(false)}
+                    className="bg-muted text-foreground px-8 py-3.5 rounded-xl font-bold hover:bg-muted/80 transition-colors"
+                  >
+                    Discard
+                  </button>
+                </div>
+              </form>
+            </section>
+          )}
 
           {loading ? (
             <div className="flex justify-center py-20">

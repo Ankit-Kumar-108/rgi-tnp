@@ -9,6 +9,7 @@ export async function GET(req: NextRequest) {
         
         const {searchParams} = new URL(req.url)
         const batch = searchParams.get("batch")
+        const branch = searchParams.get("branch")
         const search = searchParams.get("search")
         const course = searchParams.get("course")
         const page = parseInt(searchParams.get("page") || "1", 10);
@@ -22,6 +23,14 @@ export async function GET(req: NextRequest) {
 
         if (batch && batch !== "All Batches") {
             whereClause.batch = batch;
+        }
+        
+        if (branch && branch !== "All Branches") {
+            whereClause.branch = branch;
+        }
+
+        if(course && course !== "All Courses") {
+            whereClause.course = course;
         }
 
         // FIXED: Removed mode: "insensitive" as SQLite doesn't support/need it
@@ -50,6 +59,13 @@ export async function GET(req: NextRequest) {
                 batch: true,
                 course: true,
                 profileImageUrl: true,
+                about: true,
+                country: true,
+                branch: true,
+                linkedInUrl: true,
+                privacyJson: true,
+                
+
             },
             skip: skipOffset,
             take: limit,
@@ -58,7 +74,6 @@ export async function GET(req: NextRequest) {
             }
         });
 
-        // FIXED: Replaced { isVerified: true } with the dynamic whereClause
         const totalRecords = await db.alumni.count({
             where: whereClause 
         });

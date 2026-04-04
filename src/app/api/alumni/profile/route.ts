@@ -27,8 +27,10 @@ export async function POST(req: NextRequest) {
       currentCompany?: string;
       jobTitle?: string;
       city?: string;
+      country?: string;
       linkedInUrl?: string;
       phoneNumber?: string;
+      about?: string;
     };
 
     const db = getDb();
@@ -39,8 +41,10 @@ export async function POST(req: NextRequest) {
         currentCompany: body.currentCompany,
         jobTitle: body.jobTitle,
         city: body.city,
+        country: body.country,
         linkedInUrl: body.linkedInUrl,
         phoneNumber: body.phoneNumber,
+        about: body.about,
         isProfileComplete: true,
       },
     });

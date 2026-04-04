@@ -29,13 +29,6 @@ export async function POST(req: NextRequest) {
             if (student.isEmailVerified) {
                 return NextResponse.json({ success: false, message: "Account already verified" }, { status: 400 });
             }
-            if (student.lastOtpSentAt) {
-                const diffInSeconds = Math.floor((new Date().getTime() - student.lastOtpSentAt.getTime()) / 1000);
-                if (diffInSeconds < 60) {
-                    return NextResponse.json({ success: false, message: "Please wait a minute before requesting again" }, { status: 429 });
-                }
-            }
-
             userName = student.name;
             const newToken = generateVerificationToken();
             const newExpiry = getresetTokenExpiry();
@@ -45,7 +38,6 @@ export async function POST(req: NextRequest) {
                 data: {
                     emailVerificationToken: newToken,
                     emailVerificationTokenExpiry: newExpiry,
-                    lastOtpSentAt: new Date()
                 }
             });
 

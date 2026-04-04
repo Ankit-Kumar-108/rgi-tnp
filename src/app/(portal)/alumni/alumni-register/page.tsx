@@ -33,7 +33,7 @@ export default function AlumniRegister() {
     const [success, setSuccess] = useState("");
     const [form, setForm] = useState({
         name: "", personalEmail: "", enrollmentNumber: "",
-        course: "", batch: "",
+        course: "", batch: "", branch: "",
         password: "", confirmPassword: "",
     });
 
@@ -329,6 +329,25 @@ export default function AlumniRegister() {
                                     <label className="text-xs sm:text-sm font-semibold text-foreground">Batch</label>
                                     <input className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} type="text" placeholder="e.g. 2020-2024" required value={form.batch} onChange={update("batch")} />
                                 </div>
+                            </div>
+
+                            <div className="space-y-1">
+                                <label className="text-xs sm:text-sm font-semibold text-foreground">Branch</label>
+                                <select className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} required value={form.branch} onChange={update("branch")}>
+                                    <option value="">Select Branch</option>
+                                    <option value="Computer Science">Computer Science</option>
+                                    <option value="Mechanical">Mechanical</option>
+                                    <option value="Electrical">Electrical</option>
+                                    <option value="Civil">Civil</option>
+                                    <option value="Electronics">Electronics</option>
+                                    <option value="Information Technology">Information Technology</option>
+                                    <option value="Digital Communication">Digital Communication</option>
+                                    <option value="Power Systems">Power Systems</option>
+                                    <option value="Thermal Engineering">Thermal Engineering</option>
+                                    <option value="Marketing">Marketing</option>
+                                    <option value="Finance">Finance</option>
+                                    <option value="Human Resource">Human Resource</option>
+                                </select>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-1 sm:pt-2">

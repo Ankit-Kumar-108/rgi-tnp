@@ -62,7 +62,11 @@ export async function GET(req: NextRequest) {
         branch: student.branch, cgpa: student.cgpa, email: student.email,
         isVerified: student.isVerified, resumeUrl: student.resumeUrl,
         profileImageUrl: student.profileImageUrl,
-        course: student.course, batch: student.batch,
+        course: student.course, batch: student.batch, semester: student.semester,
+        tenthPercentage: student.tenthPercentage,
+        twelfthPercentage: student.twelfthPercentage,
+        activeBacklog: student.activeBacklog,
+        linkedinUrl: student.linkedinUrl, githubUrl: student.githubUrl,
       },
       drives: drives.map((d: any) => ({ ...d, isRegistered: registeredDriveIds.includes(d.id) })),
       archivedDrives: archivedDrives.map((d: any) => ({ ...d, isRegistered: registeredDriveIds.includes(d.id) })),
@@ -100,6 +104,14 @@ export async function POST(req: NextRequest) {
     });
     if (existing) {
       return NextResponse.json({ success: false, message: "Already registered" }, { status: 409 });
+    }
+
+    // Batch eligibility check
+    const studentBatchNum = parseInt(student.batch.split('-').pop() || "0", 10);
+    const minBatchNum = parseInt(drive.minBatch.split('-').pop() || "0", 10);
+    const maxBatchNum = parseInt(drive.maxBatch.split('-').pop() || "0", 10);
+    if (!isNaN(studentBatchNum) && !isNaN(minBatchNum) && !isNaN(maxBatchNum) && (studentBatchNum < minBatchNum || studentBatchNum > maxBatchNum)) {
+      return NextResponse.json({ success: false, message: `Your batch is not eligible. Eligible range: ${drive.minBatch} to ${drive.maxBatch}` }, { status: 403 });
     }
 
     // Course eligibility check

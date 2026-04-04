@@ -37,6 +37,7 @@ export async function POST(req: NextRequest) {
         branch: validatedData.branch,
         course: validatedData.course,
         batch: validatedData.batch,
+        semester: validatedData.semester,
         cgpa: validatedData.cgpa,
         resumeUrl: validatedData.resumeUrl,
         phoneNumber: validatedData.phoneNumber,
@@ -44,6 +45,8 @@ export async function POST(req: NextRequest) {
         profileImageUrl: validatedData.profileImageUrl || "",
         emailVerificationToken: verificationToken,
         emailVerificationTokenExpiry: verificationTokenExpiry,
+        tenthPercentage: 0,
+        twelfthPercentage: 0,
       },
     });
 

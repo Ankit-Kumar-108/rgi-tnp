@@ -8,6 +8,7 @@ export const externalStudentRegistrationSchema = z.object({
     branch: z.string().min(1, 'Branch is required'),
     course: z.string().min(1, 'Course is required'),
     batch: z.string().min(1, 'Batch is required'),
+    semester: z.coerce.number().int().min(1, 'Semester must be at least 1').max(8, 'Semester cannot be more than 8'),
     cgpa: z.coerce.number().min(0, 'CGPA must be a positive number').max(10, 'CGPA cannot be more than 10'),
     resumeUrl: z.string().url('Invalid URL format for resume'),
     phoneNumber: z.string().min(10, 'Phone number must be at least 10 digits').max(15),

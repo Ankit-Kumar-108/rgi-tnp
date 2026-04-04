@@ -1,0 +1,4 @@
+﻿src/app/(portal)/students/external-dashboard/page.tsx(200,11): error TS2322: Type '{ id: string; companyName: string; roleName: string; jobDescription: string; ctc: string; minCGPA: number; jobType: string; minBatch: string; maxBatch: string; course: string; eligibleBranches: string; ... 4 more ...; recruiterId: string; }' is not assignable to type 'PlacementDrive'.
+  Types of property 'googleSheetUrl' are incompatible.
+    Type 'string | null' is not assignable to type 'string | undefined'.
+      Type 'null' is not assignable to type 'string | undefined'.

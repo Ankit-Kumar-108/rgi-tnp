@@ -317,8 +317,8 @@ export default function AdminUsersPage() {
                           <td className="px-5 py-3.5 text-muted-foreground">{user.branch}</td>
                           <td className="px-5 py-3.5 font-bold text-foreground">{user.cgpa}</td>
                           <td className="px-5 py-3.5">
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${user.isVerified ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-500"}`}>
-                              {user.isVerified ? "Yes" : "No"}
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${user.isEmailVerified ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-500"}`}>
+                              {user.isEmailVerified ? "Yes" : "No"}
                             </span>
                           </td>
                         </>

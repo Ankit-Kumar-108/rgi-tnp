@@ -76,6 +76,8 @@ export async function POST(req: NextRequest) {
         isEmailVerified: false,
         emailVerificationToken: verificationToken,
         emailVerificationTokenExpiry: expiry,
+        tenthPercentage: 0,
+        twelfthPercentage: 0,
       },
     });
 

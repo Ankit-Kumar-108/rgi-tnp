@@ -12,7 +12,8 @@ async function main() {
       enrollmentNumber: '0158CS241012',
       name: 'Ankit Kumar',
       branch: 'Computer Science',
-      batch: 2028
+      course: 'B.Tech',
+      batch: '2024-2028'
     },
   });
 
@@ -25,12 +26,13 @@ async function main() {
       enrollmentNumber: '0108CS201001',
       name: 'Jane Doe',
       branch: 'Information Technology',
-      batch: '2024' // Note: Batch is a String for AlumniMaster
+      course: 'B.Tech',
+      batch: '2020-2024'
     },
   });
 
   console.log('Seeded successfully! You can register with:');
-  console.log('Student -> Name: Ankit Kumar, Enrollment: 0108CS211001');
+  console.log('Student -> Name: Ankit Kumar, Enrollment: 0158CS241012');
   console.log('Alumni -> Name: Jane Doe, Enrollment: 0108CS201001');
 }
 

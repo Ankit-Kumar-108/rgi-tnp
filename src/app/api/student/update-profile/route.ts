@@ -23,7 +23,9 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
-    const { profileImageUrl, phoneNumber, branch, course, resumeUrl } = (await req.json()) as any;
+    const { profileImageUrl, phoneNumber, branch, course, resumeUrl,
+      tenthPercentage, twelfthPercentage, activeBacklog, linkedinUrl, githubUrl
+    } = (await req.json()) as any;
     const db = getDb();
 
     // Update the student record
@@ -35,7 +37,12 @@ export async function PATCH(req: NextRequest) {
         ...(phoneNumber && { phoneNumber }),
         ...(branch && { branch }),
         ...(course && { course }),
-        ...(resumeUrl && { resumeUrl })
+        ...(resumeUrl && { resumeUrl }),
+        ...(tenthPercentage !== undefined && { tenthPercentage: parseFloat(tenthPercentage) }),
+        ...(twelfthPercentage !== undefined && { twelfthPercentage: parseFloat(twelfthPercentage) }),
+        ...(activeBacklog !== undefined && { activeBacklog: parseInt(activeBacklog) }),
+        ...(linkedinUrl !== undefined && { linkedinUrl }),
+        ...(githubUrl !== undefined && { githubUrl }),
       }
     });
 
