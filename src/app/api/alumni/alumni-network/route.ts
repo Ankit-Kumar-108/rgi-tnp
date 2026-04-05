@@ -64,6 +64,7 @@ export async function GET(req: NextRequest) {
                 branch: true,
                 linkedInUrl: true,
                 privacyJson: true,
+                isVerified: true,
                 
 
             },

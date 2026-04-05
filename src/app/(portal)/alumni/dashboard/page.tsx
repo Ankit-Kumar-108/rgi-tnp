@@ -17,6 +17,9 @@ import {
   Phone,
   LogOut,
   RefreshCw,
+  BadgeCheck,
+  BadgeAlert,
+  X
 } from "lucide-react";
 import Nav from "@/components/layout/nav/nav";
 import Footer from "@/components/layout/footer/footer";
@@ -202,158 +205,320 @@ export default function AlumniDashboard() {
 
         <main className="p-6 md:p-10 max-w-7xl mx-auto space-y-10">
           {/* Header */}
-          <section className="pt-4 md:pt-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand/10 text-brand text-xs font-bold uppercase tracking-widest mb-4">
-              <GraduationCap className="w-4 h-4" /> Alumni
-            </div>
-            <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground leading-tight">
-              Welcome back, <span className="text-brand">{user?.name || alumni?.name || "Alumni"}</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand/10 text-brand text-xs font-bold uppercase tracking-widest mb-0">
+            <GraduationCap className="w-4 h-4" /> Alumni
+          </div>
+          <section className="pt-4 md:pt-8 flex flex-col md:flex-row justify-between md:items-end gap-4">
+
+            <h1 className="text-2xl md:text-4xl lg:text-5xl font-black tracking-tight text-foreground leading-tight">
+              Welcome Back, <span className="text-brand">{alumni?.name || "Student"}</span>
             </h1>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-2">
-              {alumni && (
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-muted-foreground text-sm font-medium">
-                  {alumni.currentCompany && (
-                    <span className="flex items-center gap-1.5 bg-muted/50 px-3 py-1 rounded-full border border-border">
-                      <Briefcase className="w-3.5 h-3.5 text-brand" /> {alumni.jobTitle} at {alumni.currentCompany}
-                    </span>
-                  )}
-                  {alumni.city && (
-                    <span className="flex items-center gap-1.5 bg-muted/50 px-3 py-1 rounded-full border border-border">
-                      <MapPin className="w-3.5 h-3.5 text-brand" /> {alumni.city}
-                    </span>
-                  )}
-                  {alumni.linkedInUrl && (
-                    <a href={alumni.linkedInUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 bg-brand/5 text-brand hover:bg-brand/10 px-3 py-1 rounded-full border border-brand/20 transition-colors">
-                      <Linkedin className="w-3.5 h-3.5" /> LinkedIn Profile
-                    </a>
-                  )}
-                </div>
-              )}
-              <button
-                onClick={() => setShowProfileForm(!showProfileForm)}
-                className="inline-flex items-center gap-2 text-sm font-bold text-brand hover:text-brand/80 transition-colors"
-              >
-                {showProfileForm ? "Cancel Edit" : "Update Profile"}
-                <ChevronRight className={`w-4 h-4 transition-transform ${showProfileForm ? "rotate-90" : ""}`} />
-              </button>
+            <div className="flex items-center gap-3">
               <button
                 onClick={handleLogout}
-                className="inline-flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-red-500 border border-border px-4 py-2 rounded-xl transition-all hover:border-red-500/30"
+                className="flex items-center gap-2 bg-destructive/10 text-destructive px-5 py-2.5 rounded-2xl text-sm font-bold hover:bg-destructive/20 transition-all shadow-sm border border-destructive/10"
               >
-                <LogOut className="w-4 h-4" /> Logout
+                <LogOut className="size-4" /> Logout
               </button>
             </div>
           </section>
 
-          {/* Profile Form (Collapsible) */}
+          {/* Hero Section */}
+          <section className="pt-4 md:pt-8 w-full">
+            <div className="flex flex-col items-center justify-between gap-6 mt-2">
+              {alumni && (
+                <div className="w-full relative group">
+                  <div className="absolute -top-12 -left-12 w-48 h-48 md:w-64 md:h-64 bg-brand/10 rounded-full blur-3xl -z-10 animate-pulse"></div>
+                  <div className="absolute top-24 -right-12 w-32 h-32 md:w-48 md:h-48 bg-foreground/5 rounded-full blur-3xl -z-10"></div>
+
+                  <div className="bg-card/80 backdrop-blur-sm rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-10 lg:p-12 shadow-xl shadow-brand/5 border border-border/60 flex flex-col md:flex-row gap-8 items-center md:items-start relative overflow-hidden transition-all duration-500 hover:border-brand/30">
+
+                    <div className="absolute top-0 right-0 w-24 h-24 md:w-40 md:h-40 bg-gradient-to-bl from-brand/10 via-transparent to-transparent rounded-bl-[3rem] md:rounded-bl-[6rem]"></div>
+
+                    <div className="relative shrink-0 transition-transform duration-500 hover:scale-105">
+                      <div className="w-32 h-32 md:w-44 lg:w-52 md:h-44 lg:h-52 rounded-full p-1 md:p-1.5 bg-gradient-to-tr from-brand via-brand/60 to-orange-400">
+                        <div className="w-full h-full rounded-full border-[3px] md:border-[5px] border-background overflow-hidden bg-muted flex items-center justify-center">
+                          {alumni?.profileImageUrl ? (
+                            <img
+                              alt="Alumni Portrait"
+                              className="w-full h-full object-cover"
+                              src={alumni.profileImageUrl}
+                            />
+                          ) : (
+                            <span className="text-4xl md:text-5xl font-black text-muted-foreground/40 uppercase leading-none">
+                              {alumni?.name?.charAt(0)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="absolute bottom-1 md:bottom-2 right-1 md:right-4 bg-background rounded-full p-1 shadow-md">
+                        {alumni?.isVerified ? (
+                          <BadgeCheck className="w-8 h-8 md:w-10 md:h-10 text-green-500" />
+                        ) : (
+                          <BadgeAlert className="w-8 h-8 md:w-10 md:h-10 text-destructive/80" />
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex-1 space-y-6 md:space-y-8 w-full text-center md:text-left">
+                      <div className="space-y-2 md:space-y-3">
+                        <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-foreground tracking-tight leading-tight">
+                          {alumni?.name}
+                        </h1>
+                        <p className="text-sm md:text-lg font-bold text-brand uppercase tracking-widest bg-brand/5 inline-block px-4 py-1 rounded-full">
+                          {alumni?.course}
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-6 md:gap-y-0 md:pt-6 border-t border-border/50 pt-6">
+                        <div className="px-2 md:pr-6 md:border-r border-border/50 text-left">
+                          <p className="text-[10px] md:text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Current Role</p>
+                          <p className="text-sm md:text-lg font-extrabold text-foreground leading-snug truncate">{alumni?.jobTitle || "—"}</p>
+                        </div>
+                        <div className="px-2 md:px-6 md:border-r border-border/50 text-left">
+                          <p className="text-[10px] md:text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Company</p>
+                          <p className="text-sm md:text-lg font-extrabold text-foreground leading-snug truncate">{alumni?.currentCompany || "—"}</p>
+                        </div>
+                        <div className="px-2 md:px-6 md:border-r border-border/50 text-left text-left">
+                          <p className="text-[10px] md:text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">City</p>
+                          <p className="text-sm md:text-lg font-extrabold text-foreground leading-snug truncate">{alumni?.city || "—"}</p>
+                        </div>
+                        <div className="px-2 md:pl-6 text-left">
+                          <p className="text-[10px] md:text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Country</p>
+                          <p className="text-sm md:text-lg font-extrabold text-foreground leading-snug truncate">{alumni?.country || "—"}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                        {alumni.linkedInUrl && (
+                          <a
+                            href={alumni.linkedInUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 bg-[#0077b5] text-white hover:bg-[#0077b5]/90 px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md active:scale-95"
+                          >
+                            <Linkedin className="w-4 h-4" />
+                            <span className="hidden xs:inline">LinkedIn Profile</span>
+                            <span className="xs:hidden">LinkedIn</span>
+                          </a>
+                        )}
+                        <button
+                          onClick={() => setShowProfileForm(!showProfileForm)}
+                          className="flex items-center gap-2 text-sm font-bold border border-border bg-background hover:bg-muted px-5 py-2.5 rounded-xl transition-all active:scale-95"
+                        >
+                          {showProfileForm ? "Close Form" : "Update Profile"}
+                          <ChevronRight className={`w-4 h-4 transition-transform duration-300 ${showProfileForm ? "rotate-90" : ""}`} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Profile Form (Full Screen Overlay) */}
           {showProfileForm && (
-            <section className="bg-card rounded-[2rem] p-8 shadow-xl border-2 border-brand/20 animate-in fade-in slide-in-from-top-4 duration-300">
-              <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
-                <div className="p-2 bg-brand/10 rounded-lg text-brand"><GraduationCap className="w-5 h-5" /></div>
-                Professional Details
-              </h2>
-              <form onSubmit={handleSubmitProfile} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <div className="space-y-2 lg:col-span-3">
-                    <label
-                      htmlFor="about"
-                      className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1"
-                    >
-                      Tell Us About Yourself
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6">
+              {/* Backdrop */}
+              <div 
+                className="absolute w-full h-[120%] bg-background/60 backdrop-blur-xl animate-in fade-in duration-300"
+                onClick={() => setShowProfileForm(false)}
+              />
+              
+              {/* Modal Container */}
+              <section className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-card rounded-[2.5rem] p-6 md:p-10 shadow-2xl border border-brand/20 animate-in zoom-in-95 duration-300">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6 border-b border-border/50">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-brand/10 rounded-2xl text-brand shadow-inner">
+                      <GraduationCap className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl md:text-2xl font-black text-foreground tracking-tight">Professional Profile</h2>
+                      <p className="text-xs md:text-sm text-muted-foreground font-medium">Update your career details for the RGI community.</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowProfileForm(false)}
+                    className="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="size-7" /> 
+                  </button>
+                </div>
+
+                <form onSubmit={handleSubmitProfile} className="space-y-8">
+                  <div className="space-y-3 text-left">
+                    <label htmlFor="about" className="text-[10px] md:text-xs font-black uppercase tracking-widest text-brand ml-1 flex items-center gap-2">
+                      <div className="w-1 h-1 bg-brand rounded-full" /> Tell Us About Your Journey
                     </label>
-                    <textarea
-                      id="about"
-                      value={profileForm.about}
-                      onChange={(e) => setProfileForm({ ...profileForm, about: e.target.value })}
-                      className="w-full bg-muted px-5 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground resize-none leading-relaxed"
-                      placeholder="A brief introduction about your career journey..."
-                      rows={4}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Current Company</label>
-                    <input required value={profileForm.currentCompany} onChange={(e) => setProfileForm({ ...profileForm, currentCompany: e.target.value })}
-                      className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
-                      placeholder="e.g. Microsoft" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Job Title</label>
-                    <input required value={profileForm.jobTitle} onChange={(e) => setProfileForm({ ...profileForm, jobTitle: e.target.value })}
-                      className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
-                      placeholder="e.g. Senior Engineer" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">City</label>
-                    <input required value={profileForm.city} onChange={(e) => setProfileForm({ ...profileForm, city: e.target.value })}
-                      className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
-                      placeholder="e.g. Bangalore" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Country</label>
-                    <input value={profileForm.country} onChange={(e) => setProfileForm({ ...profileForm, country: e.target.value })}
-                      className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
-                      placeholder="e.g. India" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">LinkedIn URL</label>
-                    <div className="relative">
-                      <Linkedin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <input value={profileForm.linkedInUrl} onChange={(e) => setProfileForm({ ...profileForm, linkedInUrl: e.target.value })}
-                        className="w-full bg-muted pl-11 pr-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
-                        placeholder="https://linkedin.com/in/..." />
+                    <div className="relative group">
+                      <textarea
+                        id="about"
+                        value={profileForm.about}
+                        onChange={(e) => setProfileForm({ ...profileForm, about: e.target.value })}
+                        className="w-full bg-muted/50 px-6 py-5 rounded-[1.5rem] border border-transparent focus:border-brand/30 focus:bg-background transition-all text-sm outline-none text-foreground resize-none leading-relaxed shadow-sm group-hover:shadow-md"
+                        placeholder="E.g. Transitioned from Frontend to Full-stack, currently leading a team at Microsoft..."
+                        rows={4}
+                      />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Phone Number (Kept Private)</label>
-                    <div className="relative">
-                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <input value={profileForm.phoneNumber} onChange={(e) => setProfileForm({ ...profileForm, phoneNumber: e.target.value })}
-                        className="w-full bg-muted pl-11 pr-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
-                        placeholder="10-digit number" />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Current Company</label>
+                      <div className="relative group">
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-background rounded-lg border border-border group-focus-within:border-brand/50 transition-colors">
+                          <Briefcase className="w-3.5 h-3.5 text-muted-foreground" />
+                        </div>
+                        <input
+                          required
+                          value={profileForm.currentCompany}
+                          onChange={(e) => setProfileForm({ ...profileForm, currentCompany: e.target.value })}
+                          className="w-full bg-muted/50 pl-14 pr-5 py-4 rounded-2xl border border-transparent focus:border-brand/30 focus:bg-background transition-all text-sm outline-none text-foreground font-bold"
+                          placeholder="e.g. Google"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Job Title</label>
+                      <div className="relative group">
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-background rounded-lg border border-border group-focus-within:border-brand/50 transition-colors">
+                          <TrendingUp className="w-3.5 h-3.5 text-muted-foreground" />
+                        </div>
+                        <input
+                          required
+                          value={profileForm.jobTitle}
+                          onChange={(e) => setProfileForm({ ...profileForm, jobTitle: e.target.value })}
+                          className="w-full bg-muted/50 pl-14 pr-5 py-4 rounded-2xl border border-transparent focus:border-brand/30 focus:bg-background transition-all text-sm outline-none text-foreground font-bold"
+                          placeholder="e.g. Software Engineer"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">LinkedIn Profile</label>
+                      <div className="relative group">
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-[#0077b5]/10 rounded-lg border border-[#0077b5]/20">
+                          <Linkedin className="w-3.5 h-3.5 text-[#0077b5]" />
+                        </div>
+                        <input
+                          value={profileForm.linkedInUrl}
+                          onChange={(e) => setProfileForm({ ...profileForm, linkedInUrl: e.target.value })}
+                          className="w-full bg-muted/50 pl-14 pr-5 py-4 rounded-2xl border border-transparent focus:border-brand/30 focus:bg-background transition-all text-sm outline-none text-foreground font-bold"
+                          placeholder="linkedin.com/in/yourname"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Location (City)</label>
+                      <div className="relative group">
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-background rounded-lg border border-border">
+                          <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
+                        </div>
+                        <input
+                          required
+                          value={profileForm.city}
+                          onChange={(e) => setProfileForm({ ...profileForm, city: e.target.value })}
+                          className="w-full bg-muted/50 pl-14 pr-5 py-4 rounded-2xl border border-transparent focus:border-brand/30 focus:bg-background transition-all text-sm outline-none text-foreground font-bold"
+                          placeholder="e.g. Bhopal"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Country</label>
+                      <input
+                        value={profileForm.country}
+                        onChange={(e) => setProfileForm({ ...profileForm, country: e.target.value })}
+                        className="w-full bg-muted/50 px-6 py-4 rounded-2xl border border-transparent focus:border-brand/30 focus:bg-background transition-all text-sm outline-none text-foreground font-bold"
+                        placeholder="India"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Phone Number (Private)</label>
+                      <div className="relative group">
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-background rounded-lg border border-border">
+                          <Phone className="w-3.5 h-3.5 text-muted-foreground" />
+                        </div>
+                        <input
+                          value={profileForm.phoneNumber}
+                          onChange={(e) => setProfileForm({ ...profileForm, phoneNumber: e.target.value })}
+                          className="w-full bg-muted/50 pl-14 pr-5 py-4 rounded-2xl border border-transparent focus:border-brand/30 focus:bg-background transition-all text-sm outline-none text-foreground font-bold"
+                          placeholder="+91 XXXXX XXXXX"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-                {profileMsg && <p className={`text-sm font-medium ${profileMsg.ok ? "text-green-600" : "text-red-500"}`}>{profileMsg.msg}</p>}
-                <div className="flex gap-4">
-                  <button type="submit" disabled={submittingProfile}
-                    className="bg-brand text-primary-foreground px-8 py-3.5 rounded-xl font-bold hover:scale-105 transition-transform shadow-lg shadow-brand/20 disabled:opacity-50 flex items-center gap-2"
-                  >
-                    {submittingProfile ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                    Save Profile changes
-                  </button>
-                  <button type="button" onClick={() => setShowProfileForm(false)}
-                    className="bg-muted text-foreground px-8 py-3.5 rounded-xl font-bold hover:bg-muted/80 transition-colors"
-                  >
-                    Discard
-                  </button>
-                </div>
-              </form>
-            </section>
+
+                  {profileMsg && (
+                    <div className={`p-4 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-left-2 ${profileMsg.ok ? "bg-green-500/10 text-green-600 border border-green-500/20" : "bg-destructive/10 text-destructive border border-destructive/20"}`}>
+                      {profileMsg.ok ? <CheckCircle className="w-4 h-4" /> : <BadgeAlert className="w-4 h-4" />}
+                      <p className="text-xs md:text-sm font-bold">{profileMsg.msg}</p>
+                    </div>
+                  )}
+
+                  <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-border/50">
+                    <button
+                      type="submit"
+                      disabled={submittingProfile}
+                      className="flex-1 bg-brand text-primary-foreground px-8 py-4 rounded-2xl font-black hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-brand/20 disabled:opacity-50 flex items-center justify-center gap-3"
+                    >
+                      {submittingProfile ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle className="w-5 h-5" />}
+                      <span className="tracking-tight uppercase text-xs md:text-sm">Save Profile changes</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowProfileForm(false)}
+                      className="bg-muted text-foreground px-8 py-4 rounded-2xl font-bold hover:bg-muted/80 transition-all uppercase text-xs md:text-sm tracking-widest"
+                    >
+                      Discard
+                    </button>
+                  </div>
+                </form>
+              </section>
+            </div>
           )}
 
           {/* Stats */}
           {!loading && !fetchError && (
             <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-card rounded-[2rem] p-6 shadow-sm flex items-center justify-between border border-border hover:-translate-y-1 transition-transform">
-                <div>
-                  <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-1">Total Referrals</p>
-                  <h3 className="text-4xl font-black text-foreground">{stats.totalReferrals || 0}</h3>
+              <div className="bg-card rounded-[2rem] p-8 border transition-all hover:-translate-y-1 bg-card border-border shadow-sm">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest mb-1 text-muted-foreground">Total Referrals</p>
+                    <h3 className="text-4xl md:text-5xl font-black">{stats.totalReferrals || 0}</h3>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-brand/10 text-brand">
+                    <UserPlus className="w-7 h-7 md:w-8 md:h-8" />
+                  </div>
                 </div>
-                <div className="bg-brand/10 p-4 rounded-2xl text-brand"><UserPlus className="w-8 h-8" /></div>
               </div>
-              <div className="bg-card rounded-[2rem] p-6 shadow-sm flex items-center justify-between border border-border hover:-translate-y-1 transition-transform">
-                <div>
-                  <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-1">Approved</p>
-                  <h3 className="text-4xl font-black text-foreground">{stats.approvedReferrals || 0}</h3>
+              <div className="bg-card rounded-[2rem] p-8 border transition-all hover:-translate-y-1 bg-card border-border shadow-sm">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest mb-1 text-muted-foreground">Approved</p>
+                    <h3 className="text-4xl md:text-5xl font-black">{stats.approvedReferrals || 0}</h3>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-brand/10 text-brand">
+                    <Briefcase className="w-7 h-7 md:w-8 md:h-8" />
+                  </div>
                 </div>
-                <div className="bg-brand/10 p-4 rounded-2xl text-brand"><Briefcase className="w-8 h-8" /></div>
               </div>
-              <div className="bg-brand text-primary-foreground rounded-[2rem] p-6 shadow-xl shadow-brand/20 flex items-center justify-between hover:-translate-y-1 transition-transform">
-                <div>
-                  <p className="text-sm font-bold opacity-80 uppercase tracking-widest mb-1">Pending</p>
-                  <h3 className="text-4xl font-black">{stats.pendingReferrals || 0}</h3>
+              <div className="rounded-[2rem] p-8 border transition-all hover:-translate-y-1 bg-brand text-white border-transparent shadow-xl shadow-brand/20">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest mb-1 opacity-80">Pending Review</p>
+                    <h3 className="text-4xl md:text-5xl font-black">{stats.pendingReferrals || 0}</h3>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-white/20 backdrop-blur-md">
+                    <TrendingUp className="w-7 h-7 md:w-8 md:h-8" />
+                  </div>
                 </div>
-                <div className="bg-background/20 p-4 rounded-2xl backdrop-blur-sm"><TrendingUp className="w-8 h-8 text-primary-foreground" /></div>
               </div>
             </section>
           )}
@@ -375,44 +540,44 @@ export default function AlumniDashboard() {
           {!loading && !fetchError && (
             <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Referral Form (spans 2) */}
-              <div className="lg:col-span-2 bg-card rounded-[2rem] p-8 shadow-sm border border-border">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="p-3 bg-brand/10 rounded-xl text-brand"><Send className="w-6 h-6" /></div>
+              <div className="lg:col-span-2 bg-card rounded-[2.5rem] p-8 md:p-10 border border-border shadow-sm text-left">
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="p-4 bg-brand/10 rounded-2xl text-brand"><Send className="w-6 h-6" /></div>
                   <div>
-                    <h2 className="text-2xl font-bold text-foreground">Post a Referral</h2>
-                    <p className="text-sm text-muted-foreground mt-1">Submit a job referral for RGI students. Admin will review before publishing.</p>
+                    <h2 className="text-2xl font-black">Post a Referral</h2>
+                    <p className="text-sm text-muted-foreground">Submit a job referral for RGI students. Admin will review before publishing.</p>
                   </div>
                 </div>
-                <form onSubmit={handleSubmitReferral} className="space-y-5">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <form onSubmit={handleSubmitReferral} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Company Name</label>
                       <input required value={refForm.companyName} onChange={(e) => setRefForm({ ...refForm, companyName: e.target.value })}
-                        className="w-full bg-muted px-5 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground placeholder:text-muted-foreground/50"
+                        className="w-full bg-muted/50 px-6 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground placeholder:text-muted-foreground/50"
                         placeholder="e.g. Google" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Role / Position</label>
                       <input required value={refForm.position} onChange={(e) => setRefForm({ ...refForm, position: e.target.value })}
-                        className="w-full bg-muted px-5 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground placeholder:text-muted-foreground/50"
+                        className="w-full bg-muted/50 px-6 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground placeholder:text-muted-foreground/50"
                         placeholder="e.g. SDE Intern" />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Description</label>
                     <textarea required value={refForm.description} onChange={(e) => setRefForm({ ...refForm, description: e.target.value })} rows={3}
-                      className="w-full bg-muted px-5 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none resize-none text-foreground placeholder:text-muted-foreground/50"
+                      className="w-full bg-muted/50 px-6 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none resize-none text-foreground placeholder:text-muted-foreground/50 min-h-[120px]"
                       placeholder="Job details, eligibility..." />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Apply Link / Email</label>
                     <input required value={refForm.applyLink} onChange={(e) => setRefForm({ ...refForm, applyLink: e.target.value })}
-                      className="w-full bg-muted px-5 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground placeholder:text-muted-foreground/50"
+                      className="w-full bg-muted/50 px-6 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground placeholder:text-muted-foreground/50"
                       placeholder="https://careers.google.com/..." />
                   </div>
                   {refMsg && <p className={`text-sm font-medium ${refMsg.ok ? "text-green-600" : "text-red-500"}`}>{refMsg.msg}</p>}
                   <button type="submit" disabled={submittingRef}
-                    className="w-full md:w-auto bg-brand text-primary-foreground px-10 py-4 rounded-xl font-bold hover:scale-[1.02] transition-transform shadow-lg shadow-brand/20 disabled:opacity-50 flex items-center gap-2"
+                    className="w-full md:w-auto bg-brand text-primary-foreground px-10 py-4 rounded-2xl font-black shadow-lg shadow-brand/20 disabled:opacity-50 flex items-center gap-2 hover:scale-105 transition-all"
                   >
                     {submittingRef ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                     {submittingRef ? "Submitting..." : "Submit Referral"}
@@ -421,28 +586,28 @@ export default function AlumniDashboard() {
               </div>
 
               {/* Feedback Card */}
-              <div className="lg:col-span-1 bg-gradient-to-br from-muted/50 to-background rounded-[2rem] p-8 border border-border flex flex-col">
+              <div className="lg:col-span-1 bg-gradient-to-br from-muted/50 to-background rounded-[2.5rem] p-8 border border-border flex flex-col text-left">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="p-3 bg-brand/10 rounded-xl text-brand"><MessageSquareShare className="w-6 h-6" /></div>
-                  <h2 className="text-xl font-bold text-foreground">Curriculum Feedback</h2>
+                  <div className="p-4 bg-brand/10 rounded-2xl text-brand"><MessageSquareShare className="w-6 h-6" /></div>
+                  <h2 className="text-2xl font-black text-foreground">Feedback</h2>
                 </div>
-                <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-                  Rate the current batch's preparedness and suggest improvements.
+                <p className="text-xs text-muted-foreground mb-8 leading-relaxed font-medium uppercase tracking-tight">
+                  Is the college syllabus up to date? Rate the batch's preparedness and suggest improvements.
                 </p>
-                <div className="flex gap-2 mb-6">
+                <div className="flex gap-2 mb-8">
                   {[1, 2, 3, 4, 5].map((s) => (
-                    <button key={s} onClick={() => setFbRating(s)} className={`hover:scale-110 transition-transform ${s <= fbRating ? "text-brand" : "text-muted-foreground"}`}>
-                      <Star className={`w-6 h-6 ${s <= fbRating ? "fill-current" : ""}`} />
+                    <button key={s} onClick={() => setFbRating(s)} className={`transition-all hover:scale-110 cursor-pointer ${s <= fbRating ? "text-brand" : "text-muted-foreground/30"}`}>
+                      <Star className={`w-8 h-8 ${s <= fbRating ? "fill-current" : ""}`} />
                     </button>
                   ))}
                 </div>
                 <textarea
                   value={fbContent} onChange={(e) => setFbContent(e.target.value)}
-                  className="w-full bg-background p-5 rounded-2xl border border-border focus:ring-2 focus:ring-brand transition-all text-sm resize-none mb-6 outline-none text-foreground placeholder:text-muted-foreground/50"
+                  className="w-full flex-1 bg-background px-6 py-4 rounded-2xl border border-border focus:ring-2 focus:ring-brand outline-none text-sm mb-6 placeholder:text-muted-foreground/50 resize-none"
                   placeholder="What skill is missing from the syllabus?" rows={4} />
                 {fbMsg && <p className={`text-sm font-medium mb-3 ${fbMsg.ok ? "text-green-600" : "text-red-500"}`}>{fbMsg.msg}</p>}
                 <button onClick={handleSubmitFeedback} disabled={submittingFb || !fbContent || fbRating === 0}
-                  className="mt-auto w-full bg-foreground text-background py-4 rounded-xl font-bold hover:bg-brand hover:text-primary-foreground transition-colors disabled:opacity-50"
+                  className="mt-auto w-full bg-foreground text-background py-4 rounded-2xl font-black hover:bg-brand hover:text-white transition-all disabled:opacity-50"
                 >
                   {submittingFb ? "Submitting..." : "Share Expertise"}
                 </button>
@@ -452,27 +617,27 @@ export default function AlumniDashboard() {
 
           {/* Referrals Table */}
           {!loading && !fetchError && referrals.length > 0 && (
-            <section className="space-y-4">
-              <h2 className="text-2xl font-bold text-foreground">My Referrals</h2>
-              <div className="overflow-hidden rounded-[2rem] bg-card shadow-sm border border-border">
+            <section className="space-y-6 text-left">
+              <h2 className="text-2xl md:text-3xl font-black tracking-tight">My Referrals</h2>
+              <div className="overflow-hidden rounded-[2.5rem] bg-card shadow-sm border border-border">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
-                    <thead className="bg-muted/50">
+                    <thead className="bg-muted/50 border-b border-border text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                       <tr>
-                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Company</th>
-                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Position</th>
-                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Apply Link</th>
-                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground text-right">Status</th>
+                        <th className="px-8 py-6">Company</th>
+                        <th className="px-8 py-6">Position</th>
+                        <th className="px-8 py-6">Apply Link</th>
+                        <th className="px-8 py-6 text-right">Status</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border/50">
                       {referrals.map((ref: any) => (
                         <tr key={ref.id} className="hover:bg-muted/30 transition-colors">
-                          <td className="px-6 py-4 font-semibold text-foreground">{ref.companyName}</td>
-                          <td className="px-6 py-4 text-muted-foreground text-sm">{ref.position}</td>
-                          <td className="px-6 py-4 text-brand text-sm truncate max-w-[200px]">{ref.applyLink}</td>
-                          <td className="px-6 py-4 text-right">
-                            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${getStatusBadge(ref.status)}`}>{ref.status}</span>
+                          <td className="px-8 py-6 font-bold text-sm text-foreground">{ref.companyName}</td>
+                          <td className="px-8 py-6 text-muted-foreground text-xs">{ref.position}</td>
+                          <td className="px-8 py-6 text-brand text-xs font-bold truncate max-w-[150px]">{ref.applyLink}</td>
+                          <td className="px-8 py-6 text-right">
+                            <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase ${getStatusBadge(ref.status)}`}>{ref.status}</span>
                           </td>
                         </tr>
                       ))}

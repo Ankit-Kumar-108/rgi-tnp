@@ -218,7 +218,7 @@ export default function AlumniDiscovery() {
                           </div>
                           <div>
                             <h3 className="font-bold text-foreground">{getCollegeName(selectedAlumni?.enrollmentNumber)}</h3>
-                            <p className="text-sm text-muted-foreground">{selectedAlumni?.course}</p>
+                            <p className="text-sm text-muted-foreground">{selectedAlumni?.course} {selectedAlumni?.branch}</p>
                             <p className="text-xs font-black text-brand mt-1 uppercase tracking-wider">Class of {selectedAlumni?.batch}</p>
                           </div>
                         </div>
@@ -233,6 +233,7 @@ export default function AlumniDiscovery() {
                             <div>
                               <p className="font-bold text-foreground group-hover:text-brand transition-colors">{selectedAlumni?.jobTitle}</p>
                               <p className="text-xs text-muted-foreground mt-0.5">{selectedAlumni?.currentCompany}</p>
+                              <p className="text-xs text-muted-foreground mt-0.5">{selectedAlumni?.city}, {selectedAlumni?.country}</p>
                             </div>
                           </div>
                         </div>
@@ -240,13 +241,7 @@ export default function AlumniDiscovery() {
                     </div>
 
                     {/* Footer Action Area */}
-                    <footer className="pt-10 border-t border-border flex flex-col md:flex-row items-center justify-between gap-8">
-                      {/* Social Links */}
-                      <div className="flex items-center gap-6">
-                        <LinkIcon className="w-5 h-5 text-muted-foreground hover:text-brand cursor-pointer transition-colors" />
-                        <Mail className="w-5 h-5 text-muted-foreground hover:text-brand cursor-pointer transition-colors" />
-                        <Share2 className="w-5 h-5 text-muted-foreground hover:text-brand cursor-pointer transition-colors" />
-                      </div>
+                    <footer className="pt-10 border-t border-border flex flex-col md:flex-row items-center justify-end gap-8">
 
                       {/* Connect Button */}
                       <button
@@ -410,16 +405,6 @@ export default function AlumniDiscovery() {
                         <p className="text-xs font-semibold leading-snug text-foreground">
                           {alumni.displayRole}
                         </p>
-                      </div>
-
-                      <div className="flex items-center justify-between pt-2 border-t border-border/50">
-                        <div className="flex gap-3">
-                          <Mail className="text-muted-foreground w-4 h-4 hover:text-brand cursor-pointer transition-colors" />
-                          <Network className="text-muted-foreground w-4 h-4 hover:text-brand cursor-pointer transition-colors" />
-                        </div>
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase">
-                          {alumni.city}
-                        </span>
                       </div>
                     </div>
                   </div>
