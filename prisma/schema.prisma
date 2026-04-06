@@ -92,6 +92,7 @@ model Alumni {
   about             String?
   batch             String
   course            String
+  memories          Memory[]
   referrals         Referral[]
   alumniFeedbacks   AlumniFeedback[]
   createdAt         DateTime        @default(now())
@@ -194,8 +195,12 @@ model Memory {
   id        String   @id @default(cuid())
   imageUrl  String
   status    String   @default("pending_moderation")
-  studentId String
-  student   Student  @relation(fields: [studentId], references: [id])
+  studentId String?
+  title     String   @default("Untitled Memory")
+  uploaderName String
+  alumniId String?
+  alumni   Alumni?  @relation(fields: [alumniId], references: [id])
+  student   Student?  @relation(fields: [studentId], references: [id])
   createdAt DateTime @default(now())
 }
 

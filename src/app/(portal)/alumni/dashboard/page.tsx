@@ -27,6 +27,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { getToken, logout } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { set } from "zod";
 
 export default function AlumniDashboard() {
   const { loading: authLoading, authenticated, user } = useAuth("alumni", "/alumni/alumni-register");
@@ -68,6 +69,7 @@ export default function AlumniDashboard() {
   const fetchDashboard = async () => {
     try {
       setFetchError(null);
+      setLoading(true);
       const token = getToken("alumni");
       const res = await fetch("/api/alumni/dashboard", {
         headers: { Authorization: `Bearer ${token}` },
@@ -88,10 +90,13 @@ export default function AlumniDashboard() {
         }
       } else {
         setFetchError("Failed to load dashboard data.");
+        toast.error("Failed to load dashboard data.");
       }
     } catch (err) {
       console.error(err);
       setFetchError("Network error. Please check your connection.");
+      toast.error("Network error. Please check your connection.");
+
     } finally {
       setLoading(false);
     }

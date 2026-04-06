@@ -5,7 +5,8 @@ import {
   Search, Calendar, TrendingUp,
   Briefcase, Mail, Network, Database, Loader2, BookOpen, X,
   School, MapPin, Link as LinkIcon,
-  Share2, Send, BadgeCheck
+  Share2, Send, BadgeCheck,
+  BadgeAlert
 } from "lucide-react";
 import Footer from "@/components/layout/footer/footer";
 import Nav from "@/components/layout/nav/nav";
@@ -172,8 +173,12 @@ export default function AlumniDiscovery() {
                           src={selectedAlumni?.image}
                         />
                       </div>
-                      <div className="absolute bottom-2 right-2 w-8 h-8 bg-brand text-primary-foreground rounded-full flex items-center justify-center border-2 border-card shadow-lg">
-                        <BadgeCheck className="w-4 h-4 fill-current" />
+                      <div className="absolute bottom-1 md:bottom-2 right-1 md:right-4 bg-background rounded-full shadow-md">
+                        {selectedAlumni?.isVerified ? (
+                          <BadgeCheck className="size-5 md:size-7 text-green-500" />
+                        ) : (
+                          <BadgeAlert className="size-5 md:size-7 text-destructive/80" />
+                        )}
                       </div>
                     </div>
 

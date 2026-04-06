@@ -23,9 +23,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
-    const { imageUrl } = (await req.json()) as any;
-    if (!imageUrl) {
-      return NextResponse.json({ success: false, message: "Missing image URL" }, { status: 400 });
+    const { memories } = (await req.json()) as { memories: { imageUrl: string; title: string }[] };
+    
+    if (!memories || !Array.isArray(memories) || memories.length === 0) {
+      return NextResponse.json({ success: false, message: "No memories provided" }, { status: 400 });
     }
 
     const db = getDb();
@@ -33,33 +34,34 @@ export async function POST(req: NextRequest) {
     // Find student ID first
     const student = await db.student.findUnique({
       where: { enrollmentNumber: studentTokenData.enrollmentNumber },
-      select: { id: true }
+      select: { id: true, name: true }
     });
 
     if (!student) {
       return NextResponse.json({ success: false, message: "Student not found" }, { status: 404 });
     }
 
-    // Create Memory record
-    const memory = await db.memory.create({
-      data: {
-        imageUrl,
+    // Create Memory records in batch
+    const newRecords = await db.memory.createMany({
+      data: memories.map(m => ({
+        imageUrl: m.imageUrl,
+        title: m.title || "Untitled Memory",
+        uploaderName: student.name,
         studentId: student.id,
         status: "pending_moderation"
-      }
+      }))
     });
 
     return NextResponse.json({ 
       success: true, 
-      message: "Memory uploaded successfully and sent for moderation", 
-      memory 
+      message: `${newRecords.count} memories uploaded successfully and sent for moderation`, 
     });
 
   } catch (error: any) {
-    console.error("Memory Upload Error:", error);
+    console.error("Batch Memory Upload Error:", error);
     return NextResponse.json({ 
       success: false, 
-      message: error?.message || "Failed to upload memory" 
+      message: error?.message || "Failed to upload memories" 
     }, { status: 500 });
   }
 }

@@ -62,6 +62,8 @@ export interface Memory {
   id: string;
   imageUrl: string;
   status: string;
+  title: string;
+  uploaderName: string;
   studentId: string;
   createdAt?: string | Date;
 }

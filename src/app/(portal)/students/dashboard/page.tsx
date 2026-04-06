@@ -47,6 +47,12 @@ export default function StudentDashboard() {
   const [memUploading, setMemUploading] = useState(false);
   const [resumeUploading, setResumeUploading] = useState(false);
 
+  // Memory Modal State
+  const [isMemModalOpen, setIsMemModalOpen] = useState(false);
+  const [selectedMemFiles, setSelectedMemFiles] = useState<File[]>([]);
+  const [memBatchTitle, setMemBatchTitle] = useState("");
+  const [memPreviews, setMemPreviews] = useState<string[]>([]);
+
   // Complete Profile Form
   const [showProfileForm, setShowProfileForm] = useState(false);
   const [submittingProfile, setSubmittingProfile] = useState(false);
@@ -195,17 +201,51 @@ export default function StudentDashboard() {
   };
 
   const handleMemoryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
-    if (file.size > 10 * 1024 * 1024) { // 10MB for memories
-      toast.error("Image must be smaller than 10MB");
+    // Check for size on each file
+    const oversized = files.some(f => f.size > 10 * 1024 * 1024);
+    if (oversized) {
+      toast.error("One or more images are larger than 10MB");
+      return;
+    }
+
+    setSelectedMemFiles(files);
+    setMemBatchTitle("");
+
+    // Generate all previews
+    const previewPromises = files.map(file => {
+      return new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(file);
+      });
+    });
+
+    const results = await Promise.all(previewPromises);
+    setMemPreviews(results);
+    setIsMemModalOpen(true);
+  };
+
+  const startMemoryUpload = async () => {
+    if (selectedMemFiles.length === 0) {
+      toast.error("Please select at least one image.");
       return;
     }
 
     try {
       setMemUploading(true);
-      const imageUrl = await uploadFileToR2(file, "memories");
+
+      // 1. Upload all to R2 in parallel
+      const uploadPromises = selectedMemFiles.map(file => uploadFileToR2(file, "memories"));
+      const imageUrls = await Promise.all(uploadPromises);
+
+      // 2. Prepare the batch for the API
+      const memories = imageUrls.map(url => ({
+        imageUrl: url,
+        title: memBatchTitle || "Untitled Memory"
+      }));
 
       const token = getToken("student");
       const res = await fetch("/api/student/memories", {
@@ -214,19 +254,23 @@ export default function StudentDashboard() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ imageUrl }),
+        body: JSON.stringify({ memories }),
       });
 
       const d = await res.json() as any
       if (d.success) {
-        toast.success("Memory uploaded! It will appear after moderation.");
+        toast.success(d.message || "Memories uploaded! They will appear after moderation.");
+        setIsMemModalOpen(false);
+        setSelectedMemFiles([]);
+        setMemPreviews([]);
+        setMemBatchTitle("");
         fetchDashboard();
       } else {
         throw new Error(d.message);
       }
     } catch (err: any) {
       console.error(err);
-      toast.error("Memory upload failed: " + err.message);
+      toast.error("Upload failed: " + err.message);
     } finally {
       setMemUploading(false);
     }
@@ -261,7 +305,71 @@ export default function StudentDashboard() {
             fetchDashboard();
           }}
         />
-      )}      <div className="bg-background text-foreground antialiased font-sans min-h-screen mt-15">
+      )}
+
+      {isMemModalOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-card w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl border border-border space-y-6 animate-in zoom-in-95 duration-300">
+            <div className="text-center space-y-2">
+              <h3 className="text-2xl font-black text-foreground tracking-tight">Create Memory</h3>
+              <p className="text-sm text-muted-foreground">Share this special moment from your journey</p>
+            </div>
+
+            {memPreviews.length > 0 && (
+              <div className="grid grid-cols-2 gap-3 max-h-[300px] overflow-y-auto p-1 scrollbar-hide">
+                {memPreviews.map((preview, idx) => (
+                  <div key={idx} className="relative aspect-square rounded-2xl overflow-hidden border-2 border-brand/20 bg-muted group">
+                    <img src={preview} alt={`Preview ${idx}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Batch Title (Optional)</label>
+                <input 
+                  type="text"
+                  value={memBatchTitle}
+                  onChange={(e) => setMemBatchTitle(e.target.value)}
+                  placeholder="e.g. Campus Farewell..."
+                  className="w-full bg-muted px-6 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand outline-none text-foreground font-medium transition-all"
+                />
+                <p className="text-[10px] text-muted-foreground ml-1">This title will be applied to all {selectedMemFiles.length} images.</p>
+              </div>
+
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => { setIsMemModalOpen(false); setSelectedMemFiles([]); setMemPreviews([]); }}
+                  className="flex-1 bg-muted text-foreground px-6 py-4 rounded-xl font-bold hover:bg-muted/80 transition-all active:scale-95 text-sm"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={startMemoryUpload}
+                  disabled={memUploading}
+                  className="flex-[2] bg-brand text-white px-6 py-4 rounded-xl font-bold hover:bg-brand/90 transition-all active:scale-95 text-sm disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2 shadow-lg shadow-brand/20"
+                >
+                  {memUploading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Uploading {selectedMemFiles.length} Photos...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-4 h-4" />
+                      Upload All
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="bg-background text-foreground antialiased font-sans min-h-screen mt-15">
         <div className="fixed bottom-0 right-0 w-96 h-96 bg-brand/5 rounded-full blur-[120px] -z-10" />
         <div className="fixed top-1/2 left-0 w-64 h-64 bg-brand/5 rounded-full blur-[100px] -z-10" />
 
@@ -813,7 +921,7 @@ export default function StudentDashboard() {
                   <label className="flex items-center gap-2 px-4 py-2 bg-brand/10 text-brand rounded-xl text-xs font-bold hover:bg-brand/20 transition-all cursor-pointer">
                     {memUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                     {memUploading ? "Uploading..." : "Upload Memory"}
-                    <input type="file" accept="image/*" className="hidden" onChange={handleMemoryUpload} disabled={memUploading} />
+                    <input type="file" accept="image/*" multiple className="hidden" onChange={handleMemoryUpload} disabled={memUploading} />
                   </label>
                 </div>
                 {memories.length === 0 ? (
