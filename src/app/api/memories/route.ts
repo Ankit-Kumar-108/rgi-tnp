@@ -8,7 +8,8 @@ export async function GET() {
         const db = getDb();
         const memories = await db.memory.findMany({
             where: { status: "approved" },
-            orderBy: { createdAt: "desc" }
+            orderBy: { createdAt: "desc" },
+            take: 100
         });
         return NextResponse.json({ success: true, memories });
     } catch (error: any) {

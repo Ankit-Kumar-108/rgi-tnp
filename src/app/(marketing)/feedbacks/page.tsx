@@ -28,6 +28,7 @@ export default function Testimonials() {
             <div className="md:col-span-8 relative overflow-hidden rounded-[2rem] group bg-card shadow-xl border border-border">
               <img
                 alt="Success Story Alumni"
+                loading="lazy"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=2788&auto=format&fit=crop"
               />
@@ -55,6 +56,7 @@ export default function Testimonials() {
                     <img
                       className="w-full h-full object-cover"
                       alt="Small alumni avatar"
+                      loading="lazy"
                       src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=100&auto=format&fit=crop"
                     />
                   </div>
@@ -192,6 +194,7 @@ export default function Testimonials() {
                 <img
                   className="w-12 h-12 rounded-full object-cover"
                   alt="Alumni profile photo"
+                  loading="lazy"
                   src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=100&auto=format&fit=crop"
                 />
                 <div className="flex-1">
@@ -231,6 +234,7 @@ export default function Testimonials() {
                   <img
                     className="w-full h-full object-cover"
                     alt="Student avatar"
+                    loading="lazy"
                     src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=100&auto=format&fit=crop"
                   />
                 </div>
@@ -303,6 +307,7 @@ export default function Testimonials() {
                 <img
                   className="w-10 h-10 rounded-full object-cover grayscale"
                   alt="Smiling female student"
+                  loading="lazy"
                   src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=100&auto=format&fit=crop"
                 />
                 <div>

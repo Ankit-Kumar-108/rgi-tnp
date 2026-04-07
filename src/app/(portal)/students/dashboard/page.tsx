@@ -20,6 +20,9 @@ import {
   ChevronRight,
   Linkedin,
   Github,
+  Delete,
+  Trash,
+  Trash2,
 } from "lucide-react"
 import Nav from "@/components/layout/nav/nav"
 import Footer from "@/components/layout/footer/footer"
@@ -276,6 +279,31 @@ export default function StudentDashboard() {
     }
   };
 
+  const handleDeleteMemory = async (id: string) => {
+    try {
+      const token = getToken("student");
+      const res = await fetch("/api/student/memories", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ id })
+      });
+      const d = await res.json() as any;
+      if (d.success) {
+        toast.success("Memory deleted successfully!");
+        fetchDashboard();
+      } else {
+        throw new Error(d.message);
+      }
+
+    } catch (error: any) {
+      console.error("Error deleting memory:", error);
+      toast.error("Failed to delete memory. Please try again.");
+    }
+  }
+
   if (authLoading || !authenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -499,6 +527,7 @@ export default function StudentDashboard() {
                             {student?.profileImageUrl ? (
                               <img
                                 alt="Student Portrait"
+                                loading="lazy"
                                 className="w-full h-full object-cover"
                                 src={student.profileImageUrl}
                               />
@@ -765,7 +794,7 @@ export default function StudentDashboard() {
                             </div>
                           </div>
 
-                          <p className="text-[10px] text-muted-foreground italic">
+                          <p className="text-[10px] text-muted-foreground">
                             Drive Date: {reg.drive?.driveDate ? new Date(reg.drive.driveDate).toLocaleDateString() : "-"}
                           </p>
                         </div>
@@ -934,13 +963,15 @@ export default function StudentDashboard() {
                     {memories.map((m: any) => (
                       <div key={m.id} className="bg-card rounded-2xl border border-border overflow-hidden">
                         <div className="aspect-square bg-muted flex items-center justify-center">
-                          <img src={m.imageUrl} alt="Memory" className="w-full h-full object-cover" />
+                          <img src={m.imageUrl} alt="Memory" loading="lazy" className="w-full h-full object-cover" />
+                          
                         </div>
-                        <div className="p-3">
+                        <div className="p-3 flex items-center justify-between">
                           <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${m.status === "approved" ? "bg-green-500/10 text-green-600"
                             : m.status === "rejected" ? "bg-red-500/10 text-red-500"
                               : "bg-yellow-500/10 text-yellow-600"
                             }`}>{m.status === "pending_moderation" ? "Pending" : m.status}</span>
+                            <Trash2 className="text-red-500 cursor-pointer size-6" onClick={() => handleDeleteMemory(m.id)} />
                         </div>
                       </div>
                     ))}

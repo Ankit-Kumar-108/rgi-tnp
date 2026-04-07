@@ -302,7 +302,7 @@ export default function AdminUsersPage() {
                             <div className="flex items-center gap-3">
                               <div className="w-8 h-8 rounded-full overflow-hidden bg-muted flex-shrink-0 border border-border">
                                 {user.profileImageUrl ? (
-                                  <img src={user.profileImageUrl} alt="" className="w-full h-full object-cover" />
+                                  <img src={user.profileImageUrl} alt="" loading="lazy" className="w-full h-full object-cover" />
                                 ) : (
                                   <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-muted-foreground uppercase bg-surface">
                                     {user.name?.charAt(0)}
@@ -329,7 +329,7 @@ export default function AdminUsersPage() {
                             <div className="flex items-center gap-3">
                               <div className="w-8 h-8 rounded-full overflow-hidden bg-muted flex-shrink-0 border border-border">
                                 {user.profileImageUrl ? (
-                                  <img src={user.profileImageUrl} alt="" className="w-full h-full object-cover" />
+                                  <img src={user.profileImageUrl} alt="" loading="lazy" className="w-full h-full object-cover" />
                                 ) : (
                                   <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-muted-foreground uppercase bg-surface">
                                     {user.name?.charAt(0)}
@@ -368,7 +368,7 @@ export default function AdminUsersPage() {
                             <div className="flex items-center gap-3">
                               <div className="w-8 h-8 rounded-lg overflow-hidden bg-muted flex-shrink-0 border border-border">
                                 {user.profileImageUrl ? (
-                                  <img src={user.profileImageUrl} alt="" className="w-full h-full object-cover" />
+                                  <img src={user.profileImageUrl} alt="" loading="lazy" className="w-full h-full object-cover" />
                                 ) : (
                                   <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-muted-foreground uppercase bg-surface">
                                     {user.name?.charAt(0)}

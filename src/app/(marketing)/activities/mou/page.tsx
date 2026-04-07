@@ -18,6 +18,7 @@ export default function StrategicAlliances() {
                         <div className="absolute inset-0 z-0">
                             <img
                                 className="w-full h-full object-cover opacity-30"
+                                loading="lazy"
                                 alt="Professional business handshake in a bright modern office"
                                 src="https://images.unsplash.com/photo-1556761175-4b46a572b786?q=80&w=2874&auto=format&fit=crop"
                             />
@@ -74,6 +75,7 @@ export default function StrategicAlliances() {
                                     <div className="w-20 h-20 bg-muted rounded-2xl flex items-center justify-center mb-6 overflow-hidden">
                                         <img
                                             className="w-12 h-12 object-contain"
+                                            loading="lazy"
                                             alt="Microsoft"
                                             src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg"
                                         />
@@ -98,6 +100,7 @@ export default function StrategicAlliances() {
                                     <div className="w-20 h-20 bg-muted rounded-2xl flex items-center justify-center mb-6 overflow-hidden p-2">
                                         <img
                                             className="w-full h-full object-contain"
+                                            loading="lazy"
                                             alt="TCS iON"
                                             src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Tata_Consultancy_Services_Logo.svg"
                                         />
@@ -139,6 +142,7 @@ export default function StrategicAlliances() {
                                     <div className="w-20 h-20 bg-muted rounded-2xl flex items-center justify-center mb-6 overflow-hidden">
                                         <img
                                             className="w-12 h-12 object-contain"
+                                            loading="lazy"
                                             alt="IBM"
                                             src="https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg"
                                         />
@@ -167,6 +171,7 @@ export default function StrategicAlliances() {
                                 <div className="absolute -top-12 -left-12 w-64 h-64 bg-brand/10 blur-[100px] rounded-full"></div>
                                 <img
                                     className="relative z-10 rounded-[2rem] shadow-2xl object-cover aspect-[4/3]"
+                                    loading="lazy"
                                     alt="Students collaborating in a high-tech modern classroom"
                                     src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2940&auto=format&fit=crop"
                                 />

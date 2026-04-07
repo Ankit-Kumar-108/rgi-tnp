@@ -77,6 +77,7 @@ export default function RecruiterDashboard() {
     } catch (err) {
       console.error(err);
       setFetchError("Network error. Please check your connection.");
+      toast.error("Failed to load dashboard data");
     } finally {
       setLoading(false);
     }
@@ -85,6 +86,7 @@ export default function RecruiterDashboard() {
   const handleLogout = () => {
     if (!window.confirm("Are you sure you want to logout?")) return;
     logout("recruiter");
+    toast.success("Logged out successfully"); 
     router.push("/recruiters/login");
   };
 
@@ -99,11 +101,13 @@ export default function RecruiterDashboard() {
 
       if(!form.eligibleBranches){
         setFormMsg({ msg: "Please select eligible branches", ok: false });
+        toast.error("Please select eligible branches");
         setSubmitting(false);
         return;
       }
       if(!form.course){
         setFormMsg({ msg: "Please select at least one course", ok: false });
+        toast.error("Please select at least one course");
         setSubmitting(false);
         return;
       }
@@ -123,6 +127,7 @@ export default function RecruiterDashboard() {
       }
     } catch {
       setFormMsg({ msg: "Submission failed", ok: false });
+      toast.error("Failed to submit drive request");
     } finally {
       setSubmitting(false);
     }

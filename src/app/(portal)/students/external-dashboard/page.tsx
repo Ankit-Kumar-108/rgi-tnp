@@ -57,6 +57,7 @@ export default function ExternalStudentDashboard() {
   const handleLogout = () => {
     if (!window.confirm("Are you sure you want to logout?")) return;
     logout("external_student");
+    toast.success("Logged out successfully!");
     router.push("/");
   };
 

@@ -23,6 +23,7 @@ import Link from "next/link";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { uploadFileToR2 } from "@/lib/upload-r2";
+import { toast } from "sonner";
 
 export default function ExternalStudentRegister() {
     const router = useRouter();
@@ -134,6 +135,7 @@ export default function ExternalStudentRegister() {
             }
 
             setSuccess("Registration successful! Check your email to verify your account.");
+            toast.success("Registration successful! Check your email to verify your account.");
             setTimeout(() => router.push(`/external-students/login`), 1000);
         } catch {
             setError("Something went wrong.");

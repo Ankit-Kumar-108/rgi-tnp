@@ -65,3 +65,42 @@ export async function POST(req: NextRequest) {
     }, { status: 500 });
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const studentTokenData = await getStudentFromToken(req);
+    if (!studentTokenData) {
+      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+    }
+
+    const {id} = (await req.json()) as { id: string };
+    if (!id) {
+      return NextResponse.json({ success: false, message: "Memory ID is required" }, { status: 400 });
+    }
+
+    const db = getDb();
+    const student = await db.student.findUnique({
+      where: { enrollmentNumber: studentTokenData.enrollmentNumber },
+      select: { id: true }
+    });
+
+    if (!student) {
+      return NextResponse.json({ success: false, message: "Student not found" }, { status: 404 });
+    }
+
+    const deletedMemory = await db.memory.deleteMany({
+      where: { 
+        id: id,
+        studentId: student.id
+       }
+    });
+
+    if (deletedMemory.count === 0) {
+      return NextResponse.json({ success: false, message: "Memory not found or you don't have permission to delete it" }, { status: 404 });
+    }
+    return NextResponse.json({ success: true, message: "Memory deleted successfully" });
+  } catch (error: any) {
+    console.error("Error deleting memories:", error); 
+    return NextResponse.json({ success: false, message: "Failed to delete memories" }, { status: 500 });
+  }
+}

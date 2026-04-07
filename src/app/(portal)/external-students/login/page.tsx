@@ -7,6 +7,7 @@ import Link from "next/link"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { saveAuth } from "@/lib/auth-client"
+import { toast } from "sonner"
 
 export default function ExternalStudentLogin() {
     const router = useRouter();
@@ -35,6 +36,7 @@ export default function ExternalStudentLogin() {
             }
 
             saveAuth("external_student", data.token!, data.student);
+            toast.success("Logged in successfully!");
             router.push("/students/external-dashboard");
         } catch {
             setError("Something went wrong. Please try again.");

@@ -63,7 +63,7 @@ export default function MemoriesGallery() {
           <h1 className="text-5xl md:text-7xl font-black tracking-tight text-foreground leading-none">
             Radharaman <span className="text-brand">Memories</span>
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mt-6 leading-relaxed font-light">
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mt-6 leading-relaxed">
             A curated visual archive capturing the spirit of excellence, campus life, and the milestones of our students.
           </p>
         </header>
@@ -80,6 +80,7 @@ export default function MemoriesGallery() {
               <img
                 src={memory.imageUrl}
                 alt={memory.title}
+                loading="lazy"
                 className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-110"
               />
 
@@ -115,6 +116,7 @@ export default function MemoriesGallery() {
               <img
                 src={selectedImage.imageUrl}
                 alt={selectedImage.title}
+                loading="lazy"
                 className="w-full h-full object-contain"
               />
             </div>

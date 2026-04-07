@@ -103,6 +103,7 @@ export default function ImpactCommunity() {
                             <div className="w-full aspect-video mb-16 overflow-hidden [clip-path:polygon(0_0,100%_0,100%_85%,0_100%)]">
                                 <img
                                     alt="Community engagement"
+                                    loading="lazy"
                                     className="w-full h-full object-cover"
                                     src="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2940&auto=format&fit=crop"
                                 />
@@ -205,6 +206,7 @@ export default function ImpactCommunity() {
                                         <div className="absolute -top-6 -right-6 w-full h-full border-4 border-brand/20 -z-10"></div>
                                         <img
                                             alt="Robin Samuel"
+                                            loading="lazy"
                                             className="w-full aspect-4/5 object-cover shadow-2xl"
                                             src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=2787&auto=format&fit=crop"
                                         />
@@ -218,6 +220,7 @@ export default function ImpactCommunity() {
                                         <div className="absolute -bottom-6 -left-6 w-full h-full border-4 border-brand/20 -z-10"></div>
                                         <img
                                             alt="Elena Vance"
+                                            loading="lazy"
                                             className="w-full aspect-4/5 object-cover shadow-2xl"
                                             src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=2787&auto=format&fit=crop"
                                         />

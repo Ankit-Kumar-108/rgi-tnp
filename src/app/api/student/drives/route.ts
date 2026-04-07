@@ -54,6 +54,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: `Your batch is not eligible. Eligible range: ${drive.minBatch} to ${drive.maxBatch}` }, { status: 403 });
     }
 
+    // Check: course eligible?
+    if (drive.course !== "All" && !drive.course.includes(studentData.course)) {
+      return NextResponse.json({ success: false, message: `Your course (${studentData.course}) is not eligible for this drive.` }, { status: 403 });
+    }
+
     // Check: branch eligible?
     if (!drive.eligibleBranches.includes(studentData.branch)) {
       return NextResponse.json({ success: false, message: "Your branch is not eligible for this drive" }, { status: 403 });

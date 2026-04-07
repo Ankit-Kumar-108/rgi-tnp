@@ -18,6 +18,7 @@ import Link from "next/link"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { saveAuth } from "@/lib/auth-client"
+import { toast } from "sonner";
 
 export default function RecruiterLogin() {
     const router = useRouter();
@@ -42,13 +43,16 @@ export default function RecruiterLogin() {
 
             if (!res.ok || !data.success) {
                 setError(data.message || "Login failed");
+                toast.error(data.message || "Login failed");
                 return;
             }
 
             saveAuth("recruiter", data.token!, data.recruiter);
+            toast.success("Logged in successfully");
             router.push("/recruiters/dashboard");
         } catch {
             setError("Something went wrong. Please try again.");
+            toast.error("Something went wrong. Please try again.");
         } finally {
             setLoading(false);
         }
