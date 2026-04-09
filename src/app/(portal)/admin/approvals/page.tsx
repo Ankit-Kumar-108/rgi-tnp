@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import {
   FileText,
   Briefcase,
@@ -11,8 +11,6 @@ import {
   Loader2,
   Check,
   X,
-  Eye,
-  ExternalLink,
   Trash2,
   MapPin,
   Calendar,
@@ -52,24 +50,58 @@ export default function AdminApprovalsPage() {
   const [bulkActionLoading, setBulkActionLoading] = useState<"approve" | "reject" | null>(null);
   const [viewItem, setViewItem] = useState<any>(null);
 
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
+
+  const observer = React.useRef<IntersectionObserver | null>(null);
+  const lastItemRef = useCallback((node: HTMLDivElement | null) => {
+    if (loading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasMore) {
+        setPage((prev) => prev + 1);
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loading, hasMore]);
+
+
   useEffect(() => {
     if (!authenticated) return;
-    fetchItems();
-  }, [authenticated, activeTab]);
+    const loadItems = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/admin/approvals?type=${activeTab}&page=${page}&limit=50`);
+        const data = (await res.json()) as { success: boolean; items: any[]; totalCount: number };
+        if (data.success) {
+          setItems((prev) => {
+            if (page === 1) return data.items;
+             const existingIds = new Set(prev.map(i => i.id));
+             const newItems = data.items.filter(i => !existingIds.has(i.id));
+             return [...prev, ...newItems];
+          });
+          setTotalCount(data.totalCount || 0);
+          setHasMore(data.totalCount > page * 50);
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to fetch items");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadItems();
+  }, [authenticated, activeTab, page]);
 
-  const fetchItems = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/admin/approvals?type=${activeTab}`);
-      const data = (await res.json()) as { success: boolean; items: any[] };
-      if (data.success) setItems(data.items);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to fetch items");
-    } finally {
-      setLoading(false);
-    }
+  const handleChangeTab = (tab: TabKey) => {
+    setActiveTab(tab);
+    setPage(1);
+    setItems([])
+    setHasMore(true);
+    setViewItem(null);
   };
+
 
   const handleAction = async (id: string, action: "approve" | "reject") => {
     setActionLoading(id);
@@ -83,8 +115,11 @@ export default function AdminApprovalsPage() {
       if (data.success) {
         toast.success(data.message);
         setItems((prev) => prev.filter((item) => item.id !== id));
-        if (activeTab === "memories") {
-            fetchItems();
+        if (activeTab === "memories" && action === "approve") {
+            setItems((prev) => prev.map((item) => item.id === id ? { ...item, status: "approved" } : item));
+        } else {
+          setItems((prev) => prev.filter((item) => item.id !== id));
+          setTotalCount((prev) => prev - 1);
         }
         setViewItem(null);
       } else {
@@ -120,7 +155,13 @@ export default function AdminApprovalsPage() {
       const data = (await res.json()) as { success: boolean; message: string };
       if (data.success) {
         toast.success(data.message);
-        fetchItems();
+        const targetIds = new Set(targetItems.map(i => i.id));
+        if (activeTab === "memories" && action === "approve") {
+          setItems((prev) => prev.map((item) => targetIds.has(item.id) ? { ...item, status: "approved" } : item));
+        } else {
+          setItems((prev) => prev.filter((item) => !targetIds.has(item.id)));
+          setTotalCount((prev) => prev - targetItems.length);
+        }
       } else {
         toast.error(data.message);
       }
@@ -197,7 +238,7 @@ export default function AdminApprovalsPage() {
           {TABS.map((tab) => (
             <button
               key={tab.key}
-              onClick={() => { setActiveTab(tab.key); setViewItem(null); }}
+              onClick={() => { handleChangeTab(tab.key) }}
               className={`flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-3 rounded-xl sm:rounded-2xl text-[12px] sm:text-sm font-bold whitespace-nowrap transition-all ${activeTab === tab.key
                   ? "bg-brand text-white shadow-lg shadow-brand/20"
                   : "bg-white border border-slate-200 text-slate-500 hover:bg-slate-50"
@@ -228,7 +269,7 @@ export default function AdminApprovalsPage() {
             </div>
         )}
 
-        {loading ? (
+        {loading && page == 1 ? (
           <div className="flex flex-col items-center justify-center py-24 sm:py-32 gap-3 sm:gap-4">
             <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 animate-spin text-brand" />
             <p className="text-[12px] sm:text-sm font-bold text-slate-400">Loading...</p>
@@ -241,8 +282,12 @@ export default function AdminApprovalsPage() {
           </div>
         ) : (
           <div className={`grid gap-4 sm:gap-6 ${activeTab === "memories" ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" : "grid-cols-1 lg:grid-cols-2"}`}>
-            {displayedItems.map((item) => (
-                <div key={item.id} className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+            {displayedItems.map((item, index) => {
+              const isLastElement = index === displayedItems.length - 1;
+              return (
+                <div key={item.id}
+                ref={isLastElement ? lastItemRef : null}
+                className="animate-in fade-in slide-in-from-bottom-4 duration-300">
                     {activeTab === "drives" && <DriveRequestCard item={item} onAction={handleAction} loading={actionLoading} />}
                     {activeTab === "referrals" && <ReferralCard item={item} onAction={handleAction} loading={actionLoading} />}
                     {activeTab === "external" && <ExternalScreeningCard item={item} onAction={handleAction} loading={actionLoading} />}
@@ -256,7 +301,7 @@ export default function AdminApprovalsPage() {
                               loading="lazy"
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                             />
-                            <div className="absolute inset-x-0 bottom-0 p-2 sm:p-3 bg-gradient-to-t from-black/70 to-transparent">
+                            <div className="absolute inset-x-0 bottom-0 p-2 sm:p-3 bg-linear-to-t from-black/70 to-transparent">
                                 <p className="text-[8px] sm:text-[10px] font-bold text-white uppercase tracking-wider truncate">{item.title || "Untitled"}</p>
                                 <p className="text-[7px] sm:text-[9px] text-white/80">by {item.uploaderName}</p>
                             </div>
@@ -266,7 +311,20 @@ export default function AdminApprovalsPage() {
                         </div>
                     )}
                 </div>
-            ))}
+            )})}
+          </div>
+        )}
+        {/* Bottom Loading Indicator */}
+        {loading && page > 1 && (
+          <div className="flex justify-center py-8">
+            <Loader2 className="w-6 h-6 animate-spin text-brand" />
+          </div>
+        )}
+
+        {/* End of list message */}
+        {!hasMore && items.length > 0 && (
+          <div className="text-center py-8 text-muted-foreground font-bold text-sm">
+            Showing {items.length} of {totalCount} items
           </div>
         )}
       </main>

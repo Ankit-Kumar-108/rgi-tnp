@@ -8,53 +8,80 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("type") || "drives";
+    const parsedLimit = parseInt(searchParams.get("limit") || "200", 10);
+    const parsedPage = parseInt(searchParams.get("page") || "1", 10);
+
+    const limit = isNaN(parsedLimit) ? 200 : Math.max(1, parsedLimit);
+    const page = isNaN(parsedPage) ? 1 : Math.max(1, parsedPage);
+    const skip = (page - 1) * limit;
+
+
+
     const db = getDb();
 
     if (type === "drives") {
-      const drives = await db.placementDrive.findMany({
-        where: { status: "pending" },
-        include: { recruiter: { select: { name: true, company: true, email: true } } },
-        orderBy: { driveDate: "desc" },
-        take: 200,
-      });
-      return NextResponse.json({ success: true, items: drives });
+      const where = { status: "pending" };
+      const [drives, totalCount] = await Promise.all([
+        db.placementDrive.findMany({
+          where,
+          include: { recruiter: { select: { name: true, company: true, email: true } } },
+          orderBy: { driveDate: "desc" },
+          take: limit,
+          skip: skip,
+        }),
+        db.placementDrive.count({ where })
+      ]);
+      return NextResponse.json({ success: true, items: drives, totalCount });
     }
 
     if (type === "referrals") {
-      const referrals = await db.referral.findMany({
-        where: { status: "pending" },
-        include: { alumni: { select: { name: true, personalEmail: true, profileImageUrl: true } } },
-        take: 200,
-      });
-      return NextResponse.json({ success: true, items: referrals });
+      const where = { status: "pending" };
+      const [referrals, totalCount] = await Promise.all([
+        db.referral.findMany({
+          where,
+          include: { alumni: { select: { name: true, personalEmail: true, profileImageUrl: true } } },
+          take: limit,
+          skip: skip,
+        }),
+        db.referral.count({ where })
+      ])
+      return NextResponse.json({ success: true, items: referrals, totalCount });
     }
 
     if (type === "external") {
-      const externals = await db.externalStudent.findMany({
-        where: { isVerified: false },
-        select: {
-          id: true, name: true, collegeName: true, branch: true, cgpa: true,
-          email: true, enrollmentNumber: true, resumeUrl: true, profileImageUrl: true,
+      const where = { isVerified: false };
+      const [externals, totalCount] = await Promise.all([
+        db.externalStudent.findMany({
+          where,
+          select: {
+            id: true, name: true, collegeName: true, branch: true, cgpa: true,
+            email: true, enrollmentNumber: true, resumeUrl: true, profileImageUrl: true,
           phoneNumber: true, batch: true, course: true, tenthPercentage: true, twelfthPercentage: true,
         },
-        take: 200,
-      });
-      return NextResponse.json({ success: true, items: externals });
+        take: limit,
+        skip: skip,
+      }),
+      db.externalStudent.count({ where })
+      ]);
+      return NextResponse.json({ success: true, items: externals, totalCount });
     }
 
     if (type === "memories") {
-      const memories = await db.memory.findMany({
-        where: {
-          OR: [{ status: "pending_moderation" }, { status: "approved" }],
-        },
-        include: { 
+      const where = { OR: [{ status: "pending_moderation" }, { status: "approved" }] };
+      const [memories, totalCount] = await Promise.all([
+        db.memory.findMany({
+          where,
+          include: { 
           student: { select: { name: true, enrollmentNumber: true, profileImageUrl: true } },
           alumni: { select: { name: true, enrollmentNumber: true, profileImageUrl: true } }
         },
         orderBy: { createdAt: "desc" },
-        take: 200,
-      });
-      return NextResponse.json({ success: true, items: memories });
+        take: limit,
+        skip: skip,
+      }),
+      db.memory.count({ where })
+      ]);
+      return NextResponse.json({ success: true, items: memories, totalCount });
     }
 
 

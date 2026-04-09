@@ -19,16 +19,20 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import JobDetailsModal from "@/components/forms/studentApplyModal/modal";
+import { useRef, useCallback } from "react";
 
 const BRANCHES = ["Computer Science", "Civil", "Mechanical", "Electronics", "Electrical", "Power Systems", "Digital Communication", "Thermal Engineering", "Marketing", "Finance", "Human Resource"];
 import Link from "next/link";
 import { toast } from "sonner";
+import { set } from "zod";
 
 export default function AdminDrivesPage() {
   const { loading: authLoading, authenticated } = useAuth("admin", "/admin/login");
   const [drives, setDrives] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
   const [editDriveId, setEditDriveId] = useState<string | null>(null);
   const [viewDrive, setViewDrive] = useState<any | null>(null);
@@ -38,24 +42,48 @@ export default function AdminDrivesPage() {
   const [form, setForm] = useState({
     companyName: "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full-Time"
   });
+  const observer = useRef<IntersectionObserver | null>(null);
+
+  const lastDriveElementRef = useCallback((node: HTMLDivElement | null) => {
+    if (loading) return; // Don't trigger if we are already fetching
+    if (observer.current) observer.current.disconnect();
+
+    observer.current = new IntersectionObserver(entries => {
+      // If the sensor hits the screen AND there is more data in the DB
+      if (entries[0].isIntersecting && hasMore) {
+        setPage(prevPage => prevPage + 1); // Load the next page
+      }
+    });
+
+    if (node) observer.current.observe(node);
+  }, [loading, hasMore]);
 
   useEffect(() => {
     if (!authenticated) return;
-    fetchDrives();
-  }, [authenticated]);
+    const loadDrives = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/admin/drives?limit=12&page=${page}`);
+        const data = (await res.json()) as { success: boolean; drives: any[]; totalCount: number };
+        if (data.success) {
+          setDrives(prev => {
+            const existingIds = new Set(prev.map(d => d.id));
+            const newDrives = data.drives.filter(d => !existingIds.has(d.id));
+            return [...prev, ...newDrives];
+          });
 
-  const fetchDrives = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/admin/drives");
-      const data = (await res.json()) as { success: boolean; drives: any[] };
-      if (data.success) setDrives(data.drives);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+          setHasMore(data.totalCount > page * 12);
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to load drives");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadDrives();
+  }, [authenticated, page]);
+
 
   const handleSubmitDrive = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,11 +97,12 @@ export default function AdminDrivesPage() {
         body: JSON.stringify({ ...form, id: editDriveId, minCGPA: parseFloat(String(form.minCGPA)) }),
       });
       const d = (await res.json()) as any;
+      toast[d.success ? "success" : "error"](d.message || (d.success ? "Drive updated successfully" : "Failed to update drive"));
       setFormMsg({ msg: d.message, ok: d.success });
       if (d.success) {
         setTimeout(() => setShowForm(false), 1000);
+        setDrives(prev => prev.map(d => d.id === editDriveId ? { ...d, ...form } : d));
         setEditDriveId(null);
-        fetchDrives();
       }
     } catch {
       setFormMsg({ msg: "Update failed", ok: false });
@@ -91,22 +120,22 @@ export default function AdminDrivesPage() {
         body: JSON.stringify({ id, action }),
       });
       const data = (await res.json()) as { success: boolean };
-      if (data.success) fetchDrives();
+      if (data.success) {
+        if (action === "archive") {
+          setDrives(prev => prev.filter(d => d.id !== id));
+        } else {
+          const newStatus = action === "close" ? "completed" : "active";
+          setDrives(prev => prev.map(drive => drive.id === id ? { ...drive, status: newStatus } : drive));
+        }
+        toast.success(`Drive ${action}d successfully`);
+
+      };
     } catch (err) {
       console.error(err);
+      toast.error("Action failed");
     } finally {
       setActionLoading(null);
     }
-  };
-
-  const getStatusBadge = (status: string) => {
-    const styles: Record<string, string> = {
-      pending: "bg-yellow-500/10 text-yellow-600",
-      active: "bg-green-500/10 text-green-600",
-      completed: "bg-blue-500/10 text-blue-600",
-      rejected: "bg-red-500/10 text-red-500",
-    };
-    return styles[status] || "bg-muted text-muted-foreground";
   };
 
   if (authLoading || !authenticated) {
@@ -314,8 +343,8 @@ export default function AdminDrivesPage() {
         </div>
 
         {/* Drives Table */}
-        <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
-          {loading ? (
+        <div className="overflow-hidden">
+          {loading && page === 1 ? (
             <div className="flex justify-center py-16">
               <Loader2 className="w-6 h-6 animate-spin text-brand" />
             </div>
@@ -325,121 +354,174 @@ export default function AdminDrivesPage() {
               <p className="font-medium">No drives found</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-muted/50 border-b border-border">
-                    <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Company</th>
-                    <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Role</th>
-                    <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Type</th>
-                    <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Date</th>
-                    <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Registrations</th>
-                    <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Status</th>
-                    <th className="text-right px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {drives.map((drive: any) => (
-                    <tr key={drive.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
-                      <td className="px-5 py-3.5">
-                        <div>
-                          <p className="font-medium text-foreground">{drive.companyName}</p>
-                          <p className="text-[10px] text-muted-foreground">{drive.recruiter?.company}</p>
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 p-5">
+                {drives.map((drive: any, index: number) => {
+
+                  const isLastElement = index === drives.length - 1;
+                  const statusConfig: Record<string, { gradient: string; dot: string; label: string; bg: string }> = {
+                    active: { gradient: "from-emerald-500/20 via-emerald-500/5 to-transparent", dot: "bg-emerald-500", label: "Active", bg: "bg-emerald-500/10 text-emerald-600" },
+                    pending: { gradient: "from-amber-500/20 via-amber-500/5 to-transparent", dot: "bg-amber-500", label: "Pending", bg: "bg-amber-500/10 text-amber-600" },
+                    completed: { gradient: "from-blue-500/20 via-blue-500/5 to-transparent", dot: "bg-blue-500", label: "Completed", bg: "bg-blue-500/10 text-blue-600" },
+                    rejected: { gradient: "from-red-500/20 via-red-500/5 to-transparent", dot: "bg-red-500", label: "Rejected", bg: "bg-red-500/10 text-red-500" },
+                  };
+                  const sc = statusConfig[drive.status] || statusConfig.pending;
+
+                  return (
+                    <div
+                      key={drive.id}
+                      ref={isLastElement ? lastDriveElementRef : null}
+                      className={`group relative overflow-hidden rounded-2xl border border-border/60  bg-card/80 backdrop-blur-sm transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:hover:shadow-[0_8px_30px_rgb(0,0,0,0.3)] hover:-translate-y-1`}
+                    >
+                      {/* Subtle gradient glow at top */}
+                      <div className={`absolute inset-x-0 top-0 h-24 bg-gradient-to-b ${sc.gradient} pointer-events-none`} />
+
+                      <div className="relative p-5 flex flex-col gap-4">
+                        {/* Top row: Avatar + Company + Status */}
+                        <div className="flex items-start gap-3.5">
+                          {drive.companyLogoUrl ? (
+                            <img
+                              src={drive.companyLogoUrl}
+                              alt={drive.companyName}
+                              className="w-11 h-11 rounded-xl object-cover border border-border/50 shadow-sm flex-shrink-0"
+                            />
+                          ) : (
+                            <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-linear-to-br from-brand/20 to-brand/5 text-brand font-black text-lg border border-brand/10 shadow-sm shrink-0">
+                              {drive.companyName?.[0]?.toUpperCase() || "?"}
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <h2 className="text-base font-extrabold text-foreground leading-tight truncate">{drive.companyName}</h2>
+                            <p className="text-[13px] text-muted-foreground font-medium truncate mt-0.5">{drive.roleName}</p>
+                          </div>
+                          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${sc.bg} flex-shrink-0`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${sc.dot} ${drive.status === "active" ? "animate-pulse" : ""}`} />
+                            {sc.label}
+                          </div>
                         </div>
-                      </td>
-                      <td className="px-5 py-3.5 text-muted-foreground">{drive.roleName}</td>
-                      <td className="px-5 py-3.5">
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${drive.driveType === "Open" ? "bg-green-500/10 text-green-600" : drive.driveType === "Pool" ? "bg-amber-500/10 text-amber-600" : "bg-blue-500/10 text-blue-600"}`}>
-                          {drive.driveType}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3.5 text-muted-foreground">{new Date(drive.driveDate).toLocaleDateString()}</td>
-                      <td className="px-5 py-3.5 font-bold text-foreground">{drive.registrationCount || 0}</td>
-                      <td className="px-5 py-3.5">
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold capitalize ${getStatusBadge(drive.status)}`}>
-                          {drive.status}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3.5 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => setViewDrive(drive)}
-                            className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted/50 transition-colors"
-                            title="View Details"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => {
-                              setEditDriveId(drive.id);
-                              setForm({
-                                companyName: drive.companyName,
-                                roleName: drive.roleName,
-                                jobDescription: drive.jobDescription,
-                                ctc: drive.ctc,
-                                eligibleBranches: drive.eligibleBranches,
-                                minCGPA: drive.minCGPA,
-                                minBatch: drive.minBatch,
-                                maxBatch: drive.maxBatch,
-                                course: drive.course || "B.Tech",
-                                driveDate: new Date(drive.driveDate).toISOString().split('T')[0],
-                                driveType: drive.driveType,
-                                jobType: drive.jobType || "Full-Time"
-                              });
-                              setFormMsg(null);
-                              setShowForm(true);
-                            }}
-                            className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted/50 transition-colors"
-                            title="Edit Drive"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
+
+                        {/* Key metrics row */}
+                        <div className="flex flex-wrap items-center gap-2">
+                          <div className="flex items-center gap-1.5 bg-linear-to-r from-brand/10 to-brand/5 px-3 py-1.5 rounded-lg border border-brand/10">
+                            <span className="text-brand font-extrabold text-sm">₹{drive.ctc || "—"}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 bg-muted/60 px-3 py-1.5 rounded-lg text-muted-foreground">
+                            <Calendar className="w-3.5 h-3.5" />
+                            <span className="text-xs font-semibold">{drive.driveDate ? new Date(drive.driveDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "—"}</span>
+                          </div>
+                          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold ${drive.driveType === "Open" ? "bg-emerald-500/8 text-emerald-600 border border-emerald-500/15" : drive.driveType === "Pool" ? "bg-amber-500/8 text-amber-600 border border-amber-500/15" : "bg-blue-500/8 text-blue-600 border border-blue-500/15"}`}>
+                            {drive.driveType}
+                          </div>
+                          {drive.jobType && (
+                            <div className="flex items-center gap-1.5 bg-muted/60 px-3 py-1.5 rounded-lg text-xs font-semibold text-muted-foreground">
+                              <Briefcase className="w-3.5 h-3.5" />
+                              {drive.jobType}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Description */}
+                        <p className="text-[13px] text-muted-foreground/80 leading-relaxed line-clamp-2 min-h-10">
+                          {drive.jobDescription || <span className="italic opacity-60">No description provided.</span>}
+                        </p>
+
+                        {/* Footer: Registrations + Actions */}
+                        <div className="flex items-center justify-between pt-3 border-t border-border/40 mt-auto">
                           <Link
                             href={`/admin/drives/${drive.id}/participants`}
-                            className="p-1.5 rounded-lg bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 transition-colors"
-                            title="View Participants"
+                            className="flex items-center gap-2 bg-brand/8 hover:bg-brand/15 px-3 py-1.5 rounded-lg transition-colors group/reg"
                           >
-                            <Users className="w-4 h-4" />
+                            <Users className="w-4 h-4 text-brand" />
+                            <span className="text-sm font-bold text-brand">{drive.registrationCount || 0}</span>
+                            <span className="text-[11px] text-brand/70 font-medium">applicants</span>
                           </Link>
-                          {drive.status === "active" && (
+
+                          <div className="flex items-center gap-1">
                             <button
-                              onClick={() => handleAction(drive.id, "close")}
-                              disabled={actionLoading === drive.id}
-                              className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors disabled:opacity-50"
-                              title="Close Drive"
+                              onClick={() => setViewDrive(drive)}
+                              className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200"
+                              title="View Details"
                             >
-                              <XCircle className="w-4 h-4" />
+                              <Eye className="w-4 h-4" />
                             </button>
-                          )}
-                          {drive.status === "completed" && (
                             <button
-                              onClick={() => handleAction(drive.id, "reopen")}
-                              disabled={actionLoading === drive.id}
-                              className="p-1.5 rounded-lg bg-green-500/10 text-green-600 hover:bg-green-500/20 transition-colors disabled:opacity-50"
-                              title="Reopen Drive"
+                              onClick={() => {
+                                setEditDriveId(drive.id);
+                                setForm({
+                                  companyName: drive.companyName,
+                                  roleName: drive.roleName,
+                                  jobDescription: drive.jobDescription,
+                                  ctc: drive.ctc,
+                                  eligibleBranches: drive.eligibleBranches,
+                                  minCGPA: drive.minCGPA,
+                                  minBatch: drive.minBatch,
+                                  maxBatch: drive.maxBatch,
+                                  course: drive.course || "B.Tech",
+                                  driveDate: new Date(drive.driveDate).toISOString().split('T')[0],
+                                  driveType: drive.driveType,
+                                  jobType: drive.jobType || "Full-Time"
+                                });
+                                setFormMsg(null);
+                                setShowForm(true);
+                              }}
+                              className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200"
+                              title="Edit Drive"
                             >
-                              <RotateCcw className="w-4 h-4" />
+                              <Edit className="w-4 h-4" />
                             </button>
-                          )}
-                          <button
-                            onClick={() => {
-                              if (window.confirm("Are you sure you want to archive this drive? This action cannot be undone.")) {
-                                handleAction(drive.id, "archive");
-                              }
-                            }}
-                            disabled={actionLoading === drive.id}
-                            className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors disabled:opacity-50"
-                            title="Archive / Delete Drive"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                            {drive.status === "active" && (
+                              <button
+                                onClick={() => handleAction(drive.id, "close")}
+                                disabled={actionLoading === drive.id}
+                                className="p-2 rounded-xl text-red-400 hover:text-red-500 hover:bg-red-500/10 transition-all duration-200 disabled:opacity-40"
+                                title="Close Drive"
+                              >
+                                {actionLoading === drive.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
+                              </button>
+                            )}
+                            {drive.status === "completed" && (
+                              <button
+                                onClick={() => handleAction(drive.id, "reopen")}
+                                disabled={actionLoading === drive.id}
+                                className="p-2 rounded-xl text-emerald-400 hover:text-emerald-500 hover:bg-emerald-500/10 transition-all duration-200 disabled:opacity-40"
+                                title="Reopen Drive"
+                              >
+                                {actionLoading === drive.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
+                              </button>
+                            )}
+                            <button
+                              onClick={() => {
+                                if (window.confirm("Are you sure you want to archive this drive? This action cannot be undone.")) {
+                                  handleAction(drive.id, "archive");
+                                }
+                              }}
+                              disabled={actionLoading === drive.id}
+                              className="p-2 rounded-xl text-muted-foreground/60 hover:text-red-500 hover:bg-red-500/10 transition-all duration-200 disabled:opacity-40"
+                              title="Archive / Delete Drive"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
                         </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              {/* Loading Spinner for the bottom of the feed */}
+              {loading && (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-brand" />
+                </div>
+              )}
+
+              {/* End of list message */}
+              {!hasMore && drives.length > 0 && (
+                <div className="text-center py-8 text-muted-foreground font-medium text-sm">
+                  You have reached the end of the list.
+                </div>
+              )}
+            </>
           )}
         </div>
       </main>

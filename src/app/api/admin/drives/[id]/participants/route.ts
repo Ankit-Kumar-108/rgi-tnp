@@ -6,11 +6,22 @@ import { getDb } from "@/lib/db";
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
+    const {searchParams} = new URL(req.url)
+    const parsedLimit = parseInt(searchParams.get("limit") || "100", 10);
+    const parsedPage = parseInt(searchParams.get("page") || "1", 10);
+
+    const limit = isNaN(parsedLimit) ? 100 : Math.max(1, parsedLimit);
+    const page = isNaN(parsedPage) ? 1 : Math.max(1, parsedPage);
+    const skip = (page - 1) * limit;
+
+
     const db = getDb();
     
     // Explicitly type the query to help the compiler
     const query: Prisma.DriveRegistrationFindManyArgs = {
       where: { driveId: id },
+      take: limit,
+      skip: skip,
       select: {
         id: true,
         status: true,
@@ -25,7 +36,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
             profileImageUrl: true,
             email: true,
             phoneNumber: true,
-            resumeUrl: true
+            resumeUrl: true,
+            linkedinUrl: true,
+            githubUrl: true,
+            course: true,
+            batch: true,
+
           }
         },
         externalStudent: {
@@ -38,21 +54,27 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
             email: true,
             phoneNumber: true,
             resumeUrl: true,
-            collegeName: true
+            collegeName: true,
+            linkedinUrl: true,
+            githubUrl: true,
+            course: true,
+            batch: true,
           }
         }
       },
       orderBy: { createdAt: "desc" }
     };
 
-    const registrations = await db.driveRegistration.findMany(query);
-    
-    const drive = await db.placementDrive.findUnique({
-      where: { id },
-      select: { googleSheetUrl: true, companyName: true, roleName: true }
-    });
+    const [registrations, totalCount, drive] = await Promise.all([
+      db.driveRegistration.findMany(query),
+      db.driveRegistration.count({ where: { driveId: id } }),
+      db.placementDrive.findUnique({
+        where: { id },
+        select: { googleSheetUrl: true, companyName: true, roleName: true }
+      })
+    ])
 
-    return NextResponse.json({ success: true, registrations, drive });
+    return NextResponse.json({ success: true, registrations, drive, totalCount });
   } catch (error) {
     console.error("Fetch participants error:", error);
     return NextResponse.json({ success: false, message: "Failed to fetch participants" }, { status: 500 });
@@ -64,7 +86,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     try {
         const { id } = await params;
         const db = getDb();
-        const body = await req.json() as any;
+        const body = await req.json() as { registrationIds: string[], status: string };
         const { registrationIds, status } = body;
 
         if (!registrationIds || !Array.isArray(registrationIds) || !status) {

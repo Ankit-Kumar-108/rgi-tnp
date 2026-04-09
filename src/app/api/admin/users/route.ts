@@ -9,6 +9,12 @@ export async function GET(req: NextRequest) {
     const role = searchParams.get("role") || "student";
     const branch = searchParams.get("branch");
     const search = searchParams.get("search");
+    const parsedLimit = parseInt(searchParams.get("limit") || "100", 10);
+    const parsedPage = parseInt(searchParams.get("page") || "1", 10);
+
+    const limit = isNaN(parsedLimit) ? 100 : Math.max(1, parsedLimit);
+    const page = isNaN(parsedPage) ? 1 : Math.max(1, parsedPage);
+    const skip = (page - 1) * limit;
 
     const db = getDb();
 
@@ -22,78 +28,143 @@ export async function GET(req: NextRequest) {
           { email: { contains: search } },
         ];
       }
-      const students = await db.student.findMany({
-        where,
-        select: {
-          id: true,
-          name: true,
-          enrollmentNumber: true,
-          email: true,
-          branch: true,
-          semester: true,
-          cgpa: true,
-          isEmailVerified: true,
-          profileImageUrl: true,
-          createdAt: true,
-        },
-        orderBy: { createdAt: "desc" },
-        take: 100,
-      });
-      return NextResponse.json({ success: true, users: students, role });
+
+      const [students, totalCount] = await Promise.all([
+        db.student.findMany({
+          where,
+          select: {
+            id: true,
+            name: true,
+            enrollmentNumber: true,
+            email: true,
+            branch: true,
+            semester: true,
+            cgpa: true,
+            isEmailVerified: true,
+            profileImageUrl: true,
+            createdAt: true,
+            phoneNumber: true,
+            resumeUrl: true,
+            linkedinUrl: true,
+            githubUrl: true,
+            course: true,
+            batch: true,
+          },
+          orderBy: { createdAt: "desc" },
+          take: limit,
+          skip: skip,
+        }),
+        db.student.count({ where })
+      ])
+      return NextResponse.json({ success: true, users: students, role, totalCount });
     }
 
     if (role === "alumni") {
-      const alumni = await db.alumni.findMany({
-        select: {
-          id: true,
-          name: true,
-          enrollmentNumber: true,
-          personalEmail: true,
-          isVerified: true,
-          currentCompany: true,
-          jobTitle: true,
-          city: true,
-          country: true,
-          profileImageUrl: true,
-          createdAt: true,
-        },
-        orderBy: { createdAt: "desc" },
-        take: 100,
-      });
-      return NextResponse.json({ success: true, users: alumni, role });
+      const where: any = {};
+      if (search) {
+        where.OR = [
+          { name: { contains: search } },
+          { enrollmentNumber: { contains: search } },
+          { personalEmail: { contains: search } },
+        ];
+      }
+
+      const [alumni, totalCount] = await Promise.all([
+        db.alumni.findMany({
+          select: {
+            id: true,
+            name: true,
+            enrollmentNumber: true,
+            personalEmail: true,
+            isVerified: true,
+            currentCompany: true,
+            jobTitle: true,
+            city: true,
+            country: true,
+            profileImageUrl: true,
+            createdAt: true,
+            phoneNumber: true,
+            linkedInUrl: true,
+            course: true,
+            batch: true,
+
+          },
+          orderBy: { createdAt: "desc" },
+          take: limit,
+          skip: skip,
+        }),
+        db.alumni.count({ where })
+      ])
+      return NextResponse.json({ success: true, users: alumni, role, totalCount });
     }
 
+
     if (role === "recruiter") {
-      const recruiters = await db.recruiter.findMany({
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          company: true,
-          designation: true,
-          phoneNumber: true,
-        },
-        take: 100,
-      });
-      return NextResponse.json({ success: true, users: recruiters, role });
+      const where: any = {};
+      if (search) {
+        where.OR = [
+          { name: { contains: search } },
+          { email: { contains: search } },
+          { company: { contains: search } },
+        ];
+      }
+
+      const [recruiters, totalCount] = await Promise.all([
+        db.recruiter.findMany({
+          where,
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            company: true,
+            designation: true,
+            phoneNumber: true,
+          },
+          take: limit,
+          skip: skip,
+        }),
+        db.recruiter.count({ where })
+      ])
+      return NextResponse.json({ success: true, users: recruiters, role, totalCount });
     }
 
     if (role === "external") {
-      const externals = await db.externalStudent.findMany({
-        select: {
-          id: true,
-          name: true,
-          collegeName: true,
-          enrollmentNumber: true,
-          email: true,
-          branch: true,
-          cgpa: true,
-          isVerified: true,
-          profileImageUrl: true,
-        },
-        take: 100,
-      });
-      return NextResponse.json({ success: true, users: externals, role });
+      const where: any = {};
+      if (search) {
+        where.OR = [
+          { name: { contains: search } },
+          { enrollmentNumber: { contains: search } },
+          { email: { contains: search } },
+        ];
+      }
+
+      const [externals, totalCount] = await Promise.all([
+        db.externalStudent.findMany({
+          where,
+          select: {
+            id: true,
+            name: true,
+            collegeName: true,
+            enrollmentNumber: true,
+            email: true,
+            branch: true,
+            cgpa: true,
+            isVerified: true,
+            profileImageUrl: true,
+            phoneNumber: true,
+            resumeUrl: true,
+            linkedinUrl: true,
+            githubUrl: true,
+            course: true,
+            batch: true,
+
+          },
+          take: limit,
+          skip: skip,
+        }),
+        db.externalStudent.count({ where })
+      ])
+      return NextResponse.json({ success: true, users: externals, role, totalCount });
     }
 
     return NextResponse.json(
@@ -137,12 +208,11 @@ export async function DELETE(req: NextRequest) {
     }
 
     const db = getDb();
-    
-    // Also delete any existing registrations for these external students to maintain referential integrity
+
     await db.driveRegistration.deleteMany({
       where: { externalStudentId: { in: ids } },
     });
-    
+
     await db.externalStudent.deleteMany({
       where: { id: { in: ids } },
     });

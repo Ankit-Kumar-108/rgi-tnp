@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import {
   Users,
   GraduationCap,
@@ -11,6 +11,7 @@ import {
   Shield,
   ArrowLeft,
   ChevronDown,
+  Trash2,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
@@ -43,76 +44,152 @@ const BRANCHES = [
 export default function AdminUsersPage() {
   const { loading: authLoading, authenticated } = useAuth("admin", "/admin/login");
   const [activeTab, setActiveTab] = useState<TabKey>("student");
+  
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
+
   const [search, setSearch] = useState("");
+  const [submittedSearch, setSubmittedSearch] = useState(""); 
   const [branch, setBranch] = useState("");
+  
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [actionLoading, setActionLoading] = useState(false);
 
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastUserRef = useCallback((node: HTMLTableRowElement | null) => {
+    if (loading) return;
+    if (observer.current) observer.current.disconnect();
+
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        setPage(prevPage => prevPage + 1);
+      }
+    });
+
+    if (node) observer.current.observe(node);
+  }, [loading, hasMore]);
+
   useEffect(() => {
     if (!authenticated) return;
-    fetchUsers();
-  }, [authenticated, activeTab]);
-
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({ role: activeTab });
-      if (branch && branch !== "All Branches") params.set("branch", branch);
-      if (search) params.set("search", search);
-      const res = await fetch(`/api/admin/users?${params}`);
-      const data = (await res.json()) as { success: boolean; users: any[] };
-      if (data.success) {
-          setUsers(data.users);
-          setSelectedIds(new Set());
+    
+    const loadUsers = async () => {
+      
+      if (page === 1) setLoading(true); 
+      
+      try {
+        const params = new URLSearchParams({ 
+          role: activeTab, 
+          limit: "50", 
+          page: page.toString() 
+        });
+        
+        if (branch && branch !== "All Branches") params.set("branch", branch);
+        if (submittedSearch) params.set("search", submittedSearch);
+        
+        const res = await fetch(`/api/admin/users?${params}`);
+        const data = (await res.json()) as { success: boolean; users: any[], totalCount: number };
+        
+        if (data.success) {
+          setTotalCount(data.totalCount || 0);
+          
+          setUsers(prev => {
+            
+            if (page === 1) return data.users;
+            
+            const existingIds = new Set(prev.map(u => u.id));
+            const newUsers = data.users.filter(u => !existingIds.has(u.id));
+            return [...prev, ...newUsers];
+          });
+          
+          setHasMore(data.totalCount > page * 50);
+          if (page === 1) setSelectedIds(new Set());
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to load users");
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    };
+
+    loadUsers();
+  }, [authenticated, activeTab, branch, submittedSearch, page]);
+
+  // --- Handlers ---
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPage(1);
+    setUsers([]);
+    setSubmittedSearch(search);
+  };
+
+  const handleBranchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setBranch(e.target.value);
+    setPage(1);
+    setUsers([]); 
+  };
+
+  const handleTabChange = (tabKey: TabKey) => {
+    setActiveTab(tabKey);
+    setSearch("");
+    setSubmittedSearch("");
+    setBranch("");
+    setPage(1);
+    setUsers([]);
+    setSelectedIds(new Set());
   };
 
   const handleBulkAction = async (action: "approve" | "delete") => {
-      if (selectedIds.size === 0) return;
-      if (action === "delete" && !confirm(`Are you sure you want to delete ${selectedIds.size} student(s)?`)) return;
+    if (selectedIds.size === 0) return;
+    if (action === "delete" && !confirm(`Are you sure you want to delete ${selectedIds.size} student(s)?`)) return;
 
-      setActionLoading(true);
-      try {
-          const res = await fetch("/api/admin/users", {
-              method: action === "delete" ? "DELETE" : "PATCH",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ ids: Array.from(selectedIds), action }),
-          });
-          const data = await res.json() as any;
-          if (data.success) fetchUsers();
-          else toast.error(data.message || "Action failed");
-      } catch (err) {
-          console.error(err);
-      } finally {
-          setActionLoading(false);
+    setActionLoading(true);
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: action === "delete" ? "DELETE" : "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: Array.from(selectedIds), action }),
+      });
+      const data = await res.json() as any;
+      
+      if (data.success) {
+        toast.success(`Successfully ${action === 'delete' ? 'deleted' : 'approved'} ${selectedIds.size} users`);
+        
+        if (action === "delete") {
+          setUsers(prev => prev.filter(u => !selectedIds.has(u.id)));
+          setTotalCount(prev => prev - selectedIds.size);
+        } else {
+          setUsers(prev => prev.map(u => selectedIds.has(u.id) ? { ...u, isVerified: true } : u));
+        }
+        
+        setSelectedIds(new Set());
+      } else {
+        toast.error(data.message || "Action failed");
       }
+    } catch (err) {
+      console.error(err);
+      toast.error("An error occurred");
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   const toggleSelection = (id: string) => {
-      const newSelected = new Set(selectedIds);
-      if (newSelected.has(id)) newSelected.delete(id);
-      else newSelected.add(id);
-      setSelectedIds(newSelected);
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) newSelected.delete(id);
+    else newSelected.add(id);
+    setSelectedIds(newSelected);
   };
 
   const toggleAll = () => {
-      if (selectedIds.size === users.length && users.length > 0) {
-          setSelectedIds(new Set());
-      } else {
-          setSelectedIds(new Set(users.map(u => u.id)));
-      }
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    fetchUsers();
+    if (selectedIds.size === users.length && users.length > 0) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(users.map(u => u.id)));
+    }
   };
 
   if (authLoading || !authenticated) {
@@ -151,14 +228,15 @@ export default function AdminUsersPage() {
               <button 
                 onClick={() => handleBulkAction("approve")}
                 disabled={actionLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500/10 text-green-600 hover:bg-green-500/20 text-xs font-bold rounded-lg transition-colors">
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500/10 text-green-600 hover:bg-green-500/20 text-xs font-bold rounded-lg transition-colors disabled:opacity-50">
                 <UserCheck className="w-3.5 h-3.5" />
                 Approve
               </button>
               <button 
                 onClick={() => handleBulkAction("delete")}
                 disabled={actionLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-500 hover:bg-red-500/20 text-xs font-bold rounded-lg transition-colors">
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-500 hover:bg-red-500/20 text-xs font-bold rounded-lg transition-colors disabled:opacity-50">
+                 <Trash2 className="w-3.5 h-3.5" /> 
                  Delete
               </button>
             </div>
@@ -172,7 +250,7 @@ export default function AdminUsersPage() {
           {TABS.map((tab) => (
             <button
               key={tab.key}
-              onClick={() => { setActiveTab(tab.key); setUsers([]); }}
+              onClick={() => handleTabChange(tab.key)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${
                 activeTab === tab.key
                   ? "bg-brand text-white shadow-lg shadow-brand/20"
@@ -201,7 +279,7 @@ export default function AdminUsersPage() {
             <div className="relative">
               <select
                 value={branch}
-                onChange={(e) => setBranch(e.target.value)}
+                onChange={handleBranchChange}
                 className="appearance-none bg-card border border-border rounded-xl px-4 py-2.5 pr-10 text-sm text-foreground focus:ring-2 focus:ring-brand"
               >
                 {BRANCHES.map((b) => (
@@ -221,7 +299,7 @@ export default function AdminUsersPage() {
 
         {/* Results Table */}
         <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
-          {loading ? (
+          {loading && page === 1 ? (
             <div className="flex justify-center py-16">
               <Loader2 className="w-6 h-6 animate-spin text-brand" />
             </div>
@@ -286,9 +364,12 @@ export default function AdminUsersPage() {
                 <tbody>
                   {users.map((user: any, i: number) => {
                      const isSelected = activeTab === "external" && selectedIds.has(user.id);
+                     const isLastElement = i === users.length - 1; 
+                     
                      return (
                     <tr
                       key={user.id || i}
+                      ref={isLastElement ? lastUserRef : null}
                       className={`border-b border-border/50 transition-colors ${isSelected ? "bg-brand/5" : "hover:bg-muted/30"}`}
                       onClick={(e) => {
                           if (activeTab === "external" && (e.target as HTMLElement).tagName !== "INPUT" && (e.target as HTMLElement).tagName !== "BUTTON") {
@@ -300,7 +381,7 @@ export default function AdminUsersPage() {
                         <>
                           <td className="px-5 py-3.5">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full overflow-hidden bg-muted flex-shrink-0 border border-border">
+                              <div className="w-8 h-8 rounded-full overflow-hidden bg-muted shrink-0 border border-border">
                                 {user.profileImageUrl ? (
                                   <img src={user.profileImageUrl} alt="" loading="lazy" className="w-full h-full object-cover" />
                                 ) : (
@@ -327,7 +408,7 @@ export default function AdminUsersPage() {
                         <>
                           <td className="px-5 py-3.5">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full overflow-hidden bg-muted flex-shrink-0 border border-border">
+                              <div className="w-8 h-8 rounded-full overflow-hidden bg-muted shrink-0 border border-border">
                                 {user.profileImageUrl ? (
                                   <img src={user.profileImageUrl} alt="" loading="lazy" className="w-full h-full object-cover" />
                                 ) : (
@@ -366,7 +447,7 @@ export default function AdminUsersPage() {
                           </td>
                           <td className="px-5 py-3.5">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-lg overflow-hidden bg-muted flex-shrink-0 border border-border">
+                              <div className="w-8 h-8 rounded-lg overflow-hidden bg-muted shrink-0 border border-border">
                                 {user.profileImageUrl ? (
                                   <img src={user.profileImageUrl} alt="" loading="lazy" className="w-full h-full object-cover" />
                                 ) : (
@@ -392,12 +473,19 @@ export default function AdminUsersPage() {
                   )})}
                 </tbody>
               </table>
+
+              {/* Bottom Loading Indicator */}
+              {loading && page > 1 && (
+                <div className="flex justify-center py-6 border-t border-border">
+                  <Loader2 className="w-6 h-6 animate-spin text-brand" />
+                </div>
+              )}
             </div>
           )}
         </div>
 
-        <p className="text-center text-muted-foreground text-xs mt-6">
-          Showing {users.length} {activeTab === "external" ? "external students" : activeTab + "s"}
+        <p className="text-center text-muted-foreground text-xs mt-6 font-bold">
+          Showing {users.length} of {totalCount} {activeTab === "external" ? "external students" : activeTab + "s"}
         </p>
       </main>
     </div>

@@ -4,26 +4,52 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 
 // GET: Fetch all drives with registration counts
+// GET: Fetch all drives with registration counts
 export async function GET(req: NextRequest) {
   try {
+    const { searchParams } = new URL(req.url);
+    
+    // 1. Safe Pagination Parsing
+    const parsedLimit = parseInt(searchParams.get("limit") || "50", 10);
+    const parsedPage = parseInt(searchParams.get("page") || "1", 10);
+    const limit = isNaN(parsedLimit) ? 50 : Math.max(1, parsedLimit);
+    const page = isNaN(parsedPage) ? 1 : Math.max(1, parsedPage);
+    const skip = (page - 1) * limit;
+
     const db = getDb();
-    let drives = await db.placementDrive.findMany({
-      include: {
-        recruiter: { select: { name: true, company: true } },
-        _count: { select: { registrations: true } },
-      },
-      orderBy: { driveDate: "desc" },
-    });
+    
+    // 2. Define the exact conditions (Filter in the DB, not in memory)
+    const where = {
+        status: { not: "archived" }
+    };
 
-    drives = drives.filter(d => d.status !== "archived");
+    // 3. Parallel fetching for speed
+    const [drives, totalCount] = await Promise.all([
+      db.placementDrive.findMany({
+        where, 
+        take: limit,
+        skip: skip,
+        include: {
+          recruiter: { select: { name: true, company: true } },
+          _count: { select: { registrations: true } },
+        },
+        orderBy: { driveDate: "desc" },
+      }),
+      db.placementDrive.count({ where })
+    ]);
 
+    // 4. Format the response
     const formatted = drives.map((d: any) => ({
       ...d,
       registrationCount: d._count.registrations,
       _count: undefined,
     }));
 
-    return NextResponse.json({ success: true, drives: formatted });
+    return NextResponse.json({ 
+        success: true, 
+        drives: formatted, 
+        totalCount 
+    });
   } catch (error) {
     console.error("Drives GET Error:", error);
     return NextResponse.json({ success: false, message: "Failed to fetch drives" }, { status: 500 });

@@ -1,17 +1,66 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Loader2, X, Camera } from "lucide-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Loader2, X, Camera, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 
 export default function MemoriesGallery() {
   const [selectedImage, setSelectedImage] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [data, setData] = useState<{ memories: any[] } | null>(null);
+  const [data, setData] = useState<any[]>([]);
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
+  const [totalCount, setTotalCount] = useState(0)
+
+  const observer = useRef<IntersectionObserver | null>(null)
+  const lastImageRef = useCallback((node: HTMLDivElement | null) => {
+    if (isLoading) {
+      return
+    }
+    if (observer.current) {
+      observer.current.disconnect()
+    }
+
+    observer.current = new IntersectionObserver(enteries => {
+      if (enteries[0].isIntersecting && hasMore) {
+        setPage(prevPage => prevPage + 1)
+      }
+    })
+    if (node) observer.current.observe(node)
+  },[isLoading, hasMore])
+
+
 
   useEffect(() => {
-    fetchMemories();
-  }, []);
+    const loadMemories = async () => {
+      try {
+        setIsLoading(true)
+        const response = await fetch(`/api/memories?limit=21&page=${page}`)
+        if (response.ok) {
+          const result = await response.json() as any
+          if(result.success){
+            setTotalCount(result.totalCount || 0)
+            setHasMore(result.totalCount > page * 21)
+            setData(prev => {
+              const incoming = result.memories ?? []
+              if (page === 1) return incoming
+              const existingIds = new Set(prev.map((m: any) => m.id))
+              const newMemories = incoming.filter((m: any) => !existingIds.has(m.id))
+              return [...prev, ...newMemories]
+            })
+          }
+        } else {
+          toast.error("Failed to load memories.")
+        }
+      } catch (error) {
+        console.error("Error fetching memories:", error)
+        toast.error("An error occurred while loading our collection.")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    loadMemories()
+  }, [page]);
 
   const fetchMemories = async () => {
     try {
@@ -31,7 +80,7 @@ export default function MemoriesGallery() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading && page === 1) {
     return (
       <div className="flex-1 flex items-center justify-center min-h-[60vh]">
         <Loader2 className="animate-spin text-4xl text-brand" />
@@ -39,7 +88,7 @@ export default function MemoriesGallery() {
     );
   }
 
-  if (!data || !data.memories || data.memories.length === 0) {
+  if (!isLoading && data.length === 0) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center min-h-[60vh] space-y-4 text-center px-6">
         <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center text-muted-foreground/30">
@@ -60,23 +109,39 @@ export default function MemoriesGallery() {
           <span className="text-brand font-bold text-xs uppercase tracking-[0.3em] mb-4 block">
             Institutional Archive
           </span>
-          <h1 className="text-5xl md:text-7xl font-black tracking-tight text-foreground leading-none">
-            Radharaman <span className="text-brand">Memories</span>
-          </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mt-6 leading-relaxed">
-            A curated visual archive capturing the spirit of excellence, campus life, and the milestones of our students.
-          </p>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <h1 className="text-5xl md:text-7xl font-black tracking-tight text-foreground leading-none">
+                Radharaman <span className="text-brand">Memories</span>
+              </h1>
+              <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mt-6 leading-relaxed">
+                A curated visual archive capturing the spirit of excellence, campus life, and the milestones of our students.
+              </p>
+            </div>
+            
+            {/* Added a nice little counter for the UI */}
+            <div className="flex items-center gap-2 bg-muted/50 px-4 py-2 rounded-xl border border-border w-fit mx-auto md:mx-0">
+              <ImageIcon className="w-4 h-4 text-brand" />
+              <span className="text-sm font-bold text-muted-foreground">
+                <span className="text-foreground">{totalCount}</span> Photos
+              </span>
+            </div>
+          </div>
         </header>
 
         {/* Masonry Grid */}
         <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-          {data.memories.map((memory) => (
+          {data.map((memory, index) => {
+            const isLastElement = index === data.length - 1;
+            
+            return (
             <div
               key={memory.id}
+              ref={isLastElement ? lastImageRef : null} // Attach the sensor to the last image!
               className="relative group break-inside-avoid cursor-pointer rounded-3xl overflow-hidden border border-border/50 bg-muted shadow-sm hover:shadow-xl hover:border-brand/30 transition-all duration-500"
               onClick={() => setSelectedImage(memory)}
             >
-              {/* Image Component - Now using memory.imageUrl from the DB */}
+              {/* Image Component */}
               <img
                 src={memory.imageUrl}
                 alt={memory.title}
@@ -92,8 +157,22 @@ export default function MemoriesGallery() {
                 </span>
               </div>
             </div>
-          ))}
+          )})}
         </div>
+
+        {/* Bottom Loading Indicator */}
+        {isLoading && page > 1 && (
+          <div className="flex justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-brand" />
+          </div>
+        )}
+
+        {/* End of list message */}
+        {!hasMore && data.length > 0 && (
+          <div className="text-center py-12 text-muted-foreground font-bold text-sm">
+            You've reached the end of our gallery!
+          </div>
+        )}
       </main>
 
       {/* Lightbox Modal */}
