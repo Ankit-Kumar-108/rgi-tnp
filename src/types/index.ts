@@ -11,7 +11,6 @@ export interface Student {
   phoneNumber: string;
   profileImageUrl?: string;
   resumeUrl?: string;
-  memoriesImageUrl?: string;
   feedback?: string;
   linkedinUrl?: string;
   githubUrl?: string;

@@ -10,6 +10,7 @@ datasource db {
 
 model StudentMaster {
   id               String @id @default(cuid())
+  
   enrollmentNumber String @unique
   name             String
   branch           String
@@ -49,8 +50,6 @@ model Student {
   resetPasswordTokenExpiry     DateTime?
   profileImageUrl              String?
   resumeUrl                    String?
-  memoriesImageUrl             String?
-  feedback                     String?
   batch                        String
   phoneNumber                  String
   course                       String
@@ -107,7 +106,6 @@ model ExternalStudent {
   email            String              @unique
   passwordHash     String
   profileImageUrl  String
-  feedback         String?
   semester         Int
   linkedinUrl      String?
   githubUrl        String?
@@ -127,6 +125,8 @@ model ExternalStudent {
   resetPasswordTokenExpiry     DateTime?
   role                         String              @default("external_student")
   registrations                DriveRegistration[]
+  createdAt                    DateTime            @default(now())
+  updatedAt                    DateTime            @updatedAt
 }
 
 // 4. DRIVE & INTERACTION MODELS
@@ -149,6 +149,8 @@ model PlacementDrive {
   recruiterId      String
   recruiter        Recruiter           @relation(fields: [recruiterId], references: [id])
   registrations    DriveRegistration[]
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
 }
 
 model DriveRegistration {
@@ -175,20 +177,23 @@ model Recruiter {
   company      String
   passwordHash String
   role         String @default("recruiter")
-
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
   drives             PlacementDrive[]
   corporateFeedbacks CorporateFeedback[]
 }
 
 model Referral {
-  id          String @id @default(cuid())
+  id          String   @id @default(cuid())
   companyName String
   position    String
   description String
   applyLink   String
-  status      String @default("pending")
+  status      String   @default("pending")
   alumniId    String
-  alumni      Alumni @relation(fields: [alumniId], references: [id])
+  alumni      Alumni   @relation(fields: [alumniId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Memory {
@@ -205,25 +210,40 @@ model Memory {
 }
 
 model AlumniFeedback {
-  id       String @id @default(cuid())
-  content  String
-  rating   Int
-  alumniId String
-  alumni   Alumni @relation(fields: [alumniId], references: [id])
+  id         String   @id @default(cuid())
+  content    String
+  rating     Int    
+  isApproved Boolean  @default(false)
+  
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  alumniId   String
+  alumni     Alumni   @relation(fields: [alumniId], references: [id])
 }
 
 model StudentFeedback {
-  id        String  @id @default(cuid())
-  content   String
-  rating    Int
-  studentId String
-  student   Student @relation(fields: [studentId], references: [id])
+  id         String   @id @default(cuid())
+  content    String
+  rating     Int
+  isApproved Boolean  @default(false)
+  
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  studentId  String
+  student    Student  @relation(fields: [studentId], references: [id])
 }
 
 model CorporateFeedback {
   id          String    @id @default(cuid())
   content     String
   rating      Int
+  isApproved  Boolean   @default(false)
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
   recruiterId String
   recruiter   Recruiter @relation(fields: [recruiterId], references: [id])
 }

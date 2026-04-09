@@ -1,337 +1,292 @@
-import React from "react";
-import { Star, Building2, BadgeCheck, Quote, GraduationCap } from "lucide-react";
+"use client";
+
+import React, { useEffect, useState, useRef, useCallback, useMemo } from "react";
+import { Star, Building2, BadgeCheck, Quote, GraduationCap, Loader2 } from "lucide-react";
 import Footer from "@/components/layout/footer/footer";
 import Nav from "@/components/layout/nav/nav";
+import { toast } from "sonner";
+
+type FilterTab = "All Feedback" | "Alumni" | "Recruiters" | "Students";
 
 export default function Testimonials() {
+  const [feedbacks, setFeedbacks] = useState<any[]>([]);
+  const [activeFilter, setActiveFilter] = useState<FilterTab>("All Feedback");
+  
+  // Pagination & Loading States
+  const [isLoading, setIsLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
+
+  // Infinite Scroll Sensor
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastItemRef = useCallback((node: HTMLDivElement | null) => {
+    if (isLoading) return;
+    if (observer.current) observer.current.disconnect();
+
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        setPage(prevPage => prevPage + 1);
+      }
+    });
+
+    if (node) observer.current.observe(node);
+  }, [isLoading, hasMore]);
+
+  // Fetch Data
+  useEffect(() => {
+    const loadFeedback = async () => {
+      if (page === 1) setIsLoading(true);
+      
+      try {
+        // Fetching 10 from each category (30 total per page)
+        const response = await fetch(`/api/feedback?limit=10&page=${page}`);
+        if (response.ok) {
+          const data = await response.json() as {
+            success: boolean;
+            studentFeedback: any[];
+            alumniFeedback: any[];
+            corporateFeedback: any[];
+            studentFeedbackCount: number;
+            alumniFeedbackCount: number;
+            corporateFeedbackCount: number;
+          }
+          
+          if (data.success) {
+            // 1. Normalize the three arrays into one consistent format
+            const students = data.studentFeedback.map((f: any) => ({ ...f, _type: 'Students' }));
+            const alumni = data.alumniFeedback.map((f: any) => ({ ...f, _type: 'Alumni' }));
+            const corporate = data.corporateFeedback.map((f: any) => ({ ...f, _type: 'Recruiters' }));
+
+            // 2. Combine and sort by newest first
+            const combined = [...students, ...alumni, ...corporate].sort(
+              (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+
+            // 3. Update State safely
+            setFeedbacks(prev => {
+              if (page === 1) return combined;
+              const existingIds = new Set(prev.map(f => f.id));
+              const newItems = combined.filter(c => !existingIds.has(c.id));
+              return [...prev, ...newItems].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            });
+
+            // 4. Update Totals
+            const total = data.studentFeedbackCount + data.alumniFeedbackCount + data.corporateFeedbackCount;
+            setTotalCount(total);
+            
+            // If the combined array we got back is empty, we hit the end
+            setHasMore(combined.length > 0);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching feedback:", error);
+        toast.error("Failed to load testimonials.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadFeedback();
+  }, [page]);
+
+  // Filter the combined list
+  const displayedFeedbacks = useMemo(() => {
+    return feedbacks.filter(f => activeFilter === "All Feedback" || f._type === activeFilter);
+  }, [feedbacks, activeFilter]);
+
+  const TABS: FilterTab[] = ["All Feedback", "Alumni", "Recruiters", "Students"];
+
   return (
     <>
-    <Nav/>
-    <div className="bg-background text-foreground antialiased font-sans flex flex-col min-h-screen selection:bg-brand/10 selection:text-brand">
-      <main className="flex-1 w-full pt-20 pb-24">
-        
-        {/* Hero Section: Featured Testimonials */}
-        <section className="max-w-7xl mx-auto px-6 md:px-8 mb-20">
-          <div className="mb-12">
-            <span className="inline-block bg-brand/10 text-brand text-sm font-bold tracking-widest uppercase px-4 py-1 rounded-full mb-4">
-              Voices of Excellence
-            </span>
-            <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-[0.9] text-foreground mb-6">
-              What Our Community <br />
-              <span className="text-brand">Says.</span>
-            </h1>
-          </div>
-
-          {/* Bento Featured Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-auto md:h-[600px]">
-            {/* Featured Alumni (Large) */}
-            <div className="md:col-span-8 relative overflow-hidden rounded-[2rem] group bg-card shadow-xl border border-border">
-              <img
-                alt="Success Story Alumni"
-                loading="lazy"
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=2788&auto=format&fit=crop"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-foreground/90 via-foreground/40 to-transparent"></div>
-              <div className="absolute bottom-0 left-0 p-8 md:p-12 w-full">
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="bg-brand px-3 py-1 rounded-full text-xs font-bold text-primary-foreground uppercase tracking-wider">
-                    Alumni Spotlight
-                  </span>
-                  <span className="flex items-center text-yellow-400">
-                    <Star className="w-4 h-4 fill-current" />
-                    <Star className="w-4 h-4 fill-current" />
-                    <Star className="w-4 h-4 fill-current" />
-                    <Star className="w-4 h-4 fill-current" />
-                    <Star className="w-4 h-4 fill-current" />
-                  </span>
-                </div>
-                <blockquote className="text-2xl md:text-4xl font-bold text-background mb-6 leading-tight italic">
-                  "The curriculum at RGI wasn't just about learning code;
-                  it was about building the mindset of a leader. Three years later,
-                  I'm leading a team of 40 at a Fortune 500 company."
-                </blockquote>
-                <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-full border-2 border-brand overflow-hidden">
-                    <img
-                      className="w-full h-full object-cover"
-                      alt="Small alumni avatar"
-                      loading="lazy"
-                      src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=100&auto=format&fit=crop"
-                    />
-                  </div>
-                  <div>
-                    <p className="text-background font-bold text-lg">
-                      Dr. Elena Rodriguez
-                    </p>
-                    <p className="text-background/70 text-sm">
-                      CSE Class of '18 • Senior VP of Tech, Global Solutions
-                    </p>
-                  </div>
-                </div>
-              </div>
+      <Nav />
+      <div className="bg-background text-foreground antialiased font-sans flex flex-col min-h-screen selection:bg-brand/10 selection:text-brand">
+        <main className="flex-1 w-full pt-20 pb-24">
+          
+          {/* Header & Filter Tabs */}
+          <section className="max-w-7xl mx-auto px-6 md:px-8 mb-16 space-y-8 text-center">
+            <div className="space-y-4">
+              <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground">
+                Hear From Our <span className="text-brand">Community</span>
+              </h1>
+              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                Discover what our students, alumni, and top recruiting partners have to say about their experience with RGI.
+              </p>
             </div>
 
-            {/* Featured Student & Recruiter Stack */}
-            <div className="md:col-span-4 flex flex-col gap-6">
-              {/* Recruiter */}
-              <div className="flex-1 relative overflow-hidden rounded-[2rem] group bg-brand p-8 text-primary-foreground shadow-lg">
-                <div className="relative z-10 flex flex-col h-full justify-between">
-                  <div>
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="p-3 bg-background/20 rounded-2xl backdrop-blur-md">
-                        <Building2 className="w-8 h-8" />
-                      </div>
-                      <div className="flex items-center gap-1 bg-background/10 px-2 py-1 rounded-lg">
-                        <BadgeCheck className="w-3 h-3 fill-current" />
-                        <span className="text-[10px] font-bold uppercase tracking-tighter">
-                          Verified Recruiter
-                        </span>
-                      </div>
+            <div className="flex flex-wrap justify-center gap-2 md:gap-4 p-2 bg-muted/50 backdrop-blur-md rounded-2xl w-fit mx-auto border border-border">
+              {TABS.map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveFilter(tab)}
+                  className={`px-6 md:px-8 py-2.5 md:py-3 rounded-xl font-bold text-xs md:text-sm transition-all duration-300 ${
+                    activeFilter === tab
+                      ? "bg-brand text-primary-foreground shadow-lg shadow-brand/20"
+                      : "text-muted-foreground hover:bg-background hover:text-foreground"
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* Feedback Masonry Grid */}
+          <section className="max-w-7xl mx-auto px-6 md:px-8">
+            {isLoading && page === 1 ? (
+              <div className="flex justify-center py-20">
+                <Loader2 className="w-10 h-10 animate-spin text-brand" />
+              </div>
+            ) : displayedFeedbacks.length === 0 ? (
+              <div className="text-center py-20 text-muted-foreground">
+                <Quote className="w-12 h-12 mx-auto mb-4 opacity-20" />
+                <p className="font-bold text-lg">No feedback found for this category.</p>
+              </div>
+            ) : (
+              <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+                {displayedFeedbacks.map((feedback, index) => {
+                  const isLastElement = index === displayedFeedbacks.length - 1;
+
+                  return (
+                    <div key={feedback.id} ref={isLastElement ? lastItemRef : null}>
+                      {feedback._type === "Recruiters" && <RecruiterCard data={feedback} />}
+                      {feedback._type === "Alumni" && <AlumniCard data={feedback} />}
+                      {feedback._type === "Students" && <StudentCard data={feedback} />}
                     </div>
-                    <p className="text-xl font-bold leading-snug">
-                      "We hire from here because we know we're getting talent that's
-                      day-one ready."
-                    </p>
-                  </div>
-                  <div className="mt-4">
-                    <p className="font-bold text-sm">Marcus Chen</p>
-                    <p className="text-primary-foreground/80 text-xs">
-                      Head of Talent, Vertex Dynamics
-                    </p>
-                  </div>
-                </div>
-                <div className="absolute -right-8 -bottom-8 opacity-10">
-                  <Quote className="w-48 h-48" />
-                </div>
+                  );
+                })}
               </div>
+            )}
 
-              {/* Student */}
-              <div className="flex-1 relative overflow-hidden rounded-[2rem] bg-muted p-8 border border-border">
-                <div className="flex flex-col h-full justify-between">
-                  <div>
-                    <div className="text-brand mb-4">
-                      <GraduationCap className="w-10 h-10" />
-                    </div>
-                    <p className="text-foreground font-semibold italic text-lg leading-relaxed">
-                      "The placement support was incredible. I had three offers
-                      before finals!"
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3 mt-6">
-                    <div className="w-10 h-10 rounded-full bg-brand/10 flex items-center justify-center text-brand font-bold">
-                      SP
-                    </div>
-                    <div>
-                      <p className="font-bold text-sm text-foreground">Sarah Parker</p>
-                      <p className="text-muted-foreground text-xs">
-                        B.Tech Mechanical '24
-                      </p>
-                    </div>
-                  </div>
-                </div>
+            {/* Bottom Loading State */}
+            {isLoading && page > 1 && (
+              <div className="flex justify-center py-10 mt-8">
+                <Loader2 className="w-8 h-8 animate-spin text-brand" />
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Filter Tabs */}
-        <section className="max-w-7xl mx-auto px-6 md:px-8 mb-16">
-          <div className="flex flex-wrap justify-center gap-2 md:gap-4 p-2 bg-muted/50 backdrop-blur-md rounded-2xl w-fit mx-auto border border-border">
-            <button className="px-8 py-3 rounded-xl font-bold text-sm transition-all duration-300 bg-brand text-primary-foreground shadow-lg shadow-brand/20">
-              All Feedback
-            </button>
-            <button className="px-8 py-3 rounded-xl font-bold text-sm transition-all duration-300 text-muted-foreground hover:bg-background hover:text-foreground">
-              Alumni
-            </button>
-            <button className="px-8 py-3 rounded-xl font-bold text-sm transition-all duration-300 text-muted-foreground hover:bg-background hover:text-foreground">
-              Recruiters
-            </button>
-            <button className="px-8 py-3 rounded-xl font-bold text-sm transition-all duration-300 text-muted-foreground hover:bg-background hover:text-foreground">
-              Students
-            </button>
-          </div>
-        </section>
-
-        {/* Feedback Masonry Grid */}
-        <section className="max-w-7xl mx-auto px-6 md:px-8">
-          <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-            
-            {/* Recruiter Card */}
-            <div className="break-inside-avoid bg-card p-8 rounded-[2rem] shadow-sm border border-border hover:shadow-xl hover:scale-[1.02] transition-all duration-300 group">
-              <div className="flex justify-between items-start mb-6">
-                <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center font-black text-muted-foreground group-hover:text-brand transition-colors">
-                  V
-                </div>
-                <div className="flex items-center gap-1 text-brand">
-                  <BadgeCheck className="w-3 h-3 fill-current" />
-                  <span className="text-[10px] font-bold uppercase">Recruiter</span>
-                </div>
-              </div>
-              <div className="flex mb-4 text-yellow-500">
-                <Star className="w-4 h-4 fill-current" />
-                <Star className="w-4 h-4 fill-current" />
-                <Star className="w-4 h-4 fill-current" />
-                <Star className="w-4 h-4 fill-current" />
-                <Star className="w-4 h-4 fill-current" />
-              </div>
-              <p className="text-foreground font-medium leading-relaxed mb-6">
-                "The technical proficiency of the graduates here is consistently
-                higher than other institutes in the region. Their problem-solving
-                skills are impressive."
-              </p>
-              <div className="pt-6 border-t border-border">
-                <h4 className="font-bold text-foreground">David Wilson</h4>
-                <p className="text-muted-foreground text-xs">
-                  Director of Engineering, Innovate Labs
-                </p>
-              </div>
-            </div>
-
-            {/* Alumni Card */}
-            <div className="break-inside-avoid bg-muted/50 p-8 rounded-[2rem] shadow-sm border border-border hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
-              <div className="flex items-center gap-4 mb-6">
-                <img
-                  className="w-12 h-12 rounded-full object-cover"
-                  alt="Alumni profile photo"
-                  loading="lazy"
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=100&auto=format&fit=crop"
-                />
-                <div className="flex-1">
-                  <h4 className="font-bold text-foreground text-sm">
-                    Julian Vance
-                  </h4>
-                  <p className="text-brand text-[10px] font-bold uppercase tracking-wider">
-                    ECE Class of '21
-                  </p>
-                </div>
-                <div className="flex items-center gap-1 text-brand/40">
-                  <BadgeCheck className="w-4 h-4 fill-current" />
-                </div>
-              </div>
-              <p className="text-muted-foreground text-sm leading-relaxed italic">
-                "Beyond the books, the alumni network here is a powerhouse. I got
-                my current role at Tesla through a connection I made during a guest
-                lecture series."
-              </p>
-            </div>
-
-            {/* Student Card */}
-            <div className="break-inside-avoid bg-card p-8 rounded-[2rem] shadow-sm border border-border hover:shadow-xl hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-brand">
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center gap-2">
-                  <span className="bg-brand/10 text-brand text-[10px] font-black px-2 py-0.5 rounded-md uppercase">
-                    Current Student
-                  </span>
-                </div>
-              </div>
-              <p className="text-foreground font-semibold text-lg leading-tight mb-4">
-                "The hands-on labs changed my perspective on engineering. It's not
-                just theory; we're building real solutions."
-              </p>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-muted overflow-hidden">
-                  <img
-                    className="w-full h-full object-cover"
-                    alt="Student avatar"
-                    loading="lazy"
-                    src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=100&auto=format&fit=crop"
-                  />
-                </div>
-                <div>
-                  <p className="font-bold text-xs text-foreground">
-                    Liam O'Conner
-                  </p>
-                  <p className="text-muted-foreground text-[10px]">
-                    Information Technology '25
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Recruiter Card Dark */}
-            <div className="break-inside-avoid bg-foreground p-8 rounded-[2rem] shadow-xl text-background hover:scale-[1.02] transition-all duration-300">
-              <div className="flex justify-between items-center mb-6">
-                <div className="text-lg font-black tracking-tighter uppercase">
-                  Nexa Group
-                </div>
-                <BadgeCheck className="w-5 h-5 text-brand fill-current" />
-              </div>
-              <p className="text-background/80 text-sm leading-relaxed mb-6">
-                "RGI graduates possess a unique blend of technical depth and
-                soft skills. They integrate into our corporate culture seamlessly
-                and start contributing immediately."
-              </p>
-              <div className="flex items-center gap-1 mb-1 text-yellow-500">
-                <Star className="w-3 h-3 fill-current" />
-                <Star className="w-3 h-3 fill-current" />
-                <Star className="w-3 h-3 fill-current" />
-                <Star className="w-3 h-3 fill-current" />
-                <Star className="w-3 h-3 fill-current" />
-              </div>
-              <p className="font-bold text-sm">Amara K.</p>
-              <p className="text-background/60 text-[10px]">
-                Talent Acquisition Lead
-              </p>
-            </div>
-
-            {/* Alumni Card */}
-            <div className="break-inside-avoid bg-card p-8 rounded-[2rem] shadow-sm border border-border hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 rounded-2xl bg-brand/10 flex items-center justify-center text-brand font-black">
-                  JS
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-bold text-foreground text-sm">
-                    Jasmine Smith
-                  </h4>
-                  <p className="text-brand text-[10px] font-bold uppercase tracking-wider">
-                    Bio-Tech Class of '15
-                  </p>
-                </div>
-              </div>
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                "The research facilities here were world-class even a decade ago.
-                It provided the foundation for my PhD and subsequent work in
-                genetic engineering."
-              </p>
-            </div>
-
-            {/* Student Card */}
-            <div className="break-inside-avoid bg-brand/10 p-8 rounded-[2rem] shadow-sm border border-brand/20 hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
-              <p className="text-brand font-bold text-lg leading-snug mb-6">
-                "I never thought I'd be able to win a national hackathon, but the
-                mentorship here pushed me past my limits."
-              </p>
-              <div className="flex items-center gap-3">
-                <img
-                  className="w-10 h-10 rounded-full object-cover grayscale"
-                  alt="Smiling female student"
-                  loading="lazy"
-                  src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=100&auto=format&fit=crop"
-                />
-                <div>
-                  <p className="font-bold text-xs text-foreground">
-                    Priya Sharma
-                  </p>
-                  <p className="text-muted-foreground text-[10px]">
-                    Data Science '23
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Load More Action */}
-          <div className="mt-16 text-center">
-            <button className="bg-background border-2 border-brand/20 text-brand px-12 py-4 rounded-2xl font-bold hover:bg-brand hover:text-primary-foreground transition-all duration-300 shadow-sm hover:shadow-brand/30">
-              Load More Stories
-            </button>
-          </div>
-        </section>
-      </main>
-    </div>
-    <Footer/>
+            )}
+          </section>
+        </main>
+      </div>
+      <Footer />
     </>
+  );
+}
+
+/* --- Dynamic Sub-Components --- */
+
+function StarRating({ rating }: { rating: number }) {
+  return (
+    <div className="flex mb-4 text-yellow-500">
+      {[...Array(5)].map((_, i) => (
+        <Star key={i} className={`w-4 h-4 ${i < rating ? "fill-current" : "text-muted stroke-current"}`} />
+      ))}
+    </div>
+  );
+}
+
+function RecruiterCard({ data }: { data: any }) {
+  const isDark = Math.random() > 0.5; // Randomly assigns the dark/light variations you created!
+
+  if (isDark) {
+    return (
+      <div className="break-inside-avoid bg-foreground p-8 rounded-[2rem] shadow-xl text-background hover:scale-[1.02] transition-all duration-300">
+        <div className="flex justify-between items-center mb-6">
+          <div className="text-lg font-black tracking-tighter uppercase line-clamp-1 pr-4">
+            {data.recruiter?.company || "Corporate Partner"}
+          </div>
+          <BadgeCheck className="w-5 h-5 text-brand fill-current shrink-0" />
+        </div>
+        <p className="text-background/80 text-sm leading-relaxed mb-6 italic">
+          "{data.content}"
+        </p>
+        <StarRating rating={data.rating} />
+        <p className="font-bold text-sm">{data.recruiter?.name}</p>
+        <p className="text-background/60 text-[10px]">{data.recruiter?.designation}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="break-inside-avoid bg-card p-8 rounded-[2rem] shadow-sm border border-border hover:shadow-xl hover:scale-[1.02] transition-all duration-300 group">
+      <div className="flex justify-between items-start mb-6">
+        <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center font-black text-muted-foreground text-xl group-hover:text-brand transition-colors">
+          {data.recruiter?.company?.charAt(0) || "C"}
+        </div>
+        <div className="flex items-center gap-1 text-brand bg-brand/10 px-2 py-1 rounded-lg">
+          <Building2 className="w-3 h-3" />
+          <span className="text-[10px] font-bold uppercase">Recruiter</span>
+        </div>
+      </div>
+      <StarRating rating={data.rating} />
+      <p className="text-foreground font-medium text-sm leading-relaxed mb-6 italic">
+        "{data.content}"
+      </p>
+      <div className="pt-6 border-t border-border">
+        <h4 className="font-bold text-foreground">{data.recruiter?.name}</h4>
+        <p className="text-muted-foreground text-xs">{data.recruiter?.designation}, {data.recruiter?.company}</p>
+      </div>
+    </div>
+  );
+}
+
+function AlumniCard({ data }: { data: any }) {
+  return (
+    <div className="break-inside-avoid bg-muted/50 p-8 rounded-[2rem] shadow-sm border border-border hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
+      <div className="flex items-center gap-4 mb-6">
+        <div className="w-12 h-12 rounded-full overflow-hidden bg-card border border-border shrink-0 flex items-center justify-center font-bold text-brand">
+          {data.alumni?.profileImageUrl ? (
+            <img className="w-full h-full object-cover" alt={data.alumni.name} loading="lazy" src={data.alumni.profileImageUrl} />
+          ) : (
+            data.alumni?.name?.charAt(0)
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <h4 className="font-bold text-foreground text-sm truncate">{data.alumni?.name}</h4>
+          <p className="text-brand text-[10px] font-bold uppercase tracking-wider truncate">
+            {data.alumni?.branch} '{data.alumni?.batch?.slice(-2)}
+          </p>
+        </div>
+        <div className="flex items-center gap-1 text-brand/40 shrink-0">
+          <BadgeCheck className="w-5 h-5 fill-current" />
+        </div>
+      </div>
+      <StarRating rating={data.rating} />
+      <p className="text-muted-foreground text-sm leading-relaxed italic">
+        "{data.content}"
+      </p>
+    </div>
+  );
+}
+
+function StudentCard({ data }: { data: any }) {
+  return (
+    <div className="break-inside-avoid bg-card p-8 rounded-[2rem] shadow-sm border border-border hover:shadow-xl hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-brand">
+      <div className="flex justify-between items-start mb-4">
+        <div className="flex items-center gap-2">
+          <span className="bg-brand/10 text-brand text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider">
+            Current Student
+          </span>
+        </div>
+      </div>
+      <StarRating rating={data.rating} />
+      <p className="text-foreground font-semibold text-sm leading-relaxed mb-6 italic">
+        "{data.content}"
+      </p>
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-muted overflow-hidden flex items-center justify-center font-bold text-muted-foreground border border-border shrink-0">
+          {data.student?.profileImageUrl ? (
+            <img className="w-full h-full object-cover" alt={data.student.name} loading="lazy" src={data.student.profileImageUrl} />
+          ) : (
+            data.student?.name?.charAt(0)
+          )}
+        </div>
+        <div className="min-w-0">
+          <p className="font-bold text-xs text-foreground truncate">{data.student?.name}</p>
+          <p className="text-muted-foreground text-[10px] truncate">
+            {data.student?.course} '{data.student?.batch?.slice(-2)}
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
