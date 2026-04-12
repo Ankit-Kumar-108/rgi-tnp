@@ -14,6 +14,8 @@ function ResetPasswordContent() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [status, setStatus] = useState<"form" | "loading" | "success" | "error">("form");
+  const [message, setMessage] = useState("");
 
   const token = searchParams?.get("token");
   const role = searchParams?.get("role") || "student";
@@ -37,6 +39,7 @@ function ResetPasswordContent() {
     }
 
     setLoading(true);
+    setStatus("loading");
 
     try {
       const res = await fetch("/api/auth/reset-password", {
@@ -47,14 +50,20 @@ function ResetPasswordContent() {
       const data = await res.json() as any;
 
       if (data.success) {
+        setStatus("success");
+        setMessage(data.message || "Your password has been reset successfully. Redirecting to login...");
         toast.success(data.message || "Password reset successfully!");
         setTimeout(() => {
           router.push(getLoginHref());
         }, 1500);
       } else {
+        setStatus("error");
+        setMessage(data.message || "Reset failed. The link may have expired.");
         toast.error(data.message || "Reset failed. The link may have expired.");
       }
     } catch {
+      setStatus("error");
+      setMessage("An error occurred. Please try again later.");
       toast.error("An error occurred. Please try again later.");
     } finally {
       setLoading(false);
