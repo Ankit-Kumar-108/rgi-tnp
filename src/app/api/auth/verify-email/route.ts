@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     const db = getDb();
 
     // Helper to verify and update — returns `newlyVerified` flag to prevent duplicate welcome emails
-    const verifyUser = async (user: any, model: any, targetEmailField: string, flagField: string) => {
+    const verifyUser = async (user: any, model: any, targetEmailField: string, flagField: string, isStudent: boolean = false) => {
       if (user[flagField]) {
         return { success: true, newlyVerified: false, message: "Email already verified" };
       }
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
         emailVerificationTokenExpiry: null,
       };
       
-      if (model === db.student) {
+      if (isStudent) {
         updateData.isVerified = true;
       }
 
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
     if (role === "student") {
       const u = await db.student.findUnique({ where: { email } });
       if (u) {
-        const res = await verifyUser(u, db.student, "email", "isEmailVerified");
+        const res = await verifyUser(u, db.student, "email", "isEmailVerified", true);
         if (res.newlyVerified) await sendWelcomeEmail(email, res.userName || u.name);
         return NextResponse.json(res, { status: res.success ? 200 : 400 });
       }
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
     // 2. Fallback: Search all if role is missing or user not found with role
     const student = await db.student.findUnique({ where: { email } });
     if (student) {
-      const res = await verifyUser(student, db.student, "email", "isEmailVerified");
+      const res = await verifyUser(student, db.student, "email", "isEmailVerified", true);
       if (res.newlyVerified) await sendWelcomeEmail(email, res.userName || student.name);
       return NextResponse.json(res, { status: res.success ? 200 : 400 });
     }

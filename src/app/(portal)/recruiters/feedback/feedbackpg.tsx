@@ -5,8 +5,8 @@ import { getToken } from '@/lib/auth-client';
 import { toast } from 'sonner';
 
 
-export default function FeedbackComp() {
-  const { loading: authLoading, authenticated, user } = useAuth("student", "/student/register");
+export default function FeedbackCorporate() {
+  const { loading: authLoading, authenticated, user } = useAuth("recruiter", "/recruiters/register");
 const [fbRating, setFbRating] = useState(0);
 const [fbContent, setFbContent] = useState("");
 const [submittingFb, setSubmittingFb] = useState(false);
@@ -22,8 +22,8 @@ const handleSubmitFeedback = async () => {
   if (!fbContent || fbRating === 0) return;
   setSubmittingFb(true);
   try {
-    const token = getToken("student");
-    const res = await fetch("/api/student/feedback", {
+    const token = getToken("recruiter");
+    const res = await fetch("/api/recruiter/feedback", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ content: fbContent, rating: fbRating }),
@@ -107,14 +107,14 @@ const handleSubmitFeedback = async () => {
       <button 
         onClick={handleSubmitFeedback} 
         disabled={submittingFb || !fbContent.trim() || fbRating === 0}
-        className="group mt-auto w-full bg-gradient-to-r from-brand to-brand/80 hover:from-brand/90 hover:to-brand/70 disabled:from-muted disabled:to-muted/50 text-primary-foreground py-4 rounded-2xl font-black transition-all duration-200 shadow-lg shadow-brand/20 hover:shadow-brand/30 disabled:shadow-none active:scale-95 flex items-center justify-center gap-2 group relative overflow-hidden"
+        className="mt-auto w-full bg-gradient-to-r from-brand to-brand/80 hover:from-brand/90 hover:to-brand/70 disabled:from-muted disabled:to-muted/50 text-primary-foreground py-4 rounded-2xl font-black transition-all duration-200 shadow-lg shadow-brand/20 hover:shadow-brand/30 disabled:shadow-none active:scale-95 flex items-center justify-center gap-2 group relative overflow-hidden"
       >
         <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
-        <span className="relative flex gap-3">{submittingFb 
+        <span className="relative">{submittingFb 
           ? <><Loader2 className="w-5 h-5 animate-spin" /> <span>Submitting...</span></>
-          : <><MessageSquareShare className="w-5 h-5 group-hover:scale-125 duration-200 transition-transform" /><span>Share Expertise</span></>
+          : <><MessageSquareShare className="w-5 h-5" /> <span>Share Expertise</span></>
         }</span>
       </button>
     </div>
-  )
+  );
 }

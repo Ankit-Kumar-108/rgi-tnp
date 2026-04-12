@@ -4,13 +4,13 @@ import React, { useEffect, useState, Suspense, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle, XCircle, Loader2, ArrowRight, Mail, RefreshCw } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [message, setMessage] = useState("");
   const [resending, setResending] = useState(false);
-  const [resendMessage, setResendMessage] = useState("");
   
   const hasAttempted = useRef(false);
 
@@ -56,7 +56,6 @@ function VerifyEmailContent() {
   const handleResend = async () => {
     if (!email || resending) return;
     setResending(true);
-    setResendMessage("");
 
     try {
       const res = await fetch("/api/auth/resend-otp", {
@@ -67,12 +66,12 @@ function VerifyEmailContent() {
       const data = await res.json() as any;
 
       if (data.success) {
-        setResendMessage("✓ New verification link sent! Check your email.");
+        toast.success("New verification link sent! Check your email.");
       } else {
-        setResendMessage(data.message || "Failed to resend. Try again later.");
+        toast.error(data.message || "Failed to resend. Try again later.");
       }
     } catch {
-      setResendMessage("Network error. Please try again.");
+      toast.error("Network error. Please try again.");
     } finally {
       setResending(false);
     }
@@ -144,11 +143,7 @@ function VerifyEmailContent() {
               </button>
             )}
 
-            {resendMessage && (
-              <p className={`text-xs font-medium ${resendMessage.startsWith("✓") ? "text-green-600 dark:text-green-400" : "text-red-500"}`}>
-                {resendMessage}
-              </p>
-            )}
+            {/* Toast notifications are used for feedback */}
           </div>
         )}
 

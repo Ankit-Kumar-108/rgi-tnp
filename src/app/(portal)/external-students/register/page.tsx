@@ -20,7 +20,7 @@ import {
     FileText
 } from "lucide-react";
 import Link from "next/link";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { uploadFileToR2 } from "@/lib/upload-r2";
 import { toast } from "sonner";
@@ -51,7 +51,16 @@ export default function ExternalStudentRegister() {
     const [resumeFile, setResumeFile] = useState<File | null>(null);
     const [resumePreviewURL, setResumePreviewURL] = useState<string | null>(null);
 
-    // --- Helper Functions ---
+    // year logic states 
+    const [year, setYear] = useState<number[]>([]);
+
+        // smart year dropdown generation based on current year
+        useEffect(() => {
+            const currentYear = new Date().getFullYear();
+            const year = Array.from({ length: 4 }, (_, i) => currentYear + i);
+            
+            setYear(year);
+        }, []);
 
     const update = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
         setForm(prev => ({ ...prev, [field]: e.target.value }));
@@ -421,11 +430,16 @@ export default function ExternalStudentRegister() {
 
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
                                 <div className="space-y-1">
-                                    <label className="text-xs sm:text-sm font-semibold text-foreground">Batch</label>
-                                    <input className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} type="text" placeholder="e.g. 2024-2028" required value={form.batch} onChange={update("batch")} />
+                                    <label className="text-xs sm:text-sm font-semibold text-foreground">Select Batch</label>
+                                    <select className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} required value={form.batch} onChange={update("batch")}>
+                                        <option value="">Select</option>
+                                        {year.map((y) => (
+                                            <option key={y} value={y}>{y}</option>
+                                        ))}
+                                    </select>
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-xs sm:text-sm font-semibold text-foreground">Semester</label>
+                                    <label className="text-xs sm:text-sm font-semibold text-foreground">Select Semester</label>
                                     <select className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} required value={form.semester} onChange={update("semester")}>
                                         <option value="">Select</option>
                                         {[1,2,3,4,5,6,7,8].map(s => (

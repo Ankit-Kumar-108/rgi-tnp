@@ -176,7 +176,7 @@ export const verificationSuccessTemplate = (name: string): string => {
             <table border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
                     <td align="center" style="padding: 20px 0;">
-                        <a href="https://ankitdevprojects.qzz.io/portal/dashboard" style="background-color: #9213ec; color: #ffffff; padding: 16px 35px; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 16px; display: inline-block;">
+                        <a href="https://ankit-dev.me/portal/dashboard" style="background-color: #9213ec; color: #ffffff; padding: 16px 35px; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 16px; display: inline-block;">
                             Go to Dashboard &nbsp; &rarr;
                         </a>
                     </td>
@@ -185,10 +185,6 @@ export const verificationSuccessTemplate = (name: string): string => {
   return premiumLayout("&#127881;", "Welcome to RGI TnP", content);
 };
 
-// ──────────────────────────────────────────────────
-// 4. DRIVE REGISTRATION CONFIRMATION
-// Used by: future drive registration feature
-// ──────────────────────────────────────────────────
 export const driveRegistrationTemplate = (name: string, companyName: string, date: string, role: string): string => {
   const content = `
             <p style="color: #9213ec; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; margin-bottom: 10px;">Registration Confirmed</p>

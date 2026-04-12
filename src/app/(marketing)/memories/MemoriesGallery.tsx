@@ -150,7 +150,7 @@ export default function MemoriesGallery() {
               />
 
               {/* Overlay Info */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
                 <h3 className="text-white font-bold text-lg leading-tight mb-1">{memory.title}</h3>
                 <span className="text-slate-400 text-[10px] font-black uppercase tracking-widest">
                   Shared by {memory.uploaderName || "Anonymous"}
@@ -178,11 +178,11 @@ export default function MemoriesGallery() {
       {/* Lightbox Modal */}
       {selectedImage && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/95 backdrop-blur-xl animate-in fade-in duration-300"
+          className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-background/95 backdrop-blur-xl animate-in fade-in duration-300"
           onClick={() => setSelectedImage(null)}
         >
           <button
-            className="absolute z-[101] top-8 right-8 text-foreground p-3 hover:bg-muted rounded-full transition-colors"
+            className="absolute z-101 top-8 right-8 text-foreground p-3 hover:bg-muted rounded-full transition-colors"
           >
             <X className="w-8 h-8" />
           </button>

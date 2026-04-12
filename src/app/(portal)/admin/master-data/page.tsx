@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
+import { toast } from "sonner";
 
 type UploadType = "student" | "alumni";
 
@@ -54,6 +55,7 @@ export default function AdminMasterDataPage() {
       if (data.success) setCounts(data.counts);
     } catch (err) {
       console.error(err);
+      toast.error("Failed to fetch master data counts. Please refresh the page.");
     } finally {
       setLoading(false);
     }
@@ -89,6 +91,7 @@ export default function AdminMasterDataPage() {
         ? `${data.message} | Errors: ${data.errors.join("; ")}`
         : data.message;
       setResult({ success: data.success, message: displayMsg });
+      toast[data.success ? "success" : "error"](displayMsg);
       if (data.success) {
         fetchCounts();
         setPreview([]);
@@ -96,6 +99,7 @@ export default function AdminMasterDataPage() {
       }
     } catch {
       setResult({ success: false, message: "Upload failed" });
+      toast.error("Upload failed. Please try again.");
     } finally {
       setUploading(false);
     }

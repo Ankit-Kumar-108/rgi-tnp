@@ -2,6 +2,7 @@ import React from "react";
 import { getToken } from "@/lib/auth-client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
     X,
     FileText,
@@ -33,7 +34,6 @@ export default function JobDetailsModal({
 }) {
     const router = useRouter();
     const [registering, setRegistering] = useState(false)
-    const [regMsg, setRegMsg] = useState<{ text: string; ok: boolean } | null>(null)
 
     const getDaysLeft = () => {
         const targetDate = new Date(drive.driveDate);
@@ -59,7 +59,6 @@ export default function JobDetailsModal({
         }
         
         setRegistering(true);
-        setRegMsg(null);
         try {
             const token = getToken(role);
             const endpoint = role === "external_student" ? "/api/external/dashboard" : "/api/student/drives";
@@ -70,14 +69,14 @@ export default function JobDetailsModal({
             })
             const d = (await res.json()) as any;
             if (d.success) {
-                setRegMsg({ ok: true, text: "Successfully Registered" })
-                onSuccess()
+                toast.success(d.message || "Successfully registered for drive!");
+                onSuccess();
             }
             else {
-                setRegMsg({ ok: false, text: d.message || "Registration failed" });
+                toast.error(d.message || "Registration failed");
             }
-        } catch {
-            setRegMsg({ text: "Registration failed", ok: false });
+        } catch (error) {
+            toast.error("Registration failed. Please try again.");
         } finally {
             setRegistering(false);
         }
@@ -274,16 +273,11 @@ export default function JobDetailsModal({
                           <p className="text-xs text-brand font-medium mt-0.5">Register in {getDaysLeft()}</p>
                       </div>
                       <div className="flex-1 sm:flex-none flex flex-col sm:flex-row items-center gap-4">
-                          {regMsg && (
-                              <span className={`text-[10px] font-bold uppercase tracking-widest ${regMsg.ok ? "text-green-500" : "text-red-500"}`}>
-                                  {regMsg.text}
-                              </span>
-                          )}
                           <button
                               onClick={() => registerForDrive()}
                               disabled={registering}
                               className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-brand text-primary-foreground font-black shadow-lg shadow-brand/30 hover:shadow-brand/40 transition-all active:scale-95 flex items-center justify-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                              {publicMode ? "Login to Apply" : registering ? "Registering..." : (regMsg?.ok ? "Registered" : "Apply for Role")}
+                              {publicMode ? "Login to Apply" : registering ? "Registering..." : "Apply for Role"}
                               <ArrowRight className="w-4 h-4" />
                           </button>
                       </div>

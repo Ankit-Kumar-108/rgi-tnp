@@ -5,19 +5,16 @@ import Footer from "@/components/layout/footer/footer"
 import { Mail, Loader2, KeyRound, ChevronLeft } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
+import { toast } from "sonner";
 
 export default function ForgotPassword() {
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
     
     const [email, setEmail] = useState("");
     const [role, setRole] = useState("student");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError("");
-        setSuccess("");
         setLoading(true);
 
         try {
@@ -29,13 +26,14 @@ export default function ForgotPassword() {
             const data = (await res.json()) as any;
 
             if (!res.ok || !data.success) {
-                setError(data.message || "Something went wrong");
+                toast.error(data.message || "Something went wrong");
                 return;
             }
 
-            setSuccess(data.message || "If an account exists, a reset link was sent to your email.");
+            toast.success(data.message || "If an account exists, a reset link was sent to your email.");
+            setEmail("");
         } catch {
-            setError("Network error. Please try again.");
+            toast.error("Network error. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -58,8 +56,7 @@ export default function ForgotPassword() {
                         </p>
                     </div>
 
-                    {error && <div className="mb-4 p-3 rounded-xl bg-destructive/10 text-destructive text-sm font-medium">{error}</div>}
-                    {success && <div className="mb-4 p-3 rounded-xl bg-green-500/10 text-green-600 dark:text-green-400 text-sm font-medium">{success}</div>}
+                    {/* Form content */}
 
                     <form className="space-y-5 relative z-10" onSubmit={handleSubmit}>
                         <div className="space-y-2">

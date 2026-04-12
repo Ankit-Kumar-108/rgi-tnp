@@ -98,6 +98,13 @@ export default function AdminDashboard() {
       badge: stats?.pendingApprovals || 0,
     },
     {
+      title: "Published Management",
+      desc: "Manage approved memories, referrals & feedback",
+      icon: Image,
+      href: "/admin/published-management",
+      badge: null,
+    },
+    {
       title: "Drive Management",
       desc: "View, manage, and track placement drives",
       icon: Briefcase,

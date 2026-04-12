@@ -23,6 +23,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { getToken, logout } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import FeedbackCorporate from "../feedback/feedbackpg";
 
 const BRANCHES = ["Computer Science", "Civil", "Mechanical", "Electronics", "Electrical", "Power Systems", "Digital Communication", "Thermal Engineering", "Marketing", "Finance", "Human Resource"] //change courese here  for filtering
 
@@ -215,26 +216,57 @@ export default function RecruiterDashboard() {
 
           {/* Stats */}
           {!loading && (
-            <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-card rounded-2xl p-5 border border-border shadow-sm">
-                <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center mb-3"><Briefcase className="w-5 h-5 text-brand" /></div>
-                <p className="text-2xl font-black text-foreground">{stats.totalDrives || 0}</p>
-                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mt-1">Total Drives</p>
+            <section className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              {/* Total Drives */}
+              <div className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 rounded-[1.75rem] p-6 border border-blue-500/20 shadow-sm hover:-translate-y-1 transition-all duration-300 group cursor-pointer">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-12 h-12 bg-blue-500/20 rounded-2xl flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
+                    <Briefcase className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-blue-500/40 group-hover:text-blue-500/60 group-hover:translate-x-1 transition-all" />
+                </div>
+                <p className="text-3xl md:text-4xl font-black text-foreground leading-none mb-2">{stats.totalDrives || 0}</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total Drives</p>
+                <p className="text-[10px] text-blue-600/70 mt-2 hidden xs:block">Posted opportunities</p>
               </div>
-              <div className="bg-card rounded-2xl p-5 border border-border shadow-sm">
-                <div className="w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center mb-3"><CheckCircle className="w-5 h-5 text-green-500" /></div>
-                <p className="text-2xl font-black text-foreground">{stats.activeDrives || 0}</p>
-                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mt-1">Active</p>
+
+              {/* Active Drives */}
+              <div className="bg-gradient-to-br from-green-500/10 to-green-500/5 rounded-[1.75rem] p-6 border border-green-500/20 shadow-sm hover:-translate-y-1 transition-all duration-300 group cursor-pointer">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-12 h-12 bg-green-500/20 rounded-2xl flex items-center justify-center group-hover:bg-green-500/30 transition-colors">
+                    <CheckCircle className="w-6 h-6 text-green-600" />
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-green-500/40 group-hover:text-green-500/60 group-hover:translate-x-1 transition-all" />
+                </div>
+                <p className="text-3xl md:text-4xl font-black text-foreground leading-none mb-2">{stats.activeDrives || 0}</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Active Drives</p>
+                <p className="text-[10px] text-green-600/70 mt-2 hidden xs:block">Now accepting</p>
               </div>
-              <div className="bg-card rounded-2xl p-5 border border-border shadow-sm">
-                <div className="w-10 h-10 bg-yellow-500/10 rounded-xl flex items-center justify-center mb-3"><Clock className="w-5 h-5 text-yellow-500" /></div>
-                <p className="text-2xl font-black text-foreground">{stats.pendingDrives || 0}</p>
-                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mt-1">Pending</p>
+
+              {/* Pending Drives */}
+              <div className="bg-gradient-to-br from-yellow-500/10 to-yellow-500/5 rounded-[1.75rem] p-6 border border-yellow-500/20 shadow-sm hover:-translate-y-1 transition-all duration-300 group cursor-pointer">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-12 h-12 bg-yellow-500/20 rounded-2xl flex items-center justify-center group-hover:bg-yellow-500/30 transition-colors">
+                    <Clock className="w-6 h-6 text-yellow-600" />
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-yellow-500/40 group-hover:text-yellow-500/60 group-hover:translate-x-1 transition-all" />
+                </div>
+                <p className="text-3xl md:text-4xl font-black text-foreground leading-none mb-2">{stats.pendingDrives || 0}</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Pending Review</p>
+                <p className="text-[10px] text-yellow-600/70 mt-2 hidden xs:block">Under moderation</p>
               </div>
-              <div className="bg-brand text-primary-foreground rounded-2xl p-5 shadow-xl shadow-brand/20">
-                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-3"><Users className="w-5 h-5" /></div>
-                <p className="text-2xl font-black">{stats.totalApplicants || 0}</p>
-                <p className="text-[10px] font-bold uppercase tracking-wider mt-1 opacity-80">Total Applicants</p>
+
+              {/* Total Applicants */}
+              <div className="bg-gradient-to-br from-brand/15 to-brand/5 rounded-[1.75rem] p-6 border border-brand/30 shadow-md hover:-translate-y-1 transition-all duration-300 group cursor-pointer hover:shadow-lg hover:shadow-brand/10">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-12 h-12 bg-brand/30 rounded-2xl flex items-center justify-center group-hover:bg-brand/40 transition-colors">
+                    <Users className="w-6 h-6 text-brand" />
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-brand/50 group-hover:text-brand/70 group-hover:translate-x-1 transition-all" />
+                </div>
+                <p className="text-3xl md:text-4xl font-black text-brand leading-none mb-2">{stats.totalApplicants || 0}</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total Applicants</p>
+                <p className="text-[10px] text-brand/70 mt-2 hidden xs:block">Interested candidates</p>
               </div>
             </section>
           )}
@@ -527,6 +559,7 @@ export default function RecruiterDashboard() {
               </div>
             </section>
           )}
+          <FeedbackCorporate />
         </main>
       </div>
       <Footer />

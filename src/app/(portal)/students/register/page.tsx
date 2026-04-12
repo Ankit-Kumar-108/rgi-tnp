@@ -20,12 +20,12 @@ import {
     Eye,
     EyeOff,
     FileText,
-    CheckCircle2
 } from "lucide-react";
 import Link from "next/link";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { uploadFileToR2 } from "@/lib/upload-r2";
+import { toast } from "sonner";
 
 export default function StudentRegister() {
     const router = useRouter();
@@ -54,7 +54,21 @@ export default function StudentRegister() {
     const [resumeFile, setResumeFile] = useState<File | null>(null);
     const [resumePreviewURL, setResumePreviewURL] = useState<string | null>(null);
 
-    // --- Helper Functions ---
+    // smart year dropdown
+    const [year, setYear] = useState<number[]>([]);
+
+    // smart year function
+
+    const smartYearOptions = () => {
+        const currentYear = new Date().getFullYear()
+        const yearsArray = Array.from({length: 4}, (_, i) => currentYear + i)
+        setYear(yearsArray)
+    }
+
+    useEffect(() => {
+        smartYearOptions()
+    }, [])
+
 
     const update = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
         setForm(prev => ({ ...prev, [field]: e.target.value }));
@@ -71,7 +85,7 @@ export default function StudentRegister() {
         }
         setProfileImageFile(selectedFile);
         setImgPreviewURL(URL.createObjectURL(selectedFile));
-        setError(""); // Clear error when successful
+        setError(""); 
     };
 
     // Validates and sets the resume
@@ -99,14 +113,17 @@ export default function StudentRegister() {
         
         if (form.password !== form.confirmPassword) { 
             setError("Passwords do not match"); 
+            toast.error("Passwords do not match");
             return; 
         }
         if (!profileImageFile) { 
             setError("Please upload a profile image to continue."); 
+            toast.error("Please upload a profile image to continue.");
             return; 
         }
         if (!resumeFile) { 
             setError("Please upload your resume to continue."); 
+            toast.error("Please upload your resume to continue.");
             return; 
         }
 
@@ -130,19 +147,21 @@ export default function StudentRegister() {
             
             if (!res.ok || !data.success) { 
                 setError(data.message || "Registration failed"); 
+                toast.error(data.message || "Registration failed");
                 return; 
             }
             
             setSuccess("Registration successful! Check your email for the verification link.");
+            toast.success("Registration successful! Check your email for the verification link.");
             setTimeout(() => router.push(`/students/login`), 1000);
         } catch { 
             setError("Something went wrong."); 
+            toast.error("Something went wrong.");
         } finally { 
             setLoading(false); 
         }
     };
 
-    // --- Styling Constants ---
     const inputClass = "w-full pl-10 sm:pl-11 pr-12 py-2.5 sm:py-3.5 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all placeholder:text-muted-foreground text-sm sm:text-base shadow-sm";
     const iconClass = "absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-muted-foreground";
 
@@ -164,7 +183,7 @@ export default function StudentRegister() {
                             <button
                                 onClick={() => {
                                     setIsProfileImgModalOpen(false);
-                                    if (!profileImageFile) setImgPreviewURL(null); // Revert if cancelled
+                                    if (!profileImageFile) setImgPreviewURL(null); 
                                 }}
                                 className="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground hover:text-foreground shrink-0"
                             >
@@ -423,12 +442,27 @@ export default function StudentRegister() {
                             
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                                 <div className="space-y-1">
-                                    <label className="text-xs sm:text-sm font-semibold text-foreground">Semester</label>
-                                    <input className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} type="number" min="1" max="8" placeholder="1-8" required value={form.semester} onChange={update("semester")} />
+                                    <label className="text-xs sm:text-sm font-semibold text-foreground">Select Semester</label>
+                                    <select className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} required value={form.semester} onChange={update("semester")}>
+                                        <option value="">Select</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                    </select>
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-xs sm:text-sm font-semibold text-foreground">Batch</label>
-                                    <input className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} type="text" placeholder="2024-2028" required value={form.batch} onChange={update("batch")} />
+                                    <label className="text-xs sm:text-sm font-semibold text-foreground">Select Batch</label>
+                                    <select className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} required value={form.batch} onChange={update("batch")}>
+                                        <option value="">Select</option>
+                                        {year.map((y) => (
+                                            <option key={y} value={y}>{y}</option>
+                                        ))}
+                                    </select>
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-xs sm:text-sm font-semibold text-foreground">CGPA</label>

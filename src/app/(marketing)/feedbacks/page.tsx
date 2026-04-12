@@ -1,31 +1,56 @@
 "use client";
 
 import React, { useEffect, useState, useRef, useCallback, useMemo } from "react";
-import { Star, Building2, BadgeCheck, Quote, GraduationCap, Loader2 } from "lucide-react";
-import Footer from "@/components/layout/footer/footer";
-import Nav from "@/components/layout/nav/nav";
+import { Star, Building2, Quote, GraduationCap, Loader2, UserCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import Nav from "@/components/layout/nav/nav";
+import Footer from "@/components/layout/footer/footer";
 
+/* --- Types & Interfaces --- */
 type FilterTab = "All Feedback" | "Alumni" | "Recruiters" | "Students";
 
+interface BaseFeedback {
+  id: string;
+  content: string;
+  rating: number;
+  createdAt: string;
+  _type: Exclude<FilterTab, "All Feedback">;
+}
+
+interface StudentFeedback extends BaseFeedback {
+  student: { name: string; course: string; batch: string; branch: string; profileImageUrl?: string | null };
+}
+
+interface AlumniFeedback extends BaseFeedback {
+  alumni: { name: string; branch: string; batch: string; course: string; profileImageUrl?: string | null };
+}
+
+interface RecruiterFeedback extends BaseFeedback {
+  recruiter: { name: string; company: string; designation: string };
+}
+
+type FeedbackUnion = StudentFeedback | AlumniFeedback | RecruiterFeedback;
+
+const TABS: FilterTab[] = ["All Feedback", "Alumni", "Recruiters", "Students"];
+
+/* --- Main Page Component --- */
 export default function Testimonials() {
-  const [feedbacks, setFeedbacks] = useState<any[]>([]);
+  const [feedbacks, setFeedbacks] = useState<FeedbackUnion[]>([]);
   const [activeFilter, setActiveFilter] = useState<FilterTab>("All Feedback");
   
-  // Pagination & Loading States
+  // Pagination & Infinite Scroll States
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [totalCount, setTotalCount] = useState(0);
 
-  // Infinite Scroll Sensor
+  // Intersection Observer for Infinite Scroll
   const observer = useRef<IntersectionObserver | null>(null);
   const lastItemRef = useCallback((node: HTMLDivElement | null) => {
-    if (isLoading) return;
+    if (isLoading || !hasMore) return;
     if (observer.current) observer.current.disconnect();
 
     observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMore) {
+      if (entries[0].isIntersecting) {
         setPage(prevPage => prevPage + 1);
       }
     });
@@ -33,96 +58,92 @@ export default function Testimonials() {
     if (node) observer.current.observe(node);
   }, [isLoading, hasMore]);
 
-  // Fetch Data
-  useEffect(() => {
-    const loadFeedback = async () => {
-      if (page === 1) setIsLoading(true);
+  // Fetch Data Function
+  const loadFeedback = useCallback(async (currentPage: number) => {
+    setIsLoading(true);
+
+    try {
+      // Fetch 10 from each category per page (API returns up to 30 combined)
+      const response = await fetch(`/api/feedback?limit=10&page=${currentPage}`);
+      if (!response.ok) throw new Error("Network response was not ok");
       
-      try {
-        // Fetching 10 from each category (30 total per page)
-        const response = await fetch(`/api/feedback?limit=10&page=${page}`);
-        if (response.ok) {
-          const data = await response.json() as {
-            success: boolean;
-            studentFeedback: any[];
-            alumniFeedback: any[];
-            corporateFeedback: any[];
-            studentFeedbackCount: number;
-            alumniFeedbackCount: number;
-            corporateFeedbackCount: number;
-          }
-          
-          if (data.success) {
-            // 1. Normalize the three arrays into one consistent format
-            const students = data.studentFeedback.map((f: any) => ({ ...f, _type: 'Students' }));
-            const alumni = data.alumniFeedback.map((f: any) => ({ ...f, _type: 'Alumni' }));
-            const corporate = data.corporateFeedback.map((f: any) => ({ ...f, _type: 'Recruiters' }));
+      const data = await response.json() as any
+      
+      if (data.success) {
+        // Normalize the three arrays and attach type identifiers
+        const students = (data.studentFeedback || []).map((f: any) => ({ ...f, _type: 'Students' }));
+        const alumni = (data.alumniFeedback || []).map((f: any) => ({ ...f, _type: 'Alumni' }));
+        const recruiters = (data.corporateFeedback || []).map((f: any) => ({ ...f, _type: 'Recruiters' }));
 
-            // 2. Combine and sort by newest first
-            const combined = [...students, ...alumni, ...corporate].sort(
-              (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-            );
-
-            // 3. Update State safely
-            setFeedbacks(prev => {
-              if (page === 1) return combined;
-              const existingIds = new Set(prev.map(f => f.id));
-              const newItems = combined.filter(c => !existingIds.has(c.id));
-              return [...prev, ...newItems].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-            });
-
-            // 4. Update Totals
-            const total = data.studentFeedbackCount + data.alumniFeedbackCount + data.corporateFeedbackCount;
-            setTotalCount(total);
-            
-            // If the combined array we got back is empty, we hit the end
-            setHasMore(combined.length > 0);
-          }
+        const combined: FeedbackUnion[] = [...students, ...alumni, ...recruiters];
+        
+        // If no new items are returned, stop fetching
+        if (combined.length === 0) {
+          setHasMore(false);
+          setIsLoading(false);
+          return;
         }
-      } catch (error) {
-        console.error("Error fetching feedback:", error);
-        toast.error("Failed to load testimonials.");
-      } finally {
-        setIsLoading(false);
+
+        setFeedbacks(prev => {
+          // De-duplicate items based on ID to handle React Strict Mode double-invocations
+          const allItems = currentPage === 1 ? combined : [...prev, ...combined];
+          const uniqueItemsMap = new Map(allItems.map(item => [item.id, item]));
+          const uniqueItems = Array.from(uniqueItemsMap.values());
+          
+          // Sort overall array by newest first
+          return uniqueItems.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        });
       }
-    };
+    } catch (error) {
+      console.error("Error fetching feedback:", error);
+      if (page === 1) {
+        toast.error("Failed to load feedbacks. Please try again.");
+      } else {
+        toast.error("Failed to load more feedbacks. Please scroll again.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-    loadFeedback();
-  }, [page]);
+  // Trigger fetch when page changes
+  useEffect(() => {
+    loadFeedback(page);
+  }, [page, loadFeedback]);
 
-  // Filter the combined list
+  // Filter the displayed list based on the active tab
   const displayedFeedbacks = useMemo(() => {
     return feedbacks.filter(f => activeFilter === "All Feedback" || f._type === activeFilter);
   }, [feedbacks, activeFilter]);
 
-  const TABS: FilterTab[] = ["All Feedback", "Alumni", "Recruiters", "Students"];
-
   return (
     <>
       <Nav />
-      <div className="bg-background text-foreground antialiased font-sans flex flex-col min-h-screen selection:bg-brand/10 selection:text-brand">
-        <main className="flex-1 w-full pt-20 pb-24">
-          
-          {/* Header & Filter Tabs */}
-          <section className="max-w-7xl mx-auto px-6 md:px-8 mb-16 space-y-8 text-center">
-            <div className="space-y-4">
-              <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground">
-                Hear From Our <span className="text-brand">Community</span>
-              </h1>
-              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                Discover what our students, alumni, and top recruiting partners have to say about their experience with RGI.
-              </p>
-            </div>
+      <div className="bg-background dark:bg-background min-h-screen font-sans selection:bg-brand/20 selection:text-brand">
+        <main className="pt-24 pb-24">
 
-            <div className="flex flex-wrap justify-center gap-2 md:gap-4 p-2 bg-muted/50 backdrop-blur-md rounded-2xl w-fit mx-auto border border-border">
+          {/* Header Section */}
+          <section className="max-w-7xl mx-auto px-6 md:px-8 mb-16 text-center space-y-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight">
+              Hear From Our <span className="text-brand dark:text-brand">Community</span>
+            </h1>
+            <p className="text-slate-500 dark:text-slate-400 text-lg max-w-2xl mx-auto font-medium">
+              Discover what our students, alumni, and top recruiting partners have to say about their experience.
+            </p>
+
+            {/* Filter Tabs */}
+            <div className="flex flex-wrap justify-center gap-2 p-1.5 bg-white dark:bg-slate-800 shadow-sm rounded-2xl w-fit mx-auto border border-slate-200 dark:border-slate-700">
               {TABS.map((tab) => (
                 <button
                   key={tab}
-                  onClick={() => setActiveFilter(tab)}
-                  className={`px-6 md:px-8 py-2.5 md:py-3 rounded-xl font-bold text-xs md:text-sm transition-all duration-300 ${
+                  onClick={() => {
+                    setActiveFilter(tab);
+                    // Reset to top visually if desired, though infinite scroll keeps data in memory
+                  }}
+                  className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ${
                     activeFilter === tab
-                      ? "bg-brand text-primary-foreground shadow-lg shadow-brand/20"
-                      : "text-muted-foreground hover:bg-background hover:text-foreground"
+                      ? "bg-brand text-white shadow-md shadow-brand/20"
+                      : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700"
                   }`}
                 >
                   {tab}
@@ -131,37 +152,43 @@ export default function Testimonials() {
             </div>
           </section>
 
-          {/* Feedback Masonry Grid */}
+          {/* Masonry Grid */}
           <section className="max-w-7xl mx-auto px-6 md:px-8">
             {isLoading && page === 1 ? (
-              <div className="flex justify-center py-20">
+              <div className="flex justify-center py-32">
                 <Loader2 className="w-10 h-10 animate-spin text-brand" />
               </div>
             ) : displayedFeedbacks.length === 0 ? (
-              <div className="text-center py-20 text-muted-foreground">
-                <Quote className="w-12 h-12 mx-auto mb-4 opacity-20" />
-                <p className="font-bold text-lg">No feedback found for this category.</p>
-              </div>
+              <EmptyState />
             ) : (
               <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
                 {displayedFeedbacks.map((feedback, index) => {
                   const isLastElement = index === displayedFeedbacks.length - 1;
 
                   return (
-                    <div key={feedback.id} ref={isLastElement ? lastItemRef : null}>
-                      {feedback._type === "Recruiters" && <RecruiterCard data={feedback} />}
-                      {feedback._type === "Alumni" && <AlumniCard data={feedback} />}
-                      {feedback._type === "Students" && <StudentCard data={feedback} />}
+                    <div key={feedback.id} ref={isLastElement ? lastItemRef : null} className="break-inside-avoid relative">
+                      {feedback._type === "Recruiters" && <RecruiterCard data={feedback as RecruiterFeedback} />}
+                      {feedback._type === "Alumni" && <AlumniCard data={feedback as AlumniFeedback} />}
+                      {feedback._type === "Students" && <StudentCard data={feedback as StudentFeedback} />}
                     </div>
                   );
                 })}
               </div>
             )}
 
-            {/* Bottom Loading State */}
+            {/* Infinite Scroll Loading Indicator */}
             {isLoading && page > 1 && (
-              <div className="flex justify-center py-10 mt-8">
-                <Loader2 className="w-8 h-8 animate-spin text-brand" />
+              <div className="flex justify-center py-12 mt-8">
+                <div className="bg-white dark:bg-slate-800 p-4 rounded-full shadow-sm border border-slate-200 dark:border-slate-700">
+                  <Loader2 className="w-6 h-6 animate-spin text-brand" />
+                </div>
+              </div>
+            )}
+            
+            {/* End of list message */}
+            {!hasMore && displayedFeedbacks.length > 0 && (
+              <div className="text-center py-12 mt-8 text-slate-400 dark:text-slate-500 font-medium text-sm">
+                You've reached the end of the feedback.
               </div>
             )}
           </section>
@@ -172,121 +199,152 @@ export default function Testimonials() {
   );
 }
 
-/* --- Dynamic Sub-Components --- */
+/* --- Shared & Premium Sub-Components --- */
 
-function StarRating({ rating }: { rating: number }) {
-  return (
-    <div className="flex mb-4 text-yellow-500">
-      {[...Array(5)].map((_, i) => (
-        <Star key={i} className={`w-4 h-4 ${i < rating ? "fill-current" : "text-muted stroke-current"}`} />
-      ))}
+const StarRating = React.memo(({ rating }: { rating: number }) => (
+  <div className="flex gap-1 mb-5" aria-label={`Rating ${rating} out of 5`}>
+    {[...Array(5)].map((_, i) => (
+      <Star 
+        key={i} 
+        className={`w-4 h-4 transition-colors ${
+          i < rating 
+            ? "fill-yellow-400 text-yellow-400" 
+            : "text-slate-200 dark:text-slate-700"
+        }`} 
+      />
+    ))}
+  </div>
+));
+StarRating.displayName = "StarRating";
+
+const EmptyState = React.memo(() => (
+  <div className="flex flex-col items-center justify-center py-32 text-slate-400 dark:text-slate-500">
+    <div className="bg-slate-100 dark:bg-slate-800/50 p-6 rounded-3xl mb-6">
+      <Quote className="w-12 h-12 opacity-50" />
     </div>
-  );
-}
+    <h3 className="font-bold text-xl text-slate-900 dark:text-slate-100 mb-2">No feedback found</h3>
+    <p className="text-sm">There are currently no testimonials in this category.</p>
+  </div>
+));
+EmptyState.displayName = "EmptyState";
 
-function RecruiterCard({ data }: { data: any }) {
-  const isDark = Math.random() > 0.5; // Randomly assigns the dark/light variations you created!
-
-  if (isDark) {
-    return (
-      <div className="break-inside-avoid bg-foreground p-8 rounded-[2rem] shadow-xl text-background hover:scale-[1.02] transition-all duration-300">
-        <div className="flex justify-between items-center mb-6">
-          <div className="text-lg font-black tracking-tighter uppercase line-clamp-1 pr-4">
-            {data.recruiter?.company || "Corporate Partner"}
+/* --- 1. Recruiter Card (Corporate & Elegant) --- */
+const RecruiterCard = React.memo(({ data }: { data: RecruiterFeedback }) => {
+  return (
+    <div className="group relative bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-200/80 dark:border-slate-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+      {/* Decorative Watermark */}
+      <Building2 className="absolute -top-6 -right-6 w-32 h-32 text-slate-50 dark:text-slate-900 z-0 rotate-12 transition-transform group-hover:rotate-6 group-hover:scale-110 duration-500" />
+      
+      <div className="relative z-10">
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <h4 className="font-extrabold text-slate-900 dark:text-slate-50 text-lg uppercase tracking-tight">
+              {data.recruiter.company}
+            </h4>
+            <span className="inline-block mt-1 text-[10px] font-bold tracking-widest text-brand dark:text-brand uppercase bg-brand/10 px-2 py-1 rounded-md">
+              Industry Partner
+            </span>
           </div>
-          <BadgeCheck className="w-5 h-5 text-brand fill-current shrink-0" />
         </div>
-        <p className="text-background/80 text-sm leading-relaxed mb-6 italic">
-          "{data.content}"
-        </p>
+        
         <StarRating rating={data.rating} />
-        <p className="font-bold text-sm">{data.recruiter?.name}</p>
-        <p className="text-background/60 text-[10px]">{data.recruiter?.designation}</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="break-inside-avoid bg-card p-8 rounded-[2rem] shadow-sm border border-border hover:shadow-xl hover:scale-[1.02] transition-all duration-300 group">
-      <div className="flex justify-between items-start mb-6">
-        <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center font-black text-muted-foreground text-xl group-hover:text-brand transition-colors">
-          {data.recruiter?.company?.charAt(0) || "C"}
+        
+        <blockquote className="text-slate-600 dark:text-slate-300 font-medium text-[15px] leading-relaxed mb-8">
+          "{data.content}"
+        </blockquote>
+        
+        <div className="flex items-center gap-3 pt-6 border-t border-slate-100 dark:border-slate-700">
+          <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center shrink-0">
+             <UserCircle2 className="w-5 h-5 text-slate-400" />
+          </div>
+          <div>
+            <p className="font-bold text-sm text-slate-900 dark:text-slate-100">{data.recruiter.name}</p>
+            <p className="text-slate-500 dark:text-slate-400 text-xs font-medium">{data.recruiter.designation}</p>
+          </div>
         </div>
-        <div className="flex items-center gap-1 text-brand bg-brand/10 px-2 py-1 rounded-lg">
-          <Building2 className="w-3 h-3" />
-          <span className="text-[10px] font-bold uppercase">Recruiter</span>
-        </div>
-      </div>
-      <StarRating rating={data.rating} />
-      <p className="text-foreground font-medium text-sm leading-relaxed mb-6 italic">
-        "{data.content}"
-      </p>
-      <div className="pt-6 border-t border-border">
-        <h4 className="font-bold text-foreground">{data.recruiter?.name}</h4>
-        <p className="text-muted-foreground text-xs">{data.recruiter?.designation}, {data.recruiter?.company}</p>
       </div>
     </div>
   );
-}
+});
+RecruiterCard.displayName = "RecruiterCard";
 
-function AlumniCard({ data }: { data: any }) {
+/* --- 2. Alumni Card (Nostalgic & Proud) --- */
+const AlumniCard = React.memo(({ data }: { data: AlumniFeedback }) => {
   return (
-    <div className="break-inside-avoid bg-muted/50 p-8 rounded-[2rem] shadow-sm border border-border hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
+    <div className="relative bg-linear-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 p-8 rounded-3xl border border-slate-200/80 dark:border-slate-700 hover:shadow-xl hover:border-brand/30 transition-all duration-300">
       <div className="flex items-center gap-4 mb-6">
-        <div className="w-12 h-12 rounded-full overflow-hidden bg-card border border-border shrink-0 flex items-center justify-center font-bold text-brand">
-          {data.alumni?.profileImageUrl ? (
-            <img className="w-full h-full object-cover" alt={data.alumni.name} loading="lazy" src={data.alumni.profileImageUrl} />
-          ) : (
-            data.alumni?.name?.charAt(0)
-          )}
+        <div className="relative shrink-0">
+          <div className="w-14 h-14 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-700 border-2 border-white dark:border-slate-600 shadow-sm">
+            {data.alumni.profileImageUrl ? (
+              <img className="w-full h-full object-cover" alt={data.alumni.name} src={data.alumni.profileImageUrl} loading="lazy" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center font-bold text-brand text-xl bg-brand/10 dark:bg-brand/30">
+                {data.alumni.name.charAt(0)}
+              </div>
+            )}
+          </div>
+            <div className="absolute -bottom-1 -right-1 bg-brand text-white p-1.5 rounded-full ring-2 ring-white dark:ring-slate-900">
+            <GraduationCap className="w-3 h-3" />
+          </div>
         </div>
+        
         <div className="flex-1 min-w-0">
-          <h4 className="font-bold text-foreground text-sm truncate">{data.alumni?.name}</h4>
-          <p className="text-brand text-[10px] font-bold uppercase tracking-wider truncate">
-            {data.alumni?.branch} '{data.alumni?.batch?.slice(-2)}
+          <h4 className="font-bold text-slate-900 dark:text-slate-100 text-[15px] truncate">{data.alumni.name}</h4>
+          <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5 truncate">
+            {data.alumni.course} {data.alumni.branch ? `• ${data.alumni.branch}` : ''}
+          </p>
+          <p className="text-brand dark:text-brand text-[11px] font-bold mt-0.5">
+            Class of {data.alumni.batch}
           </p>
         </div>
-        <div className="flex items-center gap-1 text-brand/40 shrink-0">
-          <BadgeCheck className="w-5 h-5 fill-current" />
-        </div>
       </div>
+      
       <StarRating rating={data.rating} />
-      <p className="text-muted-foreground text-sm leading-relaxed italic">
+      
+      <blockquote className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed relative z-10">
         "{data.content}"
-      </p>
+      </blockquote>
     </div>
   );
-}
+});
+AlumniCard.displayName = "AlumniCard";
 
-function StudentCard({ data }: { data: any }) {
+/* --- 3. Student Card (Fresh & Vibrant) --- */
+const StudentCard = React.memo(({ data }: { data: StudentFeedback }) => {
   return (
-    <div className="break-inside-avoid bg-card p-8 rounded-[2rem] shadow-sm border border-border hover:shadow-xl hover:scale-[1.02] transition-all duration-300 border-l-4 border-l-brand">
-      <div className="flex justify-between items-start mb-4">
-        <div className="flex items-center gap-2">
-          <span className="bg-brand/10 text-brand text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider">
-            Current Student
-          </span>
-        </div>
-      </div>
-      <StarRating rating={data.rating} />
-      <p className="text-foreground font-semibold text-sm leading-relaxed mb-6 italic">
-        "{data.content}"
-      </p>
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-muted overflow-hidden flex items-center justify-center font-bold text-muted-foreground border border-border shrink-0">
-          {data.student?.profileImageUrl ? (
-            <img className="w-full h-full object-cover" alt={data.student.name} loading="lazy" src={data.student.profileImageUrl} />
-          ) : (
-            data.student?.name?.charAt(0)
-          )}
-        </div>
-        <div className="min-w-0">
-          <p className="font-bold text-xs text-foreground truncate">{data.student?.name}</p>
-          <p className="text-muted-foreground text-[10px] truncate">
-            {data.student?.course} '{data.student?.batch?.slice(-2)}
-          </p>
+    <div className="relative bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-200/80 dark:border-slate-700 hover:shadow-xl transition-all duration-300 overflow-hidden">
+       {/* Left side accent line */}
+      <div className="absolute top-0 left-0 bottom-0 w-1.5 bg-brand rounded-l-3xl" />
+      
+      <div className="pl-2">
+        <StarRating rating={data.rating} />
+        
+        <blockquote className="text-slate-800 dark:text-slate-200 font-medium text-[15px] leading-relaxed mb-8 relative z-10">
+          "{data.content}"
+        </blockquote>
+        
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-700 shrink-0">
+            {data.student.profileImageUrl ? (
+              <img className="w-full h-full object-cover" alt={data.student.name} src={data.student.profileImageUrl} loading="lazy" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center font-bold text-slate-500">
+                {data.student.name.charAt(0)}
+              </div>
+            )}
+          </div>
+          <div className="min-w-0">
+            <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 truncate">{data.student.name}</h4>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+              <p className="text-slate-500 dark:text-slate-400 text-xs truncate">
+                Current Student • {data.student.course}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
-}
+});
+StudentCard.displayName = "StudentCard";

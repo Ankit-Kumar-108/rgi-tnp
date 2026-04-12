@@ -46,6 +46,8 @@ model Student {
   isVerified                   Boolean             @default(false)
   emailVerificationToken       String?
   emailVerificationTokenExpiry DateTime?
+  emailVerificationFailed      Boolean             @default(false)
+  emailVerificationError       String?
   resetPasswordToken           String?
   resetPasswordTokenExpiry     DateTime?
   profileImageUrl              String?
@@ -76,6 +78,8 @@ model Alumni {
   isVerified        Boolean          @default(false)
   emailVerificationToken       String?
   emailVerificationTokenExpiry DateTime?
+  emailVerificationFailed      Boolean             @default(false)
+  emailVerificationError       String?
   resetPasswordToken           String?
   resetPasswordTokenExpiry     DateTime?
   isProfileComplete Boolean          @default(false)
@@ -121,6 +125,8 @@ model ExternalStudent {
   isVerified                   Boolean             @default(false)
   emailVerificationToken       String?
   emailVerificationTokenExpiry DateTime?
+  emailVerificationFailed      Boolean             @default(false)
+  emailVerificationError       String?
   resetPasswordToken           String?
   resetPasswordTokenExpiry     DateTime?
   role                         String              @default("external_student")

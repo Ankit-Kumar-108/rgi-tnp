@@ -34,6 +34,51 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: true, items: drives, totalCount });
     }
 
+    if(type === "studentFeedback"){
+      const where = { isApproved: false };
+      const [feedbacks, totalCount] = await Promise.all([
+        db.studentFeedback.findMany({
+          where,
+          include: { student: { select: { name: true, enrollmentNumber: true, profileImageUrl: true } } },
+          orderBy: { createdAt: "desc" },
+          take: limit,
+          skip: skip,
+        }),
+        db.studentFeedback.count({ where })
+      ]);
+      return NextResponse.json({ success: true, items: feedbacks, totalCount });
+    }
+
+     if(type === "alumniFeedback"){
+      const where = { isApproved: false };
+      const [feedbacks, totalCount] = await Promise.all([
+        db.alumniFeedback.findMany({
+          where,
+          include: { alumni: { select: { name: true, personalEmail: true, profileImageUrl: true } } },
+          orderBy: { createdAt: "desc" },
+          take: limit,
+          skip: skip,
+        }),
+        db.alumniFeedback.count({ where })
+      ]);
+      return NextResponse.json({ success: true, items: feedbacks, totalCount });
+    }
+
+    if(type === "corporateFeedback"){
+      const where = { isApproved: false };
+      const [feedbacks, totalCount] = await Promise.all([
+        db.corporateFeedback.findMany({
+          where,
+          include: { recruiter: { select: { name: true, email: true } } },
+          orderBy: { createdAt: "desc" },
+          take: limit,
+          skip: skip,
+        }),
+        db.corporateFeedback.count({ where })
+      ]);
+      return NextResponse.json({ success: true, items: feedbacks, totalCount });
+    }
+
     if (type === "referrals") {
       const where = { status: "pending" };
       const [referrals, totalCount] = await Promise.all([
@@ -84,6 +129,62 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: true, items: memories, totalCount });
     }
 
+    if (type === "unverifiedStudents") {
+      const where = { emailVerificationFailed: true };
+      const [students, totalCount] = await Promise.all([
+        db.student.findMany({
+          where,
+          select: {
+            id: true, name: true, enrollmentNumber: true, email: true, branch: true,
+            batch: true, course: true, cgpa: true, profileImageUrl: true, phoneNumber: true,
+            emailVerificationError: true, createdAt: true,
+          },
+          orderBy: { createdAt: "desc" },
+          take: limit,
+          skip: skip,
+        }),
+        db.student.count({ where })
+      ]);
+      return NextResponse.json({ success: true, items: students, totalCount });
+    }
+
+    if (type === "unverifiedAlumni") {
+      const where = { emailVerificationFailed: true };
+      const [alumni, totalCount] = await Promise.all([
+        db.alumni.findMany({
+          where,
+          select: {
+            id: true, name: true, enrollmentNumber: true, personalEmail: true, branch: true,
+            batch: true, course: true, profileImageUrl: true, phoneNumber: true,
+            emailVerificationError: true, createdAt: true,
+          },
+          orderBy: { createdAt: "desc" },
+          take: limit,
+          skip: skip,
+        }),
+        db.alumni.count({ where })
+      ]);
+      return NextResponse.json({ success: true, items: alumni, totalCount });
+    }
+
+    if (type === "unverifiedExternal") {
+      const where = { emailVerificationFailed: true };
+      const [external, totalCount] = await Promise.all([
+        db.externalStudent.findMany({
+          where,
+          select: {
+            id: true, name: true, enrollmentNumber: true, email: true, branch: true,
+            batch: true, course: true, cgpa: true, profileImageUrl: true, phoneNumber: true,
+            collegeName: true, emailVerificationError: true, createdAt: true,
+          },
+          orderBy: { createdAt: "desc" },
+          take: limit,
+          skip: skip,
+        }),
+        db.externalStudent.count({ where })
+      ]);
+      return NextResponse.json({ success: true, items: external, totalCount });
+    }
 
     return NextResponse.json({ success: false, message: "Invalid type" }, { status: 400 });
   } catch (error) {
@@ -141,6 +242,91 @@ export async function POST(req: NextRequest) {
         });
       } else {
         await db.memory.deleteMany({
+          where: { id: { in: targetIds } },
+        });
+      }
+    } else if (type === "studentFeedback") {
+      if (action === "approve") {
+        await db.studentFeedback.updateMany({
+          where: { id: { in: targetIds } },
+          data: { isApproved: true },
+        });
+      } else {
+        await db.studentFeedback.deleteMany({
+          where: { id: { in: targetIds } },
+        });
+      }
+    } else if (type === "alumniFeedback") {
+      if (action === "approve") {
+        await db.alumniFeedback.updateMany({
+          where: { id: { in: targetIds } },
+          data: { isApproved: true },
+        });
+      } else {
+        await db.alumniFeedback.deleteMany({
+          where: { id: { in: targetIds } },
+        });
+      }
+    } else if (type === "corporateFeedback") {
+      if (action === "approve") {
+        await db.corporateFeedback.updateMany({
+          where: { id: { in: targetIds } },
+          data: { isApproved: true },
+        });
+      } else {
+        await db.corporateFeedback.deleteMany({
+          where: { id: { in: targetIds } },
+        });
+      }
+    } else if (type === "unverifiedStudents") {
+      if (action === "approve") {
+        // Admin override: Clear email failure flag to allow manual verification or force verify
+        await db.student.updateMany({
+          where: { id: { in: targetIds } },
+          data: {
+            emailVerificationFailed: false,
+            emailVerificationError: null,
+            isEmailVerified: true, // Force verify on admin approval
+            isVerified: true,
+          },
+        });
+      } else {
+        // Reject: Delete the failed registration
+        await db.student.deleteMany({
+          where: { id: { in: targetIds } },
+        });
+      }
+    } else if (type === "unverifiedAlumni") {
+      if (action === "approve") {
+        // Admin override: Clear email failure flag
+        await db.alumni.updateMany({
+          where: { id: { in: targetIds } },
+          data: {
+            emailVerificationFailed: false,
+            emailVerificationError: null,
+            isVerified: true, // Force verify on admin approval
+          },
+        });
+      } else {
+        // Reject: Delete the failed registration
+        await db.alumni.deleteMany({
+          where: { id: { in: targetIds } },
+        });
+      }
+    } else if (type === "unverifiedExternal") {
+      if (action === "approve") {
+        // Admin override: Clear email failure flag
+        await db.externalStudent.updateMany({
+          where: { id: { in: targetIds } },
+          data: {
+            emailVerificationFailed: false,
+            emailVerificationError: null,
+            isVerified: true, // Force verify on admin approval
+          },
+        });
+      } else {
+        // Reject: Delete the failed registration
+        await db.externalStudent.deleteMany({
           where: { id: { in: targetIds } },
         });
       }

@@ -18,6 +18,7 @@ export async function GET(req: NextRequest) {
             db.studentFeedback.findMany({
                 take: limit,
                 skip,
+                where: { isApproved: true },
                 orderBy: { createdAt: "desc" },
                 include: {
                     student: {
@@ -34,6 +35,7 @@ export async function GET(req: NextRequest) {
             db.alumniFeedback.findMany({
                 take: limit,
                 skip,
+                where: { isApproved: true },
                 orderBy: { createdAt: "desc" },
                 include: {
                     alumni: {
@@ -50,6 +52,7 @@ export async function GET(req: NextRequest) {
             db.corporateFeedback.findMany({
                 take: limit,
                 skip,
+                where: { isApproved: true },
                 orderBy: { createdAt: "desc" },
                 include: {
                     recruiter: {
@@ -61,9 +64,9 @@ export async function GET(req: NextRequest) {
                     }
                 }
             }),
-            db.studentFeedback.count(),
-            db.alumniFeedback.count(),
-            db.corporateFeedback.count(),
+            db.studentFeedback.count({ where: { isApproved: true } }),
+            db.alumniFeedback.count({ where: { isApproved: true } }),
+            db.corporateFeedback.count({ where: { isApproved: true } }),
         ])
         
         return NextResponse.json({ success: true, studentFeedback, alumniFeedback, corporateFeedback, studentFeedbackCount, alumniFeedbackCount, corporateFeedbackCount });

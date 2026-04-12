@@ -4,12 +4,12 @@ import React, { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { CheckCircle, XCircle, Loader2, KeyRound, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 
 function ResetPasswordContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [status, setStatus] = useState<"form" | "loading" | "success" | "error">("form");
-  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -22,25 +22,21 @@ function ResetPasswordContent() {
     e.preventDefault();
 
     if (password.length < 8) {
-      setMessage("Password must be at least 8 characters");
-      setStatus("error");
+      toast.error("Password must be at least 8 characters");
       return;
     }
 
     if (password !== confirmPassword) {
-      setMessage("Passwords do not match");
-      setStatus("error");
+      toast.error("Passwords do not match");
       return;
     }
 
     if (!token) {
-      setMessage("Invalid reset link. Please request a new one.");
-      setStatus("error");
+      toast.error("Invalid reset link. Please request a new one.");
       return;
     }
 
-    setStatus("loading");
-    setMessage("");
+    setLoading(true);
 
     try {
       const res = await fetch("/api/auth/reset-password", {
@@ -51,15 +47,17 @@ function ResetPasswordContent() {
       const data = await res.json() as any;
 
       if (data.success) {
-        setStatus("success");
-        setMessage(data.message || "Password reset successfully!");
+        toast.success(data.message || "Password reset successfully!");
+        setTimeout(() => {
+          router.push(getLoginHref());
+        }, 1500);
       } else {
-        setStatus("error");
-        setMessage(data.message || "Reset failed. The link may have expired.");
+        toast.error(data.message || "Reset failed. The link may have expired.");
       }
     } catch {
-      setStatus("error");
-      setMessage("An error occurred. Please try again later.");
+      toast.error("An error occurred. Please try again later.");
+    } finally {
+      setLoading(false);
     }
   };
 

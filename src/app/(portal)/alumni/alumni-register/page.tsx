@@ -326,8 +326,8 @@ export default function AlumniRegister() {
                                     </select>
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-xs sm:text-sm font-semibold text-foreground">Batch</label>
-                                    <input className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} type="text" placeholder="e.g. 2020-2024" required value={form.batch} onChange={update("batch")} />
+                                    <label className="text-xs sm:text-sm font-semibold text-foreground">Batch (Passing Year)</label>
+                                    <input className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} type="text" placeholder="e.g. 2020" required value={form.batch} onChange={update("batch")} />
                                 </div>
                             </div>
 

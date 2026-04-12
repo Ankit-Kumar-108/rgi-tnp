@@ -77,11 +77,28 @@ export async function POST(req: NextRequest) {
     const protocol = host?.includes("localhost") ? "http" : "https";
     const verificationLink = `${protocol}://${host}/verify-email?token=${verificationToken}&email=${validatedData.personalEmail}&role=alumni`;
 
-    await sendEmail({
+    const emailResult = await sendEmail({
       to: validatedData.personalEmail,
       subject: "Verify Your Email - RGI TnP Portal",
       html: verificationEmailTemplate(validatedData.name, verificationLink),
     });
+
+    if (!emailResult.success) {
+      console.error("[ALUMNI-REGISTER] Email verification failed for:", validatedData.personalEmail, emailResult.error);
+      // Mark registration as failed due to email issue
+      await db.alumni.update({
+        where: { id: alumni.id },
+        data: {
+          emailVerificationFailed: true,
+          emailVerificationError: emailResult.error || "Unknown email service error"
+        }
+      });
+      return NextResponse.json({
+        success: false,
+        message: "Email verification failed. Please contact support.",
+        error: emailResult.error
+      }, { status: 500 });
+    }
 
     return NextResponse.json({
       success: true,

@@ -19,7 +19,8 @@ import {
   RefreshCw,
   BadgeCheck,
   BadgeAlert,
-  X
+  X,
+  AlertCircle
 } from "lucide-react";
 import Nav from "@/components/layout/nav/nav";
 import Footer from "@/components/layout/footer/footer";
@@ -27,7 +28,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { getToken, logout } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { set } from "zod";
 
 export default function AlumniDashboard() {
   const { loading: authLoading, authenticated, user } = useAuth("alumni", "/alumni/alumni-register");
@@ -146,11 +146,16 @@ export default function AlumniDashboard() {
       const d = (await res.json()) as any;
       setFbMsg({ msg: d.message, ok: d.success });
       if (d.success) {
+        toast.success(d.message || "Feedback submitted successfully!");
         setFbContent("");
         setFbRating(0);
+      } else {
+        toast.error(d.message || "Failed to submit feedback");
       }
-    } catch {
-      setFbMsg({ msg: "Failed to submit", ok: false });
+    } catch (error) {
+      const errorMsg = "Failed to submit feedback. Please try again.";
+      setFbMsg({ msg: errorMsg, ok: false });
+      toast.error(errorMsg);
     } finally {
       setSubmittingFb(false);
     }
@@ -492,38 +497,43 @@ export default function AlumniDashboard() {
           {/* Stats */}
           {!loading && !fetchError && (
             <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-card rounded-[2rem] p-8 border transition-all hover:-translate-y-1 bg-card border-border shadow-sm">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest mb-1 text-muted-foreground">Total Referrals</p>
-                    <h3 className="text-4xl md:text-5xl font-black">{stats.totalReferrals || 0}</h3>
+              {/* Stat Card: Total Referrals */}
+              <div className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 rounded-[1.75rem] p-6 md:p-8 border border-blue-500/20 shadow-sm hover:-translate-y-1 transition-all duration-300 group cursor-pointer">
+                <div className="flex items-start justify-between mb-6">
+                  <div className="w-14 h-14 bg-blue-500/20 rounded-2xl flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
+                    <UserPlus className="w-7 h-7 text-blue-600" />
                   </div>
-                  <div className="p-4 rounded-2xl bg-brand/10 text-brand">
-                    <UserPlus className="w-7 h-7 md:w-8 md:h-8" />
-                  </div>
+                  <ChevronRight className="w-4 h-4 text-blue-500/40 group-hover:text-blue-500/60 group-hover:translate-x-1 transition-all" />
                 </div>
+                <p className="text-3xl md:text-4xl font-black text-foreground leading-none mb-2">{stats.totalReferrals || 0}</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total Referrals</p>
+                <p className="text-[10px] text-blue-600/70 mt-2">Opportunities shared</p>
               </div>
-              <div className="bg-card rounded-[2rem] p-8 border transition-all hover:-translate-y-1 bg-card border-border shadow-sm">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest mb-1 text-muted-foreground">Approved</p>
-                    <h3 className="text-4xl md:text-5xl font-black">{stats.approvedReferrals || 0}</h3>
+
+              {/* Stat Card: Approved Referrals */}
+              <div className="bg-gradient-to-br from-green-500/10 to-green-500/5 rounded-[1.75rem] p-6 md:p-8 border border-green-500/20 shadow-sm hover:-translate-y-1 transition-all duration-300 group cursor-pointer">
+                <div className="flex items-start justify-between mb-6">
+                  <div className="w-14 h-14 bg-green-500/20 rounded-2xl flex items-center justify-center group-hover:bg-green-500/30 transition-colors">
+                    <Briefcase className="w-7 h-7 text-green-600" />
                   </div>
-                  <div className="p-4 rounded-2xl bg-brand/10 text-brand">
-                    <Briefcase className="w-7 h-7 md:w-8 md:h-8" />
-                  </div>
+                  <ChevronRight className="w-4 h-4 text-green-500/40 group-hover:text-green-500/60 group-hover:translate-x-1 transition-all" />
                 </div>
+                <p className="text-3xl md:text-4xl font-black text-foreground leading-none mb-2">{stats.approvedReferrals || 0}</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Approved</p>
+                <p className="text-[10px] text-green-600/70 mt-2">Published opportunities</p>
               </div>
-              <div className="rounded-[2rem] p-8 border transition-all hover:-translate-y-1 bg-brand text-white border-transparent shadow-xl shadow-brand/20">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest mb-1 opacity-80">Pending Review</p>
-                    <h3 className="text-4xl md:text-5xl font-black">{stats.pendingReferrals || 0}</h3>
+
+              {/* Stat Card: Pending Review */}
+              <div className="bg-gradient-to-br from-brand/15 to-brand/5 rounded-[1.75rem] p-6 md:p-8 border border-brand/30 shadow-md hover:-translate-y-1 transition-all duration-300 group cursor-pointer hover:shadow-lg hover:shadow-brand/10">
+                <div className="flex items-start justify-between mb-6">
+                  <div className="w-14 h-14 bg-brand/30 rounded-2xl flex items-center justify-center group-hover:bg-brand/40 transition-colors">
+                    <TrendingUp className="w-7 h-7 text-brand" />
                   </div>
-                  <div className="p-4 rounded-2xl bg-white/20 backdrop-blur-md">
-                    <TrendingUp className="w-7 h-7 md:w-8 md:h-8" />
-                  </div>
+                  <ChevronRight className="w-4 h-4 text-brand/50 group-hover:text-brand/70 group-hover:translate-x-1 transition-all" />
                 </div>
+                <p className="text-3xl md:text-4xl font-black text-brand leading-none mb-2">{stats.pendingReferrals || 0}</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Under Review</p>
+                <p className="text-[10px] text-brand/70 mt-2">Awaiting approval</p>
               </div>
             </section>
           )}
@@ -591,30 +601,79 @@ export default function AlumniDashboard() {
               </div>
 
               {/* Feedback Card */}
-              <div className="lg:col-span-1 bg-gradient-to-br from-muted/50 to-background rounded-[2.5rem] p-8 border border-border flex flex-col text-left">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="p-4 bg-brand/10 rounded-2xl text-brand"><MessageSquareShare className="w-6 h-6" /></div>
-                  <h2 className="text-2xl font-black text-foreground">Feedback</h2>
+              <div className="lg:col-span-1 bg-gradient-to-br from-brand/5 via-background to-muted/30 rounded-[2.5rem] p-8 border border-brand/20 shadow-lg shadow-brand/5 flex flex-col text-left hover:shadow-lg hover:shadow-brand/10 transition-all">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3.5 bg-gradient-to-br from-brand/20 to-brand/10 rounded-2xl text-brand flex items-center justify-center"><MessageSquareShare className="w-6 h-6" /></div>
+                    <div className="flex-1">
+                      <h2 className="text-2xl font-black text-foreground leading-tight">Share Your Feedback</h2>
+                      <p className="text-xs text-muted-foreground mt-0.5">Help us improve</p>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground mb-8 leading-relaxed font-medium uppercase tracking-tight">
+                
+                <p className="text-sm text-muted-foreground mb-6 leading-relaxed font-medium">
                   Is the college syllabus up to date? Rate the batch's preparedness and suggest improvements.
                 </p>
-                <div className="flex gap-2 mb-8">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <button key={s} onClick={() => setFbRating(s)} className={`transition-all hover:scale-110 cursor-pointer ${s <= fbRating ? "text-brand" : "text-muted-foreground/30"}`}>
-                      <Star className={`w-8 h-8 ${s <= fbRating ? "fill-current" : ""}`} />
-                    </button>
-                  ))}
+                
+                {/* Rating Stars */}
+                <div className="mb-6">
+                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">Your Rating</p>
+                  <div className="flex gap-3 bg-muted/20 p-4 rounded-xl">
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <button 
+                        key={s} 
+                        onClick={() => setFbRating(s)} 
+                        className={`transition-all duration-200 hover:scale-125 cursor-pointer ${
+                          s <= fbRating 
+                            ? "text-yellow-400 drop-shadow-md" 
+                            : "text-muted-foreground/30 hover:text-muted-foreground/50"
+                        }`}
+                      >
+                        <Star className={`w-7 h-7 ${s <= fbRating ? "fill-current" : ""}`} />
+                      </button>
+                    ))}
+                  </div>
+                  {fbRating > 0 && <p className="text-xs text-brand font-semibold mt-2">Rating: {fbRating}/5 ⭐</p>}
                 </div>
-                <textarea
-                  value={fbContent} onChange={(e) => setFbContent(e.target.value)}
-                  className="w-full flex-1 bg-background px-6 py-4 rounded-2xl border border-border focus:ring-2 focus:ring-brand outline-none text-sm mb-6 placeholder:text-muted-foreground/50 resize-none"
-                  placeholder="What skill is missing from the syllabus?" rows={4} />
-                {fbMsg && <p className={`text-sm font-medium mb-3 ${fbMsg.ok ? "text-green-600" : "text-red-500"}`}>{fbMsg.msg}</p>}
-                <button onClick={handleSubmitFeedback} disabled={submittingFb || !fbContent || fbRating === 0}
-                  className="mt-auto w-full bg-foreground text-background py-4 rounded-2xl font-black hover:bg-brand hover:text-white transition-all disabled:opacity-50"
+
+                {/* Feedback Textarea */}
+                <div className="mb-6">
+                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Your Feedback</p>
+                  <textarea
+                    value={fbContent} 
+                    onChange={(e) => setFbContent(e.target.value)}
+                    maxLength={500}
+                    className="w-full flex-1 bg-background px-6 py-4 rounded-2xl border-2 border-border hover:border-brand/30 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-sm placeholder:text-muted-foreground/40 resize-none transition-all"
+                    placeholder="What skill is missing from the syllabus? Any suggestions?" 
+                    rows={4} 
+                  />
+                  <p className="text-xs text-muted-foreground mt-2 text-right">{fbContent.length}/500 characters</p>
+                </div>
+
+                {/* Error/Success Message Display (kept for backward compatibility) */}
+                {fbMsg && !submittingFb && (
+                  <div className={`mb-4 p-3 rounded-xl text-sm font-medium ${
+                    fbMsg.ok 
+                      ? "bg-green-500/10 text-green-600" 
+                      : "bg-red-500/10 text-red-600"
+                  }`}>
+                    {fbMsg.msg}
+                  </div>
+                )}
+
+                {/* Submit Button */}
+                <button 
+                  onClick={handleSubmitFeedback} 
+                  disabled={submittingFb || !fbContent.trim() || fbRating === 0}
+                  className="mt-auto w-full bg-gradient-to-r from-brand to-brand/80 hover:from-brand/90 hover:to-brand/70 disabled:from-muted disabled:to-muted/50 text-primary-foreground py-4 rounded-2xl font-black transition-all duration-200 shadow-lg shadow-brand/20 hover:shadow-brand/30 disabled:shadow-none active:scale-95 flex items-center justify-center gap-2 group relative overflow-hidden"
                 >
-                  {submittingFb ? "Submitting..." : "Share Expertise"}
+                  <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
+                  <span className="relative">{
+                    submittingFb 
+                      ? <><Loader2 className="w-5 h-5 animate-spin" /> <span>Submitting...</span></>
+                      : <><MessageSquareShare className="w-5 h-5" /> <span>Share Expertise</span></>
+                  }</span>
                 </button>
               </div>
             </section>

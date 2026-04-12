@@ -32,6 +32,8 @@ export async function POST(req: NextRequest) {
         content: body.content,
         rating: body.rating,
         alumniId: alumni.id,
+        isApproved: false,
+        createdAt: new Date(),
       },
     });
 

@@ -1,4 +1,5 @@
 export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import * as jose from "jose";
@@ -29,7 +30,7 @@ export async function GET(req: NextRequest) {
       where: { enrollmentNumber: studentTokenData.enrollmentNumber },
       select: {
         id: true, name: true, enrollmentNumber: true, email: true,
-        branch: true, semester: true, cgpa: true, isEmailVerified: true,
+        branch: true, semester: true, cgpa: true, isEmailVerified: true, isVerified: true,
         profileImageUrl: true, phoneNumber: true, course: true, batch: true,
         resumeUrl: true, tenthPercentage: true, twelfthPercentage: true,
         activeBacklog: true, linkedinUrl: true, githubUrl: true,

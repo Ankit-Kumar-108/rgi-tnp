@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { toast } from "sonner";
 import {
   Search, Calendar, TrendingUp,
   Briefcase, Mail, Network, Database, Loader2, BookOpen, X,
@@ -49,9 +50,18 @@ export default function AlumniDiscovery() {
           // If page 1 (filters changed), replace data. Else (scrolling), append data.
           setAlumniRawData(prev => page === 1 ? d.alumniData : [...prev, ...d.alumniData]);
           setHasMore(d.hasMore);
+        } else {
+          if (page === 1) {
+            toast.error(d.message || "Failed to load alumni data");
+          }
         }
       } catch (err) {
         console.error("Fetch error:", err);
+        if (page === 1) {
+          toast.error("Failed to load alumni network. Please try again.");
+        } else {
+          toast.error("Failed to load more alumni. Please scroll again.");
+        }
       } finally {
         setLoading(false);
         setLoadingMore(false);
