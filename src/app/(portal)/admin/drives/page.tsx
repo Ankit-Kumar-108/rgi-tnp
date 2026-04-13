@@ -378,7 +378,7 @@ export default function AdminDrivesPage() {
 
                       <div className="relative p-5 flex flex-col gap-4">
                         {/* Top row: Avatar + Company + Status */}
-                        <div className="flex items-start gap-3.5">
+                        <div className="flex items-start gap-3.5 bg-top">
                           {drive.companyLogoUrl ? (
                             <img
                               src={drive.companyLogoUrl}

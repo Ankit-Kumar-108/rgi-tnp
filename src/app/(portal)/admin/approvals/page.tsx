@@ -400,7 +400,7 @@ export default function AdminApprovalsPage() {
                     {activeTab === "memories" && (
                         <div 
                         onClick={() => setViewItem(item)}
-                        className="group relative aspect-square bg-slate-100 rounded-lg sm:rounded-2xl overflow-hidden cursor-pointer border border-slate-200 shadow-sm hover:shadow-md transition-all">
+                        className="group relative aspect-square bg-slate-100 rounded-lg sm:rounded-2xl overflow-hidden cursor-pointer border border-slate-200 shadow-sm hover:shadow-md transition-all bg-top">
                             <img 
                               src={item.imageUrl} 
                               alt="Memory" 
@@ -448,7 +448,7 @@ export default function AdminApprovalsPage() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Content - Media */}
-            <div className="w-full md:w-1/2 max-h-[60vh] md:max-h-[80vh] bg-slate-100 relative flex items-center justify-center overflow-hidden">
+            <div className="w-full md:w-1/2 max-h-[60vh] md:max-h-[80vh] bg-slate-100 relative flex items-center justify-center overflow-hidden bg-top">
                 <img
                   src={viewItem.imageUrl || viewItem.profileImageUrl}
                   alt="Preview"
@@ -486,7 +486,7 @@ export default function AdminApprovalsPage() {
                     <div className="bg-slate-50 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-100">
                         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-3">Uploader</p>
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center font-bold text-brand overflow-hidden shrink-0">
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center font-bold text-brand overflow-hidden shrink-0 bg-top">
                                 {viewItem.student?.profileImageUrl || viewItem.alumni?.profileImageUrl ? (
                                     <img 
                                       src={viewItem.student?.profileImageUrl || viewItem.alumni?.profileImageUrl} 
@@ -673,7 +673,7 @@ function ExternalScreeningCard({ item, onAction, loading }: { item: any, onActio
         <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all overflow-hidden font-medium">
             <div className="p-4 sm:p-6">
                 <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl bg-slate-100 border border-slate-200 overflow-hidden shrink-0">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl bg-slate-100 border border-slate-200 overflow-hidden shrink-0 bg-top">
                         {item.profileImageUrl ? (
                             <img src={item.profileImageUrl} loading="lazy" className="w-full h-full object-cover" />
                         ) : (
@@ -863,7 +863,7 @@ function UnverifiedEmailCard({ item, onAction, loading, userType }: { item: any,
         <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all overflow-hidden font-medium">
             <div className="p-4 sm:p-6">
                 <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl bg-slate-100 border border-slate-200 overflow-hidden shrink-0">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl bg-slate-100 border border-slate-200 overflow-hidden shrink-0 bg-top">
                         {item.profileImageUrl ? (
                             <img src={item.profileImageUrl} loading="lazy" className="w-full h-full object-cover" />
                         ) : (

@@ -273,7 +273,7 @@ export default function PublishedManagementPage() {
                   {activeTab === "memories" && (
                     <div
                       onClick={() => setViewItem(item)}
-                      className="group relative aspect-square bg-slate-100 rounded-lg sm:rounded-2xl overflow-hidden cursor-pointer border border-slate-200 shadow-sm hover:shadow-md transition-all">
+                      className="group relative aspect-square bg-slate-100 rounded-lg sm:rounded-2xl overflow-hidden cursor-pointer border border-slate-200 shadow-sm hover:shadow-md transition-all bg-top">
                       <img
                         src={item.imageUrl}
                         alt="Memory"
@@ -323,7 +323,7 @@ export default function PublishedManagementPage() {
             className="relative bg-white rounded-2xl sm:rounded-3xl shadow-2xl max-w-4xl w-full overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col md:flex-row max-h-[90vh]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-full md:w-2/3 max-h-[60vh] md:max-h-[80vh] bg-black/5 flex items-center justify-center overflow-hidden">
+            <div className="w-full md:w-2/3 max-h-[60vh] md:max-h-[80vh] bg-black/5 flex items-center justify-center overflow-hidden bg-top">
               <img
                 src={viewItem.imageUrl}
                 alt={viewItem.title}
@@ -396,7 +396,7 @@ export default function PublishedManagementPage() {
         >
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
           <div
-            className="relative bg-white rounded-2xl sm:rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden animate-in zoom-in-95 duration-300 p-4 sm:p-8 max-h-[90vh] overflow-y-auto"
+            className="relative bg-white rounded-2xl sm:rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden animate-in zoom-in-95 duration-300 p-4 sm:p-8 max-h-[90vh] overflow-y-auto bg-top"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-3 sm:gap-4 mb-6">
@@ -412,7 +412,7 @@ export default function PublishedManagementPage() {
             {/* Alumni Info */}
             <div className="bg-slate-50 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 mb-4">
               <p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-wide mb-2">Posted By</p>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 bg-top">
                 {viewItem.alumni?.profileImageUrl && (
                   <img 
                     src={viewItem.alumni.profileImageUrl}
@@ -500,7 +500,7 @@ export default function PublishedManagementPage() {
             {/* Author Info */}
             <div className="bg-slate-50 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 mb-4">
               <p className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase tracking-wide mb-2">Author</p>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 bg-top">
                 {viewItem.student?.profileImageUrl || viewItem.alumni?.profileImageUrl || viewItem.recruiter?.profileImageUrl ? (
                   <img 
                     src={viewItem.student?.profileImageUrl || viewItem.alumni?.profileImageUrl || viewItem.recruiter?.profileImageUrl}
@@ -508,7 +508,7 @@ export default function PublishedManagementPage() {
                     className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-cover border border-slate-200"
                   />
                 ) : (
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-200 rounded-lg flex items-center justify-center">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-200 rounded-lg flex items-center justify-center bg-top">
                     {activeFeedbackSubTab === "student" && <GraduationCap className="w-5 h-5 text-slate-400" />}
                     {activeFeedbackSubTab === "alumni" && <Shield className="w-5 h-5 text-slate-400" />}
                     {activeFeedbackSubTab === "corporate" && <Briefcase className="w-5 h-5 text-slate-400" />}

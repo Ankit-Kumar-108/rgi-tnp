@@ -412,7 +412,7 @@ export default function AdminUsersPage() {
                                 {user.profileImageUrl ? (
                                   <img src={user.profileImageUrl} alt="" loading="lazy" className="w-full h-full object-cover" />
                                 ) : (
-                                  <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-muted-foreground uppercase bg-surface">
+                                  <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-muted-foreground uppercase bg-surface bg-top">
                                     {user.name?.charAt(0)}
                                   </div>
                                 )}
@@ -447,11 +447,11 @@ export default function AdminUsersPage() {
                           </td>
                           <td className="px-5 py-3.5">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-lg overflow-hidden bg-muted shrink-0 border border-border">
+                              <div className="w-8 h-8 rounded-lg overflow-hidden bg-muted shrink-0 border border-border bg-top">
                                 {user.profileImageUrl ? (
                                   <img src={user.profileImageUrl} alt="" loading="lazy" className="w-full h-full object-cover" />
                                 ) : (
-                                  <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-muted-foreground uppercase bg-surface">
+                                  <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-muted-foreground uppercase bg-surface bg-top">
                                     {user.name?.charAt(0)}
                                   </div>
                                 )}

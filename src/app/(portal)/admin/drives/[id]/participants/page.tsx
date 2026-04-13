@@ -410,7 +410,7 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
                       </div>
 
                       {/* Profile Image */}
-                      <div className="size-24 md:size-32 rounded-full bg-muted border border-border shadow-sm flex items-center justify-center overflow-hidden shrink-0">
+                      <div className="size-24 md:size-32 rounded-full bg-muted border border-border shadow-sm flex items-center justify-center overflow-hidden shrink-0 bg-top">
                         {user.profileImageUrl ? (
                           <img src={user.profileImageUrl} alt={user.name} className="w-full h-full object-cover" />
                         ) : (
