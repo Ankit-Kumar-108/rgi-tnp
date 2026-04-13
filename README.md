@@ -535,7 +535,8 @@ POST   /api/upload/presigned-url (get R2 upload URL)
 
 ### Phase 1 (to change on 15/04/2026)
 - [ ] **Feedback UI card change**
- - add notification for password mismatch 
+ - add notification for password mismatch
+ - auto removal of space in name or free name from implementation during registration 
  - UI improvement 
  - take suggetion from teacher
 
