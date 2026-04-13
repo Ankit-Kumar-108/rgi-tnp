@@ -31,6 +31,7 @@ export default function StudentLogin() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
+        toast.dismiss(); // Dismiss any existing toasts
         setLoading(true);
 
         try {
@@ -43,6 +44,7 @@ export default function StudentLogin() {
 
             if (!res.ok || !data.success) {
                 setError(data.message || "Login failed");
+                    toast.error(data.message || "Login failed");
                 return;
             }
 
@@ -51,8 +53,10 @@ export default function StudentLogin() {
             setTimeout(() => {
                 router.push("/students/dashboard");
             }, 1000);
-        } catch {
+        } catch (error: any) {
+            console.error("Error during login", error);
             setError("Something went wrong. Please try again.");
+             toast.error("An error occurred during login");
         } finally {
             setLoading(false);
         }

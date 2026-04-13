@@ -533,8 +533,9 @@ POST   /api/upload/presigned-url (get R2 upload URL)
 
 ## 🔮 Future Features & Roadmap
 
-### Phase 1 (to change on 13/04/2026)
+### Phase 1 (to change on 15/04/2026)
 - [ ] **Feedback UI card change**
+ - add notification for password mismatch 
  - UI improvement 
  - take suggetion from teacher
 

@@ -77,15 +77,19 @@ export default function StudentRegister() {
     const handleFileSelection = (selectedFile: File) => {
         if (!selectedFile.type.startsWith("image/")) {
             setError("Please upload a valid image file.");
+            toast.error("Please upload a valid image file.");
             return;
         }
         if (selectedFile.size > 5 * 1024 * 1024) {
             setError("Profile image must be smaller than 5MB");
+            toast.error("Profile image must be smaller than 5MB");
             return;
         }
         setProfileImageFile(selectedFile);
         setImgPreviewURL(URL.createObjectURL(selectedFile));
-        setError(""); 
+        setError("");
+        toast.success("Profile image uploaded successfully.");
+
     };
 
     // Validates and sets the resume
@@ -94,21 +98,25 @@ export default function StudentRegister() {
             const file = e.target.files[0];
             if (file.type !== "application/pdf") {
                 setError("Please upload a PDF file for your resume.");
+                toast.error("Please upload a PDF file for your resume.");  
                 return;
             }
             if (file.size > 5 * 1024 * 1024) {
                 setError("Resume must be smaller than 5MB");
+                toast.error("Resume must be smaller than 5MB");
                 return;
             }
             setResumeFile(file);
             setResumePreviewURL(URL.createObjectURL(file));
             setError(""); // Clear error when successful
+            toast.success("Resume uploaded successfully.");
         }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(""); 
+        toast.dismiss(); // Dismiss any existing toasts
         setSuccess("");
         
         if (form.password !== form.confirmPassword) { 
@@ -154,7 +162,8 @@ export default function StudentRegister() {
             setSuccess("Registration successful! Check your email for the verification link.");
             toast.success("Registration successful! Check your email for the verification link.");
             setTimeout(() => router.push(`/students/login`), 1000);
-        } catch { 
+        } catch (error: any) { 
+            console.error("Error during registration", error);
             setError("Something went wrong."); 
             toast.error("Something went wrong.");
         } finally { 

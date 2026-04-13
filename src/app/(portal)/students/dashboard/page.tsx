@@ -147,11 +147,21 @@ export default function StudentDashboard() {
       if (sBatch < minB || sBatch > maxB) reason = "Batch Ineligible";
     }
 
-    if (drive.isRegistered) {
-      return {
-        actionElement: <span className="inline-flex items-center gap-1 text-green-600 text-xs font-bold"><CheckCircle className="w-4 h-4" /> Registered</span>
-      };
-    }
+    const hasRegistered = drive.isRegistered || registrations.some(r => r.driveId === drive.id);
+
+  if (hasRegistered) {
+    return {
+      actionElement: (
+        // 2. Make this a clickable button so they can still read the job details
+        <button 
+          onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
+          className="inline-flex items-center gap-1.5 text-green-600 bg-green-500/10 hover:bg-green-500/20 px-4 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95"
+        >
+          <CheckCircle className="w-4 h-4" /> View Details
+        </button>
+      )
+    };
+  }
 
     if (reason) {
       return {
@@ -334,6 +344,7 @@ export default function StudentDashboard() {
           onSuccess={() => {
             fetchDashboard();
           }}
+          isRegistered={registrations.some(r => r.driveId === selectedDrive.id)}
         />
       )}
 
@@ -779,7 +790,7 @@ export default function StudentDashboard() {
                                     {drive.driveType}
                                   </span>
                                 </td>
-                                <td className="px-6 py-4 text-right">
+                                <td className="px-6 py-4 flex justify-end">
                                   {actionElement}
                                 </td>
                               </tr>

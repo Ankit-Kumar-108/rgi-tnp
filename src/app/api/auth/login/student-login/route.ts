@@ -16,14 +16,18 @@ export async function POST(req: NextRequest) {
             where: { email: validatedData.email }
         })
         if (!student) {
-            return NextResponse.json({ success: false, message: "Invalid email or password" }, { status: 401 });
+            return NextResponse.json({ success: false, message: "Check email and try again" }, { status: 401 });
         }
 
         const passwordMatch = await verifyPassword(
             validatedData.password, 
             student.passwordHash);
         if (!passwordMatch) {
-            return NextResponse.json({ success: false, message: "Invalid email or password" }, { status: 401 });
+            return NextResponse.json({ success: false, message: "Check password and try again" }, { status: 401 });
+        }
+
+        if(!student.isVerified) {
+            return NextResponse.json({ success: false, message: "Your email is not verified. Please check your inbox for the verification link." }, { status: 403 });
         }
 
         const secret = new TextEncoder().encode(process.env.JWT_SECRET!);

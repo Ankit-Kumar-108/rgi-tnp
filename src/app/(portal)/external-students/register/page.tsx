@@ -69,15 +69,19 @@ export default function ExternalStudentRegister() {
     const handleFileSelection = (selectedFile: File) => {
         if (!selectedFile.type.startsWith("image/")) {
             setError("Please upload a valid image file.");
+            toast.error("Please upload a valid image file.");
             return;
         }
         if (selectedFile.size > 5 * 1024 * 1024) {
             setError("Profile image must be smaller than 5MB");
+            toast.error("Profile image must be smaller than 5MB");
+
             return;
         }
         setProfileImageFile(selectedFile);
         setImgPreviewURL(URL.createObjectURL(selectedFile));
         setError("");
+        toast.success("Profile image uploaded successfully.");
     };
 
     // Handles the Resume Upload from the Form
@@ -86,33 +90,41 @@ export default function ExternalStudentRegister() {
             const file = e.target.files[0];
             if (file.type !== "application/pdf") {
                 setError("Please upload a PDF file for your resume.");
+                toast.error("Please upload a PDF file for your resume.");
                 return;
             }
             if (file.size > 5 * 1024 * 1024) {
                 setError("Resume must be smaller than 5MB");
+                toast.error("Resume must be smaller than 5MB");
                 return;
             }
             setResumeFile(file);
             setResumePreviewURL(URL.createObjectURL(file));
             setError(""); // Clear error if successful
+            toast.success("Resume uploaded successfully.");
+
         }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
+        toast.dismiss(); // Dismiss any existing toasts
         setSuccess("");
 
         if (form.password !== form.confirmPassword) {
             setError("Passwords do not match");
+            toast.error("Passwords do not match");
             return;
         }
         if (!resumeFile) {
             setError("Resume is required");
+            toast.error("Resume is required");
             return;
         }
         if (!profileImageFile) {
             setError("Profile image is required");
+            toast.error("Profile image is required");
             return;
         }
 
@@ -140,14 +152,16 @@ export default function ExternalStudentRegister() {
 
             if (!res.ok || !data.success) {
                 setError(data.message || "Registration failed");
+                toast.error(data.message || "Registration failed");
                 return;
             }
 
             setSuccess("Registration successful! Check your email to verify your account.");
             toast.success("Registration successful! Check your email to verify your account.");
             setTimeout(() => router.push(`/external-students/login`), 1000);
-        } catch {
+        } catch (error: any) {
             setError("Something went wrong.");
+            toast.error(error.message || "Something went wrong.");
         } finally {
             setLoading(false);
         }

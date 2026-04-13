@@ -11,26 +11,27 @@ import {
     CalendarDays,
     Users,
     MapPin,
-    ArrowRight,
 } from "lucide-react";
 import { PlacementDrive } from "@/types";
 
-export default function JobDetailsModal({ 
-  drive, 
-  isOpen, 
-  onClose, 
-  onSuccess,
-  role = "student",
-  publicMode = false,
-  readonly = false
-}: { 
-  drive: PlacementDrive; 
-  isOpen: boolean; 
-  onClose: () => void; 
-  onSuccess: () => void;
-  role?: "student" | "external_student" | "admin" | "recruiter";
-  publicMode?: boolean;
-  readonly?: boolean;
+export default function JobDetailsModal({
+    drive,
+    isOpen,
+    onClose,
+    onSuccess,
+    role = "student",
+    publicMode = false,
+    readonly = false,
+    isRegistered = false,
+}: {
+    drive: PlacementDrive;
+    isOpen: boolean;
+    onClose: () => void;
+    onSuccess: () => void;
+    role?: "student" | "external_student" | "admin" | "recruiter";
+    publicMode?: boolean;
+    readonly?: boolean;
+    isRegistered?: boolean;
 }) {
     const router = useRouter();
     const [registering, setRegistering] = useState(false)
@@ -53,11 +54,15 @@ export default function JobDetailsModal({
         return null;
 
     const registerForDrive = async () => {
+        if (isRegistered) {
+            toast("You have already registered for this drive.");
+            return;
+        }
         if (publicMode) {
             router.push("/external-students/login");
             return;
         }
-        
+
         setRegistering(true);
         try {
             const token = getToken(role);
@@ -267,21 +272,34 @@ export default function JobDetailsModal({
 
                 {/* Sticky Footer CTA */}
                 {!readonly && (
-                  <div className="px-6 py-5 md:px-8 bg-background border-t border-border flex items-center justify-between gap-6 shrink-0 rounded-b-[2.5rem]">
-                      <div className="hidden sm:block">
-                          <p className="text-sm font-bold text-foreground">Active Placement Drive</p>
-                          <p className="text-xs text-brand font-medium mt-0.5">Register in {getDaysLeft()}</p>
-                      </div>
-                      <div className="flex-1 sm:flex-none flex flex-col sm:flex-row items-center gap-4">
-                          <button
-                              onClick={() => registerForDrive()}
-                              disabled={registering}
-                              className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-brand text-primary-foreground font-black shadow-lg shadow-brand/30 hover:shadow-brand/40 transition-all active:scale-95 flex items-center justify-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                              {publicMode ? "Login to Apply" : registering ? "Registering..." : "Apply for Role"}
-                              <ArrowRight className="w-4 h-4" />
-                          </button>
-                      </div>
-                  </div>
+                    <div className="px-6 py-5 md:px-8 bg-background border-t border-border flex items-center justify-between gap-6 shrink-0 rounded-b-[2.5rem]">
+                        <div className="hidden sm:block">
+                            <p className="text-sm font-bold text-foreground">Active Placement Drive</p>
+                            <p className="text-xs text-brand font-medium mt-0.5">Register in {getDaysLeft()}</p>
+                        </div>
+                        <div className="flex-1 sm:flex-none flex flex-col sm:flex-row items-center gap-4">
+                            <button
+                                onClick={() => registerForDrive()}
+                                disabled={registering}
+                                className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-brand text-primary-foreground font-black shadow-lg shadow-brand/30 hover:shadow-brand/40 transition-all active:scale-95 flex items-center justify-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                                {publicMode ?
+                                    "Login to Apply"
+                                    :
+                                    isRegistered ?
+                                        "Registered"
+                                        :
+                                    registering ?
+                                        (
+                                            <div className="flex items-center justify-center gap-2">
+                                                <div className="w-4 h-4 animate-spin rounded-full border-2 border-t-brand border-r-brand border-b-brand border-l-transparent">
+                                                </div>
+                                                Registering...
+                                            </div>
+                                        ) :
+                                        "Apply for Role"}
+                            </button>
+                        </div>
+                    </div>
                 )}
 
             </div>

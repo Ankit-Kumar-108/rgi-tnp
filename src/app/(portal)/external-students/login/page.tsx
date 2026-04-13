@@ -20,6 +20,7 @@ export default function ExternalStudentLogin() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
+        toast.dismiss(); // Dismiss any existing toasts
         setLoading(true);
 
         try {
@@ -32,14 +33,16 @@ export default function ExternalStudentLogin() {
 
             if (!res.ok || !data.success) {
                 setError(data.message || "Login failed");
+                toast.error(data.message || "Login failed");
                 return;
             }
 
             saveAuth("external_student", data.token!, data.student);
             toast.success("Logged in successfully!");
             router.push("/students/external-dashboard");
-        } catch {
+        } catch (error: any) {
             setError("Something went wrong. Please try again.");
+            toast.error(error.message || "Something went wrong. Please try again.");
         } finally {
             setLoading(false);
         }
