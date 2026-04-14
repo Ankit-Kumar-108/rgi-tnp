@@ -1,70 +1,103 @@
 import Link from 'next/link'
-import { Globe, Mail, Phone, Linkedin, Github } from "lucide-react"
+import { Globe, Mail, Phone, MapPin, Shield } from "lucide-react"
+
 export default function Footer() {
   return (
-    <footer className="bg-surface py-16 px-6 lg:px-20 border-t border-border">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-12">
-        <div className="max-w-xs">
-          <div className="flex items-center gap-3 mb-6">
-            <img
-              className="w-8 h-8 text-brand"
-              src={"/logo/logo.png"}
-              alt='college logo'
-            />
-            <span className="font-bold text-xl">RGI T&P</span>
+    <footer className="bg-surface pt-16 pb-8 px-6 lg:px-20 border-t border-border mt-auto">
+      <div className="max-w-7xl mx-auto flex flex-col">
+        
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-16">
+          
+          {/* Column 1: Brand Info */}
+          <div className="lg:pr-8">
+            <div className="flex items-center gap-3 mb-6">
+              <img
+                className="w-8 h-8 text-brand"
+                src={"/logo/logo.png"}
+                alt='college logo'
+              />
+              <span className="font-bold text-xl text-foreground">RGI T&P</span>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed mb-6">
+              Radharaman Group of Institutes is dedicated to providing quality technical education and ensuring every student reaches their career potential.
+            </p>
+            <div className="flex gap-4">
+              <Link className="p-2 rounded-full bg-foreground/5 text-muted-foreground hover:bg-brand/10 hover:text-brand transition-colors" href="#">
+                <Globe className="w-4 h-4" />
+              </Link>
+              <Link className="p-2 rounded-full bg-foreground/5 text-muted-foreground hover:bg-brand/10 hover:text-brand transition-colors" href="mailto:tpo@radharaman.com">
+                <Mail className="w-4 h-4" />
+              </Link>
+              <Link className="p-2 rounded-full bg-foreground/5 text-muted-foreground hover:bg-brand/10 hover:text-brand transition-colors" href="tel:+917552477777">
+                <Phone className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
-          <p className="text-sm text-muted-foreground leading-relaxed mb-6">
-            Radharaman Group of Institutes is dedicated to providing quality technical education and ensuring every student reaches their career potential.
-          </p>
-          <div className="flex gap-4">
-            <Link className="text-muted-foreground hover:text-brand transition-colors" href="#"><Globe className="w-5 h-5" /></Link>
-            <Link className="text-muted-foreground hover:text-brand transition-colors" href="#"><Mail className="w-5 h-5" /></Link>
-            <Link className="text-muted-foreground hover:text-brand transition-colors" href="#"><Phone className="w-5 h-5" /></Link>
-          </div>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-12 md:gap-24">
+
+          {/* Column 2: Quick Links */}
           <div>
-            <h4 className="font-bold mb-6">Quick Links</h4>
+            <h4 className="font-bold text-foreground mb-6">Quick Links</h4>
             <ul className="space-y-4 text-sm text-muted-foreground">
               <li><Link className="hover:text-brand transition-colors" href="#">Career Portal</Link></li>
               <li><Link className="hover:text-brand transition-colors" href="#">Skill Development</Link></li>
-              <li><Link className="hover:text-brand transition-colors" href="#">MOU Details</Link></li>
-              <li><Link className="hover:text-brand transition-colors" href="#">Contact Support</Link></li>
+              <li><Link className="hover:text-brand transition-colors" href="/activities/mou">MOU Details</Link></li>
+              <li><Link className="hover:text-brand transition-colors" href="/feedbacks">Feedbacks</Link></li>
             </ul>
           </div>
+
+          {/* Column 3: Portals & Resources */}
           <div>
-            <h4 className="font-bold mb-6">Resources</h4>
+            <h4 className="font-bold text-foreground mb-6">Portals & Resources</h4>
             <ul className="space-y-4 text-sm text-muted-foreground">
               <li><Link className="hover:text-brand transition-colors" href="#">Interview Prep</Link></li>
-              <li><Link className="hover:text-brand transition-colors" href="#">Aptitude Tests</Link></li>
               <li><Link className="hover:text-brand transition-colors" href="#">Resume Builder</Link></li>
               <li><Link className="hover:text-brand transition-colors" href="#">HR Policies</Link></li>
+              {/* ADMIN LINK ADDED HERE */}
+              <li className="pt-2 mt-2 border-t border-border/50">
+                <Link className="flex items-center gap-2 hover:text-brand transition-colors font-medium" href="/admin/login">
+                  <Shield className="w-4 h-4" />
+                  Admin Portal
+                </Link>
+              </li>
             </ul>
           </div>
-          <div className="col-span-2 sm:col-span-1">
-            <h4 className="font-bold mb-6">Contact</h4>
+
+          {/* Column 4: Contact */}
+          <div>
+            <h4 className="font-bold text-foreground mb-6">Contact Us</h4>
             <address className="not-italic text-sm text-muted-foreground space-y-4">
-              <p>Ratibad Road, Bhopal,</p>
-              <p>Madhya Pradesh 462044</p>
-              <p>+91 755 2477777</p>
-              <p>tpo@radharaman.com</p>
+              <div className="flex gap-3">
+                <MapPin className="w-5 h-5 text-brand shrink-0" />
+                <p>Ratibad Road, Bhopal,<br />Madhya Pradesh 462044</p>
+              </div>
+              <div className="flex gap-3 items-center">
+                <Phone className="w-5 h-5 text-brand shrink-0" />
+                <p>+91 755 2477777</p>
+              </div>
+              <div className="flex gap-3 items-center">
+                <Mail className="w-5 h-5 text-brand shrink-0" />
+                <p>tpo@radharaman.com</p>
+              </div>
             </address>
           </div>
+
         </div>
-      </div>
-      <div className="flex flex-col md:flex-row justify-between max-w-7xl mx-auto pt-10 mt-16 border-t border-border md:text-sm text-xs text-muted-foreground">
-        <p>&copy; 2026 Radharaman Group of Institutes. All rights reserved.</p>
-        <div className="flex flex-col md:flex-row items-center gap-4">
-          <div className="flex items-center gap-2">
+
+        {/* Bottom Section: Copyright & Developer Credit */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-6 pt-8 border-t border-border text-xs md:text-sm text-muted-foreground">
+          <p className="text-center md:text-left">&copy; {new Date().getFullYear()} Radharaman Group of Institutes. All rights reserved.</p>
+          
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
             <p className="text-slate-400 dark:text-slate-500">
-              Developed by <span className="text-black dark:text-white font-bold">Ankit Kumar</span>
+              Developed by <span className="text-foreground font-bold tracking-wide">Ankit Kumar</span>
             </p>
-            <div className="flex items-center gap-2.5 ml-1">
+            <div className="flex items-center gap-3">
               <a
                 href="https://github.com/Ankit-Kumar-108"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-slate-400 hover:text-black dark:hover:text-white transition-colors duration-200"
+                className="text-slate-400 hover:text-foreground transition-colors duration-200"
                 title="GitHub Profile"
               >
                 <svg className="size-5 fill-current" viewBox="0 0 24 24">
@@ -84,6 +117,7 @@ export default function Footer() {
               </a>
             </div>
           </div>
+          
         </div>
       </div>
     </footer>

@@ -292,68 +292,7 @@ export default function Home() {
             </div>
           </div>
         </section>
-
-        {/* Feedback Section — Now theme-aware */}
-        <section className="bg-surface/30 py-24 px-5 lg:px-20 border-y border-border" id="feedback">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-            <div>
-              <h2 className="text-4xl font-bold mb-6">Feedback</h2>
-              <p className="text-muted-foreground text-sm md:text-lg mb-10">We value your input. Whether you&aposre a student who recently got placed or a recruiter who visited our campus, let us know about your experience.</p>
-              <div className="space-y-8">
-                <div className="flex gap-4">
-                  <div className="w-12 h-12 bg-brand/20 rounded-lg flex items-center justify-center shrink-0">
-                    <CheckCircle className="text-brand w-6 h-6" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold">95% Success Rate</h4>
-                    <p className="text-sm text-muted-foreground">Consistent placement records across all departments.</p>
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="w-12 h-12 bg-brand/20 rounded-lg flex items-center justify-center shrink-0">
-                    <Users className="text-brand w-6 h-6" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold">Top Recruiters</h4>
-                    <p className="text-sm text-muted-foreground">Partnerships with Fortune 500 companies.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="bg-card p-8 rounded-2xl border border-border shadow-lg">
-              <form className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Full Name</label>
-                    <input className="w-full bg-surface border border-border rounded-lg focus:ring-2 focus:ring-brand p-3 text-foreground" type="text" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Category</label>
-                    <select className="w-full bg-surface border border-border rounded-lg focus:ring-2 focus:ring-brand p-3 text-foreground">
-                      <option disabled >Select</option>
-                      <option>Student</option>
-                      <option>Recruiter</option>
-                      <option>Alumni</option>
-                    </select>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Email Address</label>
-                  <input className="w-full bg-surface border border-border rounded-lg focus:ring-2 focus:ring-brand p-3 text-foreground" type="email" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Message / Testimonial</label>
-                  <textarea className="w-full bg-surface border border-border rounded-lg focus:ring-2 focus:ring-brand p-3 text-foreground" rows={4}></textarea>
-                </div>
-                <button className="w-full bg-brand text-white py-4 rounded-lg font-bold hover:bg-brand/90 transition-all" type="submit">
-                  Submit Feedback
-                </button>
-              </form>
-            </div>
-          </div>
-        </section>
       </main>
-
       {/* Footer — Now theme-aware */}
       <Footer />
     </div>
