@@ -51,8 +51,8 @@ export default function ExternalStudentLogin() {
     return (
         <div className="min-h-screen flex flex-col bg-background">
             <Nav />
-            <main className="flex-1 flex w-full items-center justify-center p-4 sm:p-6 md:p-8 pt-24 md:pt-32 pb-12">
-                <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-background/50 backdrop-blur-sm rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl shadow-brand/10 border border-brand/10">
+            <main className="flex-1 flex w-full items-center justify-center p-4 sm:p-6 sm:mt-10 md:mt-0 pt-24 md:pt-32 pb-12 lg:h-screen lg:max-h-screen lg:py-24">
+                <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-background/50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-2xl shadow-brand/10 border border-brand/10 lg:h-[85vh] lg:max-h-200 mt-10 overflow-hidden">
                     <div className="relative hidden lg:flex flex-col justify-end p-10 xl:p-12 overflow-hidden bg-brand/5">
                         <div className="absolute inset-0 bg-cover bg-center z-0 opacity-80" data-alt="Students" style={{ backgroundImage: "linear-gradient(180deg, rgba(146, 19, 236, 0.2) 0%, rgba(26, 16, 34, 0.9) 100%), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop')" }} />
                         <div className="relative z-10 text-white">
@@ -61,9 +61,9 @@ export default function ExternalStudentLogin() {
                             <p className="text-lg text-slate-200 font-light max-w-md">Login to view and register for open campus placement drives hosted by RGI.</p>
                         </div>
                     </div>
-                    <div className="p-6 sm:p-10 md:p-12 flex flex-col justify-center relative">
+                    <div className="p-6 sm:p-10 md:p-12 flex flex-col justify-center relative overflow-y-scroll overflow-x-hidden">
                         <div className="mb-8 relative z-10">
-                            <h2 className="text-3xl font-bold tracking-tight text-foreground mb-2">Login</h2>
+                            <h2 className="text-3xl font-bold tracking-tight text-foreground mb-2 mt-15">Login</h2>
                             <p className="text-muted-foreground text-sm sm:text-base">Please enter your credentials to access your dashboard.</p>
                         </div>
                         {error && <div className="mb-4 p-3 rounded-xl bg-destructive/10 text-destructive text-sm font-medium relative z-10">{error}</div>}
@@ -99,6 +99,25 @@ export default function ExternalStudentLogin() {
                         <div className="mt-8 pt-6 border-t border-border relative z-10">
                             <p className="text-center text-muted-foreground mb-4 text-sm">Don&apos;t have an account yet?</p>
                             <Link href="/external-students/register" className="w-full py-3 sm:py-3.5 rounded-xl border-2 border-brand/20 text-brand font-bold bg-transparent hover:bg-brand/5 transition-all duration-200 flex items-center justify-center gap-2">Register as External Student</Link>
+                        </div>
+                         <div className="mt-10 flex flex-col items-center gap-2 relative z-10">
+                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
+                                Official Portal of
+                            </p>
+                            <span className="text-foreground font-bold text-xs sm:text-sm text-center">
+                                RADHARAMAN GROUP OF INSTITUTES
+                            </span>
+                            <div className="flex gap-4 mt-2">
+                                <a className="text-muted-foreground hover:text-brand transition-colors p-2 hover:bg-brand/5 rounded-full" href="#" aria-label="Website">
+                                    <Earth className="w-4 h-4" />
+                                </a>
+                                <a className="text-muted-foreground hover:text-brand transition-colors p-2 hover:bg-brand/5 rounded-full" href="#" aria-label="Share">
+                                    <Share2 className="w-4 h-4" />
+                                </a>
+                                <a className="text-muted-foreground hover:text-brand transition-colors p-2 hover:bg-brand/5 rounded-full" href="#" aria-label="Information">
+                                    <Info className="w-4 h-4" />
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>

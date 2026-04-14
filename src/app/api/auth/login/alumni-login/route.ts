@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
         });
 
         if (!alumni) {
-            return NextResponse.json({ success: false, message: "Invalid email or password" }, { status: 401 });
+            return NextResponse.json({ success: false, message: "Check Your Email (Not Found!) " }, { status: 401 });
         }
 
         const passwordMatch = await verifyPassword(
@@ -29,8 +29,12 @@ export async function POST(req: NextRequest) {
         );
         
         if (!passwordMatch) {
-            return NextResponse.json({ success: false, message: "Invalid email or password" }, { status: 401 });
+            return NextResponse.json({ success: false, message: "Check Your Password" }, { status: 401 });
         }
+
+        if (!alumni.isVerified) {
+             return NextResponse.json({ success: false, message: "Your email is not verified. Please check your inbox for the verification link." }, { status: 403 });
+         }
 
         const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
         const token = await new jose.SignJWT({ 

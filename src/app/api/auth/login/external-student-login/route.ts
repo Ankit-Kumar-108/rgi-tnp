@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
         });
 
         if (!externalStudent) {
-            return NextResponse.json({ success: false, message: "Check email and try again" }, { status: 401 });
+            return NextResponse.json({ success: false, message: "Check your email (Not Found!) " }, { status: 401 });
         }
 
         const passwordMatch = await verifyPassword(
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
         );
         
         if (!passwordMatch) {
-            return NextResponse.json({ success: false, message: "Check password and try again" }, { status: 401 });
+            return NextResponse.json({ success: false, message: "Check your password and try again" }, { status: 401 });
         }
         
         if (!externalStudent.isVerified) {

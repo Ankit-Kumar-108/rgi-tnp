@@ -24,20 +24,17 @@ export async function POST(req: NextRequest) {
       course: validatedData.course.trim(),
       batch: validatedData.batch.trim(),
       email: validatedData.email.trim(),
+      phoneNumber: validatedData.phoneNumber.trim(),
+      profileImageUrl: validatedData.profileImageUrl?.trim(),
+      resumeUrl: (body.resumeUrl as string)?.trim(),
+      cgpa: validatedData.cgpa,
+      semester: validatedData.semester,
     };
 
-    // 3. Workflow Check: Email Domain 
-    if (!trimmedData.email.endsWith("@gmail.com")) {
-      return NextResponse.json(
-        { success: false, message: "Use your @gmail.com email" },
-        { status: 400 }
-      );
-    }
     // 4. Verify Enrollment Number in Master Records
     const masterRecord = await db.studentMaster.findFirst({
       where: {
         enrollmentNumber: trimmedData.enrollmentNumber,
-        name: trimmedData.name,
         branch: trimmedData.branch,
         course: trimmedData.course,
         batch: trimmedData.batch,
@@ -58,31 +55,42 @@ export async function POST(req: NextRequest) {
 
     if (existing) {
       return NextResponse.json(
-        { success: false, message: "Account already exists" },
+        { success: false, message: "Account already exists, Please Login" },
         { status: 400 }
       );
     }
 
+    const emailExists = await db.student.findUnique({
+      where: { email: trimmedData.email },
+    });
+
+    if (emailExists) {
+      return NextResponse.json(
+        { success: false, message: "Email already registered, Please Login" },
+        { status: 400 }
+       );
+    }
+
     // 6. Security & Verification Prep
-    const passwordHash = await hashPassword(validatedData.password);
+    const passwordHash = await hashPassword(trimmedData.password);
     const verificationToken = generateVerificationToken();
     const expiry = getresetTokenExpiry();
 
     // 7. Create Student Record
     const student = await db.student.create({
-      data: {
-        name: validatedData.name,
-        enrollmentNumber: validatedData.enrollmentNumber,
-        email: validatedData.email,
-        branch: validatedData.branch,
-        course: validatedData.course,
-        semester: validatedData.semester,
-        cgpa: validatedData.cgpa,
-        batch: validatedData.batch,
-        phoneNumber: validatedData.phoneNumber,
+     data: {
+        name: trimmedData.name,
+        enrollmentNumber: trimmedData.enrollmentNumber,
+        email: trimmedData.email,
+        branch: trimmedData.branch,
+        course: trimmedData.course,
+        semester: trimmedData.semester,
+        cgpa: trimmedData.cgpa,
+        batch: trimmedData.batch,
+        phoneNumber: trimmedData.phoneNumber,
         passwordHash: passwordHash,
-        profileImageUrl: validatedData.profileImageUrl || undefined,
-        resumeUrl: (body.resumeUrl as string) || undefined,
+        profileImageUrl: trimmedData.profileImageUrl || undefined,
+        resumeUrl: trimmedData.resumeUrl || undefined,
         isVerified: false,
         isEmailVerified: false,
         emailVerificationToken: verificationToken,

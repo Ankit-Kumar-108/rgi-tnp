@@ -61,8 +61,8 @@ export default function RecruiterLogin() {
     return (
         <div className="min-h-screen flex flex-col bg-background">
             <Nav/>
-            <main className="flex-1 flex w-full items-center justify-center p-4 sm:p-6 md:p-8 pt-24 md:pt-32 pb-12">
-                <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-background/50 backdrop-blur-sm rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl shadow-brand/10 border border-brand/10">
+            <main className="flex-1 flex w-full items-center justify-center p-4 sm:p-6 sm:mt-10 md:mt-0 pt-24 md:pt-32 pb-12 lg:h-screen lg:max-h-screen lg:py-24">
+                <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-background/50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-2xl shadow-brand/10 border border-brand/10 lg:h-[85vh] lg:max-h-200 mt-10 overflow-hidden">
                     <div className="relative hidden lg:flex flex-col justify-end p-10 xl:p-12 overflow-hidden bg-brand/5">
                         <div className="absolute inset-0 bg-cover bg-center z-0 opacity-80" data-alt="Modern corporate office setting" style={{ backgroundImage: "linear-gradient(180deg, rgba(146, 19, 236, 0.2) 0%, rgba(26, 16, 34, 0.9) 100%), url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop')" }} />
                         <div className="relative z-10 text-white">
@@ -72,12 +72,12 @@ export default function RecruiterLogin() {
                             <div className="mt-12 flex items-center gap-4"><span className="text-sm font-medium text-white/90">Join 500+ top recruiters hiring from us</span></div>
                         </div>
                     </div>
-                    <div className="p-6 sm:p-10 md:p-12 flex flex-col justify-center relative">
+                    <div className="p-6 sm:p-10 md:p-12 flex flex-col justify-center relative overflow-y-scroll overflow-x-hidden">
                         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 rounded-full bg-brand/5 blur-2xl z-0 pointer-events-none"></div>
                         <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-32 h-32 rounded-full bg-brand/5 blur-2xl z-0 pointer-events-none"></div>
 
                         <div className="mb-8 relative z-10">
-                            <h2 className="text-3xl font-bold tracking-tight text-foreground mb-2">Recruiter Portal</h2>
+                            <h2 className="text-3xl font-bold tracking-tight text-foreground mb-2 mt-15">Recruiter Portal Login</h2>
                             <p className="text-muted-foreground text-sm sm:text-base">Please enter your credentials to access your dashboard.</p>
                         </div>
 

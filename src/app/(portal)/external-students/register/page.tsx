@@ -324,8 +324,8 @@ export default function ExternalStudentRegister() {
             )}
 
             {/* Registration Content */}
-            <main className="flex-1 flex w-full items-center justify-center p-4 sm:p-6 pt-24 md:pt-32 lg:mt-10 pb-12 lg:h-screen lg:max-h-screen lg:py-24">
-                <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-background/50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-2xl shadow-brand/10 border border-brand/10 lg:h-[85vh] lg:max-h-200 lg:overflow-hidden">
+            <main className="flex-1 flex w-full items-center justify-center p-4 sm:p-6 sm:mt-10 md:mt-0 pt-24 md:pt-32 pb-12 lg:h-screen lg:max-h-screen lg:py-24">
+                <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-background/50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-2xl shadow-brand/10 border border-brand/10 lg:h-[85vh] lg:max-h-200 mt-10 overflow-hidden">
 
                     {/* Left side */}
                     <div className="relative hidden lg:flex flex-col justify-end p-10 xl:p-12 bg-brand/5 h-full">

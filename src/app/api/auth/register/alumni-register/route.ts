@@ -25,7 +25,9 @@ export async function POST(req: NextRequest) {
     const masterRecord = await db.alumniMaster.findFirst({
       where: {
         enrollmentNumber: trimmedData.enrollmentNumber,
-        name: trimmedData.name,
+        branch: trimmedData.branch, 
+        batch: trimmedData.batch,
+        course: trimmedData.course,
       },
     });
 
@@ -53,27 +55,27 @@ export async function POST(req: NextRequest) {
     });
 
     if (emailExists) {
-        return NextResponse.json(
-          { success: false, message: "Email already registered" },
-          { status: 400 }
-        );
-      }
+      return NextResponse.json(
+        { success: false, message: "Email already registered, Please Login" },
+        { status: 400 }
+      );
+    }
 
-    const passwordHash = await hashPassword(validatedData.password);
+    const passwordHash = await hashPassword(trimmedData.password);
     const verificationToken = generateVerificationToken();
     const expiry = getresetTokenExpiry();
 
     // Create Alumni Record
     const alumni = await db.alumni.create({
       data: {
-        name: validatedData.name,
-        enrollmentNumber: validatedData.enrollmentNumber,
-        personalEmail: validatedData.personalEmail,
-        branch: validatedData.branch,
-        course: validatedData.course,
-        batch: validatedData.batch,
+        name: trimmedData.name,
+        enrollmentNumber: trimmedData.enrollmentNumber,
+        personalEmail: trimmedData.personalEmail,
+        branch: trimmedData.branch,
+        course: trimmedData.course,
+        batch: trimmedData.batch,
         passwordHash: passwordHash,
-        profileImageUrl: validatedData.profileImageUrl || "",
+        profileImageUrl: trimmedData.profileImageUrl || "",
         isVerified: false,
         emailVerificationToken: verificationToken,
         emailVerificationTokenExpiry: expiry,
@@ -93,7 +95,6 @@ export async function POST(req: NextRequest) {
 
     if (!emailResult.success) {
       console.error("[ALUMNI-REGISTER] Email verification failed for:", trimmedData.personalEmail, emailResult.error);
-      // Mark registration as failed due to email issue
       await db.alumni.update({
         where: { id: alumni.id },
         data: {
@@ -115,10 +116,9 @@ export async function POST(req: NextRequest) {
     }, { status: 201 });
   } catch (error: any) {
     if (error.name === "ZodError") {
-      // Extract the first error message for display
       const firstError = error.errors[0];
       const errorMessage = firstError?.message || "Validation failed";
-      
+
       return NextResponse.json(
         { success: false, message: errorMessage, errors: error.errors },
         { status: 400 }

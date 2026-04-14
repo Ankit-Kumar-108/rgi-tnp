@@ -1,11 +1,11 @@
-import z from 'zod';
+import { z } from 'zod';
 
 export const recruiterRegistrationSchema = z.object({
-    name: z.string().min(1, 'Name is required').max(100),
-    email: z.string().email('Invalid email address'),
-    phoneNumber: z.string().min(10, 'Phone number must be at least 10 digits').max(15),
-    designation: z.string().min(1, 'Designation is required'),
-    company: z.string().min(1, 'Company is required'),
+    name: z.string().trim().min(1, 'Name is required').max(100),
+    email: z.string().trim().email('Invalid email address'),
+    phoneNumber: z.string().trim().min(10, 'Phone number must be at least 10 digits').max(15),
+    designation: z.string().trim().min(1, 'Designation is required'),
+    company: z.string().trim().min(1, 'Company is required'),
     password: z.string()
         .min(8, 'Password must be at least 8 characters long')
         .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
@@ -19,10 +19,8 @@ export const recruiterRegistrationSchema = z.object({
 });
 
 export const recruiterLoginSchema = z.object({
-    email: z.string().email('Invalid email address'),
+    email: z.string().trim().email('Invalid email address'),
     password: z.string().min(8, 'Password must be at least 8 characters long'),
-}, {
-    message: 'Invalid email or password'
 });
 
 export type RecruiterRegistrationFormData = z.infer<typeof recruiterRegistrationSchema>;

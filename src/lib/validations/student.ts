@@ -1,19 +1,22 @@
-import z, { email } from 'zod';
+import { z } from 'zod';
 
 export const registrationSchema = z.object({
   name: z
     .string()
+    .trim()
     .min(1, 'Name is required')
     .max(100, 'Name cannot be more than 100 characters'),
   email: z
     .string()
+    .trim()
     .email('Invalid email address'),
   enrollmentNumber: z
     .string()
+    .trim()
     .min(1, 'Enrollment number is required')
     .regex(/^[A-Za-z0-9]+$/, 'Enrollment number must be alphanumeric'),
   branch: z.enum(['Computer Science', 'Mechanical', 'Electrical', 'Civil', 'Electronics', 'Power Systems', 'Digital Communication', 'Thermal Engineering', 'Marketing', 'Finance', 'Human Resource']),
-  course: z.string().min(1, 'Course is required'),
+  course: z.string().trim().min(1, 'Course is required'),
   semester: z.coerce
     .number()
     .int()
@@ -23,9 +26,10 @@ export const registrationSchema = z.object({
     .number()
     .min(0, 'CGPA must be a positive number')
     .max(10, 'CGPA cannot be more than 10'),
-  batch: z.string().min(1, 'Batch is required'),
+  batch: z.string().trim().min(1, 'Batch is required'),
   phoneNumber: z
     .string()
+    .trim()
     .min(10, 'Phone number must be at least 10 digits')
     .max(15, 'Phone number cannot be more than 15 digits'),
   password: z
@@ -36,7 +40,7 @@ export const registrationSchema = z.object({
     .regex(/[0-9]/, 'Password must contain at least one number')
     .regex(/[@$!%*?&]/, 'Password must contain at least one special character'),
   confirmPassword: z.string(),
-  profileImageUrl: z.string().optional(),
+  profileImageUrl: z.string().trim().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: 'Passwords do not match',
   path: ['confirmPassword'],
@@ -45,22 +49,17 @@ export const registrationSchema = z.object({
 export const loginSchema = z.object({
   email: z
     .string()
+    .trim()
     .email('Invalid email address'),
   password: z
     .string()
     .min(8, 'Password must be at least 8 characters long')
-}, {
-  message: 'Invalid email or password'
 });
 
-export const otpSchema = z.object({
-  otp: z
-    .string()
-    .length(6, 'OTP must be exactly 6 characters long')
-    .regex(/^[0-9]{6}$/, 'OTP must be numeric'),
-  email: z
-    .string()
-    .email('Invalid email address'),
+// NEW: Schema to validate the token and email from the verification link URL
+export const emailVerificationSchema = z.object({
+  token: z.string().min(1, "Verification token is required"),
+  email: z.string().trim().email("Invalid email address"),
 });
 
 export const passwordResetSchema = z
@@ -70,8 +69,9 @@ export const passwordResetSchema = z
       .string()
       .min(8, "Password must be at least 8 characters")
       .regex(/[A-Z]/, "Password must contain uppercase letter")
+      .regex(/[a-z]/, "Password must contain lowercase letter")
       .regex(/[0-9]/, "Password must contain number")
-      .regex(/[!@#$%^&*]/, "Password must contain special character"),
+      .regex(/[@$!%*?&]/, "Password must contain special character"),
     confirmPassword: z.string(),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
@@ -82,10 +82,8 @@ export const passwordResetSchema = z
 export const forgotPasswordSchema = z.object({
   email: z
     .string()
-    .email()
-    .refine((email) => email.endsWith("@rgi.ac.in"), {
-      message: "Email must be from @rgi.ac.in domain",
-    }),
+    .trim()
+    .email(),
 });
 
 export const memoryUploadSchema = z.object({
@@ -104,7 +102,7 @@ export const memoryUploadSchema = z.object({
 });
 
 export type RegistrationFormData = z.infer<typeof registrationSchema>;
-export type OTPFormData = z.infer<typeof otpSchema>;
 export type LoginFormData = z.infer<typeof loginSchema>;
+export type EmailVerificationData = z.infer<typeof emailVerificationSchema>; // NEW
 export type PasswordResetData = z.infer<typeof passwordResetSchema>;
 export type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>;

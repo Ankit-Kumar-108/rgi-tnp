@@ -17,6 +17,8 @@ export async function POST(req: NextRequest) {
       email: validatedData.email.trim(),
       name: validatedData.name.trim().replace(/\s+/g, ' '),
       phoneNumber: validatedData.phoneNumber.trim(),
+      company: validatedData.company.trim(),
+      designation: validatedData.designation.trim(),
     };
 
     const emailExists = await db.recruiter.findUnique({
@@ -25,7 +27,7 @@ export async function POST(req: NextRequest) {
 
     if (emailExists) {
       return NextResponse.json(
-        { success: false, message: "Email already registered" },
+        { success: false, message: "Email already registered, Please Login" },
         { status: 400 }
       );
     }

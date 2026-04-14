@@ -37,6 +37,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
+
     const passwordHash = await hashPassword(trimmedData.password);
     const verificationToken = generateVerificationToken();
     const verificationTokenExpiry = getresetTokenExpiry();
