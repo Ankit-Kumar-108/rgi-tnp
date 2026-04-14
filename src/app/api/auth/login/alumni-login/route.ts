@@ -10,10 +10,13 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const validatedData = alumniLoginSchema.parse(body);
 
+        // Trim email to remove extra spaces
+        const trimmedEmail = validatedData.personalEmail.trim();
+
         const db = getDb();
         
         const alumni = await db.alumni.findUnique({
-            where: { personalEmail: validatedData.personalEmail }
+            where: { personalEmail: trimmedEmail }
         });
 
         if (!alumni) {
@@ -31,7 +34,7 @@ export async function POST(req: NextRequest) {
 
         const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
         const token = await new jose.SignJWT({ 
-            email: alumni.personalEmail, 
+            email: trimmedEmail, 
             enrollmentNumber: alumni.enrollmentNumber, 
             id: alumni.id 
         })

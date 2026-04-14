@@ -13,8 +13,21 @@ export async function POST(req: NextRequest) {
 
     const validatedData = externalStudentRegistrationSchema.parse(body);
 
+    // Trim fields to remove extra spaces
+    const trimmedData = {
+      ...validatedData,
+      name: validatedData.name.trim().replace(/\s+/g, ' '),
+      collegeName: validatedData.collegeName.trim(),
+      enrollmentNumber: validatedData.enrollmentNumber.trim(),
+      email: validatedData.email.trim(),
+      branch: validatedData.branch.trim(),
+      course: validatedData.course.trim(),
+      batch: validatedData.batch.trim(),
+      phoneNumber: validatedData.phoneNumber.trim(),
+    };
+
     const emailExists = await db.externalStudent.findUnique({
-      where: { email: validatedData.email },
+      where: { email: trimmedData.email },
     });
 
     if (emailExists) {
@@ -24,25 +37,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const passwordHash = await hashPassword(validatedData.password);
+    const passwordHash = await hashPassword(trimmedData.password);
     const verificationToken = generateVerificationToken();
     const verificationTokenExpiry = getresetTokenExpiry();
 
     const externalStudent = await db.externalStudent.create({
       data: {
-        name: validatedData.name,
-        collegeName: validatedData.collegeName,
-        enrollmentNumber: validatedData.enrollmentNumber,
-        email: validatedData.email,
-        branch: validatedData.branch,
-        course: validatedData.course,
-        batch: validatedData.batch,
-        semester: validatedData.semester,
-        cgpa: validatedData.cgpa,
-        resumeUrl: validatedData.resumeUrl,
-        phoneNumber: validatedData.phoneNumber,
+        name: trimmedData.name,
+        collegeName: trimmedData.collegeName,
+        enrollmentNumber: trimmedData.enrollmentNumber,
+        email: trimmedData.email,
+        branch: trimmedData.branch,
+        course: trimmedData.course,
+        batch: trimmedData.batch,
+        semester: trimmedData.semester,
+        cgpa: trimmedData.cgpa,
+        resumeUrl: trimmedData.resumeUrl,
+        phoneNumber: trimmedData.phoneNumber,
         passwordHash: passwordHash,
-        profileImageUrl: validatedData.profileImageUrl || "",
+        profileImageUrl: trimmedData.profileImageUrl || "",
         emailVerificationToken: verificationToken,
         emailVerificationTokenExpiry: verificationTokenExpiry,
         tenthPercentage: 0,
@@ -52,16 +65,16 @@ export async function POST(req: NextRequest) {
 
     const host = req.headers.get("host");
     const protocol = host?.includes("localhost") ? "http" : "https";
-    const verificationLink = `${protocol}://${host}/verify-email?token=${verificationToken}&email=${validatedData.email}&role=external_student`;
+    const verificationLink = `${protocol}://${host}/verify-email?token=${verificationToken}&email=${trimmedData.email}&role=external_student`;
 
     const emailResult = await sendEmail({
-      to: validatedData.email,
+      to: trimmedData.email,
       subject: "Verify Your Email - RGI TnP Portal",
-      html: verificationEmailTemplate(validatedData.name, verificationLink),
-    });
+      html: verificationEmailTemplate(trimmedData.name, verificationLink),
+    })
 
     if (!emailResult.success) {
-      console.error("[EXTERNAL-STUDENT-REGISTER] Email verification failed for:", validatedData.email, emailResult.error);
+      console.error("[EXTERNAL-STUDENT-REGISTER] Email verification failed for:", trimmedData.email, emailResult.error);
       // Mark registration as failed due to email issue
       await db.externalStudent.update({
         where: { id: externalStudent.id },
@@ -90,8 +103,11 @@ export async function POST(req: NextRequest) {
     );
   } catch (error: any) {
     if (error.name === "ZodError") {
+      const firstError = error.errors[0];
+      const errorMessage = firstError?.message || "Validation failed";
+      
       return NextResponse.json(
-        { success: false, message: "Validation failed", errors: error.errors },
+        { success: false, message: errorMessage, errors: error.errors },
         { status: 400 }
       );
     }

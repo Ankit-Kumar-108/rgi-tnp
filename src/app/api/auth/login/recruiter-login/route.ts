@@ -10,10 +10,13 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const validatedData = recruiterLoginSchema.parse(body);
 
+        // Trim email to remove extra spaces
+        const trimmedEmail = validatedData.email.trim();
+
         const db = getDb();
         
         const recruiter = await db.recruiter.findUnique({
-            where: { email: validatedData.email }
+            where: { email: trimmedEmail }
         });
 
         if (!recruiter) {

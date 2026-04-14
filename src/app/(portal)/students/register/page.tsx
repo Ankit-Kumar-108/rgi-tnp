@@ -180,7 +180,7 @@ export default function StudentRegister() {
 
             {/* --- Profile Image Modal Overlay --- */}
             {isProfileImgModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-md">
+                <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-md">
                     <div className="w-full max-w-lg bg-card rounded-[1.5rem] sm:rounded-[2rem] shadow-2xl overflow-hidden ring-1 ring-border relative">
                         <div className="absolute -top-24 -right-24 w-64 h-64 bg-brand/10 rounded-full blur-[80px] pointer-events-none -z-10"></div>
 
@@ -286,7 +286,7 @@ export default function StudentRegister() {
 
             {/* --- Resume PDF Preview Modal Overlay --- */}
             {isResumePreviewOpen && resumePreviewURL && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-md">
+                <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-md">
                     <div className="w-full max-w-5xl bg-card rounded-[1.5rem] sm:rounded-[2rem] shadow-2xl overflow-hidden ring-1 ring-border flex flex-col h-[90vh] relative">
                         
                         <div className="absolute -top-24 -right-24 w-64 h-64 bg-brand/10 rounded-full blur-[80px] pointer-events-none -z-10"></div>
@@ -330,7 +330,7 @@ export default function StudentRegister() {
             <main className="flex-1 flex w-full items-center justify-center p-4 sm:p-6 sm:mt-15 md:mt-0 pt-24 md:pt-32 lg:mt-10 pb-12 lg:h-screen lg:max-h-screen lg:py-24">
                 
                 {/* Fixed Container Height for Desktop */}
-                <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-background/50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-2xl shadow-brand/10 border border-brand/10 lg:h-[85vh] lg:max-h-[800px] lg:overflow-hidden">
+                <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-background/50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-2xl shadow-brand/10 border border-brand/10 lg:h-[85vh] lg:max-h-200 lg:overflow-hidden">
                     
                     {/* Left Decorative Side (Hidden on Mobile) */}
                     <div className="relative hidden lg:flex flex-col justify-end p-10 xl:p-12 bg-brand/5 h-full">

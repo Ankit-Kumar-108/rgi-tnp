@@ -10,10 +10,13 @@ export async function POST(req: NextRequest) {
         const body = await req.json()  
         const validatedData = loginSchema.parse(body);
 
+        // Trim email to remove extra spaces
+        const trimmedEmail = validatedData.email.trim();
+
         const db = getDb()
         
         const student = await db.student.findUnique({
-            where: { email: validatedData.email }
+            where: { email: trimmedEmail }
         })
         if (!student) {
             return NextResponse.json({ success: false, message: "Check email and try again" }, { status: 401 });

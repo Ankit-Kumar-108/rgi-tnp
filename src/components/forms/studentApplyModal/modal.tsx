@@ -88,7 +88,7 @@ export default function JobDetailsModal({
     }
     return (
         // Modal Backdrop
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-background/80 backdrop-blur-md p-4">
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-background/80 backdrop-blur-md p-4">
 
             {/* Custom Scrollbar Styles for the Modal Content */}
             <style dangerouslySetInnerHTML={{
@@ -111,7 +111,7 @@ export default function JobDetailsModal({
                 <div className="overflow-y-auto custom-scrollbar flex-1">
 
                     {/* Header Section with Company Branding */}
-                    <div className="relative px-8 pt-10 pb-8 bg-gradient-to-br from-brand/10 to-transparent border-b border-border/50">
+                    <div className="relative px-8 pt-10 pb-8 bg-linear-to-br from-brand/10 to-transparent border-b border-border/50">
                         <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
                             <div className="w-20 h-20 rounded-[1.5rem] bg-background shadow-lg border border-border flex items-center justify-center p-3 overflow-hidden shrink-0">
                                 <div className="w-full h-full flex items-center justify-center bg-brand/10 text-brand">

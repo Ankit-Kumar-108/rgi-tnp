@@ -15,8 +15,19 @@ export async function POST(req: NextRequest) {
 
     const validatedData = registrationSchema.parse(body);
 
+    // Trim fields to remove extra spaces
+    const trimmedData = {
+      ...validatedData,
+      enrollmentNumber: validatedData.enrollmentNumber.trim(),
+      name: validatedData.name.trim().replace(/\s+/g, ' '),
+      branch: validatedData.branch.trim(),
+      course: validatedData.course.trim(),
+      batch: validatedData.batch.trim(),
+      email: validatedData.email.trim(),
+    };
+
     // 3. Workflow Check: Email Domain 
-    if (!validatedData.email.endsWith("@gmail.com")) {
+    if (!trimmedData.email.endsWith("@gmail.com")) {
       return NextResponse.json(
         { success: false, message: "Use your @gmail.com email" },
         { status: 400 }
@@ -25,11 +36,11 @@ export async function POST(req: NextRequest) {
     // 4. Verify Enrollment Number in Master Records
     const masterRecord = await db.studentMaster.findFirst({
       where: {
-        enrollmentNumber: validatedData.enrollmentNumber,
-        name: validatedData.name,
-        branch: validatedData.branch,
-        course: validatedData.course,
-        batch: validatedData.batch,
+        enrollmentNumber: trimmedData.enrollmentNumber,
+        name: trimmedData.name,
+        branch: trimmedData.branch,
+        course: trimmedData.course,
+        batch: trimmedData.batch,
       },
     });
 
@@ -42,7 +53,7 @@ export async function POST(req: NextRequest) {
 
     // 5. Check if already registered
     const existing = await db.student.findUnique({
-      where: { enrollmentNumber: validatedData.enrollmentNumber },
+      where: { enrollmentNumber: trimmedData.enrollmentNumber },
     });
 
     if (existing) {
@@ -87,13 +98,13 @@ export async function POST(req: NextRequest) {
     const verificationLink = `${protocol}://${host}/verify-email?token=${verificationToken}&email=${validatedData.email}&role=student`;
 
     const emailResult = await sendEmail({
-      to: validatedData.email,
+      to: trimmedData.email,
       subject: "Verify Your Email - RGI TnP Portal",
-      html: verificationEmailTemplate(validatedData.name, verificationLink),
+      html: verificationEmailTemplate(trimmedData.name, verificationLink),
     });
 
     if (!emailResult.success) {
-      console.error("[STUDENT-REGISTER] Email verification failed for:", validatedData.email, emailResult.error);
+      console.error("[STUDENT-REGISTER] Email verification failed for:", trimmedData.email, emailResult.error);
       // Mark registration as failed due to email issue
       await db.student.update({
         where: { id: student.id },
@@ -117,8 +128,12 @@ export async function POST(req: NextRequest) {
 
   } catch (error: any) {
     if (error.name === "ZodError") {
+      // Extract the first error message for display
+      const firstError = error.errors[0];
+      const errorMessage = firstError?.message || "Validation failed";
+      
       return NextResponse.json(
-        { success: false, message: "Validation failed", errors: error.errors },
+        { success: false, message: errorMessage, errors: error.errors },
         { status: 400 }
       );
     }

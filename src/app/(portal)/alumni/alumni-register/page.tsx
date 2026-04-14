@@ -23,6 +23,7 @@ import Link from "next/link";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { uploadFileToR2 } from "@/lib/upload-r2";
+import { toast } from "sonner";
 
 export default function AlumniRegister() {
     const router = useRouter();
@@ -48,7 +49,6 @@ export default function AlumniRegister() {
     const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
     const [imgPreviewURL, setImgPreviewURL] = useState<string | null>(null);
 
-    // --- Helper Functions ---
 
     const update = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
         setForm(prev => ({ ...prev, [field]: e.target.value }));
@@ -56,28 +56,34 @@ export default function AlumniRegister() {
     const handleFileSelection = (selectedFile: File) => {
         if (!selectedFile.type.startsWith("image/")) {
             setError("Please upload a valid image file.");
+            toast.error("Invalid file type. Please select an image.");
             return;
         }
         if (selectedFile.size > 5 * 1024 * 1024) {
             setError("Profile image must be smaller than 5MB");
+            toast.error("File size exceeds 5MB limit.");
             return;
         }
         setProfileImageFile(selectedFile);
         setImgPreviewURL(URL.createObjectURL(selectedFile));
         setError("");
+        toast.success("Profile image selected successfully!");
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(""); 
+        toast.dismiss();
         setSuccess("");
         
         if (form.password !== form.confirmPassword) { 
             setError("Passwords do not match"); 
+            toast.error("Passwords do not match. Please re-enter.");
             return; 
         }
         if (!profileImageFile) { 
             setError("Please upload a profile image to continue."); 
+            toast.error("Please upload a profile image to continue.");
             return; 
         }
 
@@ -97,13 +103,17 @@ export default function AlumniRegister() {
             
             if (!res.ok || !data.success) { 
                 setError(data.message || "Registration failed"); 
+                toast.error(data.message || "Registration failed");
                 return; 
             }
             
             setSuccess("Registration successful! Check your email for the verification link.");
+            toast.success("Registration successful! Check your email for the verification link.");
             setTimeout(() => router.push(`/alumni/login`), 1000);
-        } catch { 
+        } catch (error) {
+            console.error("Error during registration", error);
             setError("Something went wrong."); 
+            toast.error("Something went wrong.");
         } finally { 
             setLoading(false); 
         }
@@ -118,7 +128,7 @@ export default function AlumniRegister() {
 
             {/* --- Profile Image Modal Overlay --- */}
             {isProfileImgModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-md">
+                <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-md">
                     <div className="w-full max-w-lg bg-card rounded-[1.5rem] sm:rounded-[2rem] shadow-2xl overflow-hidden ring-1 ring-border relative">
                         <div className="absolute -top-24 -right-24 w-64 h-64 bg-brand/10 rounded-full blur-[80px] pointer-events-none -z-10"></div>
 
@@ -225,7 +235,7 @@ export default function AlumniRegister() {
             {/* --- Main Registration Content --- */}
             <main className="flex-1 flex w-full items-center justify-center p-4 sm:p-6 sm:mt-10 md:mt-0 pt-24 md:pt-32 pb-12 lg:h-screen lg:max-h-screen lg:py-24">
                 
-                <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-background/50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-2xl shadow-brand/10 border border-brand/10 lg:h-[85vh] lg:max-h-[800px] mt-10 overflow-hidden">
+                <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-background/50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-2xl shadow-brand/10 border border-brand/10 lg:h-[85vh] lg:max-h-200 mt-10 overflow-hidden">
                     
                     {/* Left Decorative Side (Hidden on Mobile) */}
                     <div className="relative hidden lg:flex flex-col justify-end p-10 xl:p-12 bg-brand/5 h-full">

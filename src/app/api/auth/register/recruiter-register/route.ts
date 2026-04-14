@@ -11,8 +11,16 @@ export async function POST(req: NextRequest) {
 
     const validatedData = recruiterRegistrationSchema.parse(body);
 
+    // Trim fields to remove extra spaces
+    const trimmedData = {
+      ...validatedData,
+      email: validatedData.email.trim(),
+      name: validatedData.name.trim().replace(/\s+/g, ' '),
+      phoneNumber: validatedData.phoneNumber.trim(),
+    };
+
     const emailExists = await db.recruiter.findUnique({
-      where: { email: validatedData.email },
+      where: { email: trimmedData.email },
     });
 
     if (emailExists) {
@@ -22,15 +30,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const passwordHash = await hashPassword(validatedData.password);
+    const passwordHash = await hashPassword(trimmedData.password);
 
     const recruiter = await db.recruiter.create({
       data: {
-        name: validatedData.name,
-        email: validatedData.email,
-        phoneNumber: validatedData.phoneNumber,
-        designation: validatedData.designation,
-        company: validatedData.company,
+        name: trimmedData.name,
+        email: trimmedData.email,
+        phoneNumber: trimmedData.phoneNumber,
+        designation: trimmedData.designation,
+        company: trimmedData.company,
         passwordHash: passwordHash,
       },
     });
@@ -45,8 +53,12 @@ export async function POST(req: NextRequest) {
     );
   } catch (error: any) {
     if (error.name === "ZodError") {
+      // Extract the first error message for display
+      const firstError = error.errors[0];
+      const errorMessage = firstError?.message || "Validation failed";
+      
       return NextResponse.json(
-        { success: false, message: "Validation failed", errors: error.errors },
+        { success: false, message: errorMessage, errors: error.errors },
         { status: 400 }
       );
     }

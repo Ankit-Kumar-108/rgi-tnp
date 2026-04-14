@@ -13,11 +13,19 @@ export async function POST(req: NextRequest) {
 
     const validatedData = alumniRegistrationSchema.parse(body);
 
+    // Trim fields to remove extra spaces
+    const trimmedData = {
+      ...validatedData,
+      enrollmentNumber: validatedData.enrollmentNumber.trim(),
+      name: validatedData.name.trim().replace(/\s+/g, ' '),
+      personalEmail: validatedData.personalEmail.trim(),
+    };
+
     // Verify Enrollment Number in Master Records
     const masterRecord = await db.alumniMaster.findFirst({
       where: {
-        enrollmentNumber: validatedData.enrollmentNumber,
-        name: validatedData.name,
+        enrollmentNumber: trimmedData.enrollmentNumber,
+        name: trimmedData.name,
       },
     });
 
@@ -30,7 +38,7 @@ export async function POST(req: NextRequest) {
 
     // Check if already registered
     const existing = await db.alumni.findUnique({
-      where: { enrollmentNumber: validatedData.enrollmentNumber },
+      where: { enrollmentNumber: trimmedData.enrollmentNumber },
     });
 
     if (existing) {
@@ -41,7 +49,7 @@ export async function POST(req: NextRequest) {
     }
 
     const emailExists = await db.alumni.findUnique({
-      where: { personalEmail: validatedData.personalEmail },
+      where: { personalEmail: trimmedData.personalEmail },
     });
 
     if (emailExists) {
@@ -75,16 +83,16 @@ export async function POST(req: NextRequest) {
     // Send Verification Email
     const host = req.headers.get("host");
     const protocol = host?.includes("localhost") ? "http" : "https";
-    const verificationLink = `${protocol}://${host}/verify-email?token=${verificationToken}&email=${validatedData.personalEmail}&role=alumni`;
+    const verificationLink = `${protocol}://${host}/verify-email?token=${verificationToken}&email=${trimmedData.personalEmail}&role=alumni`;
 
     const emailResult = await sendEmail({
-      to: validatedData.personalEmail,
+      to: trimmedData.personalEmail,
       subject: "Verify Your Email - RGI TnP Portal",
-      html: verificationEmailTemplate(validatedData.name, verificationLink),
+      html: verificationEmailTemplate(trimmedData.name, verificationLink),
     });
 
     if (!emailResult.success) {
-      console.error("[ALUMNI-REGISTER] Email verification failed for:", validatedData.personalEmail, emailResult.error);
+      console.error("[ALUMNI-REGISTER] Email verification failed for:", trimmedData.personalEmail, emailResult.error);
       // Mark registration as failed due to email issue
       await db.alumni.update({
         where: { id: alumni.id },
@@ -107,8 +115,12 @@ export async function POST(req: NextRequest) {
     }, { status: 201 });
   } catch (error: any) {
     if (error.name === "ZodError") {
+      // Extract the first error message for display
+      const firstError = error.errors[0];
+      const errorMessage = firstError?.message || "Validation failed";
+      
       return NextResponse.json(
-        { success: false, message: "Validation failed", errors: error.errors },
+        { success: false, message: errorMessage, errors: error.errors },
         { status: 400 }
       );
     }

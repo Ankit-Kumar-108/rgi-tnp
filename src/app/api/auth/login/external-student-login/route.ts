@@ -10,10 +10,13 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const validatedData = externalStudentLoginSchema.parse(body);
 
+        // Trim email to remove extra spaces
+        const trimmedEmail = validatedData.email.trim();
+
         const db = getDb();
         
         const externalStudent = await db.externalStudent.findUnique({
-            where: { email: validatedData.email }
+            where: { email: trimmedEmail }
         });
 
         if (!externalStudent) {
