@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
       const errorMessage = firstError?.message || "Validation failed";
       
       return NextResponse.json(
-        { success: false, message: errorMessage, errors: error.errors },
+        { success: false, message: errorMessage, errors: error.errors},
         { status: 400 }
       );
     }
