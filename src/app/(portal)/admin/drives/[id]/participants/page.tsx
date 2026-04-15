@@ -2,494 +2,657 @@
 export const runtime = 'edge'
 import React, { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import {
-  ArrowLeft,
-  Loader2,
-  Users,
-  Search,
-  Filter,
-  CheckCircle2,
-  ArrowRightCircle,
-  XCircle,
-  FileText,
-  Download,
-  ExternalLink,
-  Building2,
+  ArrowLeft, Loader2, Users, Search, Filter, CheckCircle2,
+  ArrowRightCircle, XCircle, FileText, Download, ExternalLink,
+  Github, Linkedin, Calendar, MessageSquare, Star, StarOff,
+  ChevronDown, SlidersHorizontal, BarChart3, Clock,
+  Mail, Phone, UserCheck // <-- Added new icons for contact and attendance
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
-import { toast } from "sonner"; // Added toast for notifications
+import { toast } from "sonner";
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+type Participant = {
+  id: string;
+  status: string;
+  attended: boolean; // <-- Added attended status from API
+  createdAt: string;
+  starred?: boolean;
+  student?: StudentUser;
+  externalStudent?: StudentUser;
+};
+type StudentUser = {
+  name?: string;
+  enrollmentNumber?: string;
+  email?: string;
+  phoneNumber?: string;
+  branch?: string;
+  batch?: string | number;
+  cgpa?: number | string;
+  course?: string;
+  collegeName?: string;
+  profileImageUrl?: string;
+  resumeUrl?: string;
+  githubUrl?: string;
+  linkedinUrl?: string;
+  skills?: string[];
+};
+
+// ─── Status Config ─────────────────────────────────────────────────────────────
+const STATUS_CONFIG: Record<string, { label: string; pill: string; dot: string; icon: React.ReactNode }> = {
+  Applied:     { label: "Applied",     pill: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",      dot: "bg-slate-400",   icon: <Clock className="w-3 h-3" /> },
+  Shortlisted: { label: "Shortlisted", pill: "bg-amber-50 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",    dot: "bg-amber-400",   icon: <ArrowRightCircle className="w-3 h-3" /> },
+  Selected:    { label: "Selected",    pill: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300", dot: "bg-emerald-500", icon: <CheckCircle2 className="w-3 h-3" /> },
+  Rejected:    { label: "Rejected",    pill: "bg-red-50 text-red-600 dark:bg-red-900/40 dark:text-red-300",            dot: "bg-red-400",     icon: <XCircle className="w-3 h-3" /> },
+};
+
+const getStatusCfg = (s?: string) => STATUS_CONFIG[s || "Applied"] ?? STATUS_CONFIG.Applied;
+
+// ─── Subcomponents ─────────────────────────────────────────────────────────────
+
+/** Circular match-score ring */
+function MatchRing({ score }: { score: number }) {
+  const r = 18;
+  const circ = 2 * Math.PI * r;
+  const dash = (score / 100) * circ;
+  const color = score >= 75 ? "#10b981" : score >= 50 ? "#f59e0b" : "#f87171";
+  return (
+    <div className="relative w-12 h-12 shrink-0" title={`${score}% match`}>
+      <svg viewBox="0 0 44 44" className="w-full h-full -rotate-90">
+        <circle cx="22" cy="22" r={r} fill="none" stroke="currentColor" strokeWidth="3.5" className="text-muted/30" />
+        <circle cx="22" cy="22" r={r} fill="none" stroke={color} strokeWidth="3.5"
+          strokeDasharray={`${dash} ${circ}`} strokeLinecap="round" />
+      </svg>
+      <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold" style={{ color }}>
+        {score}%
+      </span>
+    </div>
+  );
+}
+
+/** Avatar with optional status ring */
+function Avatar({ user, status, size = "md" }: { user: StudentUser; status: string; size?: "sm" | "md" | "lg" }) {
+  const dim = size === "lg" ? "w-14 h-14" : size === "md" ? "w-12 h-12" : "w-9 h-9";
+  const txt = size === "lg" ? "text-lg" : size === "md" ? "text-base" : "text-xs";
+  const ringColor = status === "Selected" ? "ring-emerald-500" : status === "Shortlisted" ? "ring-amber-400" : status === "Rejected" ? "ring-red-400" : "ring-border";
+  return (
+    <div className={`${dim} rounded-full ring-2 ${ringColor} ring-offset-2 ring-offset-card overflow-hidden bg-muted flex items-center justify-center shrink-0`}>
+      {user.profileImageUrl
+        ? <img src={user.profileImageUrl} alt={user.name} className="w-full h-full object-cover object-top" />
+        : <span className={`font-black text-brand ${txt}`}>{user.name?.charAt(0) ?? "?"}</span>
+      }
+    </div>
+  );
+}
+
+/** Status pill badge */
+function StatusBadge({ status }: { status: string }) {
+  const cfg = getStatusCfg(status);
+  return (
+    <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide ${cfg.pill}`}>
+      {cfg.icon}
+      {cfg.label}
+    </span>
+  );
+}
+
+/** Stat chip (number + label) */
+function StatChip({ value, label }: { value?: string | number; label: string }) {
+  if (!value) return null;
+  return (
+    <span className="inline-flex flex-col items-center leading-tight">
+      <span className="text-sm font-black text-foreground">{value}</span>
+      <span className="text-[9px] text-muted-foreground uppercase tracking-wide">{label}</span>
+    </span>
+  );
+}
+
+/** Skill tag */
+function SkillTag({ label }: { label: string }) {
+  return (
+    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full border border-border bg-muted/40 text-muted-foreground">
+      {label}
+    </span>
+  );
+}
+
+/** Pipeline funnel progress bar */
+function PipelineFunnel({ counts, total }: { counts: Record<string, number>; total: number }) {
+  const stages = [
+    { key: "Applied",     color: "bg-slate-400",   label: "Applied" },
+    { key: "Shortlisted", color: "bg-amber-400",   label: "Shortlisted" },
+    { key: "Selected",    color: "bg-emerald-500", label: "Selected" },
+    { key: "Rejected",    color: "bg-red-400",     label: "Rejected" },
+  ];
+  return (
+    <div className="flex gap-1 h-1.5 rounded-full overflow-hidden w-full">
+      {stages.map(s => {
+        const pct = total > 0 ? ((counts[s.key] || 0) / total) * 100 : 0;
+        if (pct === 0) return null;
+        return <div key={s.key} className={`${s.color} h-full`} style={{ width: `${pct}%` }} title={`${s.label}: ${counts[s.key] || 0}`} />;
+      })}
+    </div>
+  );
+}
+
+// ─── Main Page ─────────────────────────────────────────────────────────────────
 export default function DriveParticipantsPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = React.use(paramsPromise);
   const { id } = params;
   const { loading: authLoading, authenticated } = useAuth("admin", "/admin/login");
-  
-  // Infinite Scroll States
-  const [participants, setParticipants] = useState<any[]>([]);
-  const [drive, setDrive] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
+
+  // Data states
+  const [participants, setParticipants]   = useState<Participant[]>([]);
+  const [drive, setDrive]                 = useState<any>(null);
+  const [loading, setLoading]             = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [totalCount, setTotalCount] = useState(0);
+  const [page, setPage]                   = useState(1);
+  const [hasMore, setHasMore]             = useState(true);
+  const [totalCount, setTotalCount]       = useState(0);
 
-  // Selection and Filtering
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
+  // UI states
+  const [selectedIds, setSelectedIds]     = useState<Set<string>>(new Set());
+  const [starredIds, setStarredIds]       = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery]     = useState("");
+  const [statusFilter, setStatusFilter]   = useState("All");
+  const [sortBy, setSortBy]               = useState<"date" | "cgpa" | "name">("date");
+  const [showFilters, setShowFilters]     = useState(false);
+  const [typeFilter, setTypeFilter]       = useState<"All" | "Internal" | "External">("All");
 
-  // --- Infinite Scroll Sensor ---
+  // ─── Infinite scroll ───────────────────────────────────────────────────────
   const observer = useRef<IntersectionObserver | null>(null);
-  const lastParticipantRef = useCallback((node: HTMLDivElement | null) => {
+  const lastRef  = useCallback((node: HTMLDivElement | null) => {
     if (loading) return;
     if (observer.current) observer.current.disconnect();
-
     observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMore) {
-        setPage(prevPage => prevPage + 1);
-      }
+      if (entries[0].isIntersecting && hasMore) setPage(p => p + 1);
     });
-
     if (node) observer.current.observe(node);
   }, [loading, hasMore]);
 
-  // --- Fetch Participants ---
   useEffect(() => {
     if (!authenticated) return;
-    
-    const loadParticipants = async () => {
+    const load = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/admin/drives/${id}/participants?limit=50&page=${page}`);
+        const res  = await fetch(`/api/admin/drives/${id}/participants?limit=50&page=${page}`);
         const data = await res.json() as any;
-        
         if (data.success) {
           setDrive(data.drive);
           setTotalCount(data.totalCount || 0);
-          
           setParticipants(prev => {
-            const existingIds = new Set(prev.map(p => p.id));
-            const newParticipants = data.registrations.filter((p: any) => !existingIds.has(p.id));
-            return [...prev, ...newParticipants];
+            const existing = new Set(prev.map(p => p.id));
+            const fresh    = data.registrations.filter((p: any) => !existing.has(p.id));
+            return [...prev, ...fresh];
           });
-          
           setHasMore(data.totalCount > page * 50);
         }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
+      } catch (err) { console.error(err); }
+      finally { setLoading(false); }
     };
-
-    loadParticipants();
+    load();
   }, [authenticated, id, page]);
 
-  // --- Bulk Update Status (Local State Update) ---
   const handleStatusUpdate = async (newStatus: string) => {
-    if (selectedIds.size === 0) return;
-
+    if (!selectedIds.size) return;
     setActionLoading(true);
     try {
-      const res = await fetch(`/api/admin/drives/${id}/participants`, {
+      const res  = await fetch(`/api/admin/drives/${id}/participants`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          registrationIds: Array.from(selectedIds),
-          status: newStatus
-        }),
+        body: JSON.stringify({ registrationIds: Array.from(selectedIds), status: newStatus }),
       });
       const data = await res.json() as any;
-      
       if (data.success) {
-        toast.success(`Updated ${selectedIds.size} candidates to ${newStatus}`);
-        
-        // Update local state instantly instead of re-fetching
-        setParticipants(prev => prev.map(p => 
-          selectedIds.has(p.id) ? { ...p, status: newStatus } : p
-        ));
-        
-        // Clear selection
+        toast.success(`${selectedIds.size} candidate${selectedIds.size > 1 ? "s" : ""} moved to ${newStatus}`);
+        setParticipants(prev => prev.map(p => selectedIds.has(p.id) ? { ...p, status: newStatus } : p));
         setSelectedIds(new Set());
-      } else {
-        toast.error("Failed to update status");
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("An error occurred");
-    } finally {
-      setActionLoading(false);
-    }
+      } else toast.error("Failed to update status");
+    } catch { toast.error("An error occurred"); }
+    finally { setActionLoading(false); }
   };
 
-  const toggleSelection = (regId: string) => {
-    const newSelected = new Set(selectedIds);
-    if (newSelected.has(regId)) newSelected.delete(regId);
-    else newSelected.add(regId);
-    setSelectedIds(newSelected);
+  const toggleSelection = (id: string) => setSelectedIds(prev => {
+    const s = new Set(prev);
+    s.has(id) ? s.delete(id) : s.add(id);
+    return s;
+  });
+
+  const toggleStar = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setStarredIds(prev => {
+      const s = new Set(prev);
+      s.has(id) ? s.delete(id) : s.add(id);
+      return s;
+    });
   };
 
   const toggleAll = () => {
-    if (selectedIds.size === filteredParticipants.length && filteredParticipants.length > 0) {
+    if (selectedIds.size === filteredParticipants.length && filteredParticipants.length > 0)
       setSelectedIds(new Set());
-    } else {
+    else
       setSelectedIds(new Set(filteredParticipants.map(p => p.id)));
-    }
   };
 
   const filteredParticipants = useMemo(() => {
-    return participants.filter(p => {
+    let list = participants.filter(p => {
       const u = p.student || p.externalStudent;
-      const matchesSearch = u?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        u?.enrollmentNumber?.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = !searchQuery ||
+        u?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        u?.enrollmentNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        u?.branch?.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStatus = statusFilter === "All" || p.status === statusFilter;
-      return matchesSearch && matchesStatus;
+      const isInternal    = !!p.student;
+      const matchesType   = typeFilter === "All" || (typeFilter === "Internal" ? isInternal : !isInternal);
+      return matchesSearch && matchesStatus && matchesType;
     });
-  }, [participants, searchQuery, statusFilter]);
+
+    list.sort((a, b) => {
+      const ua = a.student || a.externalStudent || {};
+      const ub = b.student || b.externalStudent || {};
+      if (sortBy === "cgpa")  return (Number(ub.cgpa) || 0) - (Number(ua.cgpa) || 0);
+      if (sortBy === "name")  return (ua.name || "").localeCompare(ub.name || "");
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+
+    return list;
+  }, [participants, searchQuery, statusFilter, typeFilter, sortBy]);
 
   const uniqueStatuses = useMemo(() => {
-    const statuses = new Set(participants.map(p => p.status || "Applied"));
-    return ["All", ...Array.from(statuses)];
+    const s = new Set(participants.map(p => p.status || "Applied"));
+    return ["All", ...Array.from(s)];
   }, [participants]);
 
   const statusCounts = useMemo(() => {
-    const counts: Record<string, number> = { Applied: 0, Shortlisted: 0, Selected: 0, Rejected: 0 };
-    participants.forEach(p => {
-      const s = p.status || "Applied";
-      counts[s] = (counts[s] || 0) + 1;
-    });
-    return counts;
+    const c: Record<string, number> = { Applied: 0, Shortlisted: 0, Selected: 0, Rejected: 0 };
+    participants.forEach(p => { const s = p.status || "Applied"; c[s] = (c[s] || 0) + 1; });
+    return c;
   }, [participants]);
 
+  //  CSV export 
   const exportToCSV = () => {
-    if (filteredParticipants.length === 0) return;
-    const headers = ["Name", "Enrollment Number", "Email", "Phone Number", "Type", "College", "Branch", "CGPA", "Status", "Applied On", "Resume Link"];
+    if (!filteredParticipants.length) return;
+    const headers = ["Name","Enrollment","Email","Phone","Type","College","Branch","CGPA","Status","Attended","Applied On","Resume"];
     const rows = filteredParticipants.map(p => {
-      const u = p.student || p.externalStudent || {};
+      const u    = p.student || p.externalStudent || {};
       const type = p.student ? "Internal" : "External";
       return [
-        `"${u.name || ""}"`,
-        `"${u.enrollmentNumber || ""}"`,
-        `"${u.email || ""}"`,
-        `"${u.phoneNumber || ""}"`,
-        `"${type}"`,
-        `"${u.collegeName || "RGI"}"`,
-        `"${u.branch || ""}"`,
-        u.cgpa || "",
-        `"${p.status || "Applied"}"`,
-        `"${new Date(p.createdAt).toLocaleDateString()}"`,
-        `"${u.resumeUrl || "Not Provided"}"`
+        `"${u.name || ""}"`, `"${u.enrollmentNumber || ""}"`, `"${u.email || ""}"`,
+        `"${u.phoneNumber || ""}"`, `"${type}"`, `"${u.collegeName || "RGI"}"`,
+        `"${u.branch || ""}"`, u.cgpa || "", `"${p.status || "Applied"}"`, `"${p.attended ? "Yes" : "No"}"`,
+        `"${new Date(p.createdAt).toLocaleDateString()}"`, `"${u.resumeUrl || "—"}"`,
       ].join(",");
     });
-
-    const csvContent = [headers.join(","), ...rows].join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", `${drive?.companyName || "Drive"}_Participants.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const blob = new Blob([[headers.join(","), ...rows].join("\n")], { type: "text/csv;charset=utf-8;" });
+    const a    = document.createElement("a");
+    a.href     = URL.createObjectURL(blob);
+    a.download = `${drive?.companyName || "Drive"}_Participants.csv`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
   };
 
-  const getStatusBadge = (status: string) => {
-    const s = status || "Applied";
-    if (s === "Selected") return "bg-green-500/10 text-green-600";
-    if (s === "Rejected") return "bg-red-500/10 text-red-500";
-    if (s === "Shortlisted") return "bg-yellow-500/10 text-yellow-600";
-    return "bg-muted text-muted-foreground";
-  };
+  //  Auth gate
+  if (authLoading || !authenticated) return (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <Loader2 className="w-8 h-8 animate-spin text-brand" />
+    </div>
+  );
 
-  if (authLoading || !authenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="w-8 h-8 animate-spin text-brand" />
-      </div>
-    );
-  }
-
+  //  Render 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
+
+      {/*  Sticky Header */}
       <header className="sticky top-0 z-40 bg-card/80 backdrop-blur-xl border-b border-border">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Link href="/admin/drives" className="text-muted-foreground hover:text-brand transition-colors">
-              <ArrowLeft className="w-5 h-5" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+
+          {/* Left: back + title */}
+          <div className="flex items-center gap-3 min-w-0">
+            <Link href="/admin/drives"
+              className="w-8 h-8 rounded-lg flex items-center justify-center border border-border hover:bg-muted transition-colors shrink-0">
+              <ArrowLeft className="w-4 h-4 text-muted-foreground" />
             </Link>
-            <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center">
-              <Users className="w-5 h-5 text-brand" />
-            </div>
-            <div>
-              <h1 className="text-lg font-black text-foreground tracking-tight">Participant Management</h1>
-              <p className="text-xs text-muted-foreground">Manage candidates for {drive?.companyName || "this drive"}</p>
+            <div className="min-w-0">
+              <h1 className="text-sm font-black text-foreground tracking-tight truncate">
+                {drive?.companyName || "Drive"} — Candidates
+              </h1>
+              <p className="text-[11px] text-muted-foreground hidden sm:block">
+                {totalCount} total · {statusCounts.Shortlisted || 0} shortlisted · {statusCounts.Selected || 0} selected
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* Bulk action bar */}
+          {selectedIds.size > 0 && (
+            <div className="flex items-center gap-2 h-11 px-3 bg-brand/5 border border-brand/20 rounded-xl animate-in fade-in slide-in-from-bottom-2 duration-200">
+              <span className="text-xs font-bold text-brand mr-1">{selectedIds.size} selected</span>
+              <div className="h-4 w-px bg-border" />
+              {[
+                { status: "Shortlisted", label: "Shortlist",   icon: <ArrowRightCircle className="w-3.5 h-3.5" />, cls: "text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30" },
+                { status: "Selected",    label: "Select",      icon: <CheckCircle2 className="w-3.5 h-3.5" />,    cls: "text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30" },
+                { status: "Rejected",    label: "Reject",      icon: <XCircle className="w-3.5 h-3.5" />,         cls: "text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30" },
+              ].map(action => (
+                <button key={action.status}
+                  onClick={() => handleStatusUpdate(action.status)}
+                  disabled={actionLoading}
+                  className={`flex items-center gap-1.5 h-7 px-3 rounded-lg text-xs font-bold transition-colors disabled:opacity-50 ${action.cls}`}>
+                  {actionLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : action.icon}
+                  {action.label}
+                </button>
+              ))}
+              <button onClick={() => setSelectedIds(new Set())}
+                className="ml-auto text-muted-foreground hover:text-foreground transition-colors">
+                <XCircle className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
+          {/* Right: actions */}
+          <div className="flex items-center gap-2 shrink-0">
             {drive?.googleSheetUrl && (
-              <a
-                href={drive.googleSheetUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500/10 text-green-600 hover:bg-green-500/20 text-xs font-bold rounded-lg transition-colors"
-                title="Open Google Sheet"
-              >
-                <ExternalLink className="w-3.5 h-3.5" />
-                Sheet
+              <a href={drive.googleSheetUrl} target="_blank" rel="noopener noreferrer"
+                className="hidden sm:flex items-center gap-1.5 h-8 px-3 rounded-lg bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20 text-xs font-bold transition-colors">
+                <ExternalLink className="w-3.5 h-3.5" /> Sheet
               </a>
             )}
-            <button
-              onClick={exportToCSV}
-              disabled={filteredParticipants.length === 0}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-brand text-white hover:bg-brand/90 text-xs font-bold rounded-lg transition-colors disabled:opacity-50"
-            >
+            <button onClick={exportToCSV} disabled={!filteredParticipants.length}
+              className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-brand text-white hover:bg-brand/90 text-xs font-bold transition-colors disabled:opacity-40">
               <Download className="w-3.5 h-3.5" />
-              Export CSV
+              <span className="hidden sm:inline">Export CSV</span>
             </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
 
-        {/* Stats */}
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-card rounded-2xl p-5 border border-border shadow-sm">
-            <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center mb-3">
-              <Users className="w-5 h-5 text-brand" />
-            </div>
-            <p className="text-2xl font-black text-foreground">{totalCount || participants.length}</p>
-            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mt-1">Total Applied</p>
-          </div>
-          <div className="bg-card rounded-2xl p-5 border border-border shadow-sm">
-            <div className="w-10 h-10 bg-yellow-500/10 rounded-xl flex items-center justify-center mb-3">
-              <ArrowRightCircle className="w-5 h-5 text-yellow-500" />
-            </div>
-            <p className="text-2xl font-black text-foreground">{statusCounts.Shortlisted || 0}</p>
-            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mt-1">Shortlisted (Loaded)</p>
-          </div>
-          <div className="bg-card rounded-2xl p-5 border border-border shadow-sm">
-            <div className="w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center mb-3">
-              <CheckCircle2 className="w-5 h-5 text-green-500" />
-            </div>
-            <p className="text-2xl font-black text-foreground">{statusCounts.Selected || 0}</p>
-            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mt-1">Selected (Loaded)</p>
-          </div>
-          <div className="bg-card rounded-2xl p-5 border border-border shadow-sm">
-            <div className="w-10 h-10 bg-red-500/10 rounded-xl flex items-center justify-center mb-3">
-              <XCircle className="w-5 h-5 text-red-500" />
-            </div>
-            <p className="text-2xl font-black text-foreground">{statusCounts.Rejected || 0}</p>
-            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mt-1">Rejected (Loaded)</p>
-          </div>
-        </section>
-
-        {/* Search + Filter + Bulk Actions */}
-        <section className="space-y-4">
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-            <div className="relative w-full sm:w-96">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Search loaded candidates..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-card border border-border rounded-xl text-sm focus:outline-none focus:border-brand"
-              />
-            </div>
-            <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0">
-              <Filter className="w-4 h-4 text-muted-foreground shrink-0" />
-              {uniqueStatuses.map(status => (
-                <button
-                  key={status}
-                  onClick={() => setStatusFilter(status)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-colors ${statusFilter === status
-                    ? "bg-brand text-primary-foreground shadow-md"
-                    : "bg-card border border-border text-foreground hover:border-brand/50"
-                    }`}
-                >
-                  {status}
+        {/*  Pipeline Stats  */}
+        <section>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {[
+              { key: "Applied",     label: "Total Applied",  icon: <Users className="w-4 h-4" />,              accent: "text-slate-600 bg-slate-100 dark:bg-slate-800 dark:text-slate-300",   value: totalCount || participants.length },
+              { key: "Shortlisted", label: "Shortlisted",    icon: <ArrowRightCircle className="w-4 h-4" />,   accent: "text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-300",  value: statusCounts.Shortlisted || 0 },
+              { key: "Selected",    label: "Selected",       icon: <CheckCircle2 className="w-4 h-4" />,       accent: "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 dark:text-emerald-300", value: statusCounts.Selected || 0 },
+              { key: "Rejected",    label: "Rejected",       icon: <XCircle className="w-4 h-4" />,            accent: "text-red-500 bg-red-50 dark:bg-red-900/30 dark:text-red-300",         value: statusCounts.Rejected || 0 },
+            ].map(stat => {
+              const pct = totalCount > 0 ? Math.round((stat.value / totalCount) * 100) : 0;
+              return (
+                <button key={stat.key}
+                  onClick={() => setStatusFilter(statusFilter === stat.key && stat.key !== "Applied" ? "All" : stat.key === "Applied" ? "All" : stat.key)}
+                  className={`bg-card border rounded-xl p-4 text-left hover:border-brand/40 transition-all group ${statusFilter === stat.key ? "border-brand ring-1 ring-brand/20" : "border-border"}`}>
+                  <div className={`inline-flex items-center justify-center w-8 h-8 rounded-lg mb-3 ${stat.accent}`}>
+                    {stat.icon}
+                  </div>
+                  <p className="text-2xl font-black text-foreground tabular-nums">{stat.value}</p>
+                  <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider mt-0.5">{stat.label}</p>
+                  {totalCount > 0 && stat.key !== "Applied" && (
+                    <div className="mt-2">
+                      <div className="h-1 bg-muted rounded-full overflow-hidden">
+                        <div className={`h-full rounded-full transition-all ${stat.accent.includes("amber") ? "bg-amber-400" : stat.accent.includes("emerald") ? "bg-emerald-500" : "bg-red-400"}`}
+                          style={{ width: `${pct}%` }} />
+                      </div>
+                      <p className="text-[10px] text-muted-foreground mt-1">{pct}% of total</p>
+                    </div>
+                  )}
                 </button>
-              ))}
-            </div>
+              );
+            })}
           </div>
 
-          {/* Bulk Actions */}
-          {selectedIds.size > 0 && (
-            <div className="flex items-center gap-2 bg-muted/50 p-2 rounded-xl border border-border animate-in fade-in slide-in-from-bottom-2">
-              <span className="text-xs font-bold text-muted-foreground px-2">
-                {selectedIds.size} Selected
-              </span>
-              <button
-                onClick={() => handleStatusUpdate("Shortlisted")}
-                disabled={actionLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-yellow-500/10 text-yellow-600 hover:bg-yellow-500/20 text-xs font-bold rounded-lg transition-colors disabled:opacity-50">
-                <ArrowRightCircle className="w-3.5 h-3.5" />
-                Shortlist
-              </button>
-              <button
-                onClick={() => handleStatusUpdate("Selected")}
-                disabled={actionLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500/10 text-green-600 hover:bg-green-500/20 text-xs font-bold rounded-lg transition-colors disabled:opacity-50">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                Select
-              </button>
-              <button
-                onClick={() => handleStatusUpdate("Rejected")}
-                disabled={actionLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-500 hover:bg-red-500/20 text-xs font-bold rounded-lg transition-colors disabled:opacity-50">
-                <XCircle className="w-3.5 h-3.5" />
-                Reject
-              </button>
+          {totalCount > 0 && (
+            <div className="mt-3 bg-card border border-border rounded-xl px-4 py-3">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
+                  <BarChart3 className="w-3.5 h-3.5" /> Pipeline overview
+                </p>
+                <p className="text-[11px] text-muted-foreground">{filteredParticipants.length} shown of {totalCount}</p>
+              </div>
+              <PipelineFunnel counts={statusCounts} total={totalCount} />
+              <div className="flex gap-4 mt-2">
+                {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
+                  <span key={key} className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                    <span className={`w-2 h-2 rounded-full ${cfg.dot}`} />
+                    {cfg.label}
+                  </span>
+                ))}
+              </div>
             </div>
           )}
         </section>
 
-        {/* Participants - Card Layout */}
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
-              <Users className="w-5 h-5 text-brand" />
-              Candidates
-            </h2>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                className="w-4 h-4 rounded border-border text-brand focus:ring-brand accent-brand cursor-pointer"
-                checked={selectedIds.size > 0 && selectedIds.size === filteredParticipants.length}
-                onChange={toggleAll}
-              />
-              <span className="text-xs font-bold text-muted-foreground">
-                {selectedIds.size > 0 ? `${selectedIds.size} / ${filteredParticipants.length}` : "Select All"}
-              </span>
+        <section className="space-y-3">
+          <div className="flex flex-col sm:flex-row gap-3">
+
+            {/* Search */}
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+              <input type="text" placeholder="Search by name, enrollment, branch…"
+                value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+                className="w-full h-9 pl-9 pr-4 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-brand focus:border-brand transition-colors" />
+              {searchQuery && (
+                <button onClick={() => setSearchQuery("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                  <XCircle className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
+
+            {/* Sort */}
+            <div className="relative">
+              <select value={sortBy} onChange={e => setSortBy(e.target.value as any)}
+                className="h-9 pl-3 pr-8 bg-card border border-border rounded-lg text-sm appearance-none focus:outline-none focus:ring-1 focus:ring-brand cursor-pointer">
+                <option value="date">Sort: Latest</option>
+                <option value="cgpa">Sort: CGPA ↓</option>
+                <option value="name">Sort: A → Z</option>
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+            </div>
+
+            {/* Filter toggle */}
+            <button onClick={() => setShowFilters(!showFilters)}
+              className={`h-9 px-3 rounded-lg border text-sm font-medium flex items-center gap-1.5 transition-colors ${showFilters ? "bg-brand text-white border-brand" : "bg-card border-border text-foreground hover:border-brand/40"}`}>
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              Filters
+              {(statusFilter !== "All" || typeFilter !== "All") && (
+                <span className="w-4 h-4 rounded-full bg-white text-brand text-[9px] font-black flex items-center justify-center">
+                  {[statusFilter !== "All", typeFilter !== "All"].filter(Boolean).length}
+                </span>
+              )}
+            </button>
+          </div>
+
+          {/* Expanded filters */}
+          {showFilters && (
+            <div className="flex flex-wrap gap-2 p-3 bg-muted/30 border border-border rounded-xl">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Status:</span>
+                {uniqueStatuses.map(s => (
+                  <button key={s} onClick={() => setStatusFilter(s)}
+                    className={`h-7 px-3 rounded-full text-xs font-bold transition-colors ${statusFilter === s ? "bg-brand text-white" : "bg-card border border-border text-foreground hover:border-brand/50"}`}>
+                    {s}
+                    {s !== "All" && <span className="ml-1 opacity-60">·{statusCounts[s] || 0}</span>}
+                  </button>
+                ))}
+              </div>
+              <div className="w-px bg-border mx-1 hidden sm:block" />
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Type:</span>
+                {(["All", "Internal", "External"] as const).map(t => (
+                  <button key={t} onClick={() => setTypeFilter(t)}
+                    className={`h-7 px-3 rounded-full text-xs font-bold transition-colors ${typeFilter === t ? "bg-brand text-white" : "bg-card border border-border text-foreground hover:border-brand/50"}`}>
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
+              <Users className="w-4 h-4 text-brand" />
+              Candidates
+              <span className="text-muted-foreground font-normal">({filteredParticipants.length})</span>
+            </h2>
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input type="checkbox"
+                className="w-4 h-4 rounded border-border accent-brand cursor-pointer"
+                checked={selectedIds.size > 0 && selectedIds.size === filteredParticipants.length}
+                onChange={toggleAll} />
+              <span className="text-xs text-muted-foreground font-medium">
+                {selectedIds.size > 0 ? `${selectedIds.size} / ${filteredParticipants.length}` : "Select all"}
+              </span>
+            </label>
           </div>
 
           {loading && page === 1 ? (
-            <div className="flex justify-center py-20">
-              <Loader2 className="w-8 h-8 animate-spin text-brand" />
+            <div className="space-y-3">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="bg-card border border-border rounded-xl p-5 animate-pulse">
+                  <div className="flex gap-4">
+                    <div className="w-12 h-12 rounded-full bg-muted" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 bg-muted rounded w-40" />
+                      <div className="h-3 bg-muted rounded w-64" />
+                      <div className="h-3 bg-muted rounded w-32" />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : filteredParticipants.length === 0 ? (
-            <div className="bg-card rounded-2xl border border-border p-8 text-center text-muted-foreground">
-              <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
-              <p className="font-medium">No participants found</p>
-              <p className="text-xs mt-1">Try adjusting your filters or search query.</p>
+            <div className="bg-card rounded-xl border border-border p-12 text-center">
+              <Users className="w-10 h-10 mx-auto mb-3 text-muted-foreground/30" />
+              <p className="font-bold text-foreground text-sm">No candidates found</p>
+              <p className="text-xs text-muted-foreground mt-1">Try adjusting your filters or search query.</p>
+              {(searchQuery || statusFilter !== "All" || typeFilter !== "All") && (
+                <button onClick={() => { setSearchQuery(""); setStatusFilter("All"); setTypeFilter("All"); }}
+                  className="mt-3 text-xs text-brand hover:underline font-medium">
+                  Clear all filters
+                </button>
+              )}
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {filteredParticipants.map((reg, index) => {
-                const user = reg.student || reg.externalStudent || {};
+                const user       = reg.student || reg.externalStudent || {} as StudentUser;
                 const isSelected = selectedIds.has(reg.id);
+                const isStarred  = starredIds.has(reg.id);
                 const isInternal = !!reg.student;
-                const isLastElement = index === filteredParticipants.length - 1;
+                const isLast     = index === filteredParticipants.length - 1;
+                const skills     = user.skills || [];
 
                 return (
-                  <div
-                    key={reg.id}
-                    ref={isLastElement ? lastParticipantRef : null}
-                    className={`bg-card border rounded-2xl p-4 md:p-5 shadow-sm transition-colors cursor-pointer ${isSelected ? "border-brand bg-brand/5" : "border-border hover:bg-muted/20"}`}
-                    onClick={(e) => {
-                      const tag = (e.target as HTMLElement).tagName;
-                      if (tag !== "INPUT" && tag !== "A") toggleSelection(reg.id);
-                    }}
-                  >
-                    <div className="flex flex-col md:flex-row items-center md:items-start gap-3 md:gap-4">
+                  <div key={reg.id} ref={isLast ? lastRef : null}
+                    onClick={e => { const t = (e.target as HTMLElement).tagName; if (t !== "INPUT" && t !== "A" && t !== "BUTTON") toggleSelection(reg.id); }}
+                    className={`group bg-card border rounded-xl px-5 py-4 transition-all cursor-pointer select-none
+                      ${isSelected
+                        ? "border-brand ring-1 ring-brand/20 bg-brand/20"
+                        : "border-border hover:border-border/80 hover:shadow-sm"
+                      }`}>
+
+                    <div className="flex items-start gap-4">
+
                       {/* Checkbox */}
-                      <div className="w-full md:w-0 flex items-center justify-between">
-                      <input
-                        type="checkbox"
-                        className="w-4 h-4 md:mt-3 rounded border-border text-brand focus:ring-brand accent-brand cursor-pointer shrink-0"
-                        checked={isSelected}
-                        onChange={() => toggleSelection(reg.id)}
-                      />
-                      <span className={`md:hidden shrink-0 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider ${getStatusBadge(reg.status)}`}>
-                            {reg.status || "Applied"}
-                          </span>
-                      </div>
+                      <input type="checkbox" onClick={e => e.stopPropagation()}
+                        className="mt-1 w-4 h-4 rounded border-border accent-brand cursor-pointer shrink-0"
+                        checked={isSelected} onChange={() => toggleSelection(reg.id)} />
 
-                      {/* Profile Image */}
-                      <div className="size-24 md:size-32 rounded-full bg-muted border border-border shadow-sm flex items-center justify-center overflow-hidden shrink-0 bg-top">
-                        {user.profileImageUrl ? (
-                          <img src={user.profileImageUrl} alt={user.name} className="w-full h-full object-cover" />
-                        ) : (
-                          <span className="text-brand font-black text-lg">{user.name?.charAt(0) || "?"}</span>
-                        )}
-                      </div>
+                      {/* Avatar */}
+                      <Avatar user={user} status={reg.status} size="md" />
 
-                      {/* Info Section */}
-                      <div className="flex-1 min-w-0">                      
-                        {/* Row 1: Name + Status */}
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="min-w-0">
-                            <h3 className="font-bold text-foreground text-base md:text-lg leading-tight truncate">{user.name}</h3>
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+
+                        {/* Row 1: Name + badges + status + star */}
+                        <div className="flex items-start justify-between gap-2 mb-1.5">
+                          <div className="flex items-center gap-2 flex-wrap min-w-0">
+                            <h3 className="font-black text-foreground text-base leading-tight truncate">{user.name || "—"}</h3>
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isInternal ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300" : "bg-brand/10 text-brand"}`}>
+                              {isInternal ? "Internal" : "External"}
+                            </span>
+                            <StatusBadge status={reg.status} />
+                            
+                            {/* NEW: Attended Badge */}
+                            {reg.attended && (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-900/30 dark:border-purple-800 dark:text-purple-300">
+                                <UserCheck className="w-3 h-3" /> Attended
+                              </span>
+                            )}
+
                           </div>
-                          <span className={`hidden md:block shrink-0 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider ${getStatusBadge(reg.status)}`}>
-                            {reg.status || "Applied"}
-                          </span>
                         </div>
 
-                        {/* Row 2: Course, College */}
-                        <div className="flex items-center gap-2 mt-1 flex-wrap">
-                          <span className="text-xs font-medium text-muted-foreground">{user.course || "-"}</span>
-                          <span className="text-muted-foreground/40">•</span>
-                          <span className="text-xs font-medium text-brand">{user.collegeName || "RGI"}</span>
-                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${isInternal ? "bg-blue-500/10 text-blue-600" : "bg-brand/10 text-brand"}`}>
-                            {isInternal ? "Internal" : "External"}
-                          </span>
+                        {/* Row 2: Degree · College · Branch · Batch */}
+                        <div className="flex items-center gap-1.5 flex-wrap text-xs text-muted-foreground mb-1.5">
+                          <span className="font-medium text-foreground">{user.course || "B.Tech"}</span>
+                          <span className="text-border">·</span>
+                          <span className="font-semibold text-brand">{user.collegeName || "RGI"}</span>
+                          <span className="text-border">·</span>
+                          <span>{user.branch || "—"}</span>
+                          {user.batch && <><span className="text-border">·</span><span>Batch {user.batch}</span></>}
+                          <span className="text-border">·</span>
+                          <span className="text-[11px]">Applied {new Date(reg.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span>
                         </div>
 
-                        {/* Row 3: Branch, Batch */}
-                        <div className="flex items-center gap-2 mt-1 flex-wrap">
-                          <span className="text-xs text-foreground font-medium">{user.branch || "-"}</span>
-                          <span className="text-muted-foreground/40">•</span>
-                          <span className="text-xs text-muted-foreground">{user.batch ? `Batch ${user.batch}` : "-"}</span>
+                        {/* Row 3: Stats + Skills */}
+                        <div className="flex items-center gap-4 flex-wrap mb-2.5">
+                          <div className="flex items-center gap-3 divide-x divide-border">
+                            {user.cgpa && (
+                              <div className="pr-3">
+                                <StatChip value={user.cgpa} label="CGPA" />
+                              </div>
+                            )}
+                            {user.enrollmentNumber && (
+                              <div className="pl-3">
+                                <span className="text-[10px] text-muted-foreground font-medium">{user.enrollmentNumber}</span>
+                              </div>
+                            )}
+                          </div>
+                          {skills.length > 0 && (
+                            <div className="flex gap-1.5 flex-wrap">
+                              {skills.slice(0, 4).map(s => <SkillTag key={s} label={s} />)}
+                              {skills.length > 4 && <SkillTag label={`+${skills.length - 4} more`} />}
+                            </div>
+                          )}
                         </div>
 
-                        {/* Row 4: CGPA, Applied Date */}
-                        <div className="flex items-center gap-2 mt-1 flex-wrap">
-                          <span className="text-[10px] font-bold px-2 py-0.5 bg-muted rounded-md text-muted-foreground">
-                            {user.cgpa || "-"} CGPA
-                          </span>
-                          <span className="text-[10px] text-muted-foreground">
-                            Applied {new Date(reg.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-                          </span>
-                        </div>
+                        {/* Row 4: Actionable Links (Email, Phone, Resumes, etc.) */}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          
+                          {/* NEW: Clickable Email Link */}
+                          {user.email && (
+                            <a href={`mailto:${user.email}`} onClick={e => e.stopPropagation()}
+                               className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-[11px] font-bold bg-muted text-muted-foreground hover:bg-muted/80 transition-colors">
+                              <Mail className="w-3 h-3" /> {user.email}
+                            </a>
+                          )}
+                          
+                          {/* NEW: Clickable Phone Link */}
+                          {user.phoneNumber && (
+                            <a href={`tel:${user.phoneNumber}`} onClick={e => e.stopPropagation()}
+                               className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-[11px] font-bold bg-muted text-muted-foreground hover:bg-muted/80 transition-colors">
+                              <Phone className="w-3 h-3" /> {user.phoneNumber}
+                            </a>
+                          )}
 
-                        {/* Row 5: Links */}
-                        <div className="flex items-center gap-2 mt-2 flex-wrap">
                           {user.resumeUrl && (
-                            <a
-                              href={user.resumeUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={e => e.stopPropagation()}
-                              className="text-[10px] font-bold px-2 py-0.5 bg-blue-500/10 text-blue-600 rounded-md hover:bg-blue-500/20 flex items-center gap-1 transition-colors"
-                            >
-                              <FileText className="w-3 h-3" /> C.V
+                            <a href={user.resumeUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
+                              className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-[11px] font-bold bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 hover:bg-blue-100 transition-colors">
+                              <FileText className="w-3 h-3" /> Resume
                             </a>
                           )}
                           {user.githubUrl && (
-                            <a
-                              href={user.githubUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={e => e.stopPropagation()}
-                              className="text-[10px] font-bold px-2 py-0.5 bg-gray-500/10 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-500/20 flex items-center gap-1 transition-colors"
-                            >
-                              <ExternalLink className="w-3 h-3" /> GitHub
+                            <a href={user.githubUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
+                              className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-[11px] font-bold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-200 transition-colors">
+                              <Github className="w-3 h-3" /> GitHub
                             </a>
                           )}
                           {user.linkedinUrl && (
-                            <a
-                              href={user.linkedinUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={e => e.stopPropagation()}
-                              className="text-[10px] font-bold px-2 py-0.5 bg-blue-700/10 text-blue-700 rounded-md hover:bg-blue-700/20 flex items-center gap-1 transition-colors"
-                            >
-                              <ExternalLink className="w-3 h-3" /> LinkedIn
+                            <a href={user.linkedinUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
+                              className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-[11px] font-bold bg-blue-700/10 text-blue-700 dark:text-blue-400 hover:bg-blue-700/20 transition-colors">
+                              <Linkedin className="w-3 h-3" /> LinkedIn
                             </a>
                           )}
                         </div>
@@ -499,24 +662,24 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
                 );
               })}
 
-              {/* Bottom Loading Indicator */}
+              {/* Infinite scroll loader */}
               {loading && page > 1 && (
                 <div className="flex justify-center py-6">
-                  <Loader2 className="w-6 h-6 animate-spin text-brand" />
+                  <Loader2 className="w-5 h-5 animate-spin text-brand" />
                 </div>
               )}
 
-              {/* End of list message */}
+              {/* End of list */}
               {!hasMore && participants.length > 0 && (
-                <div className="text-center py-6 text-muted-foreground font-medium text-sm">
-                  All candidates loaded.
+                <div className="text-center py-8 text-sm text-muted-foreground">
+                  All candidates loaded · {participants.length} total
                 </div>
               )}
 
               {/* Footer */}
-              <div className="p-4 text-xs font-bold text-muted-foreground flex justify-between border-t border-border mt-4">
-                <span>Loaded Candidates: {filteredParticipants.length} of {totalCount}</span>
-                {selectedIds.size > 0 && <span className="text-brand">Selected: {selectedIds.size}</span>}
+              <div className="flex items-center justify-between pt-3 border-t border-border text-[11px] text-muted-foreground font-medium">
+                <span>Showing {filteredParticipants.length} of {totalCount} candidates</span>
+                {selectedIds.size > 0 && <span className="text-brand font-bold">{selectedIds.size} selected</span>}
               </div>
             </div>
           )}
