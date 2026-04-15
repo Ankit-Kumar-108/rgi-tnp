@@ -2,21 +2,21 @@
 export const runtime = 'edge'
 import React, { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import {
-  ArrowLeft, Loader2, Users, Search, Filter, CheckCircle2,
+  ArrowLeft, Loader2, Users, Search, CheckCircle2,
   ArrowRightCircle, XCircle, FileText, Download, ExternalLink,
-  Github, Linkedin, Calendar, MessageSquare, Star, StarOff,
+  Github, Linkedin,
   ChevronDown, SlidersHorizontal, BarChart3, Clock,
-  Mail, Phone, UserCheck // <-- Added new icons for contact and attendance
+  Mail, Phone, UserCheck
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
 import { toast } from "sonner";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// Types
 type Participant = {
   id: string;
   status: string;
-  attended: boolean; // <-- Added attended status from API
+  attended: boolean;
   createdAt: string;
   starred?: boolean;
   student?: StudentUser;
@@ -37,43 +37,25 @@ type StudentUser = {
   githubUrl?: string;
   linkedinUrl?: string;
   skills?: string[];
+  tenthPercentage?: number | string;
+  twelfthPercentage?: number | string;
 };
 
-// ─── Status Config ─────────────────────────────────────────────────────────────
+//Status Config 
 const STATUS_CONFIG: Record<string, { label: string; pill: string; dot: string; icon: React.ReactNode }> = {
-  Applied:     { label: "Applied",     pill: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",      dot: "bg-slate-400",   icon: <Clock className="w-3 h-3" /> },
-  Shortlisted: { label: "Shortlisted", pill: "bg-amber-50 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",    dot: "bg-amber-400",   icon: <ArrowRightCircle className="w-3 h-3" /> },
-  Selected:    { label: "Selected",    pill: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300", dot: "bg-emerald-500", icon: <CheckCircle2 className="w-3 h-3" /> },
-  Rejected:    { label: "Rejected",    pill: "bg-red-50 text-red-600 dark:bg-red-900/40 dark:text-red-300",            dot: "bg-red-400",     icon: <XCircle className="w-3 h-3" /> },
+  Applied: { label: "Applied", pill: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300", dot: "bg-slate-400", icon: <Clock className="w-3 h-3" /> },
+  Shortlisted: { label: "Shortlisted", pill: "bg-amber-50 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300", dot: "bg-amber-400", icon: <ArrowRightCircle className="w-3 h-3" /> },
+  Selected: { label: "Selected", pill: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300", dot: "bg-emerald-500", icon: <CheckCircle2 className="w-3 h-3" /> },
+  Rejected: { label: "Rejected", pill: "bg-red-50 text-red-600 dark:bg-red-900/40 dark:text-red-300", dot: "bg-red-400", icon: <XCircle className="w-3 h-3" /> },
 };
 
 const getStatusCfg = (s?: string) => STATUS_CONFIG[s || "Applied"] ?? STATUS_CONFIG.Applied;
 
-// ─── Subcomponents ─────────────────────────────────────────────────────────────
-
-/** Circular match-score ring */
-function MatchRing({ score }: { score: number }) {
-  const r = 18;
-  const circ = 2 * Math.PI * r;
-  const dash = (score / 100) * circ;
-  const color = score >= 75 ? "#10b981" : score >= 50 ? "#f59e0b" : "#f87171";
-  return (
-    <div className="relative w-12 h-12 shrink-0" title={`${score}% match`}>
-      <svg viewBox="0 0 44 44" className="w-full h-full -rotate-90">
-        <circle cx="22" cy="22" r={r} fill="none" stroke="currentColor" strokeWidth="3.5" className="text-muted/30" />
-        <circle cx="22" cy="22" r={r} fill="none" stroke={color} strokeWidth="3.5"
-          strokeDasharray={`${dash} ${circ}`} strokeLinecap="round" />
-      </svg>
-      <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold" style={{ color }}>
-        {score}%
-      </span>
-    </div>
-  );
-}
+// Subcomponents 
 
 /** Avatar with optional status ring */
 function Avatar({ user, status, size = "md" }: { user: StudentUser; status: string; size?: "sm" | "md" | "lg" }) {
-  const dim = size === "lg" ? "w-14 h-14" : size === "md" ? "w-12 h-12" : "w-9 h-9";
+  const dim = size === "lg" ? "size-32" : size === "md" ? "size-24" : "size-16";
   const txt = size === "lg" ? "text-lg" : size === "md" ? "text-base" : "text-xs";
   const ringColor = status === "Selected" ? "ring-emerald-500" : status === "Shortlisted" ? "ring-amber-400" : status === "Rejected" ? "ring-red-400" : "ring-border";
   return (
@@ -108,22 +90,14 @@ function StatChip({ value, label }: { value?: string | number; label: string }) 
   );
 }
 
-/** Skill tag */
-function SkillTag({ label }: { label: string }) {
-  return (
-    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full border border-border bg-muted/40 text-muted-foreground">
-      {label}
-    </span>
-  );
-}
 
 /** Pipeline funnel progress bar */
 function PipelineFunnel({ counts, total }: { counts: Record<string, number>; total: number }) {
   const stages = [
-    { key: "Applied",     color: "bg-slate-400",   label: "Applied" },
-    { key: "Shortlisted", color: "bg-amber-400",   label: "Shortlisted" },
-    { key: "Selected",    color: "bg-emerald-500", label: "Selected" },
-    { key: "Rejected",    color: "bg-red-400",     label: "Rejected" },
+    { key: "Applied", color: "bg-slate-400", label: "Applied" },
+    { key: "Shortlisted", color: "bg-amber-400", label: "Shortlisted" },
+    { key: "Selected", color: "bg-emerald-500", label: "Selected" },
+    { key: "Rejected", color: "bg-red-400", label: "Rejected" },
   ];
   return (
     <div className="flex gap-1 h-1.5 rounded-full overflow-hidden w-full">
@@ -136,33 +110,32 @@ function PipelineFunnel({ counts, total }: { counts: Record<string, number>; tot
   );
 }
 
-// ─── Main Page ─────────────────────────────────────────────────────────────────
+// Main Page 
 export default function DriveParticipantsPage({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
   const params = React.use(paramsPromise);
   const { id } = params;
   const { loading: authLoading, authenticated } = useAuth("admin", "/admin/login");
 
   // Data states
-  const [participants, setParticipants]   = useState<Participant[]>([]);
-  const [drive, setDrive]                 = useState<any>(null);
-  const [loading, setLoading]             = useState(false);
+  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [drive, setDrive] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
-  const [page, setPage]                   = useState(1);
-  const [hasMore, setHasMore]             = useState(true);
-  const [totalCount, setTotalCount]       = useState(0);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
 
   // UI states
-  const [selectedIds, setSelectedIds]     = useState<Set<string>>(new Set());
-  const [starredIds, setStarredIds]       = useState<Set<string>>(new Set());
-  const [searchQuery, setSearchQuery]     = useState("");
-  const [statusFilter, setStatusFilter]   = useState("All");
-  const [sortBy, setSortBy]               = useState<"date" | "cgpa" | "name">("date");
-  const [showFilters, setShowFilters]     = useState(false);
-  const [typeFilter, setTypeFilter]       = useState<"All" | "Internal" | "External">("All");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [sortBy, setSortBy] = useState<"date" | "cgpa" | "name">("date");
+  const [showFilters, setShowFilters] = useState(false);
+  const [typeFilter, setTypeFilter] = useState<"All" | "Internal" | "External">("All");
 
-  // ─── Infinite scroll ───────────────────────────────────────────────────────
+  // Infinite scroll
   const observer = useRef<IntersectionObserver | null>(null);
-  const lastRef  = useCallback((node: HTMLDivElement | null) => {
+  const lastRef = useCallback((node: HTMLDivElement | null) => {
     if (loading) return;
     if (observer.current) observer.current.disconnect();
     observer.current = new IntersectionObserver(entries => {
@@ -176,14 +149,14 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
     const load = async () => {
       setLoading(true);
       try {
-        const res  = await fetch(`/api/admin/drives/${id}/participants?limit=50&page=${page}`);
+        const res = await fetch(`/api/admin/drives/${id}/participants?limit=50&page=${page}`);
         const data = await res.json() as any;
         if (data.success) {
           setDrive(data.drive);
           setTotalCount(data.totalCount || 0);
           setParticipants(prev => {
             const existing = new Set(prev.map(p => p.id));
-            const fresh    = data.registrations.filter((p: any) => !existing.has(p.id));
+            const fresh = data.registrations.filter((p: any) => !existing.has(p.id));
             return [...prev, ...fresh];
           });
           setHasMore(data.totalCount > page * 50);
@@ -198,7 +171,7 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
     if (!selectedIds.size) return;
     setActionLoading(true);
     try {
-      const res  = await fetch(`/api/admin/drives/${id}/participants`, {
+      const res = await fetch(`/api/admin/drives/${id}/participants`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ registrationIds: Array.from(selectedIds), status: newStatus }),
@@ -219,14 +192,6 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
     return s;
   });
 
-  const toggleStar = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setStarredIds(prev => {
-      const s = new Set(prev);
-      s.has(id) ? s.delete(id) : s.add(id);
-      return s;
-    });
-  };
 
   const toggleAll = () => {
     if (selectedIds.size === filteredParticipants.length && filteredParticipants.length > 0)
@@ -243,16 +208,16 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
         u?.enrollmentNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         u?.branch?.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStatus = statusFilter === "All" || p.status === statusFilter;
-      const isInternal    = !!p.student;
-      const matchesType   = typeFilter === "All" || (typeFilter === "Internal" ? isInternal : !isInternal);
+      const isInternal = !!p.student;
+      const matchesType = typeFilter === "All" || (typeFilter === "Internal" ? isInternal : !isInternal);
       return matchesSearch && matchesStatus && matchesType;
     });
 
     list.sort((a, b) => {
       const ua = a.student || a.externalStudent || {};
       const ub = b.student || b.externalStudent || {};
-      if (sortBy === "cgpa")  return (Number(ub.cgpa) || 0) - (Number(ua.cgpa) || 0);
-      if (sortBy === "name")  return (ua.name || "").localeCompare(ub.name || "");
+      if (sortBy === "cgpa") return (Number(ub.cgpa) || 0) - (Number(ua.cgpa) || 0);
+      if (sortBy === "name") return (ua.name || "").localeCompare(ub.name || "");
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
 
@@ -273,20 +238,20 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
   //  CSV export 
   const exportToCSV = () => {
     if (!filteredParticipants.length) return;
-    const headers = ["Name","Enrollment","Email","Phone","Type","College","Branch","CGPA","Status","Attended","Applied On","Resume"];
+    const headers = ["Name", "Enrollment", "Email", "Phone", "Type", "College", "Branch", "CGPA", "10th Percentage", "12th Percentage/ Diploma", "Status", "Attended", "Applied On", "Resume"];
     const rows = filteredParticipants.map(p => {
-      const u    = p.student || p.externalStudent || {};
+      const u = p.student || p.externalStudent || {};
       const type = p.student ? "Internal" : "External";
       return [
         `"${u.name || ""}"`, `"${u.enrollmentNumber || ""}"`, `"${u.email || ""}"`,
         `"${u.phoneNumber || ""}"`, `"${type}"`, `"${u.collegeName || "RGI"}"`,
-        `"${u.branch || ""}"`, u.cgpa || "", `"${p.status || "Applied"}"`, `"${p.attended ? "Yes" : "No"}"`,
+        `"${u.branch || ""}"`, u.cgpa || "", `"${u.tenthPercentage || ""}"`, `"${u.twelfthPercentage || ""}"`, `"${p.status || "Applied"}"`, `"${p.attended ? "Yes" : "No"}"`,
         `"${new Date(p.createdAt).toLocaleDateString()}"`, `"${u.resumeUrl || "—"}"`,
       ].join(",");
     });
     const blob = new Blob([[headers.join(","), ...rows].join("\n")], { type: "text/csv;charset=utf-8;" });
-    const a    = document.createElement("a");
-    a.href     = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
     a.download = `${drive?.companyName || "Drive"}_Participants.csv`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
   };
@@ -304,17 +269,19 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
 
       {/*  Sticky Header */}
       <header className="sticky top-0 z-40 bg-card/80 backdrop-blur-xl border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+        {/* 1. Changed: Removed fixed h-16, added py-3, flex-wrap, and min-h-[4rem] */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 min-h-16 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
 
           {/* Left: back + title */}
-          <div className="flex items-center gap-3 min-w-0">
+          {/* 2. Changed: Added flex-1 on mobile so it pushes the export button to the right */}
+          <div className="flex items-center gap-3 min-w-0 flex-1 sm:flex-none">
             <Link href="/admin/drives"
               className="w-8 h-8 rounded-lg flex items-center justify-center border border-border hover:bg-muted transition-colors shrink-0">
               <ArrowLeft className="w-4 h-4 text-muted-foreground" />
             </Link>
             <div className="min-w-0">
               <h1 className="text-sm font-black text-foreground tracking-tight truncate">
-                {drive?.companyName || "Drive"} — Candidates
+                {drive?.companyName || "Drive"}
               </h1>
               <p className="text-[11px] text-muted-foreground hidden sm:block">
                 {totalCount} total · {statusCounts.Shortlisted || 0} shortlisted · {statusCounts.Selected || 0} selected
@@ -322,33 +289,9 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
             </div>
           </div>
 
-          {/* Bulk action bar */}
-          {selectedIds.size > 0 && (
-            <div className="flex items-center gap-2 h-11 px-3 bg-brand/5 border border-brand/20 rounded-xl animate-in fade-in slide-in-from-bottom-2 duration-200">
-              <span className="text-xs font-bold text-brand mr-1">{selectedIds.size} selected</span>
-              <div className="h-4 w-px bg-border" />
-              {[
-                { status: "Shortlisted", label: "Shortlist",   icon: <ArrowRightCircle className="w-3.5 h-3.5" />, cls: "text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30" },
-                { status: "Selected",    label: "Select",      icon: <CheckCircle2 className="w-3.5 h-3.5" />,    cls: "text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30" },
-                { status: "Rejected",    label: "Reject",      icon: <XCircle className="w-3.5 h-3.5" />,         cls: "text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30" },
-              ].map(action => (
-                <button key={action.status}
-                  onClick={() => handleStatusUpdate(action.status)}
-                  disabled={actionLoading}
-                  className={`flex items-center gap-1.5 h-7 px-3 rounded-lg text-xs font-bold transition-colors disabled:opacity-50 ${action.cls}`}>
-                  {actionLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : action.icon}
-                  {action.label}
-                </button>
-              ))}
-              <button onClick={() => setSelectedIds(new Set())}
-                className="ml-auto text-muted-foreground hover:text-foreground transition-colors">
-                <XCircle className="w-4 h-4" />
-              </button>
-            </div>
-          )}
-
           {/* Right: actions */}
-          <div className="flex items-center gap-2 shrink-0">
+          {/* 3. Changed: Added order-2 on mobile so it stays on the top row with the title */}
+          <div className="flex items-center gap-2 shrink-0 order-2 sm:order-0">
             {drive?.googleSheetUrl && (
               <a href={drive.googleSheetUrl} target="_blank" rel="noopener noreferrer"
                 className="hidden sm:flex items-center gap-1.5 h-8 px-3 rounded-lg bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20 text-xs font-bold transition-colors">
@@ -361,6 +304,32 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
               <span className="hidden sm:inline">Export CSV</span>
             </button>
           </div>
+
+          {/* Bulk action bar */}
+          {selectedIds.size > 0 && (
+            <div className="flex items-center gap-2 h-11 px-3 bg-brand/5 border border-brand/20 rounded-xl animate-in fade-in slide-in-from-bottom-2 duration-200 w-full sm:w-auto order-3 sm:order-0 overflow-x-auto no-scrollbar">
+              <span className="hidden md:block text-xs font-bold text-brand mr-1 shrink-0">{selectedIds.size} selected</span>
+              <div className="h-4 w-px bg-border shrink-0" />
+              {[
+                { status: "Shortlisted", label: "Shortlist", icon: <ArrowRightCircle className="w-3.5 h-3.5" />, cls: "text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30" },
+                { status: "Selected", label: "Select", icon: <CheckCircle2 className="w-3.5 h-3.5" />, cls: "text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30" },
+                { status: "Rejected", label: "Reject", icon: <XCircle className="w-3.5 h-3.5" />, cls: "text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30" },
+              ].map(action => (
+                <button key={action.status}
+                  onClick={() => handleStatusUpdate(action.status)}
+                  disabled={actionLoading}
+                  className={`flex items-center gap-1.5 h-7 px-3 rounded-lg text-xs font-bold transition-colors disabled:opacity-50 shrink-0 ${action.cls}`}>
+                  {actionLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : action.icon}
+                  <span className="whitespace-nowrap">{action.label}</span>
+                </button>
+              ))}
+              <button onClick={() => setSelectedIds(new Set())}
+                className="ml-auto text-muted-foreground hover:text-foreground transition-colors shrink-0 pl-2">
+                <XCircle className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
         </div>
       </header>
 
@@ -370,10 +339,10 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
         <section>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {[
-              { key: "Applied",     label: "Total Applied",  icon: <Users className="w-4 h-4" />,              accent: "text-slate-600 bg-slate-100 dark:bg-slate-800 dark:text-slate-300",   value: totalCount || participants.length },
-              { key: "Shortlisted", label: "Shortlisted",    icon: <ArrowRightCircle className="w-4 h-4" />,   accent: "text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-300",  value: statusCounts.Shortlisted || 0 },
-              { key: "Selected",    label: "Selected",       icon: <CheckCircle2 className="w-4 h-4" />,       accent: "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 dark:text-emerald-300", value: statusCounts.Selected || 0 },
-              { key: "Rejected",    label: "Rejected",       icon: <XCircle className="w-4 h-4" />,            accent: "text-red-500 bg-red-50 dark:bg-red-900/30 dark:text-red-300",         value: statusCounts.Rejected || 0 },
+              { key: "Applied", label: "Total Applied", icon: <Users className="w-4 h-4" />, accent: "text-slate-600 bg-slate-100 dark:bg-slate-800 dark:text-slate-300", value: totalCount || participants.length },
+              { key: "Shortlisted", label: "Shortlisted", icon: <ArrowRightCircle className="w-4 h-4" />, accent: "text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-300", value: statusCounts.Shortlisted || 0 },
+              { key: "Selected", label: "Selected", icon: <CheckCircle2 className="w-4 h-4" />, accent: "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 dark:text-emerald-300", value: statusCounts.Selected || 0 },
+              { key: "Rejected", label: "Rejected", icon: <XCircle className="w-4 h-4" />, accent: "text-red-500 bg-red-50 dark:bg-red-900/30 dark:text-red-300", value: statusCounts.Rejected || 0 },
             ].map(stat => {
               const pct = totalCount > 0 ? Math.round((stat.value / totalCount) * 100) : 0;
               return (
@@ -536,12 +505,10 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
           ) : (
             <div className="space-y-2.5">
               {filteredParticipants.map((reg, index) => {
-                const user       = reg.student || reg.externalStudent || {} as StudentUser;
+                const user = reg.student || reg.externalStudent || {} as StudentUser;
                 const isSelected = selectedIds.has(reg.id);
-                const isStarred  = starredIds.has(reg.id);
                 const isInternal = !!reg.student;
-                const isLast     = index === filteredParticipants.length - 1;
-                const skills     = user.skills || [];
+                const isLast = index === filteredParticipants.length - 1;
 
                 return (
                   <div key={reg.id} ref={isLast ? lastRef : null}
@@ -552,15 +519,33 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
                         : "border-border hover:border-border/80 hover:shadow-sm"
                       }`}>
 
-                    <div className="flex items-start gap-4">
-
-                      {/* Checkbox */}
+                    <div className="flex items-start gap-4 flex-col md:flex-row">
+                      {/* Checkbox Desktop */}
                       <input type="checkbox" onClick={e => e.stopPropagation()}
-                        className="mt-1 w-4 h-4 rounded border-border accent-brand cursor-pointer shrink-0"
-                        checked={isSelected} onChange={() => toggleSelection(reg.id)} />
+                          className="hidden md:block mt-1 w-4 h-4 rounded border-border accent-brand cursor-pointer shrink-0"
+                          checked={isSelected} onChange={() => toggleSelection(reg.id)}
+                        />
+                      {/* Mobile View */}
+                      <div className="md:hidden w-full flex justify-between items-start md:items-center gap-2">
+                        {/* Checkbox mobile */}
+                        <input type="checkbox" onClick={e => e.stopPropagation()}
+                          className="mt-1 w-4 h-4 rounded border-border accent-brand cursor-pointer shrink-0"
+                          checked={isSelected} onChange={() => toggleSelection(reg.id)}
+                        />
+                        {/* status mobile */}
+                        <div className="md:hidden">
+                          <StatusBadge status={reg.status} />
+                        </div>
+                      </div>
+                      {/* Avatar Desktop */}
+                      <div className="hidden md:block">
+                        <Avatar user={user} status={reg.status} size="lg" />
+                      </div>
 
-                      {/* Avatar */}
-                      <Avatar user={user} status={reg.status} size="md" />
+                      {/* Avatar Mobile */}
+                      <div className="md:hidden flex justify-center w-full">
+                        <Avatar user={user} status={reg.status} size="md" />
+                      </div>
 
                       {/* Content */}
                       <div className="flex-1 min-w-0">
@@ -572,8 +557,10 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
                             <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isInternal ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300" : "bg-brand/10 text-brand"}`}>
                               {isInternal ? "Internal" : "External"}
                             </span>
+                            <div className="hidden md:block">
                             <StatusBadge status={reg.status} />
-                            
+                            </div>
+
                             {/* NEW: Attended Badge */}
                             {reg.attended && (
                               <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-900/30 dark:border-purple-800 dark:text-purple-300">
@@ -598,41 +585,45 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
 
                         {/* Row 3: Stats + Skills */}
                         <div className="flex items-center gap-4 flex-wrap mb-2.5">
-                          <div className="flex items-center gap-3 divide-x divide-border">
+                          <div className="flex flex-wrap items-center gap-3 divide-x divide-border">
                             {user.cgpa && (
                               <div className="pr-3">
                                 <StatChip value={user.cgpa} label="CGPA" />
                               </div>
                             )}
                             {user.enrollmentNumber && (
-                              <div className="pl-3">
+                              <div className="pr-3">
                                 <span className="text-[10px] text-muted-foreground font-medium">{user.enrollmentNumber}</span>
                               </div>
                             )}
-                          </div>
-                          {skills.length > 0 && (
-                            <div className="flex gap-1.5 flex-wrap">
-                              {skills.slice(0, 4).map(s => <SkillTag key={s} label={s} />)}
-                              {skills.length > 4 && <SkillTag label={`+${skills.length - 4} more`} />}
+                            <div className="pr-3">
+                              {user.tenthPercentage && (
+                                <StatChip value={`${user.tenthPercentage}%`} label="10th" />
+                              )}
                             </div>
-                          )}
+                            <div className="pr-3">
+                              {user.twelfthPercentage && (
+                                <StatChip value={`${user.twelfthPercentage}%`} label="12th/Diploma" />
+                              )}
+                            </div>
+                          </div>
                         </div>
 
                         {/* Row 4: Actionable Links (Email, Phone, Resumes, etc.) */}
                         <div className="flex items-center gap-2 flex-wrap">
-                          
+
                           {/* NEW: Clickable Email Link */}
                           {user.email && (
                             <a href={`mailto:${user.email}`} onClick={e => e.stopPropagation()}
-                               className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-[11px] font-bold bg-muted text-muted-foreground hover:bg-muted/80 transition-colors">
+                              className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-[11px] font-bold bg-muted text-muted-foreground hover:bg-muted/80 transition-colors">
                               <Mail className="w-3 h-3" /> {user.email}
                             </a>
                           )}
-                          
+
                           {/* NEW: Clickable Phone Link */}
                           {user.phoneNumber && (
                             <a href={`tel:${user.phoneNumber}`} onClick={e => e.stopPropagation()}
-                               className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-[11px] font-bold bg-muted text-muted-foreground hover:bg-muted/80 transition-colors">
+                              className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-[11px] font-bold bg-muted text-muted-foreground hover:bg-muted/80 transition-colors">
                               <Phone className="w-3 h-3" /> {user.phoneNumber}
                             </a>
                           )}

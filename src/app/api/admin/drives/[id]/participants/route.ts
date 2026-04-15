@@ -41,7 +41,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
             githubUrl: true,
             course: true,
             batch: true,
-
+            tenthPercentage: true,
+            twelfthPercentage: true,
           }
         },
         externalStudent: {
@@ -59,6 +60,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
             githubUrl: true,
             course: true,
             batch: true,
+            tenthPercentage: true,
+            twelfthPercentage: true,
           }
         }
       },

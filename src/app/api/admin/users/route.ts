@@ -87,7 +87,7 @@ export async function GET(req: NextRequest) {
             linkedInUrl: true,
             course: true,
             batch: true,
-
+            
           },
           orderBy: { createdAt: "desc" },
           take: limit,
@@ -182,18 +182,43 @@ export async function GET(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
-    const { ids, action } = (await req.json()) as any;
-    if (!ids || !Array.isArray(ids) || action !== "approve") {
+    // 1. Extract role from the payload
+    const { ids, action, role } = (await req.json()) as any;
+    
+    if (!ids || !Array.isArray(ids) || action !== "approve" || !role) {
       return NextResponse.json({ success: false, message: "Invalid request payload" }, { status: 400 });
     }
 
     const db = getDb();
-    await db.externalStudent.updateMany({
-      where: { id: { in: ids } },
-      data: { isVerified: true },
-    });
+    switch (role) {
+      case "student":
+        await db.student.updateMany({
+          where: { id: { in: ids } },
+          data: { isEmailVerified: true }, 
+        });
+        break;
 
-    return NextResponse.json({ success: true, message: "Users approved successfully" });
+      case "alumni":
+        await db.alumni.updateMany({
+          where: { id: { in: ids } },
+          data: { isVerified: true }, 
+        });
+        break;
+
+      case "external":
+        await db.externalStudent.updateMany({
+          where: { id: { in: ids } },
+          data: { isVerified: true },
+        });
+        break;
+
+      case "recruiter":
+        return NextResponse.json({ success: false, message: "Recruiters do not require approval" }, { status: 400 });
+      default:
+        return NextResponse.json({ success: false, message: "Invalid role specified" }, { status: 400 });
+    }
+
+    return NextResponse.json({ success: true, message: `${role}s approved successfully` });
   } catch (error) {
     console.error("Admin Users PATCH Error:", error);
     return NextResponse.json({ success: false, message: "Failed to update users" }, { status: 500 });
@@ -202,22 +227,48 @@ export async function PATCH(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const { ids, action } = (await req.json()) as any;
-    if (!ids || !Array.isArray(ids) || action !== "delete") {
+    const { ids, action, role } = (await req.json()) as any;
+    if (!ids || !Array.isArray(ids) || action !== "delete" || !role) {
       return NextResponse.json({ success: false, message: "Invalid request payload" }, { status: 400 });
     }
 
     const db = getDb();
+    switch (role) {
+      case "student":
+        await db.driveRegistration.deleteMany({
+          where: { studentId: { in: ids } },
+        });
+        await db.student.deleteMany({
+          where: { id: { in: ids } },
+        });
+        break;
 
-    await db.driveRegistration.deleteMany({
-      where: { externalStudentId: { in: ids } },
-    });
+      case "alumni":
+        await db.alumni.deleteMany({
+          where: { id: { in: ids } },
+        });
+        break;
 
-    await db.externalStudent.deleteMany({
-      where: { id: { in: ids } },
-    });
+      case "recruiter":
+        await db.recruiter.deleteMany({
+          where: { id: { in: ids } },
+        });
+        break;
 
-    return NextResponse.json({ success: true, message: "Users deleted successfully" });
+      case "external":
+        await db.driveRegistration.deleteMany({
+          where: { externalStudentId: { in: ids } },
+        });
+        await db.externalStudent.deleteMany({
+          where: { id: { in: ids } },
+        });
+        break;
+
+      default:
+        return NextResponse.json({ success: false, message: "Invalid role specified" }, { status: 400 });
+    }
+
+    return NextResponse.json({ success: true, message: `${role}s deleted successfully` });
   } catch (error) {
     console.error("Admin Users DELETE Error:", error);
     return NextResponse.json({ success: false, message: "Failed to delete users" }, { status: 500 });
