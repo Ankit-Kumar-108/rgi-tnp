@@ -599,9 +599,14 @@ export default function AlumniDashboard() {
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Job Type</label>
-                      <input value={refForm.jobType} onChange={(e) => setRefForm({ ...refForm, jobType: e.target.value })}
-                        className="w-full bg-muted/50 px-6 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground placeholder:text-muted-foreground/50"
-                        placeholder="e.g. Full-time, Internship" />
+                      <select value={refForm.jobType} onChange={(e) => setRefForm({ ...refForm, jobType: e.target.value })}
+                        className="w-full bg-muted/50 px-6 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground placeholder:text-muted-foreground/50">
+                        <option value="">Select Job Type</option>
+                        <option value="Full-time">Full-time</option>
+                        <option value="Part-time">Part-time</option>
+                        <option value="Internship">Internship</option>
+                        <option value="Contract/Bond">Contract</option>
+                      </select>
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
