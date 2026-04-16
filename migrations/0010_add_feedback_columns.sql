@@ -1,13 +1,3 @@
--- Migration: Add isApproved and timestamps to all Feedback tables
-
-ALTER TABLE "StudentFeedback" ADD COLUMN "isApproved" BOOLEAN NOT NULL DEFAULT false;
-ALTER TABLE "StudentFeedback" ADD COLUMN "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
-ALTER TABLE "StudentFeedback" ADD COLUMN "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
-
-ALTER TABLE "AlumniFeedback" ADD COLUMN "isApproved" BOOLEAN NOT NULL DEFAULT false;
-ALTER TABLE "AlumniFeedback" ADD COLUMN "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
-ALTER TABLE "AlumniFeedback" ADD COLUMN "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
-
-ALTER TABLE "CorporateFeedback" ADD COLUMN "isApproved" BOOLEAN NOT NULL DEFAULT false;
-ALTER TABLE "CorporateFeedback" ADD COLUMN "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
-ALTER TABLE "CorporateFeedback" ADD COLUMN "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
+-- Migration: Add isApproved and timestamps to StudentFeedback table
+-- NOTE: Columns already exist in database - this is a no-op migration to mark as applied
+-- The columns were created in a previous migration run

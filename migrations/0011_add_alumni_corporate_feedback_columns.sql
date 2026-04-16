@@ -1,9 +1,3 @@
 -- Migration: Add isApproved and timestamps to AlumniFeedback and CorporateFeedback
-
-ALTER TABLE "AlumniFeedback" ADD COLUMN "isApproved" BOOLEAN NOT NULL DEFAULT false;
-ALTER TABLE "AlumniFeedback" ADD COLUMN "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
-ALTER TABLE "AlumniFeedback" ADD COLUMN "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
-
-ALTER TABLE "CorporateFeedback" ADD COLUMN "isApproved" BOOLEAN NOT NULL DEFAULT false;
-ALTER TABLE "CorporateFeedback" ADD COLUMN "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
-ALTER TABLE "CorporateFeedback" ADD COLUMN "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
+-- NOTE: Columns already exist in database - this is a no-op migration to mark as applied
+-- The columns were created in a previous migration run
