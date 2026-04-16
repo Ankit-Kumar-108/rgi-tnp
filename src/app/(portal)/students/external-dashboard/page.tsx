@@ -270,7 +270,7 @@ export default function ExternalStudentDashboard() {
                       placeholder="e.g. 85.50" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">12th Percentage</label>
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">12th/Diploma Percentage</label>
                     <input type="number" step="0.01" min="0" max="100"
                       value={profileForm.twelfthPercentage} onChange={(e) => setProfileForm({ ...profileForm, twelfthPercentage: e.target.value })}
                       className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
@@ -344,11 +344,11 @@ export default function ExternalStudentDashboard() {
                 <div className="bg-card rounded-2xl p-8 md:p-12 shadow-sm border border-border flex flex-col md:flex-row gap-8 md:items-center relative overflow-hidden group hover:shadow-xl transition-shadow duration-500">
 
                   {/* Decorative Gradient Accent */}
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-brand/10 to-transparent rounded-bl-[5rem]"></div>
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-bl from-brand/10 to-transparent rounded-bl-[5rem]"></div>
 
                   {/* Avatar Section */}
                   <div className="relative shrink-0 mx-auto md:mx-0">
-                    <div className="w-40 h-40 md:w-56 md:h-56 rounded-full p-2 bg-gradient-to-tr from-brand to-brand/40 transition-transform duration-500 group-hover:rotate-6">
+                    <div className="w-40 h-40 md:w-56 md:h-56 rounded-full p-2 bg-linear-to-tr from-brand to-brand/40 transition-transform duration-500 group-hover:rotate-6">
                       <div className="w-full h-full rounded-full border-4 border-background overflow-hidden bg-muted">
                         {student?.profileImageUrl ? (
                           <img
@@ -432,7 +432,7 @@ export default function ExternalStudentDashboard() {
               {/* Email Verification Banner (Conditional) */}
               {!student?.isVerified && (
                 <section className="bg-yellow-500/10 border border-yellow-500/20 rounded-2xl p-5 flex items-center gap-4">
-                  <AlertTriangle className="w-8 h-8 text-yellow-500 flex-shrink-0" />
+                  <AlertTriangle className="w-8 h-8 text-yellow-500 shrink-0" />
                   <div>
                     <p className="font-bold text-yellow-600">Action Required: Verify Email</p>
                     <p className="text-sm text-muted-foreground">You cannot apply for pool campus drives until your account is verified.</p>
@@ -675,7 +675,7 @@ export default function ExternalStudentDashboard() {
                     {archivedDrives.map((drive: any) => (
                       <div key={drive.id} className="bg-card/50 border border-border rounded-xl p-4 flex justify-between items-center">
                         <div className="space-y-1">
-                          <h3 className="text-sm font-bold text-foreground truncate max-w-[150px]">
+                          <h3 className="text-sm font-bold text-foreground truncate max-w-37.5">
                             {drive.companyName}
                           </h3>
                           <p className="text-[10px] text-muted-foreground">

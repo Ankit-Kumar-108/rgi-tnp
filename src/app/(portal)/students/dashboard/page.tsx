@@ -178,7 +178,7 @@ export default function StudentDashboard() {
       actionElement: (
         <button
           onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
-          className="bg-gradient-to-r from-brand to-brand/80 hover:from-brand/90 hover:to-brand/70 text-white px-6 py-2.5 rounded-xl text-xs font-bold shadow-lg shadow-brand/20 hover:shadow-xl hover:shadow-brand/30 transition-all active:scale-95 flex items-center gap-2 group"
+          className="bg-linear-to-r from-brand to-brand/80 hover:from-brand/90 hover:to-brand/70 text-white px-6 py-2.5 rounded-xl text-xs font-bold shadow-lg shadow-brand/20 hover:shadow-xl hover:shadow-brand/30 transition-all active:scale-95 flex items-center gap-2 group"
         >
           <span>Apply Now</span>
           <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
@@ -349,7 +349,7 @@ export default function StudentDashboard() {
       )}
 
       {isMemModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-card w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl border border-border space-y-6 animate-in zoom-in-95 duration-300">
             <div className="text-center space-y-2">
               <h3 className="text-2xl font-black text-foreground tracking-tight">Create Memory</h3>
@@ -357,11 +357,11 @@ export default function StudentDashboard() {
             </div>
 
             {memPreviews.length > 0 && (
-              <div className="grid grid-cols-2 gap-3 max-h-[300px] overflow-y-auto p-1 scrollbar-hide">
+              <div className="grid grid-cols-2 gap-3 max-h-75 overflow-y-auto p-1 scrollbar-hide">
                 {memPreviews.map((preview, idx) => (
                   <div key={idx} className="relative aspect-square rounded-2xl overflow-hidden border-2 border-brand/20 bg-muted group">
                     <img src={preview} alt={`Preview ${idx}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                 ))}
               </div>
@@ -390,7 +390,7 @@ export default function StudentDashboard() {
                 <button 
                   onClick={startMemoryUpload}
                   disabled={memUploading}
-                  className="flex-[2] bg-brand text-white px-6 py-4 rounded-xl font-bold hover:bg-brand/90 transition-all active:scale-95 text-sm disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2 shadow-lg shadow-brand/20"
+                  className="flex-2 bg-brand text-white px-6 py-4 rounded-xl font-bold hover:bg-brand/90 transition-all active:scale-95 text-sm disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2 shadow-lg shadow-brand/20"
                 >
                   {memUploading ? (
                     <>
@@ -454,7 +454,7 @@ export default function StudentDashboard() {
                       placeholder="e.g. 85.50" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">12th Percentage</label>
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">12th/Diploma Percentage</label>
                     <input type="number" step="0.01" min="0" max="100"
                       value={profileForm.twelfthPercentage} onChange={(e) => setProfileForm({ ...profileForm, twelfthPercentage: e.target.value })}
                       className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
@@ -531,11 +531,11 @@ export default function StudentDashboard() {
                     <div className="bg-card rounded-2xl p-8 md:p-12 shadow-sm border border-border flex flex-col md:flex-row gap-8 md:items-center relative overflow-hidden group hover:shadow-xl transition-shadow duration-500">
 
                       {/* Decorative Gradient Accent */}
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-brand/10 to-transparent rounded-bl-[5rem]"></div>
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-bl from-brand/10 to-transparent rounded-bl-[5rem]"></div>
 
                       {/* Avatar Section */}
                       <div className="relative shrink-0 mx-auto md:mx-0">
-                        <div className="w-40 h-40 md:w-56 md:h-56 rounded-full p-2 bg-gradient-to-tr from-brand to-brand/40 transition-transform duration-500 group-hover:rotate-6">
+                        <div className="w-40 h-40 md:w-56 md:h-56 rounded-full p-2 bg-linear-to-tr from-brand to-brand/40 transition-transform duration-500 group-hover:rotate-6">
                           <div className="w-full h-full rounded-full border-4 border-background overflow-hidden bg-muted">
                             {student?.profileImageUrl ? (
                               <img
@@ -624,7 +624,7 @@ export default function StudentDashboard() {
               {!loading && data && (
                 <section className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                   {/* Stat Card: Eligible Drives */}
-                  <div className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 rounded-[1.75rem] p-6 border border-blue-500/20 shadow-sm hover:-translate-y-1 transition-all duration-300 group cursor-pointer">
+                  <div className="bg-linear-to-br from-blue-500/10 to-blue-500/5 rounded-[1.75rem] p-6 border border-blue-500/20 shadow-sm hover:-translate-y-1 transition-all duration-300 group cursor-pointer">
                     <div className="flex items-start justify-between mb-4">
                       <div className="w-12 h-12 bg-blue-500/20 rounded-2xl flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
                         <Briefcase className="w-6 h-6 text-blue-600" />
@@ -637,7 +637,7 @@ export default function StudentDashboard() {
                   </div>
 
                   {/* Stat Card: Registrations */}
-                  <div className="bg-gradient-to-br from-green-500/10 to-green-500/5 rounded-[1.75rem] p-6 border border-green-500/20 shadow-sm hover:-translate-y-1 transition-all duration-300 group cursor-pointer">
+                  <div className="bg-linear-to-br from-green-500/10 to-green-500/5 rounded-[1.75rem] p-6 border border-green-500/20 shadow-sm hover:-translate-y-1 transition-all duration-300 group cursor-pointer">
                     <div className="flex items-start justify-between mb-4">
                       <div className="w-12 h-12 bg-green-500/20 rounded-2xl flex items-center justify-center group-hover:bg-green-500/30 transition-colors">
                         <CheckCircle className="w-6 h-6 text-green-600" />
@@ -650,7 +650,7 @@ export default function StudentDashboard() {
                   </div>
 
                   {/* Stat Card: Memories */}
-                  <div className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 rounded-[1.75rem] p-6 border border-purple-500/20 shadow-sm hover:-translate-y-1 transition-all duration-300 group cursor-pointer">
+                  <div className="bg-linear-to-br from-purple-500/10 to-purple-500/5 rounded-[1.75rem] p-6 border border-purple-500/20 shadow-sm hover:-translate-y-1 transition-all duration-300 group cursor-pointer">
                     <div className="flex items-start justify-between mb-4">
                       <div className="w-12 h-12 bg-purple-500/20 rounded-2xl flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
                         <Camera className="w-6 h-6 text-purple-600" />
@@ -663,7 +663,7 @@ export default function StudentDashboard() {
                   </div>
 
                   {/* Stat Card: Attended */}
-                  <div className="bg-gradient-to-br from-brand/15 to-brand/5 rounded-[1.75rem] p-6 border border-brand/30 shadow-md hover:-translate-y-1 transition-all duration-300 group cursor-pointer hover:shadow-lg hover:shadow-brand/10">
+                  <div className="bg-linear-to-br from-brand/15 to-brand/5 rounded-[1.75rem] p-6 border border-brand/30 shadow-md hover:-translate-y-1 transition-all duration-300 group cursor-pointer hover:shadow-lg hover:shadow-brand/10">
                     <div className="flex items-start justify-between mb-4">
                       <div className="w-12 h-12 bg-brand/30 rounded-2xl flex items-center justify-center group-hover:bg-brand/40 transition-colors">
                         <TrendingUp className="w-6 h-6 text-brand" />
@@ -693,7 +693,7 @@ export default function StudentDashboard() {
                 </div>
 
                 {drives.length === 0 ? (
-                  <div className="bg-gradient-to-br from-muted/30 to-muted/10 rounded-[2rem] border-2 border-dashed border-border p-12 text-center space-y-4 group hover:border-brand/30 transition-colors">
+                  <div className="bg-linear-to-br from-muted/30 to-muted/10 rounded-[2rem] border-2 border-dashed border-border p-12 text-center space-y-4 group hover:border-brand/30 transition-colors">
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-muted rounded-full group-hover:bg-brand/10 transition-colors">
                       <Briefcase className="w-8 h-8 text-muted-foreground group-hover:text-brand transition-colors" />
                     </div>
@@ -754,7 +754,7 @@ export default function StudentDashboard() {
                     <div className="hidden md:block bg-card rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow overflow-hidden">
                       <table className="w-full">
                         <thead>
-                          <tr className="bg-gradient-to-r from-muted/50 to-muted/30 border-b border-border">
+                          <tr className="bg-linear-to-r from-muted/50 to-muted/30 border-b border-border">
                             <th className="text-left px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Company</th>
                             <th className="text-left px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Position</th>
                             <th className="text-left px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">CTC</th>
@@ -819,7 +819,7 @@ export default function StudentDashboard() {
                 </div>
 
                 {registrations.length === 0 ? (
-                  <div className="bg-gradient-to-br from-muted/30 to-muted/10 rounded-[2rem] border-2 border-dashed border-border p-12 text-center space-y-4 group hover:border-brand/30 transition-colors">
+                  <div className="bg-linear-to-br from-muted/30 to-muted/10 rounded-[2rem] border-2 border-dashed border-border p-12 text-center space-y-4 group hover:border-brand/30 transition-colors">
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-muted rounded-full group-hover:bg-brand/10 transition-colors">
                       <Briefcase className="w-8 h-8 text-muted-foreground group-hover:text-brand transition-colors" />
                     </div>
@@ -881,7 +881,7 @@ export default function StudentDashboard() {
                       <div className="overflow-x-auto">
                         <table className="w-full">
                           <thead>
-                            <tr className="bg-gradient-to-r from-muted/50 to-muted/30 border-b border-border">
+                            <tr className="bg-linear-to-r from-muted/50 to-muted/30 border-b border-border">
                               <th className="text-left px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Company & Role</th>
                               <th className="text-center px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Drive Date</th>
                               <th className="text-center px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Application Status</th>
@@ -959,7 +959,7 @@ export default function StudentDashboard() {
                     {archivedDrives.map((drive: any) => (
                       <div key={drive.id} className="bg-card/50 border border-border rounded-xl p-4 flex justify-between items-center">
                         <div className="space-y-1">
-                          <h3 className="text-sm font-bold text-foreground truncate max-w-[150px]">
+                          <h3 className="text-sm font-bold text-foreground truncate max-w-37.5">
                             {drive.companyName}
                           </h3>
                           <p className="text-[10px] text-muted-foreground">

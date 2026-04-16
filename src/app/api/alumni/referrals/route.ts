@@ -1,6 +1,7 @@
 export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { referralSchema } from "@/lib/validations/alumni";
 import * as jose from "jose";
 
 async function getAlumniFromToken(req: NextRequest) {
@@ -24,21 +25,34 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
-    const body = (await req.json()) as {
-      companyName: string;
-      position: string;
-      description: string;
-      applyLink: string;
-    };
+    const body = await req.json();
+
+    // Validate request body
+    const validationResult = referralSchema.safeParse(body);
+    if (!validationResult.success) {
+      return NextResponse.json({ 
+        success: false, 
+        message: "Validation failed", 
+        errors: validationResult.error.flatten()
+      }, { status: 400 });
+    }
 
     const db = getDb();
 
     const referral = await db.referral.create({
       data: {
-        companyName: body.companyName,
-        position: body.position,
-        description: body.description,
-        applyLink: body.applyLink,
+        companyName: validationResult.data.companyName,
+        jobType: validationResult.data.jobType,
+        position: validationResult.data.position,
+        description: validationResult.data.description,
+        location: validationResult.data.location,
+        minCGPA: validationResult.data.minCGPA ? parseFloat(validationResult.data.minCGPA) : null,
+        experience: validationResult.data.experience,
+        batchEligible: validationResult.data.batchEligible,
+        refrerralLink: validationResult.data.refrerralLink,
+        referralCode: validationResult.data.referralCode,
+        deadline: validationResult.data.deadline ? new Date(validationResult.data.deadline) : null,
+        applyLink: validationResult.data.applyLink,
         status: "pending",
         alumniId: alumni.id,
       },

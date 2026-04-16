@@ -192,8 +192,16 @@ model Recruiter {
 model Referral {
   id          String   @id @default(cuid())
   companyName String
+  jobType     String
   position    String
   description String
+  location    String?
+  minCGPA      Float?
+  experience  String?
+  batchEligible String?
+  refrerralLink String?
+  referralCode String?
+  deadline    DateTime?
   applyLink   String
   status      String   @default("pending")
   alumniId    String

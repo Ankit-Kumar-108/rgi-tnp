@@ -26,7 +26,29 @@ export const alumniRegistrationSchema = z.object({
 export const alumniLoginSchema = z.object({
     personalEmail: z.string().trim().email('Invalid email address'), 
     password: z.string().min(8, 'Password must be at least 8 characters long'),
-}); 
+});
+
+export const referralSchema = z.object({
+    companyName: z.string().trim().min(1, 'Company name is required').max(100),
+    jobType: z.string().trim().optional(),
+    position: z.string().trim().min(1, 'Position is required').max(100),
+    description: z.string().trim().min(10, 'Description must be at least 10 characters').max(2000),
+    location: z.string().trim().optional(),
+    minCGPA: z.string().trim().optional().refine(
+        (val) => !val || !isNaN(parseFloat(val)),
+        'Min CGPA must be a valid number'
+    ),
+    experience: z.string().trim().optional(),
+    batchEligible: z.string().trim().optional(),
+    refrerralLink: z.string().trim().refine(
+        (val) => !val || /^https?:\/\//.test(val),
+        'Referral link must start with http:// or https://'
+    ).optional(),
+    referralCode: z.string().trim().optional(),
+    deadline: z.string().trim().optional(),
+    applyLink: z.string().trim().url('Apply link must be a valid URL'),
+});
 
 export type AlumniRegistrationFormData = z.infer<typeof alumniRegistrationSchema>;
 export type AlumniLoginFormData = z.infer<typeof alumniLoginSchema>;
+export type ReferralFormData = z.infer<typeof referralSchema>;

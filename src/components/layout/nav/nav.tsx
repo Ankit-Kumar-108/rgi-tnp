@@ -120,20 +120,20 @@ export default function Nav() {
         <Link href={"/"} className="flex items-center gap-3 min-w-max">
           <div className="text-brand">
             <img
-              className="w-10 h-10"
+              className="size-12 md:size-20"
               src={"/logo/logo.png"}
               alt='college logo'
             />
           </div>
           <div>
-            <h1 className="md:hidden text-xl font-bold leading-none tracking-tight text-foreground">RGI T&P</h1>
-            <h1 className="hidden md:block text-2xl font-bold leading-none tracking-tight text-foreground">RGI <span className="text-brand">Training & Placement</span></h1>
-            <p className="text-[10px] uppercase tracking-widest text-brand font-semibold hidden md:flex">Excellence in Placement</p>
+            <h1 className="sm:hidden text-xl font-bold leading-none tracking-tight text-foreground">RGI</h1>
+            <h1 className="text-lg hidden sm:flex md:text-2xl font-bold leading-none tracking-tight text-foreground">Radharaman Group Of Institutes</h1>
+            <p className="text-[7px] md:text-[10px] uppercase tracking-widest text-brand font-semibold">Department of Training & Placement</p>
           </div>
         </Link >
 
         {/* Desktop Navigation */}
-        <div className="hidden lg:flex items-center justify-center flex-1 gap-4 xl:gap-6 px-4">
+        <div className="hidden xl:flex items-center justify-center flex-1 gap-4 xl:gap-6 px-4">
           {navItems.map((item) => (
             <div
               key={item.name}
@@ -177,7 +177,7 @@ export default function Nav() {
         <div className="flex items-center gap-4 min-w-max justify-end">
           <AnimatedThemeToggler />
           
-          <div className='lg:hidden flex items-center gap-4'>
+          <div className='xl:hidden flex items-center gap-4'>
             <div
               onClick={() => setIsOpen(!isOpen)}
               className='size-7 cursor-pointer'>
@@ -189,7 +189,7 @@ export default function Nav() {
         {/* Mobile Menu */}
         {isOpen && (
           <>
-            <div className='lg:hidden fixed z-50 right-5 top-24 bg-background border border-brand/20 w-56 rounded-2xl flex flex-col p-2 shadow-xl shadow-brand/10 max-h-[75vh] overflow-y-auto'>
+            <div className='xl:hidden fixed z-50 right-5 top-24 bg-background border border-brand/20 w-56 rounded-2xl flex flex-col p-2 shadow-xl shadow-brand/10 max-h-[75vh] overflow-y-auto'>
               <div className="flex flex-col divide-y divide-brand/10">
                 {navItems.map((item) => (
                   <div key={item.name} className="flex flex-col">

@@ -148,10 +148,8 @@ export const passwordResetEmailTemplate = (name: string, resetLink: string): str
   return premiumLayout("&#128274;", "Password Reset", content);
 };
 
-// ──────────────────────────────────────────────────
 // 3. VERIFICATION SUCCESS / WELCOME EMAIL
 // Used by: verify-email (sent to user after successful verification)
-// ──────────────────────────────────────────────────
 export const verificationSuccessTemplate = (name: string): string => {
   const content = `
             <p style="color: #9213ec; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; margin-bottom: 10px;">Account Activated</p>
@@ -200,7 +198,7 @@ export const driveRegistrationTemplate = (name: string, companyName: string, dat
                         <table border="0" cellpadding="0" cellspacing="0" width="100%">
                             <tr><td style="padding: 10px 0; font-size: 14px; color: #4d4355; border-bottom: 1px solid #ebdeee;"><strong style="color: #9213ec;">Company</strong><br>${companyName}</td></tr>
                             <tr><td style="padding: 10px 0; font-size: 14px; color: #4d4355; border-bottom: 1px solid #ebdeee;"><strong style="color: #9213ec;">Role</strong><br>${role}</td></tr>
-                            <tr><td style="padding: 10px 0; font-size: 14px; color: #4d4355;"><strong style="color: #9213ec;">Date</strong><br>${date}</td></tr>
+                            <tr><td style="padding: 10px 0; font-size: 14px; color: #4d4355;"><strong style="color: #9213ec;">Date</strong><br>${date}<br><span>Expected</span></td></tr>
                         </table>
                     </td>
                 </tr>

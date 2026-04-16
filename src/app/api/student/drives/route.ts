@@ -2,6 +2,9 @@ export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import * as jose from "jose";
+import { sendEmail } from "@/lib/send-email";
+import { driveRegistrationTemplate } from "@/lib/email-templates";
+import { email } from "zod";
 
 async function getStudentFromToken(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
@@ -73,6 +76,24 @@ export async function POST(req: NextRequest) {
     await db.driveRegistration.create({
       data: { driveId, studentId: studentData.id },
     });
+
+    // Send Drive Registration Confirmation Email 
+    try {
+      const emailResult = await sendEmail({
+        to: studentData.email,
+        subject: `Registered for ${drive.companyName} Drive`,
+        html: driveRegistrationTemplate(studentData.name, drive.companyName, drive.driveDate.toDateString(), drive.roleName),
+      })
+
+      if(!emailResult.success) {
+        console.warn("Drive registration email failed to send:", emailResult.error);
+        return NextResponse.json({ success: true, message: "Registered for the drive, but failed to send confirmation email" }, { status: 200 });
+
+      }
+    } catch (emailError) {
+      console.error("Failed to send drive registration email:", emailError);
+      return NextResponse.json({ success: false, message: "Registered for the drive, but failed to send confirmation email" }, { status: 500 });
+    }
 
     return NextResponse.json({ success: true, message: "Successfully registered for the drive" });
   } catch (error) {

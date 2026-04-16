@@ -37,7 +37,20 @@ export default function AlumniDashboard() {
   const router = useRouter();
 
   // Referral form
-  const [refForm, setRefForm] = useState({ companyName: "", position: "", description: "", applyLink: "" });
+  const [refForm, setRefForm] = useState({ 
+    companyName: "", 
+    jobType: "",
+    position: "", 
+    description: "", 
+    location: "",
+    minCGPA: "",
+    experience: "",
+    batchEligible: "",
+    refrerralLink: "",
+    referralCode: "",
+    deadline: "",
+    applyLink: "" 
+  });
   const [submittingRef, setSubmittingRef] = useState(false);
   const [refMsg, setRefMsg] = useState<{ msg: string; ok: boolean } | null>(null);
 
@@ -122,7 +135,20 @@ export default function AlumniDashboard() {
       const d = (await res.json()) as any;
       setRefMsg({ msg: d.message, ok: d.success });
       if (d.success) {
-        setRefForm({ companyName: "", position: "", description: "", applyLink: "" });
+        setRefForm({ 
+          companyName: "", 
+          jobType: "",
+          position: "", 
+          description: "", 
+          location: "",
+          minCGPA: "",
+          experience: "",
+          batchEligible: "",
+          refrerralLink: "",
+          referralCode: "",
+          deadline: "",
+          applyLink: "" 
+        });
         fetchDashboard();
       }
     } catch {
@@ -572,10 +598,24 @@ export default function AlumniDashboard() {
                         placeholder="e.g. Google" />
                     </div>
                     <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Job Type</label>
+                      <input value={refForm.jobType} onChange={(e) => setRefForm({ ...refForm, jobType: e.target.value })}
+                        className="w-full bg-muted/50 px-6 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground placeholder:text-muted-foreground/50"
+                        placeholder="e.g. Full-time, Internship" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
                       <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Role / Position</label>
                       <input required value={refForm.position} onChange={(e) => setRefForm({ ...refForm, position: e.target.value })}
                         className="w-full bg-muted/50 px-6 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground placeholder:text-muted-foreground/50"
                         placeholder="e.g. SDE Intern" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Location</label>
+                      <input value={refForm.location} onChange={(e) => setRefForm({ ...refForm, location: e.target.value })}
+                        className="w-full bg-muted/50 px-6 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground placeholder:text-muted-foreground/50"
+                        placeholder="e.g. Bangalore, India" />
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -583,6 +623,45 @@ export default function AlumniDashboard() {
                     <textarea required value={refForm.description} onChange={(e) => setRefForm({ ...refForm, description: e.target.value })} rows={3}
                       className="w-full bg-muted/50 px-6 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none resize-none text-foreground placeholder:text-muted-foreground/50 min-h-[120px]"
                       placeholder="Job details, eligibility..." />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Min CGPA</label>
+                      <input type="number" step="0.01" value={refForm.minCGPA} onChange={(e) => setRefForm({ ...refForm, minCGPA: e.target.value })}
+                        className="w-full bg-muted/50 px-6 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground placeholder:text-muted-foreground/50"
+                        placeholder="e.g. 3.5" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Experience Required</label>
+                      <input value={refForm.experience} onChange={(e) => setRefForm({ ...refForm, experience: e.target.value })}
+                        className="w-full bg-muted/50 px-6 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground placeholder:text-muted-foreground/50"
+                        placeholder="e.g. 0-1 years" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Batch Eligible</label>
+                      <input value={refForm.batchEligible} onChange={(e) => setRefForm({ ...refForm, batchEligible: e.target.value })}
+                        className="w-full bg-muted/50 px-6 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground placeholder:text-muted-foreground/50"
+                        placeholder="e.g. 2024, 2025" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Referral Code <span className="text-brand font-normal">(Optional)</span></label>
+                      <input value={refForm.referralCode} onChange={(e) => setRefForm({ ...refForm, referralCode: e.target.value })}
+                        className="w-full bg-muted/50 px-6 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground placeholder:text-muted-foreground/50"
+                        placeholder="e.g. REF2024" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Deadline</label>
+                      <input type="datetime-local" value={refForm.deadline} onChange={(e) => setRefForm({ ...refForm, deadline: e.target.value })}
+                        className="w-full bg-muted/50 px-6 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground placeholder:text-muted-foreground/50" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Referral Link <span className="text-brand font-normal">(Optional)</span></label>
+                    <input value={refForm.refrerralLink} onChange={(e) => setRefForm({ ...refForm, refrerralLink: e.target.value })}
+                      className="w-full bg-muted/50 px-6 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground placeholder:text-muted-foreground/50"
+                      placeholder="e.g. https://referral-link.com" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Apply Link / Email</label>
