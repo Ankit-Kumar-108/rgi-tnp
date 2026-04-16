@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
         refrerralLink: validationResult.data.refrerralLink ?? null,
         referralCode: validationResult.data.referralCode ?? null,
         deadline: validationResult.data.deadline ? new Date(validationResult.data.deadline) : null,
-        applyLink: validationResult.data.applyLink,
+        applyLink: validationResult.data.applyLink ?? null,
         status: "pending",
         alumniId: alumni.id,
       },

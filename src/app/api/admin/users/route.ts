@@ -194,21 +194,32 @@ export async function PATCH(req: NextRequest) {
       case "student":
         await db.student.updateMany({
           where: { id: { in: ids } },
-          data: { isEmailVerified: true }, 
+          data: { 
+            isEmailVerified: true,
+            isVerified: true
+
+           }, 
         });
         break;
 
       case "alumni":
         await db.alumni.updateMany({
           where: { id: { in: ids } },
-          data: { isVerified: true }, 
+          data: { 
+            isVerified: true,
+            isEmailVerified: true
+
+           }, 
         });
         break;
 
       case "external":
         await db.externalStudent.updateMany({
           where: { id: { in: ids } },
-          data: { isVerified: true },
+          data: { 
+            isVerified: true,
+            isEmailVerified: true
+          },
         });
         break;
 

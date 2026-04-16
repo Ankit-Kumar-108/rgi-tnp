@@ -30,23 +30,31 @@ export const alumniLoginSchema = z.object({
 
 export const referralSchema = z.object({
     companyName: z.string().trim().min(1, 'Company name is required').max(100),
-    jobType: z.string().trim().optional(),
+    jobType: z.string().trim().optional().transform(v => v === '' ? undefined : v),
     position: z.string().trim().min(1, 'Position is required').max(100),
     description: z.string().trim().min(10, 'Description must be at least 10 characters').max(2000),
-    location: z.string().trim().optional(),
-    minCGPA: z.string().trim().optional().refine(
+    location: z.string().trim().optional().transform(v => v === '' ? undefined : v),
+    minCGPA: z.string().trim().optional().transform(v => v === '' ? undefined : v).refine(
         (val) => !val || !isNaN(parseFloat(val)),
         'Min CGPA must be a valid number'
     ),
-    experience: z.string().trim().optional(),
-    batchEligible: z.string().trim().optional(),
-    refrerralLink: z.string().trim().refine(
+    experience: z.string().trim().optional().transform(v => v === '' ? undefined : v),
+    batchEligible: z.string().trim().optional().transform(v => v === '' ? undefined : v),
+    refrerralLink: z.string().trim().optional().transform(v => v === '' ? undefined : v).refine(
         (val) => !val || /^https?:\/\//.test(val),
         'Referral link must start with http:// or https://'
-    ).optional(),
-    referralCode: z.string().trim().optional(),
-    deadline: z.string().trim().optional(),
-    applyLink: z.string().trim().url('Apply link must be a valid URL'),
+    ),
+    referralCode: z.string().trim().optional().transform(v => v === '' ? undefined : v),
+    deadline: z.string().trim().optional().transform(v => v === '' ? undefined : v),
+    applyLink: z.string().trim().optional().transform(v => v === '' ? undefined : v).refine(
+        (val) => {
+            if (!val) return true;
+            const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+            const isUrl = /^https?:\/\//.test(val);
+            return isEmail || isUrl;
+        },
+        'Apply link must be a valid email or URL (starting with http:// or https://)'
+    ),
 });
 
 export type AlumniRegistrationFormData = z.infer<typeof alumniRegistrationSchema>;

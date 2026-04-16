@@ -202,7 +202,7 @@ model Referral {
   refrerralLink String?
   referralCode String?
   deadline    DateTime?
-  applyLink   String
+  applyLink   String?
   status      String   @default("pending")
   alumniId    String
   alumni      Alumni   @relation(fields: [alumniId], references: [id])

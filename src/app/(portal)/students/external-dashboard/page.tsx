@@ -19,6 +19,7 @@ import {
   ChevronRight,
   Linkedin,
   Github,
+  MessageSquareShare,
 } from "lucide-react";
 import Nav from "@/components/layout/nav/nav";
 import Footer from "@/components/layout/footer/footer";
@@ -29,6 +30,7 @@ import { uploadFileToR2 } from "@/lib/upload-r2";
 import { PlacementDrive } from "@/types";
 import JobDetailsModal from "@/components/forms/studentApplyModal/modal";
 import { toast } from "sonner";
+import FeedbackComp from "../feedback/feedbakComp";
 
 export default function ExternalStudentDashboard() {
   const router = useRouter();
@@ -36,6 +38,9 @@ export default function ExternalStudentDashboard() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
+
+  // Feedback Modal
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
   // Complete Profile Form
   const [showProfileForm, setShowProfileForm] = useState(false);
@@ -236,7 +241,14 @@ export default function ExternalStudentDashboard() {
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight text-foreground leading-tight">
               Welcome, <span className="text-brand">{student?.name || "Student"}</span>
             </h1>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                onClick={() => setShowFeedbackModal(true)}
+                className="inline-flex items-center gap-2 text-sm font-bold text-foreground hover:bg-muted transition-colors border border-border px-4 py-2.5 rounded-2xl bg-card shadow-sm"
+              >
+                <MessageSquareShare className="w-4 h-4" />
+                Share Feedback
+              </button>
               <button
                 onClick={() => setShowProfileForm(!showProfileForm)}
                 className="inline-flex items-center gap-2 text-sm font-bold text-brand hover:text-brand/80 transition-colors border border-brand/20 px-4 py-2.5 rounded-2xl bg-brand/5 hover:bg-brand/10"
@@ -255,8 +267,8 @@ export default function ExternalStudentDashboard() {
 
           {/* Complete Profile Form (Collapsible) */}
           {showProfileForm && (
-            <section className="bg-card rounded-[2rem] p-8 shadow-xl border-2 border-brand/20 animate-in fade-in slide-in-from-top-4 duration-300">
-              <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
+            <section className="bg-card rounded-2xl p-6 shadow-xl border-2 border-brand/20 animate-in fade-in slide-in-from-top-4 duration-300">
+              <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
                 <div className="p-2 bg-brand/10 rounded-lg text-brand"><FileText className="w-5 h-5" /></div>
                 Academic &amp; Professional Details
               </h2>
@@ -341,14 +353,14 @@ export default function ExternalStudentDashboard() {
                 <div className="absolute -top-12 -left-12 w-64 h-64 bg-brand/10 rounded-full blur-3xl -z-10"></div>
                 <div className="absolute top-24 -right-12 w-48 h-48 bg-foreground/5 rounded-full blur-3xl -z-10"></div>
 
-                <div className="bg-card rounded-2xl p-8 md:p-12 shadow-sm border border-border flex flex-col md:flex-row gap-8 md:items-center relative overflow-hidden group hover:shadow-xl transition-shadow duration-500">
+                <div className="bg-card rounded-2xl p-6 md:p-8 shadow-sm border border-border flex flex-col md:flex-row gap-8 md:items-center relative overflow-hidden group hover:shadow-xl transition-shadow duration-500">
 
                   {/* Decorative Gradient Accent */}
                   <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-bl from-brand/10 to-transparent rounded-bl-[5rem]"></div>
 
                   {/* Avatar Section */}
                   <div className="relative shrink-0 mx-auto md:mx-0">
-                    <div className="w-40 h-40 md:w-56 md:h-56 rounded-full p-2 bg-linear-to-tr from-brand to-brand/40 transition-transform duration-500 group-hover:rotate-6">
+                    <div className="w-32 h-32 md:w-48 md:h-48 rounded-full p-2 bg-linear-to-tr from-brand to-brand/40 transition-transform duration-500 group-hover:rotate-6">
                       <div className="w-full h-full rounded-full border-4 border-background overflow-hidden bg-muted">
                         {student?.profileImageUrl ? (
                           <img
@@ -380,7 +392,7 @@ export default function ExternalStudentDashboard() {
                       <p className="text-brand font-bold text-xs uppercase tracking-[0.3em]">
                         Institutional Identity
                       </p>
-                      <h2 className="text-4xl md:text-6xl font-black text-foreground tracking-tighter leading-none">
+                      <h2 className="text-3xl md:text-5xl font-black text-foreground tracking-tighter leading-none">
                         {student?.name}
                       </h2>
                       <p className="text-lg md:text-xl font-medium text-muted-foreground tracking-tight flex items-center justify-center md:justify-start gap-2">
@@ -739,6 +751,24 @@ export default function ExternalStudentDashboard() {
                     </div>
                   </div>
                 </section>
+              )}
+
+              <button
+                onClick={() => setShowFeedbackModal(true)}
+                className="mt-8 flex items-center gap-2 text-sm font-medium text-brand hover:underline"
+              >
+                <MessageSquareShare className="w-4 h-4" />
+                Share Feedback
+              </button>
+
+              {/* Feedback Modal */}
+              {showFeedbackModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                  <div className="absolute inset-0 bg-background/60 backdrop-blur-xl animate-in fade-in duration-300" onClick={() => setShowFeedbackModal(false)} />
+                  <div className="relative w-full max-w-2xl animate-in zoom-in-95 duration-300">
+                    <FeedbackComp onClose={() => setShowFeedbackModal(false)} />
+                  </div>
+                </div>
               )}
             </>
           )}

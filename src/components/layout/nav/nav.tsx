@@ -88,7 +88,6 @@ export default function Nav() {
         { name: "Dashboard", icon: TrendingUp, link: "alumni/dashboard" },
       ]
     }
-    // Admin was completely removed. Put this link in your Footer component instead!
   ];
 
   const renderMobileSubMenu = (categoryName: string) => {
