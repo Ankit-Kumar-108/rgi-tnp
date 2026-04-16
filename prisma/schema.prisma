@@ -192,7 +192,7 @@ model Recruiter {
 model Referral {
   id          String   @id @default(cuid())
   companyName String
-  jobType     String
+  jobType     String?
   position    String
   description String
   location    String?
