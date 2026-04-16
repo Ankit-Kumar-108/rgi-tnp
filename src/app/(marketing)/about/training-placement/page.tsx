@@ -105,7 +105,7 @@ export default function ImpactCommunity() {
                                     alt="Community engagement"
                                     loading="lazy"
                                     className="w-full h-full object-cover"
-                                    src="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2940&auto=format&fit=crop"
+                                    src="/images/tnp-conference-hall.jpeg"
                                 />
                             </div>
                             <div className="max-w-2xl mx-auto space-y-12">

@@ -54,7 +54,7 @@ export default function Home() {
                 </div>
                 <div className="relative group">
                   <div className="absolute -inset-4 bg-brand/20 rounded-3xl blur-2xl group-hover:bg-brand/30 transition-all"></div>
-                  <div className="relative h-112.5 w-full rounded-2xl bg-cover bg-center shadow-2xl overflow-hidden border-4 border-background" data-alt="Modern college campus students collaborating outdoors" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuBIVPJ6bv7Dr7lCEYqnwXx2t5FSUvVVJgGETqGWiAnivZer2aB87kt_HLiLPDt21HDlVDz8VsoaU6Ndo3QrsOqWBkHLzvp_lqpnUppw5BcFfjcLKCRAkiFxoux2y4go15GQUt0lPo3SukxGG7brmhc5VyesFUCdQe2SK_GCCXnRFTml0yTzr9G94J-eKXgGRDHi0GAUnNj4V9R1QWLhShBOwsV-arIw46WqYP6Paax2cpoZvE5npGQZscSCV3LVb_M9c0SN0zA4DA)" }}>
+                  <div className="relative h-112.5 w-full rounded-2xl bg-cover bg-center shadow-2xl overflow-hidden border-4 border-background" data-alt="Modern college campus students collaborating outdoors" style={{ backgroundImage: "url(/images/RGI.jpg)" }}>
                   </div>
                 </div>
               </div>
