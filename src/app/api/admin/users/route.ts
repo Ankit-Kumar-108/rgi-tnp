@@ -182,7 +182,6 @@ export async function GET(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
-    // 1. Extract role from the payload
     const { ids, action, role } = (await req.json()) as any;
     
     if (!ids || !Array.isArray(ids) || action !== "approve" || !role) {
@@ -207,7 +206,6 @@ export async function PATCH(req: NextRequest) {
           where: { id: { in: ids } },
           data: { 
             isVerified: true,
-            isEmailVerified: true
 
            }, 
         });
@@ -218,7 +216,6 @@ export async function PATCH(req: NextRequest) {
           where: { id: { in: ids } },
           data: { 
             isVerified: true,
-            isEmailVerified: true
           },
         });
         break;
