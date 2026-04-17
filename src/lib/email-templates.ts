@@ -215,10 +215,8 @@ export const driveRegistrationTemplate = (name: string, companyName: string, dat
   return premiumLayout("&#128188;", "Drive Registration", content);
 };
 
-// ──────────────────────────────────────────────────
 // 5. ADMIN NOTIFICATION — NEW USER VERIFIED
 // Sent to admin when a user successfully verifies their account
-// ──────────────────────────────────────────────────
 export const adminVerificationNotifyTemplate = (userName: string, userEmail: string, userRole: string): string => {
   const roleLabel = userRole === "external_student" ? "External Student" : userRole === "alumni" ? "Alumni" : "Internal Student";
   const content = `
@@ -243,3 +241,173 @@ export const adminVerificationNotifyTemplate = (userName: string, userEmail: str
             </table>`;
   return premiumLayout("&#128276;", "New User Alert", content);
 };
+
+export const shortlistedEmailTemplate = (
+    studentName: string,
+    jobRole: string,
+    companyName: string,
+    interviewDate: string,
+    location: string,
+    coordinatorName: string,
+    confirmUrl: string = "https://ankit-dev.me/portal/dashboard"
+): string => {
+    const content = `
+            <p style="color: #9213ec; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; margin-bottom: 10px;">Status Update</p>
+            <h2 style="font-size: 22px; margin: 0 0 20px 0; color: #1f1924;">Congratulations, ${studentName}!</h2>
+            
+            <p style="font-size: 16px; line-height: 1.6; color: #4d4355; font-weight: 300;">
+                We are pleased to inform you that your application for the <strong style="color: #9213ec;">${jobRole}</strong> position at <strong style="color: #9213ec;">${companyName}</strong> has successfully passed the initial screening. You have been shortlisted for the next round.
+            </p>
+
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 25px 0; border: 2px solid #9213ec; border-radius: 16px; overflow: hidden; background-color: #f7f6f8;">
+                <tr>
+                    <td style="padding: 25px;">
+                        <h3 style="margin: 0 0 15px 0; font-size: 18px; color: #1f1924; font-weight: 700;">Next Steps</h3>
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <td style="padding: 8px 0; border-bottom: 1px solid #ebdeee;">
+                                    <span style="font-size: 11px; font-weight: 700; color: #9213ec; text-transform: uppercase;">Event</span><br>
+                                    <span style="font-size: 14px; color: #1f1924;">Technical Interview / Assessment</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; border-bottom: 1px solid #ebdeee;">
+                                    <span style="font-size: 11px; font-weight: 700; color: #9213ec; text-transform: uppercase;">Date & Time</span><br>
+                                    <span style="font-size: 14px; color: #1f1924;">${interviewDate}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; border-bottom: 1px solid #ebdeee;">
+                                    <span style="font-size: 11px; font-weight: 700; color: #9213ec; text-transform: uppercase;">Location / Link</span><br>
+                                    <span style="font-size: 14px; color: #1f1924;">${location}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0;">
+                                    <span style="font-size: 11px; font-weight: 700; color: #9213ec; text-transform: uppercase;">T&P Coordinator</span><br>
+                                    <span style="font-size: 14px; color: #1f1924;">${coordinatorName}</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                    <td align="center" style="padding: 10px 0 30px 0;">
+                        <a href="${confirmUrl}" style="background-color: #9213ec; color: #ffffff; padding: 16px 35px; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 16px; display: inline-block; box-shadow: 0 4px 14px rgba(146, 19, 236, 0.3);">
+                            Confirm Attendance &nbsp; &rarr;
+                        </a>
+                    </td>
+                </tr>
+            </table>
+
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ebdeee; border-radius: 16px; border-left: 4px solid #9213ec;">
+                <tr>
+                    <td style="padding: 20px;">
+                        <p style="margin: 0 0 5px 0; font-size: 14px; font-weight: 700; color: #4d4355;">Preparation Tip</p>
+                        <p style="margin: 0; font-size: 13px; color: #4d4355; font-weight: 300;">Review the job description and keep a digital copy of your resume ready. We wish you the very best!</p>
+                    </td>
+                </tr>
+            </table>`;
+
+    return premiumLayout("&#127882;", "You're Shortlisted!", content);
+};
+
+export const offerSelectionEmailTemplate = (
+    studentName: string,
+    jobRole: string,
+    companyName: string,
+    packageAmount: string,
+    joiningDate: string,
+): string => {
+    const content = `
+            <div style="text-align: center; margin-bottom: 30px;">
+                <p style="color: #9213ec; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; margin-bottom: 10px;">New Milestone Achieved</p>
+                <h2 style="font-size: 28px; margin: 0; color: #1f1924; font-weight: 900; line-height: 1.2;">Fantastic news, ${studentName}!</h2>
+            </div>
+            
+            <p style="font-size: 16px; line-height: 1.6; color: #4d4355; font-weight: 300; text-align: center;">
+                We are absolutely thrilled to announce that you have been selected for the <strong style="color: #9213ec;">${jobRole}</strong> position at <strong style="color: #9213ec;">${companyName}</strong>. 
+                Your hard work and excellence have truly paid off.
+            </p>
+
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 30px 0; border: 1px solid #ebdeee; border-radius: 20px; overflow: hidden; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                <tr>
+                    <td style="padding: 30px;">
+                        <h3 style="margin: 0 0 20px 0; font-size: 18px; color: #1f1924; font-weight: 700; border-bottom: 2px solid #f1daff; display: inline-block; padding-bottom: 5px;">Offer Breakdown</h3>
+                        
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #f7f6f8;">
+                                    <span style="font-size: 11px; font-weight: 700; color: #7f7387; text-transform: uppercase; tracking-widest;">Company</span><br>
+                                    <span style="font-size: 16px; font-weight: 600; color: #1f1924;">${companyName}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 12px 0; border-bottom: 1px solid #f7f6f8;">
+                                    <span style="font-size: 11px; font-weight: 700; color: #7f7387; text-transform: uppercase; tracking-widest;">Annual Package (CTC)</span><br>
+                                    <span style="font-size: 18px; font-weight: 800; color: #9213ec;">${packageAmount}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 12px 0;">
+                                    <span style="font-size: 11px; font-weight: 700; color: #7f7387; text-transform: uppercase; tracking-widest;">Joining Date</span><br>
+                                    <span style="font-size: 16px; font-weight: 600; color: #1f1924;">${joiningDate}</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+            <div style="margin-top: 40px; padding: 20px; background-color: #f1daff; border-radius: 16px; text-align: center;">
+                <p style="margin: 0; font-size: 14px; color: #2d004f; font-weight: 600;">
+                    Welcome to the professional world! 
+                </p>
+                <p style="margin: 5px 0 0 0; font-size: 12px; color: #5b2688;">
+                    The T&P Cell is proud of your achievement. Please complete the formal acceptance on the portal.
+                </p>
+            </div>`;
+
+    return premiumLayout("&#127881;", "Congratulations!", content);
+};
+
+export const rejectionEmailTemplate = (
+    studentName: string,
+    jobRole: string,
+    companyName: string,
+    dashboardUrl: string = "https://ankit-dev.me/portal/dashboard"
+): string => {
+    const content = `
+            <p style="color: #7f7387; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; margin-bottom: 10px;">Application Update</p>
+            <h2 style="font-size: 22px; margin: 0 0 20px 0; color: #1f1924;">Update on your application for ${jobRole}</h2>
+            
+            <p style="font-size: 16px; line-height: 1.6; color: #4d4355; font-weight: 300;">
+                Dear ${studentName},<br><br>
+                Thank you for participating in the recruitment drive for <strong style="color: #1f1924;">${companyName}</strong>. After careful consideration, we regret to inform you that we will not be moving forward with your application for the ${jobRole} position at this time.
+            </p>
+
+            <p style="font-size: 16px; line-height: 1.6; color: #4d4355; font-weight: 300;">
+                We truly appreciate the effort you invested in the process and your interest in the role.
+            </p>
+
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 30px 0; background-color: #f7f6f8; border-radius: 20px; border-left: 4px solid #7f7387;">
+                <tr>
+                    <td style="padding: 25px;">
+                        <h3 style="margin: 0 0 10px 0; font-size: 17px; color: #1f1924; font-weight: 700;">Career Growth Hub</h3>
+                        <p style="margin: 0 0 20px 0; font-size: 14px; color: #4d4355; line-height: 1.5;">
+                            The T&amp;P Cell remains committed to your success. We encourage you to check out our upcoming workshops to sharpen your skills for future opportunities.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+
+            <p style="font-size: 12px; color: #7f7387; text-align: center; margin-top: 30px;">
+                Every experience is a step forward. Keep pushing your boundaries!
+            </p>`;
+
+    return premiumLayout("&#9888;", "Application Update", content);
+};
+
