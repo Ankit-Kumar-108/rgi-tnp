@@ -1,6 +1,6 @@
 // Premium email layout wrapper matching the institutional design system
 const premiumLayout = (heroIcon: string, heroTitle: string, content: string): string => {
-  return `<!DOCTYPE html>
+    return `<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
@@ -67,13 +67,10 @@ const premiumLayout = (heroIcon: string, heroTitle: string, content: string): st
 </body>
 </html>`;
 };
-
-// ──────────────────────────────────────────────────
 // 1. VERIFICATION EMAIL
 // Used by: student-register, external-student-register, alumni-register, resend-verification
-// ──────────────────────────────────────────────────
 export const verificationEmailTemplate = (name: string, verificationLink: string): string => {
-  const content = `
+    const content = `
             <p style="color: #9213ec; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; margin-bottom: 10px;">Welcome to the Vanguard</p>
             <h2 style="font-size: 22px; margin: 0 0 20px 0; color: #1f1924;">Confirm your institutional access</h2>
             
@@ -105,15 +102,13 @@ export const verificationEmailTemplate = (name: string, verificationLink: string
             <div style="padding: 10px; background-color: #f7f6f8; border: 1px solid #ebdeee; border-radius: 8px; font-family: monospace; font-size: 11px; word-break: break-all; color: #9213ec;">
                 ${verificationLink}
             </div>`;
-  return premiumLayout("&#10003;", "Verify Your Identity", content);
+    return premiumLayout("&#10003;", "Verify Your Identity", content);
 };
 
-// ──────────────────────────────────────────────────
 // 2. PASSWORD RESET EMAIL
 // Used by: forgot-password
-// ──────────────────────────────────────────────────
 export const passwordResetEmailTemplate = (name: string, resetLink: string): string => {
-  const content = `
+    const content = `
             <p style="color: #9213ec; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; margin-bottom: 10px;">Security Alert</p>
             <h2 style="font-size: 22px; margin: 0 0 20px 0; color: #1f1924;">Reset your password</h2>
             
@@ -145,13 +140,13 @@ export const passwordResetEmailTemplate = (name: string, resetLink: string): str
             <div style="padding: 10px; background-color: #f7f6f8; border: 1px solid #ebdeee; border-radius: 8px; font-family: monospace; font-size: 11px; word-break: break-all; color: #9213ec;">
                 ${resetLink}
             </div>`;
-  return premiumLayout("&#128274;", "Password Reset", content);
+    return premiumLayout("&#128274;", "Password Reset", content);
 };
 
 // 3. VERIFICATION SUCCESS / WELCOME EMAIL
 // Used by: verify-email (sent to user after successful verification)
 export const verificationSuccessTemplate = (name: string): string => {
-  const content = `
+    const content = `
             <p style="color: #9213ec; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; margin-bottom: 10px;">Account Activated</p>
             <h2 style="font-size: 22px; margin: 0 0 20px 0; color: #1f1924;">Welcome aboard, ${name}!</h2>
             
@@ -180,11 +175,11 @@ export const verificationSuccessTemplate = (name: string): string => {
                     </td>
                 </tr>
             </table>`;
-  return premiumLayout("&#127881;", "Welcome to RGI TnP", content);
+    return premiumLayout("&#127881;", "Welcome to RGI TnP", content);
 };
 
 export const driveRegistrationTemplate = (name: string, companyName: string, date: string, role: string): string => {
-  const content = `
+    const content = `
             <p style="color: #9213ec; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; margin-bottom: 10px;">Registration Confirmed</p>
             <h2 style="font-size: 22px; margin: 0 0 20px 0; color: #1f1924;">You're all set, ${name}!</h2>
             
@@ -212,14 +207,14 @@ export const driveRegistrationTemplate = (name: string, companyName: string, dat
                     </td>
                 </tr>
             </table>`;
-  return premiumLayout("&#128188;", "Drive Registration", content);
+    return premiumLayout("&#128188;", "Drive Registration", content);
 };
 
 // 5. ADMIN NOTIFICATION — NEW USER VERIFIED
 // Sent to admin when a user successfully verifies their account
 export const adminVerificationNotifyTemplate = (userName: string, userEmail: string, userRole: string): string => {
-  const roleLabel = userRole === "external_student" ? "External Student" : userRole === "alumni" ? "Alumni" : "Internal Student";
-  const content = `
+    const roleLabel = userRole === "external_student" ? "External Student" : userRole === "alumni" ? "Alumni" : "Internal Student";
+    const content = `
             <p style="color: #9213ec; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; margin-bottom: 10px;">Admin Notification</p>
             <h2 style="font-size: 22px; margin: 0 0 20px 0; color: #1f1924;">New account verified</h2>
             
@@ -239,7 +234,7 @@ export const adminVerificationNotifyTemplate = (userName: string, userEmail: str
                     </td>
                 </tr>
             </table>`;
-  return premiumLayout("&#128276;", "New User Alert", content);
+    return premiumLayout("&#128276;", "New User Alert", content);
 };
 
 export const shortlistedEmailTemplate = (
@@ -249,7 +244,7 @@ export const shortlistedEmailTemplate = (
     interviewDate: string,
     location: string,
     coordinatorName: string,
-    confirmUrl: string = "https://ankit-dev.me/portal/dashboard"
+    confirmUrl: string = "https://ankit-dev.me/students/dashboard"
 ): string => {
     const content = `
             <p style="color: #9213ec; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; margin-bottom: 10px;">Status Update</p>
@@ -378,7 +373,6 @@ export const rejectionEmailTemplate = (
     studentName: string,
     jobRole: string,
     companyName: string,
-    dashboardUrl: string = "https://ankit-dev.me/portal/dashboard"
 ): string => {
     const content = `
             <p style="color: #7f7387; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; margin-bottom: 10px;">Application Update</p>
@@ -411,3 +405,90 @@ export const rejectionEmailTemplate = (
     return premiumLayout("&#9888;", "Application Update", content);
 };
 
+export const placementOpportunityTemplate = (
+    studentName: string,
+    companyName: string,
+    driveType: string, // e.g., "Full Time", "Internship", "Contract/Bond"
+    packageRange: string,
+    batch: string,
+    course: string,
+    branch: string,
+    deadlineDate: string,
+    applyUrl: string = "https://ankit-dev.me/students/dashboard"
+): string => {
+    const content = `
+            <p style="color: #9213ec; font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; margin-bottom: 10px;">Immediate Opening</p>
+            <h2 style="font-size: 26px; margin: 0 0 15px 0; color: #1f1924; font-weight: 900; line-height: 1.2;">
+                🚀 New Opportunity: <span style="color: #9213ec;">${companyName}</span> is hiring!
+            </h2>
+            
+            <p style="font-size: 16px; line-height: 1.6; color: #4d4355; font-weight: 300;">
+                Hello <strong>${studentName}</strong>, based on your academic profile, you are eligible for the upcoming campus recruitment drive. 
+            </p>
+
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 25px 0; background-color: #ffffff; border: 1px solid #ebdeee; border-radius: 20px; overflow: hidden;">
+                <tr>
+                    <td style="padding: 25px;">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <td style="padding-bottom: 15px; border-bottom: 1px solid #f7f6f8;">
+                                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                        <tr>
+                                            <td>
+                                                <span style="font-size: 11px; font-weight: 700; color: #7f7387; text-transform: uppercase;">Company</span><br>
+                                                <span style="font-size: 18px; font-weight: 800; color: #1f1924;">${companyName}</span>
+                                            </td>
+                                            <td align="right" valign="top">
+                                                <span style="background-color: #f1daff; color: #9213ec; padding: 4px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; text-transform: uppercase; border: 1px solid #dfb7ff;">
+                                                    ${driveType}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="padding: 15px 0; border-bottom: 1px solid #f7f6f8;">
+                                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                        <tr>
+                                            <td width="50%" valign="top" style="padding-right: 10px;">
+                                                <span style="font-size: 11px; font-weight: 700; color: #7f7387; text-transform: uppercase;">Package (CTC)</span><br>
+                                                <span style="font-size: 15px; font-weight: 700; color: #9213ec;">${packageRange}</span>
+                                            </td>
+                                            <td width="50%" valign="top" style="border-left: 1px solid #f7f6f8; padding-left: 15px;">
+                                                <span style="font-size: 11px; font-weight: 700; color: #7f7387; text-transform: uppercase;">Eligibility</span>
+                                                <div style="margin-top: 5px; font-size: 13px; color: #4d4355; line-height: 1.5;">
+                                                    <strong>Batch:</strong> ${batch}<br>
+                                                    <strong>Course:</strong> ${course}<br>
+                                                    <strong>Branch:</strong> ${branch}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="padding-top: 15px;">
+                                    <span style="font-size: 11px; font-weight: 700; color: #ba1a1a; text-transform: uppercase;">Registration Deadline</span><br>
+                                    <span style="font-size: 16px; font-weight: 800; color: #ba1a1a;">${deadlineDate}</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                    <td align="center" style="padding: 10px 0 30px 0;">
+                        <a href="${applyUrl}" style="background-color: #9213ec; color: #ffffff; padding: 18px 45px; text-decoration: none; border-radius: 14px; font-weight: 900; font-size: 16px; display: inline-block; box-shadow: 0 10px 20px rgba(146, 19, 236, 0.2);">
+                            View Details & Apply Now &nbsp; &rarr;
+                        </a>
+                    </td>
+                </tr>
+            </table>`;
+
+    return premiumLayout("&#128188;", "New Placement Drive", content);
+};
