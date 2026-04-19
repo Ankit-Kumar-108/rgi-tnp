@@ -24,7 +24,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     const { profileImageUrl, phoneNumber, branch, course, resumeUrl,
-      tenthPercentage, twelfthPercentage, activeBacklog, linkedinUrl, githubUrl
+      tenthPercentage, twelfthPercentage, activeBacklog, linkedinUrl, githubUrl, isProfileComplete
     } = (await req.json()) as any;
     const db = getDb();
 
@@ -43,6 +43,7 @@ export async function PATCH(req: NextRequest) {
         ...(activeBacklog !== undefined && { activeBacklog: parseInt(activeBacklog) }),
         ...(linkedinUrl !== undefined && { linkedinUrl }),
         ...(githubUrl !== undefined && { githubUrl }),
+        ...(studentTokenData.isProfileComplete ? {} : { isProfileComplete: true }) // Mark profile as complete after update
       }
     });
 

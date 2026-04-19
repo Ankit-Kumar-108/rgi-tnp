@@ -49,6 +49,7 @@ model Student {
   emailVerificationFailed      Boolean             @default(false)
   emailVerificationError       String?
   resetPasswordToken           String?
+  isProfileComplete             Boolean             @default(false)
   resetPasswordTokenExpiry     DateTime?
   profileImageUrl              String?
   resumeUrl                    String?
@@ -111,6 +112,7 @@ model ExternalStudent {
   passwordHash     String
   profileImageUrl  String
   semester         Int
+  isProfileComplete Boolean             @default(false)
   linkedinUrl      String?
   githubUrl        String?
   resumeUrl        String
@@ -155,8 +157,19 @@ model PlacementDrive {
   recruiterId      String
   recruiter        Recruiter           @relation(fields: [recruiterId], references: [id])
   registrations    DriveRegistration[]
+  driveImages      DriveImage[]
   createdAt        DateTime            @default(now())
   updatedAt        DateTime            @updatedAt
+}
+
+model DriveImage {
+  id               String         @id @default(cuid())
+  title            String
+  imageUrl         String
+  driveId          String
+  drive            PlacementDrive @relation(fields: [driveId], references: [id], onDelete: Cascade)
+  uploadedBy       String         // admin email for audit
+  createdAt        DateTime       @default(now())
 }
 
 model DriveRegistration {

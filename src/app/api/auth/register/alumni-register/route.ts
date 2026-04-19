@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
     };
 
     // Verify Enrollment Number in Master Records
+    // Using select to fetch only ID (more efficient)
     const masterRecord = await db.alumniMaster.findFirst({
       where: {
         enrollmentNumber: trimmedData.enrollmentNumber,
@@ -29,6 +30,7 @@ export async function POST(req: NextRequest) {
         batch: trimmedData.batch,
         course: trimmedData.course,
       },
+      select: { id: true }, // Only fetch ID
     });
 
     if (!masterRecord) {

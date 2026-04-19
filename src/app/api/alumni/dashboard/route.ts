@@ -39,25 +39,33 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Alumni not found" }, { status: 404 });
     }
 
-    // Get referrals
-    const referrals = await db.referral.findMany({
-      where: { alumniId: alumni.id },
-      orderBy: { id: "desc" },
-    });
+    // Get referrals with counts at database level (avoid filtering in-memory)
+    const [referrals, feedbacks, referralCounts] = await Promise.all([
+      db.referral.findMany({
+        where: { alumniId: alumni.id },
+        orderBy: { id: "desc" },
+        take: 50, // Limit to prevent large payload
+      }),
+      db.alumniFeedback.findMany({
+        where: { alumniId: alumni.id },
+      }),
+      Promise.all([
+        db.referral.count({ where: { alumniId: alumni.id } }),
+        db.referral.count({ where: { alumniId: alumni.id, status: "published" } }),
+        db.referral.count({ where: { alumniId: alumni.id, status: "pending" } }),
+      ])
+    ]);
 
-    // Get feedback
-    const feedbacks = await db.alumniFeedback.findMany({
-      where: { alumniId: alumni.id },
-    });
+    const [totalReferrals, approvedReferrals, pendingReferrals] = referralCounts;
 
     return NextResponse.json({
       success: true,
       alumni: alumniData,
       referrals,
       stats: {
-        totalReferrals: referrals.length,
-        approvedReferrals: referrals.filter((r: any) => r.status === "published").length,
-        pendingReferrals: referrals.filter((r: any) => r.status === "pending").length,
+        totalReferrals,
+        approvedReferrals,
+        pendingReferrals,
         totalFeedbacks: feedbacks.length,
       },
     });

@@ -84,26 +84,32 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 2. Fallback: Search all if role is missing or user not found with role
-    const student = await db.student.findUnique({ where: { email } });
-    if (student) {
-      const res = await verifyUser(student, db.student, "email", "isEmailVerified", true);
-      if (res.newlyVerified) await sendWelcomeEmail(email, res.userName || student.name);
-      return NextResponse.json(res, { status: res.success ? 200 : 400 });
-    }
+    // 2. Fallback: Search all in PARALLEL if role is missing or user not found with role
+    if (!role) {
+      // Use Promise.all for parallel queries instead of sequential
+      const [student, external, alumni] = await Promise.all([
+        db.student.findUnique({ where: { email } }),
+        db.externalStudent.findUnique({ where: { email } }),
+        db.alumni.findUnique({ where: { personalEmail: email } }),
+      ]);
 
-    const external = await db.externalStudent.findUnique({ where: { email } });
-    if (external) {
-      const res = await verifyUser(external, db.externalStudent, "email", "isVerified");
-      if (res.newlyVerified) await sendWelcomeEmail(email, res.userName || external.name);
-      return NextResponse.json(res, { status: res.success ? 200 : 400 });
-    }
+      if (student) {
+        const res = await verifyUser(student, db.student, "email", "isEmailVerified", true);
+        if (res.newlyVerified) await sendWelcomeEmail(email, res.userName || student.name);
+        return NextResponse.json(res, { status: res.success ? 200 : 400 });
+      }
 
-    const alumni = await db.alumni.findUnique({ where: { personalEmail: email } });
-    if (alumni) {
-      const res = await verifyUser(alumni, db.alumni, "personalEmail", "isVerified");
-      if (res.newlyVerified) await sendWelcomeEmail(email, res.userName || alumni.name);
-      return NextResponse.json(res, { status: res.success ? 200 : 400 });
+      if (external) {
+        const res = await verifyUser(external, db.externalStudent, "email", "isVerified");
+        if (res.newlyVerified) await sendWelcomeEmail(email, res.userName || external.name);
+        return NextResponse.json(res, { status: res.success ? 200 : 400 });
+      }
+
+      if (alumni) {
+        const res = await verifyUser(alumni, db.alumni, "personalEmail", "isVerified");
+        if (res.newlyVerified) await sendWelcomeEmail(email, res.userName || alumni.name);
+        return NextResponse.json(res, { status: res.success ? 200 : 400 });
+      }
     }
 
     return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });

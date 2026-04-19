@@ -5,7 +5,7 @@
  * @param folder The target folder in R2 bucket (e.g. 'profiles' or 'memories')
  * @returns The public URL of the uploaded image
  */
-export async function uploadFileToR2(file: File, folder: "profiles" | "memories" | "resumes"): Promise<string> {
+export async function uploadFileToR2(file: File, folder: "profiles" | "memories" | "resumes" | "drive-images"): Promise<string> {
   // 1. Get Presigned URL from our API
   const res = await fetch("/api/upload/presigned-url", {
     method: "POST",

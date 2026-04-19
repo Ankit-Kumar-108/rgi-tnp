@@ -25,35 +25,60 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
+    // Pagination parameters
+    const { searchParams } = new URL(req.url);
+    const drivesLimit = Math.min(parseInt(searchParams.get("drivesLimit") || "50", 10), 100);
+    const registrationsLimit = Math.min(parseInt(searchParams.get("registrationsLimit") || "50", 10), 100);
+    const drivesPage = Math.max(1, parseInt(searchParams.get("drivesPage") || "1", 10));
+    const registrationsPage = Math.max(1, parseInt(searchParams.get("registrationsPage") || "1", 10));
+
     const db = getDb();
     const student = await db.externalStudent.findUnique({ where: { id: ext.id } });
     if (!student) {
       return NextResponse.json({ success: false, message: "Not found" }, { status: 404 });
     }
 
-    // Show all open & active drives regardless of verification status
-    const drives = await db.placementDrive.findMany({
-      where: {
-        status: "active",
-        driveType: { in: ["Open", "Pool"] },
-      },
-      orderBy: { driveDate: "asc" },
-    });
-
-    const archivedDrives = await db.placementDrive.findMany({
-      where: {
-        status: "completed",
-        driveType: { in: ["Open", "Pool"] }
-      },
-      orderBy: { driveDate: "desc" }
-    });
-
-    const registrations = await db.driveRegistration.findMany({
-      where: { externalStudentId: student.id },
-      include: {
-        drive: { select: { companyName: true, roleName: true, driveDate: true, status: true } },
-      },
-    });
+    // Parallel fetches for better performance
+    const [drives, archivedDrives, registrations, drivesCount, registrationsCount] = await Promise.all([
+      // Get open & active drives with pagination
+      db.placementDrive.findMany({
+        where: {
+          status: "active",
+          driveType: { in: ["Open", "Pool"] },
+        },
+        take: drivesLimit,
+        skip: (drivesPage - 1) * drivesLimit,
+        orderBy: { driveDate: "asc" },
+      }),
+      // Get archived drives (limited)
+      db.placementDrive.findMany({
+        where: {
+          status: "completed",
+          driveType: { in: ["Open", "Pool"] }
+        },
+        take: 10,
+        orderBy: { driveDate: "desc" }
+      }),
+      // Get registrations with pagination
+      db.driveRegistration.findMany({
+        where: { externalStudentId: student.id },
+        include: {
+          drive: { select: { companyName: true, roleName: true, driveDate: true, status: true } },
+        },
+        take: registrationsLimit,
+        skip: (registrationsPage - 1) * registrationsLimit,
+        orderBy: { createdAt: "desc" },
+      }),
+      // Count total open drives
+      db.placementDrive.count({
+        where: {
+          status: "active",
+          driveType: { in: ["Open", "Pool"] },
+        }
+      }),
+      // Count total registrations
+      db.driveRegistration.count({ where: { externalStudentId: student.id } }),
+    ]);
 
     const registeredDriveIds = registrations.map((r: any) => r.driveId);
 
@@ -71,8 +96,14 @@ export async function GET(req: NextRequest) {
         linkedinUrl: student.linkedinUrl, githubUrl: student.githubUrl,
       },
       drives: drives.map((d: any) => ({ ...d, isRegistered: registeredDriveIds.includes(d.id) })),
+      drivesCount,
+      drivesPage,
+      drivesLimit,
       archivedDrives: archivedDrives.map((d: any) => ({ ...d, isRegistered: registeredDriveIds.includes(d.id) })),
       registrations,
+      registrationsCount,
+      registrationsPage,
+      registrationsLimit,
     });
   } catch (error) {
     console.error("External Dashboard Error:", error);

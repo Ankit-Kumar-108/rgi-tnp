@@ -24,6 +24,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Add batch size limit to prevent abuse
+    if (records.length > 10000) {
+      return NextResponse.json(
+        { success: false, message: "Maximum 10000 records per batch" },
+        { status: 400 }
+      );
+    }
+
     let created = 0;
     let skipped = 0;
     const errors: string[] = [];

@@ -1,4 +1,3 @@
-// Premium email layout wrapper matching the institutional design system
 const premiumLayout = (heroIcon: string, heroTitle: string, content: string): string => {
     return `<!DOCTYPE html>
 <html>

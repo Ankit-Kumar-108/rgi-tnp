@@ -25,6 +25,13 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
+    // Pagination parameters
+    const { searchParams } = new URL(req.url);
+    const drivesLimit = Math.min(parseInt(searchParams.get("drivesLimit") || "50", 10), 100);
+    const registrationsLimit = Math.min(parseInt(searchParams.get("registrationsLimit") || "50", 10), 100);
+    const drivesPage = Math.max(1, parseInt(searchParams.get("drivesPage") || "1", 10));
+    const registrationsPage = Math.max(1, parseInt(searchParams.get("registrationsPage") || "1", 10));
+
     const db = getDb();
     const studentData = await db.student.findUnique({
       where: { enrollmentNumber: studentTokenData.enrollmentNumber },
@@ -34,6 +41,7 @@ export async function GET(req: NextRequest) {
         profileImageUrl: true, phoneNumber: true, course: true, batch: true,
         resumeUrl: true, tenthPercentage: true, twelfthPercentage: true,
         activeBacklog: true, linkedinUrl: true, githubUrl: true,
+        isProfileComplete: true,
       },
     });
 
@@ -41,34 +49,42 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Student not found" }, { status: 404 });
     }
 
-    // Get all active drives (eligibility handled on frontend)
-    const drives = await db.placementDrive.findMany({
-      where: {
-        status: "active",
-      },
-      orderBy: { driveDate: "asc" },
-    });
-
-    // Get archived/completed drives
-    const archivedDrives = await db.placementDrive.findMany({
-      where: { status: "completed" },
-      orderBy: { driveDate: "desc" },
-    });
-
-    // Get student's registrations
-    const registrations = await db.driveRegistration.findMany({
-      where: { student: { enrollmentNumber: studentTokenData.enrollmentNumber } },
-      include: {
-        drive: { select: { companyName: true, roleName: true, driveDate: true, status: true } },
-      },
-      orderBy: { createdAt: "desc" },
-    });
-
-    // Get student's memories
-    const memories = await db.memory.findMany({
-      where: { studentId: studentData.id },
-      orderBy: { createdAt: "desc" },
-    });
+    // Parallel fetch for better performance
+    const [drives, archivedDrives, registrations, memories, drivesCount, registrationsCount] = await Promise.all([
+      // Get active drives with pagination
+      db.placementDrive.findMany({
+        where: { status: "active" },
+        take: drivesLimit,
+        skip: (drivesPage - 1) * drivesLimit,
+        orderBy: { driveDate: "asc" },
+      }),
+      // Get archived/completed drives
+      db.placementDrive.findMany({
+        where: { status: "completed" },
+        take: 10, // Limit archived drives
+        orderBy: { driveDate: "desc" },
+      }),
+      // Get student's registrations with pagination
+      db.driveRegistration.findMany({
+        where: { student: { enrollmentNumber: studentTokenData.enrollmentNumber } },
+        include: {
+          drive: { select: { companyName: true, roleName: true, driveDate: true, status: true } },
+        },
+        take: registrationsLimit,
+        skip: (registrationsPage - 1) * registrationsLimit,
+        orderBy: { createdAt: "desc" },
+      }),
+      // Get student's memories (limited)
+      db.memory.findMany({
+        where: { studentId: studentData.id },
+        take: 20,
+        orderBy: { createdAt: "desc" },
+      }),
+      // Count total active drives
+      db.placementDrive.count({ where: { status: "active" } }),
+      // Count total registrations
+      db.driveRegistration.count({ where: { student: { enrollmentNumber: studentTokenData.enrollmentNumber } } }),
+    ]);
 
     const registeredDriveIds = registrations.map((r: any) => r.driveId);
 
@@ -79,11 +95,17 @@ export async function GET(req: NextRequest) {
         ...d,
         isRegistered: registeredDriveIds.includes(d.id),
       })),
+      drivesCount,
+      drivesPage,
+      drivesLimit,
       archivedDrives: archivedDrives.map((d: any) => ({
         ...d,
         isRegistered: registeredDriveIds.includes(d.id),
       })),
       registrations,
+      registrationsCount,
+      registrationsPage,
+      registrationsLimit,
       memories,
     });
   } catch (error) {

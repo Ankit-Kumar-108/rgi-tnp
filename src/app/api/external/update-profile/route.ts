@@ -46,6 +46,7 @@ export async function PATCH(req: NextRequest) {
         ...(linkedinUrl !== undefined && { linkedinUrl }),
         ...(githubUrl !== undefined && { githubUrl }),
         ...(semester !== undefined && { semester: parseInt(semester) }),
+        ...(studentTokenData.isProfileComplete ? {} : { isProfileComplete: true }) // Mark profile complete if not already
       }
     });
 

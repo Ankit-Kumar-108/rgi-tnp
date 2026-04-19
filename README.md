@@ -533,12 +533,14 @@ POST   /api/upload/presigned-url (get R2 upload URL)
 
 ## 🔮 Future Features & Roadmap
 
-### Phase 1 (to change on 15/04/2026)
-- [ ] **Feedback UI card change**
+### Phase 1
+- [ ] **Feedback UI card change  (to change on 15/04/2026 [Done])**
  - add notification for password mismatch
  - auto removal of space in name or free name from implementation during registration 
  - UI improvement 
  - take suggetion from teacher
+- [ ] **Feedback UI card change  (to change on 18/04/2026 [Under Work])**
+ - add isProfileComplete functionality both in frontend and backend
 
 ### Phase 2 (Next Quarter)
 - [ ] **Advanced Analytics Dashboard**

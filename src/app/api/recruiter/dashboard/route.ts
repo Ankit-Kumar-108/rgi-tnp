@@ -23,27 +23,112 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
+    const { searchParams } = new URL(req.url);
+    const applicantsLimit = Math.min(parseInt(searchParams.get("applicantsLimit") || "50", 10), 100);
+    const applicantsPage = Math.max(1, parseInt(searchParams.get("applicantsPage") || "1", 10));
+
     const db = getDb();
 
-    // Get recruiter's drives with registration counts
+    // Get recruiter's drives WITHOUT nested registrations (avoid N+1)
     const drives = await db.placementDrive.findMany({
       where: { 
         recruiterId: recruiter.id,
         status: { not: "archived" }
       },
-      include: {
+      select: {
+        id: true,
+        companyName: true,
+        roleName: true,
+        jobDescription: true,
+        ctc: true,
+        driveDate: true,
+        driveType: true,
+        status: true,
+        eligibleBranches: true,
+        minCGPA: true,
         _count: { select: { registrations: true } },
-        registrations: {
-          include: {
-            student: { select: { name: true, enrollmentNumber: true, branch: true, cgpa: true, email: true } },
-            externalStudent: { select: { name: true, collegeName: true, branch: true, cgpa: true, email: true } },
-          },
-        },
       },
       orderBy: { driveDate: "desc" },
     });
 
-    const formatted = drives.map((d: any) => ({
+    // Parallel fetch: count applicants for each drive efficiently
+    const registrationCounts = await Promise.all(
+      drives.map(drive =>
+        db.driveRegistration.count({
+          where: { driveId: drive.id }
+        })
+      )
+    );
+
+    // Get detailed registrations only for first drive (paginated)
+    let applicants: any[] = [];
+    let applicantsCount = 0;
+
+    if (drives.length > 0) {
+      const firstDriveId = drives[0].id;
+      [applicants, applicantsCount] = await Promise.all([
+        db.driveRegistration.findMany({
+          where: { driveId: firstDriveId },
+          select: {
+            id: true,
+            attended: true,
+            createdAt: true,
+            status: true,
+            studentId: true,
+            externalStudentId: true,
+          },
+          take: applicantsLimit,
+          skip: (applicantsPage - 1) * applicantsLimit,
+          orderBy: { createdAt: "desc" },
+        }),
+        db.driveRegistration.count({
+          where: { driveId: firstDriveId }
+        })
+      ]);
+
+      // Fetch student/external data separately (not nested)
+      const studentIds = applicants.filter(a => a.studentId).map(a => a.studentId);
+      const externalIds = applicants.filter(a => a.externalStudentId).map(a => a.externalStudentId);
+
+      const [students, externalStudents] = await Promise.all([
+        studentIds.length > 0
+          ? db.student.findMany({
+              where: { id: { in: studentIds } },
+              select: { id: true, name: true, enrollmentNumber: true, branch: true, cgpa: true, email: true }
+            })
+          : Promise.resolve([]),
+        externalIds.length > 0
+          ? db.externalStudent.findMany({
+              where: { id: { in: externalIds } },
+              select: { id: true, name: true, collegeName: true, branch: true, cgpa: true, email: true }
+            })
+          : Promise.resolve([]),
+      ]);
+
+      const studentMap = new Map(students.map(s => [s.id, s]));
+      const externalMap = new Map(externalStudents.map(e => [e.id, e]));
+
+      applicants = applicants.map((a: any) => {
+        const student = a.studentId ? studentMap.get(a.studentId) : null;
+        const external = a.externalStudentId ? externalMap.get(a.externalStudentId) : null;
+        const data = student || external;
+
+        return {
+          id: a.id,
+          attended: a.attended,
+          status: a.status,
+          createdAt: a.createdAt,
+          name: data?.name || "Unknown",
+          college: data && 'collegeName' in data ? data.collegeName : "RGI",
+          branch: data?.branch || "",
+          cgpa: data?.cgpa || 0,
+          email: data?.email || "",
+          type: student ? "internal" : "external",
+        };
+      });
+    }
+
+    const formatted = drives.map((d: any, idx: number) => ({
       id: d.id,
       companyName: d.companyName,
       roleName: d.roleName,
@@ -54,25 +139,21 @@ export async function GET(req: NextRequest) {
       status: d.status,
       eligibleBranches: d.eligibleBranches,
       minCGPA: d.minCGPA,
-      registrationCount: d._count.registrations,
-      applicants: d.registrations.map((r: any) => ({
-        id: r.id,
-        attended: r.attended,
-        createdAt: r.createdAt,
-        name: r.student?.name || r.externalStudent?.name || "Unknown",
-        college: r.externalStudent?.collegeName || "RGI",
-        branch: r.student?.branch || r.externalStudent?.branch || "",
-        cgpa: r.student?.cgpa || r.externalStudent?.cgpa || 0,
-        email: r.student?.email || r.externalStudent?.email || "",
-        type: r.student ? "internal" : "external",
-      })),
+      registrationCount: registrationCounts[idx],
     }));
 
-    const totalApplicants = formatted.reduce((sum: number, d: any) => sum + d.registrationCount, 0);
+    const totalApplicants = registrationCounts.reduce((sum, count) => sum + count, 0);
 
     return NextResponse.json({
       success: true,
       drives: formatted,
+      firstDriveApplicants: applicants,
+      applicantsPagination: {
+        page: applicantsPage,
+        limit: applicantsLimit,
+        total: applicantsCount,
+        totalPages: Math.ceil(applicantsCount / applicantsLimit),
+      },
       stats: {
         totalDrives: drives.length,
         activeDrives: drives.filter((d: any) => d.status === "active").length,

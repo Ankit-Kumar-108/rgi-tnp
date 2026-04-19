@@ -19,6 +19,22 @@ async function getStudentFromToken(req: NextRequest) {
   }
 }
 
+// Helper function to extract batch number from batch string (e.g., "2023-1" -> 1)
+function extractBatchNumber(batchStr: string): number {
+  return parseInt(batchStr.split('-').pop() || "0", 10);
+}
+
+// Helper function to parse eligible branches as Set for O(1) lookup
+function parseBranches(branchesStr: string): Set<string> {
+  // Assuming branches are comma-separated or already a single value
+  return new Set(
+    branchesStr
+      .split(',')
+      .map(b => b.trim())
+      .filter(b => b.length > 0)
+  );
+}
+
 // POST: Register for a drive
 export async function POST(req: NextRequest) {
   try {
@@ -43,33 +59,49 @@ export async function POST(req: NextRequest) {
 
     // Check: already registered?
     const existing = await db.driveRegistration.findFirst({
-      where: { driveId, student: { enrollmentNumber: student.enrollmentNumber } },
+      where: { driveId, studentId: studentData.id }, // Optimized: use studentId directly
     });
     if (existing) {
       return NextResponse.json({ success: false, message: "Already registered for this drive" }, { status: 409 });
     }
 
+    // Parse batch numbers ONCE (optimization)
+    const studentBatchNum = extractBatchNumber(studentData.batch);
+    const minBatchNum = extractBatchNumber(drive.minBatch);
+    const maxBatchNum = extractBatchNumber(drive.maxBatch);
+
     // Check: batch eligible?
-    const studentBatchNum = parseInt(studentData.batch.split('-').pop() || "0", 10);
-    const minBatchNum = parseInt(drive.minBatch.split('-').pop() || "0", 10);
-    const maxBatchNum = parseInt(drive.maxBatch.split('-').pop() || "0", 10);
-    if (!isNaN(studentBatchNum) && !isNaN(minBatchNum) && !isNaN(maxBatchNum) && (studentBatchNum < minBatchNum || studentBatchNum > maxBatchNum)) {
-      return NextResponse.json({ success: false, message: `Your batch is not eligible. Eligible range: ${drive.minBatch} to ${drive.maxBatch}` }, { status: 403 });
+    if (!isNaN(studentBatchNum) && !isNaN(minBatchNum) && !isNaN(maxBatchNum) && 
+        (studentBatchNum < minBatchNum || studentBatchNum > maxBatchNum)) {
+      return NextResponse.json(
+        { success: false, message: `Your batch is not eligible. Eligible range: ${drive.minBatch} to ${drive.maxBatch}` },
+        { status: 403 }
+      );
     }
 
     // Check: course eligible?
     if (drive.course !== "All" && !drive.course.includes(studentData.course)) {
-      return NextResponse.json({ success: false, message: `Your course (${studentData.course}) is not eligible for this drive.` }, { status: 403 });
+      return NextResponse.json(
+        { success: false, message: `Your course (${studentData.course}) is not eligible for this drive.` },
+        { status: 403 }
+      );
     }
 
-    // Check: branch eligible?
-    if (!drive.eligibleBranches.includes(studentData.branch)) {
-      return NextResponse.json({ success: false, message: "Your branch is not eligible for this drive" }, { status: 403 });
+    // Check: branch eligible? (Using Set for O(1) lookup instead of String.includes which is O(n))
+    const eligibleBranchesSet = parseBranches(drive.eligibleBranches);
+    if (!eligibleBranchesSet.has(studentData.branch)) {
+      return NextResponse.json(
+        { success: false, message: "Your branch is not eligible for this drive" },
+        { status: 403 }
+      );
     }
 
     // Check: CGPA eligible?
     if (studentData.cgpa < drive.minCGPA) {
-      return NextResponse.json({ success: false, message: `Minimum CGPA ${drive.minCGPA} required` }, { status: 403 });
+      return NextResponse.json(
+        { success: false, message: `Minimum CGPA ${drive.minCGPA} required` },
+        { status: 403 }
+      );
     }
 
     // Register

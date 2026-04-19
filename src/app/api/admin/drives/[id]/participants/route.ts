@@ -100,6 +100,21 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       return NextResponse.json({ success: false, message: "Invalid payload" }, { status: 400 });
     }
 
+    // Validate batch size to prevent abuse
+    if (registrationIds.length > 1000) {
+      return NextResponse.json(
+        { success: false, message: "Maximum 1000 records per request" },
+        { status: 400 }
+      );
+    }
+
+    if (!["selected", "rejected", "shortlisted"].includes(status.toLowerCase())) {
+      return NextResponse.json(
+        { success: false, message: "Invalid status" },
+        { status: 400 }
+      );
+    }
+
     // Update all registrations with the new status
     await db.driveRegistration.updateMany({
       where: {
@@ -142,29 +157,35 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
         });
 
-        // Send email to each selected student
-        for (const reg of updatedRegistrations) {
-          const studentData = reg.student || reg.externalStudent;
-          if (studentData?.email && studentData?.name && reg.drive?.companyName && reg.drive?.roleName && reg.drive?.ctc) {
-            try {
-              await sendEmail({
-                to: studentData.email,
-                subject: `Selected for ${reg.drive.companyName} Campus Drive`,
-                html: offerSelectionEmailTemplate(
-                  studentData.name,
-                  reg.drive.roleName,
-                  reg.drive.companyName,
-                  reg.drive.ctc,
-                  "Sent Later",
-                )
-              });
-            } catch (emailError) {
-              console.error(`Failed to send email to ${studentData.email}:`, {
+        // Send emails to all selected students in PARALLEL (not sequential)
+        const emailPromises = updatedRegistrations
+          .filter(reg => {
+            const studentData = reg.student || reg.externalStudent;
+            return studentData?.email && studentData?.name && reg.drive?.companyName && reg.drive?.roleName && reg.drive?.ctc;
+          })
+          .map(reg => {
+            const studentData = reg.student || reg.externalStudent;
+            return sendEmail({
+              to: studentData!.email,
+              subject: `Selected for ${reg.drive!.companyName} Campus Drive`,
+              html: offerSelectionEmailTemplate(
+                studentData!.name,
+                reg.drive!.roleName,
+                reg.drive!.companyName,
+                reg.drive!.ctc,
+                "Sent Later",
+              )
+            }).catch(emailError => {
+              console.error(`Failed to send email to ${studentData!.email}:`, {
                 error: emailError instanceof Error ? emailError.message : String(emailError),
                 stack: emailError instanceof Error ? emailError.stack : null
               });
-            }
-          }
+            });
+          });
+
+        // Wait for all emails to send (parallel, not sequential)
+        if (emailPromises.length > 0) {
+          await Promise.all(emailPromises);
         }
 
       } catch (emailError) {
@@ -203,27 +224,33 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
         });
 
-        // Send email to each rejected student
-        for (const reg of updatedRegistrations) {
-          const studentData = reg.student || reg.externalStudent;
-          if (studentData?.email && studentData?.name && reg.drive?.companyName && reg.drive?.roleName) {
-            try {
-              await sendEmail({
-                to: studentData.email,
-                subject: `Update on ${reg.drive.companyName} Campus Drive application`,
-                html: rejectionEmailTemplate(
-                  studentData.name,
-                  reg.drive.roleName,
-                  reg.drive.companyName
-                )
-              });
-            } catch (emailError) {
-              console.error(`Failed to send email to ${studentData.email}:`, {
+        // Send emails to all rejected students in PARALLEL (not sequential)
+        const emailPromises = updatedRegistrations
+          .filter(reg => {
+            const studentData = reg.student || reg.externalStudent;
+            return studentData?.email && studentData?.name && reg.drive?.companyName && reg.drive?.roleName;
+          })
+          .map(reg => {
+            const studentData = reg.student || reg.externalStudent;
+            return sendEmail({
+              to: studentData!.email,
+              subject: `Update on ${reg.drive!.companyName} Campus Drive application`,
+              html: rejectionEmailTemplate(
+                studentData!.name,
+                reg.drive!.roleName,
+                reg.drive!.companyName
+              )
+            }).catch(emailError => {
+              console.error(`Failed to send email to ${studentData!.email}:`, {
                 error: emailError instanceof Error ? emailError.message : String(emailError),
                 stack: emailError instanceof Error ? emailError.stack : null
               });
-            }
-          }
+            });
+          });
+
+        // Wait for all emails to send (parallel, not sequential)
+        if (emailPromises.length > 0) {
+          await Promise.all(emailPromises);
         }
 
       } catch (emailError) {
@@ -262,30 +289,36 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
         });
 
-        // Send email to each shortlisted student
-        for (const reg of updatedRegistrations) {
-          const studentData = reg.student || reg.externalStudent;
-          if (studentData?.email && studentData?.name && reg.drive?.companyName && reg.drive?.roleName) {
-            try {
-              await sendEmail({
-                to: studentData.email,
-                subject: `Shortlisted for ${reg.drive.companyName} Campus Drive`,
-                html: shortlistedEmailTemplate(
-                  studentData.name,
-                  reg.drive.roleName,
-                  reg.drive.companyName,
-                  "Today in 10 Minutes",
-                  "RGI Seminar Hall",
-                  "Robin Samul (TPO)",
-                )
-              });
-            } catch (emailError) {
-              console.error(`Failed to send email to ${studentData.email}:`, {
+        // Send emails to all shortlisted students in PARALLEL (not sequential)
+        const emailPromises = updatedRegistrations
+          .filter(reg => {
+            const studentData = reg.student || reg.externalStudent;
+            return studentData?.email && studentData?.name && reg.drive?.companyName && reg.drive?.roleName;
+          })
+          .map(reg => {
+            const studentData = reg.student || reg.externalStudent;
+            return sendEmail({
+              to: studentData!.email,
+              subject: `Shortlisted for ${reg.drive!.companyName} Campus Drive`,
+              html: shortlistedEmailTemplate(
+                studentData!.name,
+                reg.drive!.roleName,
+                reg.drive!.companyName,
+                "Today in 10 Minutes",
+                "RGI Seminar Hall",
+                "Robin Samul (TPO)",
+              )
+            }).catch(emailError => {
+              console.error(`Failed to send email to ${studentData!.email}:`, {
                 error: emailError instanceof Error ? emailError.message : String(emailError),
                 stack: emailError instanceof Error ? emailError.stack : null
               });
-            }
-          }
+            });
+          });
+
+        // Wait for all emails to send (parallel, not sequential)
+        if (emailPromises.length > 0) {
+          await Promise.all(emailPromises);
         }
 
       } catch (emailError) {

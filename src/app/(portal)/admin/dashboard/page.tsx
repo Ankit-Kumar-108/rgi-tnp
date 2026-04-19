@@ -18,6 +18,7 @@ import {
   ChevronRight,
   Shield,
   RefreshCw,
+  Images,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { logout } from "@/lib/auth-client";
@@ -57,6 +58,7 @@ export default function AdminDashboard() {
       } catch (err) {
         console.error(err);
         setFetchError("Network error. Please check your connection.");
+        toast.error("Failed to load dashboard data. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -110,6 +112,13 @@ export default function AdminDashboard() {
       icon: Briefcase,
       href: "/admin/drives",
       badge: stats?.activeDrives || 0,
+    },
+    {
+      title: "Drive Images",
+      desc: "Upload and manage drive campus photos",
+      icon: Images,
+      href: "/admin/drive-images",
+      badge: null,
     },
     {
       title: "User Management",
