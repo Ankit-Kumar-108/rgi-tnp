@@ -100,7 +100,7 @@ export default function VolunteersManagement() {
         throw new Error("Failed to fetch volunteers");
       }
 
-      const data = await res.json();
+      const data = (await res.json()) as { success: boolean; data: Volunteer[] };
       setVolunteers(data.data || []);
     } catch (err: any) {
       setError(err.message);
