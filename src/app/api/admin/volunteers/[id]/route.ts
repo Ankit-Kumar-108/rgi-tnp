@@ -20,7 +20,7 @@ async function getAdminFromToken(req: NextRequest) {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const adminTokenData = await getAdminFromToken(req);
@@ -34,9 +34,10 @@ export async function GET(
 
     // Admin is verified via JWT
     const db = getDb();
+    const { id } = await params;
 
     const volunteer = await db.volunteer.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         student: {
           select: {
@@ -76,7 +77,7 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const adminTokenData = await getAdminFromToken(req);
@@ -90,9 +91,10 @@ export async function PUT(
 
     // Admin is verified via JWT
     const db = getDb();
+    const { id } = await params;
 
     const volunteer = await db.volunteer.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!volunteer) {
@@ -102,11 +104,11 @@ export async function PUT(
       );
     }
 
-    const body = await req.json();
+    const body = await req.json() as any
     const { designation, isVerified, verificationNotes, isActive } = body;
 
     const updatedVolunteer = await db.volunteer.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         designation: designation ?? volunteer.designation,
         isVerified: isVerified ?? volunteer.isVerified,
@@ -147,7 +149,7 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const adminTokenData = await getAdminFromToken(req);
@@ -161,9 +163,10 @@ export async function DELETE(
 
     // Admin is verified via JWT
     const db = getDb();
+    const { id } = await params;
 
     const volunteer = await db.volunteer.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!volunteer) {
@@ -175,7 +178,7 @@ export async function DELETE(
 
     // Soft delete - mark as inactive
     const updatedVolunteer = await db.volunteer.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         isActive: false,
         updatedAt: new Date(),
