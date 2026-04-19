@@ -19,7 +19,7 @@ async function getStudentFromToken(req: NextRequest) {
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const studentTokenData = await getStudentFromToken(req);
@@ -32,6 +32,7 @@ export async function DELETE(
     }
 
     const db = getDb();
+    const { id } = await params;
 
     // Get student and verify volunteer status
     const student = await db.student.findUnique({
@@ -59,7 +60,7 @@ export async function DELETE(
 
     // Get the image and verify ownership
     const image = await db.driveImage.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: { id: true, uploadedBy: true, imageUrl: true },
     });
 
@@ -80,7 +81,7 @@ export async function DELETE(
 
     // Delete the image
     await db.driveImage.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true, message: "Image deleted" });
