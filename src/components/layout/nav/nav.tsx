@@ -21,7 +21,8 @@ import {
   TrendingUp,
   Network,
   ClipboardList,
-  Earth
+  Earth,
+  Heart
 } from "lucide-react"
 import { useState } from 'react'
 
@@ -86,6 +87,14 @@ export default function Nav() {
         { name: "Register", icon: ClipboardList, link: "alumni/alumni-register" },
         { name: "Alumni Network", icon: Network, link: "alumni/alumni-network" },
         { name: "Dashboard", icon: TrendingUp, link: "alumni/dashboard" },
+      ]
+    },
+    {
+      name: "Volunteer",
+      icon: Heart,
+      subMenu: [
+        { name: "Login", icon: UserCheck, link: "volunteer/login" },
+        { name: "Dashboard", icon: Activity, link: "volunteer/dashboard" }
       ]
     }
   ];

@@ -15,6 +15,7 @@ import {
   Edit,
   LogOut,
   RefreshCw,
+  MessageSquareShare,
 } from "lucide-react";
 import Nav from "@/components/layout/nav/nav";
 import JobDetailsModal from "@/components/forms/studentApplyModal/modal";
@@ -38,6 +39,7 @@ export default function RecruiterDashboard() {
   const [formMsg, setFormMsg] = useState<{ msg: string; ok: boolean } | null>(null);
   const [selectedDrive, setSelectedDrive] = useState<any>(null);
   const [search, setSearch] = useState("");
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
   const [form, setForm] = useState({
     companyName: "",
@@ -199,6 +201,13 @@ export default function RecruiterDashboard() {
                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold border border-border text-muted-foreground hover:text-red-500 hover:border-red-500/30 transition-all"
               >
                 <LogOut className="w-4 h-4" /> Logout
+              </button>
+              <button
+                onClick={() => setShowFeedbackModal(true)}
+                className="inline-flex items-center gap-2 text-sm font-bold text-foreground hover:bg-muted transition-colors border border-border px-4 py-2.5 rounded-xl bg-card shadow-sm cursor-pointer"
+              >
+                <MessageSquareShare className="w-4 h-4" />
+                Share Feedback
               </button>
             <button
               onClick={() => {
@@ -559,7 +568,15 @@ export default function RecruiterDashboard() {
               </div>
             </section>
           )}
-          <FeedbackCorporate />
+          {/* Feedback Modal */}
+          {showFeedbackModal && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+              <div className="absolute inset-0 bg-background/60 backdrop-blur-xl animate-in fade-in duration-300" onClick={() => setShowFeedbackModal(false)} />
+              <div className="relative w-full max-w-2xl animate-in zoom-in-95 duration-300">
+                <FeedbackCorporate onClose={() => setShowFeedbackModal(false)} />
+              </div>
+            </div>
+          )}
         </main>
       </div>
       <Footer />

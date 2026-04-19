@@ -1,6 +1,5 @@
 -- Migration: Add isApproved column to feedback tables
--- These columns are missing from the database but expected by Prisma schema
+-- NOTE: These columns already exist in the remote database
+-- This migration is a no-op as columns are already present
 
-ALTER TABLE "StudentFeedback" ADD COLUMN "isApproved" BOOLEAN NOT NULL DEFAULT false;
-ALTER TABLE "AlumniFeedback" ADD COLUMN "isApproved" BOOLEAN NOT NULL DEFAULT false;
-ALTER TABLE "CorporateFeedback" ADD COLUMN "isApproved" BOOLEAN NOT NULL DEFAULT false;
+SELECT 1;

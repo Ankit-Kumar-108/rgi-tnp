@@ -128,6 +128,13 @@ export default function AdminDashboard() {
       badge: null,
     },
     {
+      title: "Volunteers",
+      desc: "Assign and manage event volunteers",
+      icon: UserCheck,
+      href: "/admin/volunteers",
+      badge: null,
+    },
+    {
       title: "Notification Center",
       desc: "Email logs, approval history, custom emails",
       icon: Bell,

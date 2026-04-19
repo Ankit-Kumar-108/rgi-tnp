@@ -208,6 +208,7 @@ export default function ExternalStudentDashboard() {
   }
 
   const student = data?.student;
+  const isProfileIncomplete = student && (!student.tenthPercentage || !student.twelfthPercentage || !student.resumeUrl);
   const drives = data?.drives || [];
   const archivedDrives = data?.archivedDrives || [];
   const registrations = data?.registrations || [];
@@ -251,10 +252,13 @@ export default function ExternalStudentDashboard() {
               </button>
               <button
                 onClick={() => setShowProfileForm(!showProfileForm)}
-                className="inline-flex items-center gap-2 text-sm font-bold text-brand hover:text-brand/80 transition-colors border border-brand/20 px-4 py-2.5 rounded-2xl bg-brand/5 hover:bg-brand/10"
+                className="relative inline-flex items-center gap-2 text-sm font-bold text-brand hover:text-brand/80 transition-colors border border-brand/20 px-4 py-2.5 rounded-2xl bg-brand/5 hover:bg-brand/10"
               >
                 {showProfileForm ? "Cancel Edit" : "Complete Profile"}
                 <ChevronRight className={`w-4 h-4 transition-transform ${showProfileForm ? "rotate-90" : ""}`} />
+                {!showProfileForm && isProfileIncomplete && (
+                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shadow-sm" />
+                )}
               </button>
               <button
                 onClick={handleLogout}

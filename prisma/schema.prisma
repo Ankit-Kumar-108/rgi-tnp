@@ -68,6 +68,7 @@ model Student {
   studentFeedbacks             StudentFeedback[]
   createdAt                    DateTime            @default(now())
   updatedAt                    DateTime            @updatedAt
+  volunteers Volunteer[]
 }
 
 model Alumni {
@@ -273,4 +274,17 @@ model CorporateFeedback {
 
   recruiterId String
   recruiter   Recruiter @relation(fields: [recruiterId], references: [id])
+}
+model Volunteer {
+  id                  String    @id @default(cuid())
+  studentId           String?   @unique
+  student             Student?  @relation(fields: [studentId], references: [id])
+  designation         String    @default("Volunteer")
+  isVerified          Boolean   @default(false)
+  assignedBy          String?   // Admin email who assigned this volunteer
+  assignedAt          DateTime?
+  verificationNotes   String?   // Notes from admin about why/when approved
+  isActive            Boolean   @default(true)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 }

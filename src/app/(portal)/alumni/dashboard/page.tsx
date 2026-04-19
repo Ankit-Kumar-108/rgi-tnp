@@ -266,6 +266,7 @@ export default function AlumniDashboard() {
   }
 
   const alumni = data?.alumni;
+  const isProfileIncomplete = alumni && (!alumni.jobTitle || !alumni.currentCompany || !alumni.city || !alumni.linkedInUrl);
   const referrals = data?.referrals || [];
   const stats = data?.stats || {};
 
@@ -392,10 +393,13 @@ export default function AlumniDashboard() {
                         )}
                         <button
                           onClick={() => setShowProfileForm(!showProfileForm)}
-                          className="flex items-center gap-2 text-sm font-bold border border-border bg-background hover:bg-muted px-5 py-2.5 rounded-xl transition-all active:scale-95"
+                          className="relative flex items-center gap-2 text-sm font-bold border border-border bg-background hover:bg-muted px-5 py-2.5 rounded-xl transition-all active:scale-95"
                         >
                           {showProfileForm ? "Close Form" : "Update Profile"}
                           <ChevronRight className={`w-4 h-4 transition-transform duration-300 ${showProfileForm ? "rotate-90" : ""}`} />
+                          {!showProfileForm && isProfileIncomplete && (
+                            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shadow-sm" />
+                          )}
                         </button>
                       </div>
                     </div>

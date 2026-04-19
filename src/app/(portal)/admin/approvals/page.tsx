@@ -26,7 +26,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
 import { toast } from "sonner";
 
-type TabKey = "drives"| "feedback" | "referrals" | "external" | "memories" | "unverified"
+type TabKey = "drives"| "feedback" | "referrals" | "external" | "memories" | "unverified" | "volunteers";
 type SubTabKey = "approve" | "approved";
 type FeedbackSubTabKey = "student" | "alumni" | "corporate";
 type UnverifiedSubTabKey = "students" | "alumni" | "external";
@@ -36,6 +36,7 @@ const TABS: { key: TabKey; label: string; icon: React.ElementType }[] = [
   { key: "feedback", label: "Feedbacks", icon: FileText },
   { key: "referrals", label: "Referrals", icon: Users },
   { key: "external", label: "Screening", icon: FileText },
+  { key: "volunteers", label: "Volunteers", icon: Users },
   { key: "memories", label: "Memories", icon: ImageIcon },
   { key: "unverified", label: "Unverified Emails", icon: Mail },
 ];
@@ -64,6 +65,7 @@ export default function AdminApprovalsPage() {
   const [activeFeedbackSubTab, setActiveFeedbackSubTab] = useState<FeedbackSubTabKey>("student");
   const [activeUnverifiedSubTab, setActiveUnverifiedSubTab] = useState<UnverifiedSubTabKey>("students");
   const [items, setItems] = useState<any[]>([]);
+  const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [bulkActionLoading, setBulkActionLoading] = useState<"approve" | "reject" | null>(null);
@@ -121,7 +123,19 @@ export default function AdminApprovalsPage() {
         setLoading(false);
       }
     };
+
+    const fetchStats = async () => {
+      try {
+        const res = await fetch("/api/admin/stats");
+        const data = await res.json() as { success: boolean; stats: any };
+        if (data.success) setStats(data.stats);
+      } catch (err) {
+        // Silent catch for stats
+      }
+    };
+
     loadItems();
+    fetchStats();
   }, [authenticated, activeTab, activeFeedbackSubTab, activeUnverifiedSubTab, page]);
 
   const handleChangeTab = (tab: TabKey) => {
@@ -291,19 +305,39 @@ export default function AdminApprovalsPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Category Tabs */}
         <div className="flex gap-1.5 sm:gap-2 mb-6 sm:mb-8 overflow-x-auto pb-2 scrollbar-none">
-          {TABS.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => { handleChangeTab(tab.key) }}
-              className={`flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-3 rounded-xl sm:rounded-2xl text-[12px] sm:text-sm font-bold whitespace-nowrap transition-all ${activeTab === tab.key
-                  ? "bg-brand text-white shadow-lg shadow-brand/20"
-                  : "bg-white border border-slate-200 text-slate-500 hover:bg-slate-50"
-                }`}
-            >
-              <tab.icon className="w-4 h-4" />
-              {tab.label}
-            </button>
-          ))}
+          {TABS.map((tab) => {
+            let count = 0;
+            if (stats) {
+              if (tab.key === "drives") count = stats.pendingDrives || 0;
+              else if (tab.key === "referrals") count = stats.pendingReferrals || 0;
+              else if (tab.key === "external") count = stats.pendingExternalScreening || 0;
+              else if (tab.key === "memories") count = stats.pendingMemories || 0;
+              // Feedback count is not explicitly defined in the stats currently
+            }
+
+            return (
+              <button
+                key={tab.key}
+                onClick={() => { handleChangeTab(tab.key) }}
+                className={`relative flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-3 rounded-xl sm:rounded-2xl text-[12px] sm:text-sm font-bold whitespace-nowrap transition-all ${activeTab === tab.key
+                    ? "bg-brand text-white shadow-lg shadow-brand/20"
+                    : "bg-white border border-slate-200 text-slate-500 hover:bg-slate-50"
+                  }`}
+              >
+                <tab.icon className="w-4 h-4 shrink-0" />
+                <span>{tab.label}</span>
+                {count > 0 && (
+                  <span className={`ml-1 min-w-[20px] h-5 rounded-full text-[10px] flex items-center justify-center px-1.5 font-bold transition-all ${
+                    activeTab === tab.key 
+                      ? "bg-white text-brand shadow-sm" 
+                      : "bg-red-500 text-white animate-pulse shadow-sm shadow-red-500/20"
+                  }`}>
+                    {count}
+                  </span>
+                )}
+              </button>
+            )
+          })}
         </div>
 
         {/* Memories Sub-Tabs */}
