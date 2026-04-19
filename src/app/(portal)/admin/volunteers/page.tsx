@@ -140,7 +140,7 @@ export default function VolunteersManagement() {
         body: JSON.stringify(assignForm),
       });
 
-      const data = await res.json();
+      const data = (await res.json()) as { success: boolean; message?: string; data?: any };
 
       if (!res.ok) {
         throw new Error(data.message || "Failed to assign volunteer");
@@ -178,7 +178,7 @@ export default function VolunteersManagement() {
         body: JSON.stringify(editForm),
       });
 
-      const data = await res.json();
+      const data = (await res.json()) as { success: boolean; message?: string; data?: any };
 
       if (!res.ok) {
         throw new Error(data.message || "Failed to update volunteer");
@@ -207,7 +207,7 @@ export default function VolunteersManagement() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const data = await res.json();
+      const data = (await res.json()) as { success: boolean; message?: string; data?: any };
 
       if (!res.ok) {
         throw new Error(data.message || "Failed to deactivate volunteer");
