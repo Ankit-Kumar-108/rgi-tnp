@@ -64,6 +64,7 @@ export async function GET(req: NextRequest) {
     for (const drive of activeDrives) {
       const registrations = await db.driveRegistration.findMany({
         where: { driveId: drive.id },
+        
         include: {
           student: {
             select: {
@@ -95,23 +96,6 @@ export async function GET(req: NextRequest) {
       });
 
       for (const reg of registrations) {
-        // Get status from VolunteerStudentStatus, default to "Applied"
-        let status = "Applied";
-        if (reg.student) {
-          const volunteerStatus = await db.volunteerStudentStatus.findUnique({
-            where: {
-              driveId_studentId: {
-                driveId: drive.id,
-                studentId: reg.student.id
-              }
-            },
-            select: { status: true }
-          });
-          if (volunteerStatus) {
-            status = volunteerStatus.status;
-          }
-        }
-
         const studentData = reg.student || reg.externalStudent;
         
         allStudents.push({
@@ -134,7 +118,7 @@ export async function GET(req: NextRequest) {
           minCGPA: drive.minCGPA,
           jobType: drive.jobType,
           driveDate: drive.driveDate,
-          status: status,
+          status: reg.status,
           appliedAt: reg.createdAt
         });
       }
