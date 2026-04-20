@@ -22,7 +22,7 @@ import {
 import Link from "next/link";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { uploadFileToR2 } from "@/lib/upload-r2";
+import { getRegistrationUploadToken, uploadFileToR2 } from "@/lib/upload-r2";
 import { toast } from "sonner";
 
 export default function AlumniRegister() {
@@ -89,7 +89,8 @@ export default function AlumniRegister() {
 
         setLoading(true);
         try {
-            const profileImageUrl = await uploadFileToR2(profileImageFile, "profiles");
+            const uploadToken = await getRegistrationUploadToken("alumni_registration");
+            const profileImageUrl = await uploadFileToR2(profileImageFile, "profiles", { uploadToken });
 
             const res = await fetch("/api/auth/register/alumni-register", {
                 method: "POST",

@@ -3,7 +3,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { externalStudentLoginSchema } from "@/lib/validations/external-student";
 import { getDb } from "@/lib/db";
 import { verifyPassword } from "@/lib/auth-utils";
-import * as jose from "jose";
+import { signAuthToken } from "@/lib/auth-jwt";
 
 export async function POST(req: NextRequest) {
     try {
@@ -36,15 +36,12 @@ export async function POST(req: NextRequest) {
              return NextResponse.json({ success: false, message: "Your email is not verified. Please check your inbox for the verification link." }, { status: 403 });
          }
 
-        const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
-        const token = await new jose.SignJWT({ 
+        const token = await signAuthToken({ 
             email: externalStudent.email, 
             id: externalStudent.id, 
-            enrollmentNumber: externalStudent.enrollmentNumber 
-        })
-            .setProtectedHeader({ alg: 'HS256' })
-            .setExpirationTime('7d')
-            .sign(secret);
+            enrollmentNumber: externalStudent.enrollmentNumber,
+            role: "external_student",
+        });
 
         return NextResponse.json({ 
             success: true, 

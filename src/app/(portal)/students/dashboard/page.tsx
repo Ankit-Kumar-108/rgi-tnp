@@ -196,7 +196,7 @@ export default function StudentDashboard() {
 
     try {
       setResumeUploading(true);
-      const url = await uploadFileToR2(file, "resumes");
+      const url = await uploadFileToR2(file, "resumes", { role: "student" });
       const token = getToken("student");
       const res = await fetch("/api/student/update-profile", {
         method: "PATCH",
@@ -256,7 +256,9 @@ export default function StudentDashboard() {
       setMemUploading(true);
 
       // 1. Upload all to R2 in parallel
-      const uploadPromises = selectedMemFiles.map(file => uploadFileToR2(file, "memories"));
+      const uploadPromises = selectedMemFiles.map((file) =>
+        uploadFileToR2(file, "memories", { role: "student" }),
+      );
       const imageUrls = await Promise.all(uploadPromises);
 
       // 2. Prepare the batch for the API

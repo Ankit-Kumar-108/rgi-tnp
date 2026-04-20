@@ -24,7 +24,7 @@ import {
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { uploadFileToR2 } from "@/lib/upload-r2";
+import { getRegistrationUploadToken, uploadFileToR2 } from "@/lib/upload-r2";
 import { toast } from "sonner";
 
 export default function StudentRegister() {
@@ -137,8 +137,9 @@ export default function StudentRegister() {
 
         setLoading(true);
         try {
-            const profileImageUrl = await uploadFileToR2(profileImageFile, "profiles");
-            const resumeUrl = await uploadFileToR2(resumeFile, "resumes");
+            const uploadToken = await getRegistrationUploadToken("student_registration");
+            const profileImageUrl = await uploadFileToR2(profileImageFile, "profiles", { uploadToken });
+            const resumeUrl = await uploadFileToR2(resumeFile, "resumes", { uploadToken });
 
             const res = await fetch("/api/auth/register/student-register", {
                 method: "POST",

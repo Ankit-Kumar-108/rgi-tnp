@@ -11,6 +11,7 @@ import {
   Eye,
   EyeOff,
   ArrowRight,
+  Check,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -93,24 +94,24 @@ export default function VolunteerLogin() {
               </p>
               <div className="mt-12 flex flex-col gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-brand/20 flex items-center justify-center flex-shrink-0">
-                    <Heart className="w-5 h-5 text-brand" />
+                  <div className="w-10 h-10 rounded-full bg-brand flex items-center justify-center shrink-0">
+                    <Check className="w-5 h-5" />
                   </div>
                   <span className="text-sm font-medium text-white/90">
                     Upload drive images
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-brand/20 flex items-center justify-center flex-shrink-0">
-                    <Heart className="w-5 h-5 text-brand" />
+                  <div className="w-10 h-10 rounded-full bg-brand flex items-center justify-center shrink-0">
+                    <Check className="w-5 h-5" />
                   </div>
                   <span className="text-sm font-medium text-white/90">
                     Help students in placements
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-brand/20 flex items-center justify-center flex-shrink-0">
-                    <Heart className="w-5 h-5 text-brand" />
+                  <div className="w-10 h-10 rounded-full bg-brand flex items-center justify-center shrink-0">
+                    <Check className="w-5 h-5" />
                   </div>
                   <span className="text-sm font-medium text-white/90">
                     Gain leadership experience
@@ -178,7 +179,7 @@ export default function VolunteerLogin() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
+                    placeholder="Enter your password"
                     className="w-full pl-12 pr-12 py-3 bg-muted border border-border rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all text-foreground placeholder:text-muted-foreground"
                   />
                   <button

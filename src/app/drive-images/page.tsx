@@ -1,7 +1,7 @@
 "use client";
 export const runtime = "edge";
+
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface DriveImageData {
   id: string;
@@ -9,19 +9,17 @@ interface DriveImageData {
   imageUrl: string;
   driveId: string;
   createdAt: string;
-  drive: {
-    companyName: string;
-  };
 }
 
-interface Drive {
+interface DriveWithImages {
   id: string;
   companyName: string;
   driveDate: string;
+  driveImages: DriveImageData[];
 }
 
 export default function DriveImagesPage() {
-  const [drives, setDrives] = useState<Drive[]>([]);
+  const [drives, setDrives] = useState<DriveWithImages[]>([]);
   const [images, setImages] = useState<DriveImageData[]>([]);
   const [selectedDrive, setSelectedDrive] = useState<string>("");
   const [loading, setLoading] = useState(true);
@@ -29,14 +27,20 @@ export default function DriveImagesPage() {
   useEffect(() => {
     const fetchDrives = async () => {
       try {
-        const res = await fetch("/api/admin/drives?limit=1000");
-        const data = await res.json() as { success: boolean; drives: Drive[] };
-        if (data.success && data.drives && data.drives.length > 0) {
-          const sortedDrives = data.drives.sort(
-            (a: Drive, b: Drive) => new Date(b.driveDate).getTime() - new Date(a.driveDate).getTime()
+        const res = await fetch("/api/home/driveImages?limit=100");
+        const data = (await res.json()) as {
+          success: boolean;
+          drives: DriveWithImages[];
+        };
+
+        if (data.success && data.drives?.length) {
+          const sortedDrives = [...data.drives].sort(
+            (a, b) =>
+              new Date(b.driveDate).getTime() - new Date(a.driveDate).getTime(),
           );
           setDrives(sortedDrives);
           setSelectedDrive(sortedDrives[0].id);
+          setImages(sortedDrives[0].driveImages);
         }
       } catch (error) {
         console.error("Error fetching drives:", error);
@@ -44,25 +48,19 @@ export default function DriveImagesPage() {
         setLoading(false);
       }
     };
+
     fetchDrives();
   }, []);
 
   useEffect(() => {
-    if (!selectedDrive) return;
+    if (!selectedDrive) {
+      setImages([]);
+      return;
+    }
 
-    const fetchImages = async () => {
-      try {
-        const res = await fetch(`/api/drive-images/${selectedDrive}`);
-        const data = await res.json() as { success: boolean; images: DriveImageData[] };
-        if (data.success) {
-          setImages(data.images);
-        }
-      } catch (error) {
-        console.error("Error fetching images:", error);
-      }
-    };
-    fetchImages();
-  }, [selectedDrive]);
+    const selectedDriveData = drives.find((drive) => drive.id === selectedDrive);
+    setImages(selectedDriveData?.driveImages ?? []);
+  }, [drives, selectedDrive]);
 
   if (loading) {
     return (
@@ -77,13 +75,11 @@ export default function DriveImagesPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-3 lg:px-20 py-12">
-        {/* Header */}
         <div className="mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-2">Drive Images Gallery</h1>
           <p className="text-slate-500 text-lg">Moments from our campus recruitment drives</p>
         </div>
 
-        {/* Drive Selector */}
         {drives.length > 0 && (
           <div className="mb-8">
             <label className="block text-sm font-semibold mb-3">Select Drive</label>
@@ -101,7 +97,6 @@ export default function DriveImagesPage() {
           </div>
         )}
 
-        {/* Images Grid */}
         {images.length === 0 ? (
           <div className="text-center py-24">
             <p className="text-xl text-gray-600">No images available for this drive</p>

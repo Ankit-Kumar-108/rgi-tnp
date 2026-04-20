@@ -3,7 +3,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { recruiterLoginSchema } from "@/lib/validations/recruiter";
 import { getDb } from "@/lib/db";
 import { verifyPassword } from "@/lib/auth-utils";
-import * as jose from "jose";
+import { signAuthToken } from "@/lib/auth-jwt";
 
 export async function POST(req: NextRequest) {
     try {
@@ -32,15 +32,12 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ success: false, message: "Check your password and try again" }, { status: 401 });
         }
 
-        const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
-        const token = await new jose.SignJWT({ 
+        const token = await signAuthToken({ 
             email: recruiter.email, 
             id: recruiter.id, 
-            company: recruiter.company 
-        })
-            .setProtectedHeader({ alg: 'HS256' })
-            .setExpirationTime('7d')
-            .sign(secret);
+            company: recruiter.company,
+            role: "recruiter",
+        });
 
         return NextResponse.json({ 
             success: true, 

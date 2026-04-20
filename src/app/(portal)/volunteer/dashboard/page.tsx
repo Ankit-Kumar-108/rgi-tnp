@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
 import VolunteerDriveImageManagement from "@/components/volunteer/VolunteerDriveImageManagement";
+import StudentsOverviewTabs from "@/components/volunteer/StudentsOverviewTabs";
 
 interface VolunteerData {
   volunteer: {
@@ -66,14 +67,9 @@ export default function VolunteerDashboard() {
   const [data, setData] = useState<VolunteerData | null>(null);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"overview" | "drive-images">("overview");
-  const [showProfileForm, setShowProfileForm] = useState(false);
-  const [submittingProfile, setSubmittingProfile] = useState(false);
-  const [profileMsg, setProfileMsg] = useState<{ msg: string; ok: boolean } | null>(null);
-  const [profileForm, setProfileForm] = useState({
-    linkedinUrl: "",
-    githubUrl: "",
-  });
+  const [activeTab, setActiveTab] = useState<"overview" | "drive-images" | "students-overview">("overview");
+  const [studentsOverviewData, setStudentsOverviewData] = useState<any[]>([]);
+  const [studentsOverviewLoading, setStudentsOverviewLoading] = useState(false);
 
   const router = useRouter();
 
@@ -81,6 +77,12 @@ export default function VolunteerDashboard() {
     if (!authenticated) return;
     fetchVolunteerDashboard();
   }, [authenticated]);
+
+  useEffect(() => {
+    if (activeTab === "students-overview" && studentsOverviewData.length === 0) {
+      fetchStudentsOverview();
+    }
+  }, [activeTab]);
 
   const handleLogout = () => {
     if (!window.confirm("Are you sure you want to logout?")) return;
@@ -99,12 +101,6 @@ export default function VolunteerDashboard() {
       const d = (await res.json()) as any;
       if (d.success) {
         setData(d.data);
-        if (d.data.student) {
-          setProfileForm({
-            linkedinUrl: d.data.student.linkedinUrl || "",
-            githubUrl: d.data.student.githubUrl || "",
-          });
-        }
       } else {
         setFetchError(d.message || "Failed to load dashboard");
         toast.error(d.message || "Failed to load dashboard");
@@ -118,31 +114,25 @@ export default function VolunteerDashboard() {
     }
   };
 
-  const handleSubmitProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmittingProfile(true);
-    setProfileMsg(null);
+  const fetchStudentsOverview = async () => {
     try {
+      setStudentsOverviewLoading(true);
       const token = getToken("student");
-      const res = await fetch("/api/student/update-profile", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(profileForm),
+      const res = await fetch("/api/volunteer/students-overview", {
+        headers: { Authorization: `Bearer ${token}` },
       });
       const d = (await res.json()) as any;
-      setProfileMsg({ msg: d.message, ok: d.success });
       if (d.success) {
-        fetchVolunteerDashboard();
-        setTimeout(() => setShowProfileForm(false), 2000);
+        setStudentsOverviewData(d.students || []);
+      } else {
+        console.error(d);
+        toast.error(d.message || "Failed to load students overview");
       }
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      setProfileMsg({ msg: "Update failed", ok: false });
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load students overview");
     } finally {
-      setSubmittingProfile(false);
+      setStudentsOverviewLoading(false);
     }
   };
 
@@ -279,263 +269,9 @@ export default function VolunteerDashboard() {
                   </p>
                 </div>
               </div>
-
-              {/* Links */}
-              <div className="flex gap-4 pt-4 border-t border-border justify-center md:justify-start flex-wrap">
-                {student?.linkedinUrl && (
-                  <a
-                    href={student.linkedinUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium"
-                  >
-                    LinkedIn →
-                  </a>
-                )}
-                {student?.githubUrl && (
-                  <a
-                    href={student.githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium"
-                  >
-                    GitHub →
-                  </a>
-                )}
-                <button
-                  onClick={() => setShowProfileForm(!showProfileForm)}
-                  className="text-sm text-brand hover:text-brand/80 transition-colors font-bold"
-                >
-                  {showProfileForm ? "Cancel" : "Edit Profile →"}
-                </button>
-              </div>
             </div>
           </div>
         </section>
-
-        {/* Volunteer Status Section */}
-        <section className="mb-8">
-          <div
-            className={`rounded-2xl p-6 md:p-8 border ${
-              volunteer?.isActive
-                ? volunteer?.isVerified
-                  ? "bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800"
-                  : "bg-yellow-50 border-yellow-200 dark:bg-yellow-950/20 dark:border-yellow-800"
-                : "bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-800"
-            }`}
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-start gap-4">
-                {volunteer?.isActive ? (
-                  volunteer?.isVerified ? (
-                    <CheckCircle className="w-8 h-8 text-green-600 flex-shrink-0 mt-1" />
-                  ) : (
-                    <Clock className="w-8 h-8 text-yellow-600 flex-shrink-0 mt-1" />
-                  )
-                ) : (
-                  <AlertCircle className="w-8 h-8 text-red-600 flex-shrink-0 mt-1" />
-                )}
-                <div className="flex-1">
-                  <h3 className={`text-lg font-bold mb-2 ${
-                    volunteer?.isActive
-                      ? volunteer?.isVerified
-                        ? "text-green-900 dark:text-green-100"
-                        : "text-yellow-900 dark:text-yellow-100"
-                      : "text-red-900 dark:text-red-100"
-                  }`}>
-                    {volunteer?.isActive
-                      ? volunteer?.isVerified
-                        ? "✓ Volunteer Verified"
-                        : "⏳ Pending Admin Approval"
-                      : "❌ Volunteer Account Deactivated"}
-                  </h3>
-                  <p className={`text-sm ${
-                    volunteer?.isActive
-                      ? volunteer?.isVerified
-                        ? "text-green-800 dark:text-green-200"
-                        : "text-yellow-800 dark:text-yellow-200"
-                      : "text-red-800 dark:text-red-200"
-                  }`}>
-                    {volunteer?.isActive
-                      ? volunteer?.isVerified
-                        ? "Your volunteer account is active and verified. You can now upload drive images and manage your volunteer responsibilities."
-                        : "Your volunteer account has been created. An administrator will verify your account and contact you soon. Expected timeframe: 24-48 hours."
-                      : "Your volunteer account has been deactivated. Please contact an administrator if you believe this is a mistake."}
-                  </p>
-
-                  {/* Additional Status Info */}
-                  <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {volunteer?.assignedAt && (
-                      <div>
-                        <p className={`text-xs font-bold uppercase tracking-wide mb-1 ${
-                          volunteer?.isActive
-                            ? volunteer?.isVerified
-                              ? "text-green-700 dark:text-green-300"
-                              : "text-yellow-700 dark:text-yellow-300"
-                            : "text-red-700 dark:text-red-300"
-                        }`}>
-                          Assigned Date
-                        </p>
-                        <p className={`text-sm font-medium ${
-                          volunteer?.isActive
-                            ? volunteer?.isVerified
-                              ? "text-green-900 dark:text-green-100"
-                              : "text-yellow-900 dark:text-yellow-100"
-                            : "text-red-900 dark:text-red-100"
-                        }`}>
-                          {new Date(volunteer.assignedAt).toLocaleDateString(
-                            "en-US",
-                            {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            }
-                          )}
-                        </p>
-                      </div>
-                    )}
-                    {volunteer?.assignedBy && (
-                      <div>
-                        <p className={`text-xs font-bold uppercase tracking-wide mb-1 ${
-                          volunteer?.isActive
-                            ? volunteer?.isVerified
-                              ? "text-green-700 dark:text-green-300"
-                              : "text-yellow-700 dark:text-yellow-300"
-                            : "text-red-700 dark:text-red-300"
-                        }`}>
-                          Assigned By
-                        </p>
-                        <p className={`text-sm font-medium ${
-                          volunteer?.isActive
-                            ? volunteer?.isVerified
-                              ? "text-green-900 dark:text-green-100"
-                              : "text-yellow-900 dark:text-yellow-100"
-                            : "text-red-900 dark:text-red-100"
-                        }`}>
-                          {volunteer.assignedBy}
-                        </p>
-                      </div>
-                    )}
-                    <div>
-                      <p className={`text-xs font-bold uppercase tracking-wide mb-1 ${
-                        volunteer?.isActive
-                          ? volunteer?.isVerified
-                            ? "text-green-700 dark:text-green-300"
-                            : "text-yellow-700 dark:text-yellow-300"
-                          : "text-red-700 dark:text-red-300"
-                      }`}>
-                        Designation
-                      </p>
-                      <p className={`text-sm font-medium ${
-                        volunteer?.isActive
-                          ? volunteer?.isVerified
-                            ? "text-green-900 dark:text-green-100"
-                            : "text-yellow-900 dark:text-yellow-100"
-                          : "text-red-900 dark:text-red-100"
-                      }`}>
-                        {volunteer?.designation}
-                      </p>
-                    </div>
-                  </div>
-
-                  {volunteer?.verificationNotes && (
-                    <div className="mt-4 p-3 bg-white/40 dark:bg-black/20 rounded-lg">
-                      <p className={`text-xs font-bold uppercase tracking-wide mb-1 ${
-                        volunteer?.isActive
-                          ? volunteer?.isVerified
-                            ? "text-green-700 dark:text-green-300"
-                            : "text-yellow-700 dark:text-yellow-300"
-                          : "text-red-700 dark:text-red-300"
-                      }`}>
-                        Admin Notes
-                      </p>
-                      <p className={`text-sm ${
-                        volunteer?.isActive
-                          ? volunteer?.isVerified
-                            ? "text-green-900 dark:text-green-100"
-                            : "text-yellow-900 dark:text-yellow-100"
-                          : "text-red-900 dark:text-red-100"
-                      }`}>
-                        {volunteer.verificationNotes}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Edit Profile Form */}
-        {showProfileForm && (
-          <section className="mb-8 bg-card border border-border rounded-2xl p-6 md:p-8">
-            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-              <CheckCircle className="w-6 h-6 text-brand" />
-              Update Profile Links
-            </h2>
-            <form onSubmit={handleSubmitProfile} className="space-y-6">
-              <div>
-                <label className="block text-sm font-bold mb-2 text-foreground">
-                  LinkedIn URL
-                </label>
-                <input
-                  type="url"
-                  value={profileForm.linkedinUrl}
-                  onChange={(e) =>
-                    setProfileForm({ ...profileForm, linkedinUrl: e.target.value })
-                  }
-                  placeholder="https://linkedin.com/in/yourprofile"
-                  className="w-full px-4 py-3 bg-muted border border-border rounded-lg focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-bold mb-2 text-foreground">
-                  GitHub URL
-                </label>
-                <input
-                  type="url"
-                  value={profileForm.githubUrl}
-                  onChange={(e) =>
-                    setProfileForm({ ...profileForm, githubUrl: e.target.value })
-                  }
-                  placeholder="https://github.com/yourprofile"
-                  className="w-full px-4 py-3 bg-muted border border-border rounded-lg focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all"
-                />
-              </div>
-              {profileMsg && (
-                <p
-                  className={`text-sm font-medium ${
-                    profileMsg.ok ? "text-green-600" : "text-red-500"
-                  }`}
-                >
-                  {profileMsg.msg}
-                </p>
-              )}
-              <div className="flex gap-4">
-                <button
-                  type="submit"
-                  disabled={submittingProfile}
-                  className="bg-brand text-primary-foreground px-8 py-3.5 rounded-xl font-bold hover:scale-105 transition-transform shadow-lg shadow-brand/20 disabled:opacity-50 flex items-center gap-2"
-                >
-                  {submittingProfile ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <CheckCircle className="w-4 h-4" />
-                  )}
-                  Save Profile
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowProfileForm(false)}
-                  className="bg-muted text-foreground px-8 py-3.5 rounded-xl font-bold hover:bg-muted/80 transition-colors"
-                >
-                  Discard
-                </button>
-              </div>
-            </form>
-          </section>
-        )}
-
         {/* Stats Cards */}
         {data && (
           <section className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -614,6 +350,19 @@ export default function VolunteerDashboard() {
             <div className="flex items-center gap-2">
               <Award className="w-4 h-4" />
               Overview
+            </div>
+          </button>
+          <button
+            onClick={() => setActiveTab("students-overview")}
+            className={`pb-4 px-4 font-bold text-sm transition-colors ${
+              activeTab === "students-overview"
+                ? "text-brand border-b-2 border-brand"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              Students Overview
             </div>
           </button>
           <button
@@ -715,6 +464,15 @@ export default function VolunteerDashboard() {
                     </div>
                   </div>
                 </div>
+              </section>
+            )}
+
+            {activeTab === "students-overview" && (
+              <section>
+                <StudentsOverviewTabs 
+                  students={studentsOverviewData} 
+                  loading={studentsOverviewLoading}
+                />
               </section>
             )}
 

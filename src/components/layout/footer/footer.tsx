@@ -55,9 +55,9 @@ export default function Footer() {
               <li><Link className="hover:text-brand transition-colors" href="#">HR Policies</Link></li>
               {/* ADMIN LINK ADDED HERE */}
               <li className="pt-2 mt-2 border-t border-border/50">
-                <Link className="flex items-center gap-2 hover:text-brand transition-colors font-medium" href="/admin/login">
+                <Link className="flex items-center gap-2 hover:text-brand transition-colors font-medium" href="/administration-panel">
                   <Shield className="w-4 h-4" />
-                  Admin Portal
+                  Administration Portal
                 </Link>
               </li>
             </ul>

@@ -197,7 +197,7 @@ export default function DriveImageManagement() {
 
       // Upload all files to R2 in parallel
       const uploadPromises = filesToUpload.map((file, idx) =>
-        uploadFileToR2(file, "drive-images" as any).then((url) => {
+        uploadFileToR2(file, "drive-images", { role: "admin" }).then((url) => {
           setUploadProgress(
             Math.round(((idx + 1) / filesToUpload.length) * 80),
           );

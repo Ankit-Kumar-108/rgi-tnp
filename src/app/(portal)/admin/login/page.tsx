@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Shield, Loader2, Eye, EyeOff } from "lucide-react";
 import { saveAuth } from "@/lib/auth-client";
+import Nav from "@/components/layout/nav/nav";
+import Footer from "@/components/layout/footer/footer";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -40,8 +42,10 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
+    <>
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
+      <Nav />
+      <div className="w-full max-w-md mt-20 md:mt-30 mb-20">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-brand/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -123,5 +127,7 @@ export default function AdminLoginPage() {
         </p>
       </div>
     </div>
+      <Footer />
+    </>
   );
 }

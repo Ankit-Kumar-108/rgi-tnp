@@ -20,7 +20,9 @@ export async function POST(req: NextRequest) {
       uploadedBy?: string;
     };
 
-    const { title, driveId, uploadedBy = "admin" } = body;
+    const { title, driveId } = body;
+    const uploadedBy =
+      req.headers.get("x-admin-email")?.trim() || body.uploadedBy || "admin";
 
     if (!title || !driveId) {
       return NextResponse.json(

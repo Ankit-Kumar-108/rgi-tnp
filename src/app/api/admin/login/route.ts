@@ -1,11 +1,9 @@
 export const runtime = 'edge';
 
 import { NextRequest, NextResponse } from "next/server";
-import * as jose from "jose";
-
-// Hardcoded admin credentials change later
-const ADMIN_EMAIL = "admin@rgi.ac.in";
-const ADMIN_PASSWORD = "Admin@123";
+import { getDb } from "@/lib/db";
+import { verifyPassword } from "@/lib/auth-utils";
+import { attachAuthCookie, signAuthToken } from "@/lib/auth-jwt";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,32 +17,85 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
+    const normalizedEmail = email.trim().toLowerCase();
+    const db = getDb();
+
+    let admin = await db.admin.findUnique({
+      where: { email: normalizedEmail },
+      select: {
+        id: true,
+        email: true,
+        passwordHash: true,
+        role: true,
+      },
+    });
+
+    let passwordMatch = false;
+
+    if (admin) {
+      passwordMatch = await verifyPassword(password, admin.passwordHash);
+    } else {
+      const bootstrapEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+      const bootstrapPasswordHash = process.env.ADMIN_PASSWORD_HASH?.trim();
+
+      if (
+        bootstrapEmail &&
+        bootstrapPasswordHash &&
+        normalizedEmail === bootstrapEmail
+      ) {
+        passwordMatch = await verifyPassword(password, bootstrapPasswordHash);
+
+        if (passwordMatch) {
+          admin = await db.admin.upsert({
+            where: { email: bootstrapEmail },
+            update: {
+              passwordHash: bootstrapPasswordHash,
+              role: "admin",
+            },
+            create: {
+              email: bootstrapEmail,
+              passwordHash: bootstrapPasswordHash,
+              role: "admin",
+            },
+            select: {
+              id: true,
+              email: true,
+              passwordHash: true,
+              role: true,
+            },
+          });
+        }
+      }
+    }
+
+    if (!admin || !passwordMatch || admin.role !== "admin") {
       return NextResponse.json(
         { success: false, message: "Invalid admin credentials" },
         { status: 401 }
       );
     }
 
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
-    const token = await new jose.SignJWT({
-      email: ADMIN_EMAIL,
+    const token = await signAuthToken({
+      id: admin.id,
+      email: admin.email,
       role: "admin",
-    })
-      .setProtectedHeader({ alg: "HS256" })
-      .setExpirationTime("7d")
-      .sign(secret);
+    });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       message: "Admin login successful",
       token,
       admin: {
-        email: ADMIN_EMAIL,
+        id: admin.id,
+        email: admin.email,
         role: "admin",
         name: "Admin",
       },
     }, { status: 200 });
+
+    attachAuthCookie(response, "admin", token);
+
+    return response;
 
   } catch (error: any) {
     console.error("Admin Login Error:", error);

@@ -22,7 +22,7 @@ import {
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { uploadFileToR2 } from "@/lib/upload-r2";
+import { getRegistrationUploadToken, uploadFileToR2 } from "@/lib/upload-r2";
 import { toast } from "sonner";
 
 export default function ExternalStudentRegister() {
@@ -130,13 +130,14 @@ export default function ExternalStudentRegister() {
 
         setLoading(true);
         try {
+            const uploadToken = await getRegistrationUploadToken("external_student_registration");
             let profileImageUrl: string | undefined = undefined;
             let resumeUrl: string | undefined = undefined;
 
             if (profileImageFile) {
-                profileImageUrl = await uploadFileToR2(profileImageFile, "profiles");
+                profileImageUrl = await uploadFileToR2(profileImageFile, "profiles", { uploadToken });
             }
-            resumeUrl = await uploadFileToR2(resumeFile, "resumes");
+            resumeUrl = await uploadFileToR2(resumeFile, "resumes", { uploadToken });
 
             const res = await fetch("/api/auth/register/external-student-register", {
                 method: "POST",

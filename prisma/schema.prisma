@@ -66,6 +66,7 @@ model Student {
   registrations                DriveRegistration[]
   memories                     Memory[]
   studentFeedbacks             StudentFeedback[]
+  volunteerStudentStatuses     VolunteerStudentStatus[]
   createdAt                    DateTime            @default(now())
   updatedAt                    DateTime            @updatedAt
   volunteers Volunteer[]
@@ -159,6 +160,7 @@ model PlacementDrive {
   recruiter        Recruiter           @relation(fields: [recruiterId], references: [id])
   registrations    DriveRegistration[]
   driveImages      DriveImage[]
+  volunteerStudentStatuses VolunteerStudentStatus[]
   createdAt        DateTime            @default(now())
   updatedAt        DateTime            @updatedAt
 }
@@ -287,4 +289,19 @@ model Volunteer {
   isActive            Boolean   @default(true)
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
+}
+
+model VolunteerStudentStatus {
+  id        String         @id @default(cuid())
+  driveId   String
+  drive     PlacementDrive @relation(fields: [driveId], references: [id], onDelete: Cascade)
+  
+  studentId String
+  student   Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
+  status    String         @default("Applied") // Applied, Selected, Rejected, Shortlisted
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  
+  @@unique([driveId, studentId])
 }

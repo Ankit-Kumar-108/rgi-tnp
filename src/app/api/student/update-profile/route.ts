@@ -1,66 +1,146 @@
-export const runtime = 'edge';
+export const runtime = "edge";
+
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import * as jose from "jose";
+import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
 
-async function getStudentFromToken(req: NextRequest) {
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader) return null;
-  const token = authHeader.replace("Bearer ", "");
-  try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
-    const { payload } = await jose.jwtVerify(token, secret);
-    return payload as any;
-  } catch {
-    return null;
-  }
+function hasValue(value: unknown) {
+  return value !== undefined && value !== null && value !== "";
 }
 
 export async function PATCH(req: NextRequest) {
   try {
-    const studentTokenData = await getStudentFromToken(req);
-    if (!studentTokenData) {
-      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+    const studentTokenData = await getVerifiedAuthPayloadFromRequest(req, [
+      "student",
+    ]);
+
+    if (!studentTokenData?.enrollmentNumber || studentTokenData.role !== "student") {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized" },
+        { status: 401 },
+      );
     }
 
-    const { profileImageUrl, phoneNumber, branch, course, resumeUrl,
-      tenthPercentage, twelfthPercentage, activeBacklog, linkedinUrl, githubUrl, isProfileComplete
-    } = (await req.json()) as any;
-    const db = getDb();
+    const {
+      profileImageUrl,
+      phoneNumber,
+      resumeUrl,
+      tenthPercentage,
+      twelfthPercentage,
+      activeBacklog,
+      linkedinUrl,
+      githubUrl,
+    } = (await req.json()) as {
+      profileImageUrl?: string;
+      phoneNumber?: string;
+      resumeUrl?: string;
+      tenthPercentage?: string | number;
+      twelfthPercentage?: string | number;
+      activeBacklog?: string | number;
+      linkedinUrl?: string;
+      githubUrl?: string;
+    };
 
-    // Update the student record
-    // We use findUnique with the enrollmentNumber from token to be safe
+    if (
+      profileImageUrl === undefined &&
+      phoneNumber === undefined &&
+      resumeUrl === undefined &&
+      tenthPercentage === undefined &&
+      twelfthPercentage === undefined &&
+      activeBacklog === undefined &&
+      linkedinUrl === undefined &&
+      githubUrl === undefined
+    ) {
+      return NextResponse.json(
+        { success: false, message: "Missing update data" },
+        { status: 400 },
+      );
+    }
+
+    const db = getDb();
+    const existingStudent = await db.student.findUnique({
+      where: { enrollmentNumber: studentTokenData.enrollmentNumber },
+      select: {
+        name: true,
+        profileImageUrl: true,
+        phoneNumber: true,
+        resumeUrl: true,
+        tenthPercentage: true,
+        twelfthPercentage: true,
+        activeBacklog: true,
+        linkedinUrl: true,
+        githubUrl: true,
+      },
+    });
+
+    if (!existingStudent) {
+      return NextResponse.json(
+        { success: false, message: "Student not found" },
+        { status: 404 },
+      );
+    }
+
+    const normalizedTenth =
+      tenthPercentage !== undefined ? Number.parseFloat(String(tenthPercentage)) : undefined;
+    const normalizedTwelfth =
+      twelfthPercentage !== undefined
+        ? Number.parseFloat(String(twelfthPercentage))
+        : undefined;
+    const normalizedBacklog =
+      activeBacklog !== undefined ? Number.parseInt(String(activeBacklog), 10) : undefined;
+    const nextProfileImageUrl = profileImageUrl ?? existingStudent.profileImageUrl;
+    const nextPhoneNumber = phoneNumber ?? existingStudent.phoneNumber;
+    const nextResumeUrl = resumeUrl ?? existingStudent.resumeUrl;
+    const nextTenthPercentage =
+      tenthPercentage !== undefined ? normalizedTenth : existingStudent.tenthPercentage;
+    const nextTwelfthPercentage =
+      twelfthPercentage !== undefined
+        ? normalizedTwelfth
+        : existingStudent.twelfthPercentage;
+    const nextActiveBacklog =
+      activeBacklog !== undefined ? normalizedBacklog : existingStudent.activeBacklog;
+    const isProfileComplete =
+      [nextProfileImageUrl, nextPhoneNumber, nextResumeUrl].every(hasValue) &&
+      hasValue(nextTenthPercentage) &&
+      hasValue(nextTwelfthPercentage) &&
+      Number.isFinite(nextActiveBacklog) &&
+      Number(nextActiveBacklog) >= 0;
+
     const updatedStudent = await db.student.update({
       where: { enrollmentNumber: studentTokenData.enrollmentNumber },
       data: {
-        ...(profileImageUrl && { profileImageUrl }),
-        ...(phoneNumber && { phoneNumber }),
-        ...(branch && { branch }),
-        ...(course && { course }),
-        ...(resumeUrl && { resumeUrl }),
-        ...(tenthPercentage !== undefined && { tenthPercentage: parseFloat(tenthPercentage) }),
-        ...(twelfthPercentage !== undefined && { twelfthPercentage: parseFloat(twelfthPercentage) }),
-        ...(activeBacklog !== undefined && { activeBacklog: parseInt(activeBacklog) }),
+        ...(profileImageUrl !== undefined && { profileImageUrl }),
+        ...(phoneNumber !== undefined && { phoneNumber }),
+        ...(resumeUrl !== undefined && { resumeUrl }),
+        ...(tenthPercentage !== undefined && { tenthPercentage: normalizedTenth }),
+        ...(twelfthPercentage !== undefined && {
+          twelfthPercentage: normalizedTwelfth,
+        }),
+        ...(activeBacklog !== undefined && { activeBacklog: normalizedBacklog }),
         ...(linkedinUrl !== undefined && { linkedinUrl }),
         ...(githubUrl !== undefined && { githubUrl }),
-        ...(studentTokenData.isProfileComplete ? {} : { isProfileComplete: true }) // Mark profile as complete after update
-      }
+        isProfileComplete,
+      },
     });
 
-    return NextResponse.json({ 
-      success: true, 
-      message: "Profile updated successfully", 
+    return NextResponse.json({
+      success: true,
+      message: "Profile updated successfully",
       student: {
         name: updatedStudent.name,
-        profileImageUrl: updatedStudent.profileImageUrl
-      }
+        profileImageUrl: updatedStudent.profileImageUrl,
+      },
     });
-
-  } catch (error: any) {
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to update profile";
     console.error("Update Profile Error:", error);
-    return NextResponse.json({ 
-      success: false, 
-      message: error?.message || "Failed to update profile" 
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        message,
+      },
+      { status: 500 },
+    );
   }
 }

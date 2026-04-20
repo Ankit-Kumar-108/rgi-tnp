@@ -89,14 +89,6 @@ export default function Nav() {
         { name: "Dashboard", icon: TrendingUp, link: "alumni/dashboard" },
       ]
     },
-    {
-      name: "Volunteer",
-      icon: Heart,
-      subMenu: [
-        { name: "Login", icon: UserCheck, link: "volunteer/login" },
-        { name: "Dashboard", icon: Activity, link: "volunteer/dashboard" }
-      ]
-    }
   ];
 
   const renderMobileSubMenu = (categoryName: string) => {
@@ -128,15 +120,16 @@ export default function Nav() {
         <Link href={"/"} className="flex items-center gap-3 min-w-max">
           <div className="text-brand">
             <img
-              className="size-12 md:size-20"
+              className="size-12 md:size-16"
               src={"/logo/logo.png"}
               alt='college logo'
             />
           </div>
           <div>
-            <h1 className="sm:hidden text-xl font-bold leading-none tracking-tight text-foreground">RGI</h1>
+            <h1 className="sm:hidden text-[12px] font-bold leading-none tracking-tight text-foreground">Radharaman Group Of Institutes</h1>
             <h1 className="text-lg hidden sm:flex md:text-2xl font-bold leading-none tracking-tight text-foreground">Radharaman Group Of Institutes</h1>
-            <p className="text-[7px] md:text-[10px] uppercase tracking-widest text-brand font-semibold">Department of Training & Placement</p>
+            <p className="hidden md:text-[15px] md:block uppercase tracking-widest text-brand font-semibold">Department of Training & Placement</p>
+            <p className="text-[10px] md:hidden uppercase tracking-widest text-brand font-semibold">T&P Department</p>
           </div>
         </Link >
 

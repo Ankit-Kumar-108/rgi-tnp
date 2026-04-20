@@ -66,8 +66,14 @@ export default function AdminDashboard() {
     fetchStats();
   }, [authenticated]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     if (!window.confirm("Are you sure you want to logout?")) return;
+    try {
+      await fetch("/api/admin/logout", { method: "POST" });
+    } catch (error) {
+      toast.error("Logout failed. Please try again.");
+      console.error("Admin logout request failed:", error);
+    }
     logout("admin");
     router.push("/admin/login");
   };

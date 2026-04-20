@@ -177,7 +177,9 @@ export default function ExternalStudentDashboard() {
     if (!e.target.files?.[0]) return;
     try {
       setResumeUploading(true);
-      const url = await uploadFileToR2(e.target.files[0], "resumes");
+      const url = await uploadFileToR2(e.target.files[0], "resumes", {
+        role: "external_student",
+      });
       const token = getToken("external_student");
       const res = await fetch("/api/external/update-profile", {
         method: "PATCH",

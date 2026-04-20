@@ -10,9 +10,8 @@ import {
 import Nav from "../components/layout/nav/nav"
 import Footer from "../components/layout/footer/footer"
 import Link from "next/link"
-import { toast } from "sonner";
 import { useEffect, useState } from "react";
-import { Camera, Loader2 } from "lucide-react";
+import { Camera } from "lucide-react";
 
 /* ──────────────────────────────────────
    Types
@@ -39,12 +38,28 @@ interface MemoryData {
   createdAt: string;
 }
 
+interface HomeDrive {
+  id: string;
+  companyName: string;
+  driveDate: string;
+  driveImages: DriveImageData[];
+}
+
+interface TestimonialData {
+  id: string;
+  name?: string;
+  jobTitle?: string;
+  currentCompany?: string;
+  content?: string;
+  profileImageUrl?: string;
+}
+
 /* ──────────────────────────────────────
    Component
    ────────────────────────────────────── */
 
 export default function Home() {
-  const [testimonials, setTestimonials] = useState<any[]>([]);
+  const [testimonials, setTestimonials] = useState<TestimonialData[]>([]);
   const [memories, setMemories] = useState<MemoryData[]>([]);
   const [driveGroups, setDriveGroups] = useState<DriveGroup[]>([]);
   const [currentGroupIndex, setCurrentGroupIndex] = useState(0);
@@ -58,43 +73,25 @@ export default function Home() {
 
     const fetchDriveImages = async () => {
       try {
-        const drivesRes = await fetch("/api/admin/drives?limit=100", {
+        const drivesRes = await fetch("/api/home/driveImages?limit=10", {
           signal: controller.signal
         });
-        const drivesData = await drivesRes.json() as { success: boolean; drives: any[] };
+        const drivesData = await drivesRes.json() as {
+          success: boolean;
+          drives: HomeDrive[];
+        };
 
         if (!drivesData.success || !drivesData.drives) {
           setLoadingDrives(false);
           return;
         }
 
-        // Fetch images for drives in PARALLEL
-        const driveSlice = drivesData.drives.slice(0, 10);
-        const imagePromises = driveSlice.map(drive =>
-          fetch(`/api/drive-images/${drive.id}`, {
-            signal: controller.signal
-          })
-            .then(res => res.json() as Promise<{ success: boolean; images: DriveImageData[] }>)
-            .then(imagesData => ({
-              drive,
-              images: imagesData.success ? imagesData.images.slice(0, 4) : []
-            }))
-            .catch(error => {
-              if (error.name !== 'AbortError') {
-                console.error(`Failed to fetch images for drive ${drive.id}:`, error);
-              }
-              return { drive, images: [] };
-            })
-        );
-
-        const results = await Promise.all(imagePromises);
-
-        const groups = results
-          .filter(result => result.images.length > 0)
-          .map(result => ({
-            driveId: result.drive.id,
-            title: result.drive.companyName,
-            images: result.images,
+        const groups = drivesData.drives
+          .filter((drive) => drive.driveImages.length > 0)
+          .map((drive) => ({
+            driveId: drive.id,
+            title: drive.companyName,
+            images: drive.driveImages,
           }));
 
         setDriveGroups(groups);
@@ -116,12 +113,12 @@ export default function Home() {
     const fetchTestimonials = async () => {
       try {
         const response = await fetch("/api/home/testimonial");
-        const data = (await response.json()) as any;
+        const data = (await response.json()) as TestimonialData[];
         if (!response.ok) {
           throw new Error("Failed to fetch testimonials");
         }
         setTestimonials(data);
-      } catch (error: any) {
+      } catch (error) {
         console.error("Error fetching testimonials:", error);
       } finally {
         setLoadingTestimonials(false);
@@ -394,7 +391,7 @@ export default function Home() {
               </div>
               <div className="lg:w-2/3 p-8 lg:p-16 flex flex-col justify-center">
                 <div className="mb-8">
-                  <h2 className="text-2xl md:text-3xl font-bold mb-2">Dy Director's Message</h2>
+                  <h2 className="text-2xl md:text-3xl font-bold mb-2">Dy Director&apos;s Message</h2>
                   <p className="text-brand font-semibold text-lg">Robin P. Samuel, Dy Director (T&amp;P)</p>
                 </div>
                 <Quote className="text-brand text-5xl mb-4" />
@@ -526,7 +523,7 @@ export default function Home() {
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-8">
-                {testimonials.map((testimonial: any) => (
+                {testimonials.map((testimonial) => (
                   <div key={testimonial.id} className="bg-white dark:bg-slate-900 p-4 md:p-10 rounded-3xl shadow-sm border border-brand/10 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center group">
                     <div className="w-32 h-32 rounded-full bg-cover bg-center mb-6 ring-4 ring-brand/10 group-hover:ring-brand/30 transition-all" data-alt="Alumni testimonial" style={{ backgroundImage: testimonial.profileImageUrl ? `url('${testimonial.profileImageUrl}')` : "url('https://lh3.googleusercontent.com/aida-public/AB6AXuD-4qpQG9rSHLujKoHhrbgWRAg81sFBu41MDA54QQ14Y6yYxoww19N7Hs6lybLRgvZCg5yNw-06wJ8p2GwAuZrN9ytupLwK1aRZSm47WIYXx5ld9vONPYIsuhD5KGlStRJhFuJTFHl_Hc-t-2CxveYwpsep0lUKrYPz6ghsEv9_r2NE8H2tzkba6XLY91OoOHMGHGA4iF6n7TtSxX_Dr3zeJ206-8b6lxuPWVgO5R0mihIiXboKj1OEPXe_2qH9vxxFdK4gE9e5YQ')" }}></div>
                     <div className="mb-6">
@@ -535,7 +532,9 @@ export default function Home() {
                     </div>
                     <div className="relative px-1 md:px-4">
                       <Quote className="text-brand/60  md:text-4xl absolute -top-5 -left-2" />
-                      <p className="text-slate-600 text-xs md:text-md dark:text-slate-400 leading-relaxed italic">"{testimonial.content || "No content available."}"</p>
+                      <p className="text-slate-600 text-xs md:text-md dark:text-slate-400 leading-relaxed italic">
+                        &ldquo;{testimonial.content || "No content available."}&rdquo;
+                      </p>
                     </div>
                   </div>
                 ))}
