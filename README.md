@@ -539,8 +539,14 @@ POST   /api/upload/presigned-url (get R2 upload URL)
  - auto removal of space in name or free name from implementation during registration 
  - UI improvement 
  - take suggetion from teacher
-- [ ] **Feedback UI card change  (to change on 18/04/2026 [Under Work])**
+
+- [ ] **Feedback UI card change  (to change on 18/04/2026 [Done])**
  - add isProfileComplete functionality both in frontend and backend
+
+- [ ] **Volunteer Dashboard (Add Filter)  (to change on 18/04/2026 [Done])**
+ - add filter to filter out selected, rejected and shortlisted students
+ 
+
 
 ### Phase 2 (Next Quarter)
 - [ ] **Advanced Analytics Dashboard**
