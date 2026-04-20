@@ -5,7 +5,6 @@ import {
   Loader2,
   Briefcase,
   CheckCircle,
-  Clock,
   BadgeCheck,
   BadgeAlert,
   Images,
@@ -20,9 +19,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { getToken, logout } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import Link from "next/link";
 import VolunteerDriveImageManagement from "@/components/volunteer/VolunteerDriveImageManagement";
-import StudentsOverviewTabs from "@/components/volunteer/StudentsOverviewTabs";
+import StudentsOverviewTabs, { type StudentData } from "@/components/volunteer/StudentsOverviewTabs";
 
 interface VolunteerData {
   volunteer: {
@@ -60,7 +58,7 @@ interface VolunteerData {
 }
 
 export default function VolunteerDashboard() {
-  const { loading: authLoading, authenticated, user } = useAuth(
+  const { loading: authLoading, authenticated } = useAuth(
     "student",
     "/students/login"
   );
@@ -68,7 +66,7 @@ export default function VolunteerDashboard() {
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "drive-images" | "students-overview">("overview");
-  const [studentsOverviewData, setStudentsOverviewData] = useState<any[]>([]);
+  const [studentsOverviewData, setStudentsOverviewData] = useState<StudentData[]>([]);
   const [studentsOverviewLoading, setStudentsOverviewLoading] = useState(false);
 
   const router = useRouter();
@@ -82,7 +80,7 @@ export default function VolunteerDashboard() {
     if (activeTab === "students-overview" && studentsOverviewData.length === 0) {
       fetchStudentsOverview();
     }
-  }, [activeTab]);
+  }, [activeTab, studentsOverviewData.length]);
 
   const handleLogout = () => {
     if (!window.confirm("Are you sure you want to logout?")) return;
@@ -94,12 +92,12 @@ export default function VolunteerDashboard() {
   const fetchVolunteerDashboard = async () => {
     try {
       setFetchError(null);
-      const token = getToken("student");
+      const token = getToken("student") 
       const res = await fetch("/api/volunteer/dashboard", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const d = (await res.json()) as any;
-      if (d.success) {
+      const d = (await res.json()) as { success: boolean; data?: VolunteerData; message?: string };
+      if (d.success && d.data) {
         setData(d.data);
       } else {
         setFetchError(d.message || "Failed to load dashboard");
@@ -121,7 +119,7 @@ export default function VolunteerDashboard() {
       const res = await fetch("/api/volunteer/students-overview", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const d = (await res.json()) as any;
+      const d = (await res.json()) as { success: boolean; students?: StudentData[]; message?: string };
       if (d.success) {
         setStudentsOverviewData(d.students || []);
       } else {

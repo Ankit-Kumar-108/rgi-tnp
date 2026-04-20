@@ -3,7 +3,7 @@
 import React, { useMemo } from "react";
 import { Search, GraduationCap } from "lucide-react";
 
-interface StudentData {
+export interface StudentData {
   registrationId: string;
   driveId: string;
   studentId: string;
