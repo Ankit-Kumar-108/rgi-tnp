@@ -3,13 +3,6 @@ export const runtime = "edge";
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 
-/**
- * POST: Batch-upload drive images (up to 4 per drive).
- *
- * Accepts two payload shapes for backward compatibility:
- *   Legacy:  { title, imageUrl, driveId, uploadedBy }         → single image
- *   Batch:   { title, images: [{ imageUrl }], driveId, uploadedBy } → up to 4 images
- */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json() as {
@@ -42,9 +35,9 @@ export async function POST(req: NextRequest) {
       imageUrls = [body.imageUrl];
     }
 
-    if (imageUrls.length === 0) {
+    if (imageUrls.length !== 4) {
       return NextResponse.json(
-        { success: false, message: "At least one image URL is required" },
+        { success: false, message: "Exactly 4 image URLLs are required" },
         { status: 400 },
       );
     }

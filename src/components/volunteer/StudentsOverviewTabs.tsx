@@ -45,11 +45,11 @@ export default function StudentsOverviewTabs({ students, loading = false }: Stud
     const [activeTab, setActiveTab] = React.useState<TabType>("all");
     const [searchQuery, setSearchQuery] = React.useState("");
 
-    const tabs: { id: TabType; label: string; status?: string }[] = [
-        { id: "all", label: "All Students" },
-        { id: "selected", label: "Selected", status: "Selected" },
-        { id: "rejected", label: "Rejected", status: "Rejected" },
-        { id: "shortlisted", label: "Shortlisted", status: "Shortlisted" },
+    const tabs: { id: TabType; label: string; status?: string; bg: string }[] = [
+        { id: "all", label: "All Students", bg: "bg-slate-100/20" },
+        { id: "selected", label: "Selected", status: "Selected", bg: "bg-green-500/20" },
+        { id: "rejected", label: "Rejected", status: "Rejected", bg: "bg-red-500/20" },
+        { id: "shortlisted", label: "Shortlisted", status: "Shortlisted", bg: "bg-yellow-500/20" },
     ];
 
     const filteredStudents = useMemo(() => {
@@ -104,22 +104,23 @@ export default function StudentsOverviewTabs({ students, loading = false }: Stud
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 rounded-2xl bg-card p-2 md:p-6">
             {/* Stats Cards */}
+            <h1 className="text-text font-bold text-s md:text ml-2">Filter Buttons</h1>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {tabs.map((tab) => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`p-4 rounded-xl border-2 transition-all text-left ${activeTab === tab.id
-                                ? "border-brand bg-brand/5"
-                                : "border-border bg-card hover:border-brand/50"
+                        className={`p-4 rounded-xl border-2 transition-all text-left ${tab.bg} ${activeTab === tab.id
+                                ? "border-brand"
+                                : "border-border hover:border-brand/50"
                             }`}
                     >
                         <div className="text-sm text-muted-foreground font-medium">
                             {tab.label}
                         </div>
-                        <div className={`text-2xl font-bold mt-2 ${activeTab === tab.id ? "text-brand" : "text-foreground"
+                        <div className={`text-2xl font-bold mt-2 ${activeTab === tab.id ? "text-brand" : "text-text"
                             }`}>
                             {tab.id === "all" ? stats.all : stats[tab.id as keyof typeof stats]}
                         </div>
@@ -137,6 +138,7 @@ export default function StudentsOverviewTabs({ students, loading = false }: Stud
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
                 />
+
             </div>
 
             {/* Students List/Table */}

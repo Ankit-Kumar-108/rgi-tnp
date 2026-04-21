@@ -65,7 +65,7 @@ export default function VolunteerDashboard() {
   const [data, setData] = useState<VolunteerData | null>(null);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"overview" | "drive-images" | "students-overview">("overview");
+  const [activeTab, setActiveTab] = useState<"students-overview" | "drive-images" | "overview">("students-overview");
   const [studentsOverviewData, setStudentsOverviewData] = useState<StudentData[]>([]);
   const [studentsOverviewLoading, setStudentsOverviewLoading] = useState(false);
 
@@ -92,7 +92,7 @@ export default function VolunteerDashboard() {
   const fetchVolunteerDashboard = async () => {
     try {
       setFetchError(null);
-      const token = getToken("student") 
+      const token = getToken("student")
       const res = await fetch("/api/volunteer/dashboard", {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -191,8 +191,8 @@ export default function VolunteerDashboard() {
 
             {/* Avatar Section */}
             <div className="relative shrink-0 mx-auto md:mx-0">
-              <div className="w-32 h-32 md:w-48 md:h-48 rounded-full p-2 bg-linear-to-tr from-brand to-brand/40 transition-transform duration-500 group-hover:rotate-6">
-                <div className="w-full h-full rounded-full border-4 border-background overflow-hidden bg-muted">
+              <div className="w-32 h-32 md:w-48 md:h-48 rounded-full p-1 bg-linear-to-tr from-brand to-brand/40 transition-transform duration-500 group-hover:rotate-6">
+                <div className="w-full h-full rounded-full border-2 border-background overflow-hidden bg-muted">
                   {student?.profileImageUrl ? (
                     <img
                       alt="Volunteer Portrait"
@@ -338,42 +338,39 @@ export default function VolunteerDashboard() {
         {/* Tab Navigation */}
         <section className="mb-8 flex gap-4 border-b border-border">
           <button
-            onClick={() => setActiveTab("overview")}
-            className={`pb-4 px-4 font-bold text-sm transition-colors ${
-              activeTab === "overview"
-                ? "text-brand border-b-2 border-brand"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <Award className="w-4 h-4" />
-              Overview
-            </div>
-          </button>
-          <button
             onClick={() => setActiveTab("students-overview")}
-            className={`pb-4 px-4 font-bold text-sm transition-colors ${
-              activeTab === "students-overview"
+            className={`pb-4 px-4 font-bold text-sm transition-colors ${activeTab === "students-overview"
                 ? "text-brand border-b-2 border-brand"
                 : "text-muted-foreground hover:text-foreground"
-            }`}
+              }`}
           >
             <div className="flex items-center gap-2">
-              <Users className="w-4 h-4" />
-              Students Overview
+              <Users className="size-6" />
+              <span className="hidden md:block">Students Overview</span>
             </div>
           </button>
           <button
             onClick={() => setActiveTab("drive-images")}
-            className={`pb-4 px-4 font-bold text-sm transition-colors ${
-              activeTab === "drive-images"
+            className={`pb-4 px-4 font-bold text-sm transition-colors ${activeTab === "drive-images"
                 ? "text-brand border-b-2 border-brand"
                 : "text-muted-foreground hover:text-foreground"
-            }`}
+              }`}
           >
             <div className="flex items-center gap-2">
-              <Images className="w-4 h-4" />
-              Drive Images
+              <Images className="size-6" />
+              <span className="hidden md:block">Drive Images</span>
+            </div>
+          </button>
+          <button
+            onClick={() => setActiveTab("overview")}
+            className={`pb-4 px-4 font-bold text-sm transition-colors ${activeTab === "overview"
+                ? "text-brand border-b-2 border-brand"
+                : "text-muted-foreground hover:text-foreground"
+              }`}
+          >
+            <div className="flex items-center gap-2">
+              <Award className="size-6" />
+              <span className="hidden md:block">Overview</span>
             </div>
           </button>
         </section>
@@ -467,8 +464,8 @@ export default function VolunteerDashboard() {
 
             {activeTab === "students-overview" && (
               <section>
-                <StudentsOverviewTabs 
-                  students={studentsOverviewData} 
+                <StudentsOverviewTabs
+                  students={studentsOverviewData}
                   loading={studentsOverviewLoading}
                 />
               </section>

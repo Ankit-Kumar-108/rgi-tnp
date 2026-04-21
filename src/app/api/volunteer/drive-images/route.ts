@@ -54,9 +54,9 @@ export async function POST(req: NextRequest) {
         .filter(Boolean);
     }
 
-    if (imageUrls.length === 0) {
+    if (imageUrls.length !== 4) {
       return NextResponse.json(
-        { success: false, message: "At least one image URL is required" },
+        { success: false, message: "Exactly 4 image URLLs are required" },
         { status: 400 }
       );
     }
@@ -192,10 +192,7 @@ export async function GET(req: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1", 10);
     const skip = (page - 1) * limit;
 
-    let where: any = {
-      uploadedBy: student.email,
-    };
-
+    let where: any = {};
     if (driveId) {
       where.driveId = driveId;
     }

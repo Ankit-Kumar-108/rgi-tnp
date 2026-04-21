@@ -52,9 +52,7 @@ const EMPTY_SLOTS: ImageSlot[] = Array.from({ length: 4 }, () => ({
   preview: null,
 }));
 
-/* ──────────────────────────────────────────────
-   Component
-   ────────────────────────────────────────────── */
+/*Component*/
 
 export default function VolunteerDriveImageManagement() {
   // ── State ──
@@ -306,19 +304,15 @@ export default function VolunteerDriveImageManagement() {
       { drive: DriveImage["drive"]; title: string; images: DriveImage[] }
     >,
   );
-
-  /* ──────────────────────────────────────────────
-     Render
-     ────────────────────────────────────────────── */
   return (
     <div className="space-y-10">
       {/* ── Header ── */}
       <div className="flex items-center gap-4">
-        <div className="w-12 h-12 bg-brand/10 rounded-2xl flex items-center justify-center">
+        <div className="w-12 h-12 bg-brand/10 rounded-full flex items-center justify-center shrink-0">
           <Images className="w-6 h-6 text-brand" />
         </div>
         <div>
-          <h2 className="text-2xl font-black tracking-tight text-foreground">
+          <h2 className="text-xl md:text-2xl font-black tracking-tight text-foreground">
             Drive Image Management
           </h2>
           <p className="text-sm text-muted-foreground">

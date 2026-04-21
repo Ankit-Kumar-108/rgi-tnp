@@ -469,7 +469,7 @@ export default function VolunteersManagement() {
                   onChange={(e) =>
                     setAssignForm({ ...assignForm, studentId: e.target.value })
                   }
-                  className="w-full px-4 py-2 bg-muted border border-border rounded-lg focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none"
+                  className="uppercase w-full px-4 py-2 bg-muted border border-border rounded-lg focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none"
                 />
               </div>
               <div>
