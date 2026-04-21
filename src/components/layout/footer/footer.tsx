@@ -13,11 +13,13 @@ export default function Footer() {
           <div className="lg:pr-8">
             <div className="flex items-center gap-3 mb-6">
               <img
-                className="w-8 h-8 text-brand"
+                className="size-12 text-brand"
                 src={"/logo/logo.png"}
                 alt='college logo'
               />
+              <div className='flex flex-col'>
               <span className="font-bold text-xl text-foreground">RGI T&P</span>
+              </div>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed mb-6">
               Radharaman Group of Institutes is dedicated to providing quality technical education and ensuring every student reaches their career potential.
