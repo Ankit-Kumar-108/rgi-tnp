@@ -28,7 +28,7 @@ export default function RGIProfile() {
                 Radharaman Group of Institutes:{" "}
                 <span className="text-brand">A Legacy of Excellence</span>
               </h1>
-              <p className="text-xl text-slate-300 leading-relaxed mb-10 font-light max-w-2xl">
+              <p className="text-xl text-white/70 leading-relaxed mb-10 font-light max-w-2xl">
                 Nurturing talent and driving innovation in Central India through
                 world-class infrastructure and academic rigor for over two
                 decades.

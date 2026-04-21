@@ -431,10 +431,10 @@ export default function VolunteerDriveImageManagement() {
                       <div className="w-10 h-10 rounded-xl bg-brand/10 flex items-center justify-center group-hover/slot:bg-brand/20 transition-colors">
                         <ImagePlus className="w-5 h-5 text-brand" />
                       </div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                      <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                         Image {index + 1}
                       </span>
-                      <span className="text-[9px] text-muted-foreground/60">
+                      <span className="text-xs text-muted-foreground/60">
                         Drag or click
                       </span>
                       <input
@@ -633,3 +633,4 @@ export default function VolunteerDriveImageManagement() {
     </div>
   );
 }
+

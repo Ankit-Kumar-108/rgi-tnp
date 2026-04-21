@@ -79,7 +79,7 @@ export default function StudentLogin() {
                                 <GraduationCap className="w-8 h-8"/>
                             </div>
                             <h1 className="text-4xl font-black mb-4 leading-tight">Kickstart Your Career Journey</h1>
-                            <p className="text-lg text-slate-200 font-light max-w-md">Access exclusive internships, upcoming placement drives, premium training resources, and track your applications seamlessly.</p>
+                            <p className="text-lg text-white/80 font-light max-w-md">Access exclusive internships, upcoming placement drives, premium training resources, and track your applications seamlessly.</p>
                             <div className="mt-12 flex items-center gap-4">
                                 <div className="flex -space-x-4">
                                     <img className="w-11 h-11 rounded-full border-2 border-slate-900 object-cover relative z-30" alt="Student 1" src="https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=100&h=100&fit=crop" />
@@ -150,7 +150,7 @@ export default function StudentLogin() {
                                 </div>
                             </div>
                             <button 
-                                className="w-full bg-brand hover:bg-brand/90 text-primary-foreground font-bold py-3.5 rounded-xl shadow-[0_4px_14px_0_rgba(var(--brand-rgb),0.39)] hover:shadow-[0_6px_20px_rgba(var(--brand-rgb),0.23)] hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed" 
+                                className="w-full bg-brand hover:opacity-90 text-primary-foreground font-bold py-3.5 rounded-full shadow-[var(--shadow-brand)] transition-all duration-200 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed" 
                                 type="submit"
                                 disabled={loading}
                             >
@@ -164,13 +164,13 @@ export default function StudentLogin() {
                         
                         <div className="mt-8 pt-6 border-t border-border relative z-10">
                             <p className="text-center text-muted-foreground mb-4 text-sm">Don&apos;t have an account yet?</p>
-                            <Link href="/students/register" className="w-full py-3 sm:py-3.5 rounded-xl border-2 border-brand/20 text-brand font-bold bg-transparent hover:bg-brand/5 transition-all duration-200 flex items-center justify-center gap-2">
+                            <Link href="/students/register" className="w-full py-3 sm:py-3.5 rounded-full border-2 border-brand/20 text-brand font-bold bg-transparent hover:bg-brand/5 transition-colors duration-200 flex items-center justify-center gap-2">
                                 Register as Student
                             </Link>
                         </div>
                         
                         <div className="mt-10 flex flex-col items-center gap-2 relative z-10">
-                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Official Portal of</p>
+                            <p className="text-xs uppercase tracking-widest text-muted-foreground font-bold">Official Portal of</p>
                             <span className="text-foreground font-bold text-xs sm:text-sm text-center">RADHARAMAN GROUP OF INSTITUTES</span>
                             <div className="flex gap-4 mt-2">
                                 <a className="text-muted-foreground hover:text-brand transition-colors p-2 hover:bg-brand/5 rounded-full" href="#" aria-label="Website"><Earth className="w-4 h-4"/></a>

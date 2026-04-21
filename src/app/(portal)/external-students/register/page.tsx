@@ -249,7 +249,7 @@ export default function ExternalStudentRegister() {
                                     <p className="font-bold text-foreground text-sm sm:text-base">Drag and drop your image</p>
                                     <p className="text-muted-foreground text-xs sm:text-sm mt-1">Or <span className="text-brand font-bold hover:underline">click to browse</span></p>
                                 </div>
-                                <p className="text-[9px] sm:text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-1 sm:mt-2 bg-background px-3 py-1 rounded-full border border-border">
+                                <p className="text-xs sm:text-xs text-muted-foreground font-bold uppercase tracking-widest mt-1 sm:mt-2 bg-background px-3 py-1 rounded-full border border-border">
                                     Supports JPG, PNG, WEBP (Max 5MB)
                                 </p>
                             </div>
@@ -336,7 +336,7 @@ export default function ExternalStudentRegister() {
                                 <GraduationCap className="w-8 h-8" />
                             </div>
                             <h1 className="text-4xl font-black mb-4 leading-tight">Join as an External Student</h1>
-                            <p className="text-lg text-slate-200 font-light max-w-md">Register to participate in open campus placement drives hosted by RGI.</p>
+                            <p className="text-lg text-white/80 font-light max-w-md">Register to participate in open campus placement drives hosted by RGI.</p>
                         </div>
                     </div>
 
@@ -552,7 +552,7 @@ export default function ExternalStudentRegister() {
                                 </div>
                             </div>
 
-                            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 px-1">
+                            <p className="text-xs sm:text-xs text-muted-foreground mt-1 px-1">
                                 Password must contain: uppercase letter, lowercase letter, number, and special character (@$!%*?&)
                             </p>
 
@@ -576,3 +576,5 @@ export default function ExternalStudentRegister() {
         </div>
     );
 }
+
+

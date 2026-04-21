@@ -115,7 +115,7 @@ export default function YouthHub() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-[var(--ach-primary)]/5 p-10 rounded-[2.5rem] border border-[var(--ach-primary)]/10 flex flex-col justify-between transition-all duration-300 hover:-rotate-1 hover:scale-[1.02] hover:shadow-2xl hover:shadow-[var(--ach-primary)]/20">
+            <div className="bg-[var(--ach-primary)]/5 p-8 md:p-10 rounded-2xl md:rounded-[2.5rem] border border-[var(--ach-primary)]/10 flex flex-col justify-between transition-all duration-300 hover:shadow-[var(--shadow-lg)]">
               <GraduationCap className="w-16 h-16 text-[var(--ach-primary)] mb-12" />
               <div>
                 <h3 className="text-3xl font-black mb-4 text-[var(--ach-on-surface)]">
@@ -131,7 +131,7 @@ export default function YouthHub() {
               </div>
             </div>
             
-            <div className="bg-[var(--ach-secondary)]/5 p-10 rounded-[2.5rem] border border-[var(--ach-secondary)]/10 md:mt-12 flex flex-col justify-between transition-all duration-300 hover:-rotate-1 hover:scale-[1.02] hover:shadow-2xl hover:shadow-[var(--ach-secondary)]/20">
+            <div className="bg-[var(--ach-secondary)]/5 p-8 md:p-10 rounded-2xl md:rounded-[2.5rem] border border-[var(--ach-secondary)]/10 md:mt-12 flex flex-col justify-between transition-all duration-300 hover:shadow-[var(--shadow-lg)]">
               <Medal className="w-16 h-16 text-[var(--ach-secondary)] mb-12" />
               <div>
                 <h3 className="text-3xl font-black mb-4 text-[var(--ach-on-surface)]">
@@ -146,7 +146,7 @@ export default function YouthHub() {
               </div>
             </div>
 
-            <div className="bg-[var(--ach-accent)]/10 p-10 rounded-[2.5rem] border border-[var(--ach-accent)]/20 flex flex-col justify-between transition-all duration-300 hover:-rotate-1 hover:scale-[1.02] hover:shadow-2xl hover:shadow-[var(--ach-accent)]/20">
+            <div className="bg-[var(--ach-accent)]/10 p-8 md:p-10 rounded-2xl md:rounded-[2.5rem] border border-[var(--ach-accent)]/20 flex flex-col justify-between transition-all duration-300 hover:shadow-[var(--shadow-lg)]">
               <Award className="w-16 h-16 text-[var(--ach-on-surface)] mb-12" />
               <div>
                 <h3 className="text-3xl font-black mb-4 text-[var(--ach-on-surface)]">
@@ -280,7 +280,7 @@ export default function YouthHub() {
               </p>
               
               <div className="space-y-6">
-                <div className="flex items-start gap-4 p-6 bg-white dark:bg-[var(--ach-on-surface)] rounded-3xl shadow-lg border-l-8 border-[var(--ach-secondary)] transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl">
+                <div className="flex items-start gap-4 p-5 md:p-6 bg-card rounded-2xl md:rounded-3xl shadow-[var(--shadow-sm)] border-l-8 border-[var(--ach-secondary)] transition-shadow duration-300 hover:shadow-[var(--shadow-lg)]">
                   <Trophy className="w-6 h-6 text-[var(--ach-secondary)]" />
                   <div>
                     <h5 className="font-black text-[var(--ach-on-surface)] dark:text-[var(--ach-surface)]">
@@ -291,7 +291,7 @@ export default function YouthHub() {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-start gap-4 p-6 bg-white dark:bg-[var(--ach-on-surface)] rounded-3xl shadow-lg border-l-8 border-[var(--ach-accent)] transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl">
+                <div className="flex items-start gap-4 p-5 md:p-6 bg-card rounded-2xl md:rounded-3xl shadow-[var(--shadow-sm)] border-l-8 border-[var(--ach-accent)] transition-shadow duration-300 hover:shadow-[var(--shadow-lg)]">
                   <Activity className="w-6 h-6 text-[var(--ach-accent)]" />
                   <div>
                     <h5 className="font-black text-[var(--ach-on-surface)] dark:text-[var(--ach-surface)]">

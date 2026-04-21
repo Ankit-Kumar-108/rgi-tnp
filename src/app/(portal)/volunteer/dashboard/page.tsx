@@ -163,7 +163,7 @@ export default function VolunteerDashboard() {
               <h1 className="text-lg font-black text-foreground tracking-tight">
                 Volunteer Dashboard
               </h1>
-              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">
+              <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest">
                 RGI T&P Cell
               </p>
             </div>
@@ -237,7 +237,7 @@ export default function VolunteerDashboard() {
               {/* Horizontal Grid Stats */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-0 pt-6 border-t border-border">
                 <div className="md:pr-6 md:border-r border-border">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
+                  <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">
                     Current CGPA
                   </p>
                   <p className="text-xl md:text-2xl font-bold text-brand">
@@ -245,7 +245,7 @@ export default function VolunteerDashboard() {
                   </p>
                 </div>
                 <div className="md:px-6 md:border-r border-border">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
+                  <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">
                     Semester
                   </p>
                   <p className="text-xl md:text-2xl font-bold text-brand">
@@ -253,7 +253,7 @@ export default function VolunteerDashboard() {
                   </p>
                 </div>
                 <div className="md:px-6 md:border-r border-border">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
+                  <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">
                     Branch
                   </p>
                   <p className="text-xl md:text-2xl font-bold text-brand">
@@ -261,7 +261,7 @@ export default function VolunteerDashboard() {
                   </p>
                 </div>
                 <div className="md:pl-6">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
+                  <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">
                     Status
                   </p>
                   <p className="text-xl md:text-2xl font-bold text-green-600">

@@ -50,16 +50,16 @@ export default function PublicOpenDrivesPage() {
         <main className="flex-1 w-full pt-20 pb-24">
           
           {/* Hero Section */}
-          <section className="max-w-7xl mx-auto px-6 md:px-8 mb-20">
+          <section className="max-w-7xl mx-auto px-4 md:px-8 mb-16 md:mb-20">
             <div className="mb-12 text-center md:text-left">
               <span className="inline-block bg-brand/10 text-brand text-sm font-bold tracking-widest uppercase px-4 py-1 rounded-full mb-4">
                 Global Opportunities
               </span>
-              <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-[0.9] text-foreground mb-6">
+              <h1 className="text-4xl md:text-5xl lg:text-7xl font-black tracking-tight leading-[1.05] text-foreground mb-4 md:mb-6">
                 Open Campus <br />
                 <span className="text-brand">Drives.</span>
               </h1>
-              <p className="text-lg text-muted-foreground font-light max-w-2xl">
+              <p className="text-base md:text-lg text-muted-foreground font-light max-w-2xl">
                 Explore exciting placement opportunities available for students from all colleges. Register and start your journey with top organizations.
               </p>
             </div>
@@ -114,7 +114,7 @@ export default function PublicOpenDrivesPage() {
 
                     <button 
                       onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
-                      className="w-full bg-background border-2 border-brand/20 text-brand py-3.5 rounded-xl font-bold hover:bg-brand hover:text-primary-foreground hover:border-brand transition-colors text-sm"
+                      className="w-full bg-background border-2 border-brand/20 text-brand py-3.5 rounded-full font-bold hover:bg-brand hover:text-primary-foreground hover:border-brand transition-colors text-sm"
                     >
                       View Details
                     </button>

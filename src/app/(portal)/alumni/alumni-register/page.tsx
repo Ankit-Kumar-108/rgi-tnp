@@ -201,7 +201,7 @@ export default function AlumniRegister() {
                                     <p className="font-bold text-foreground text-sm sm:text-base">Drag and drop your image</p>
                                     <p className="text-muted-foreground text-xs sm:text-sm mt-1">Or <span className="text-brand font-bold hover:underline">click to browse</span></p>
                                 </div>
-                                <p className="text-[9px] sm:text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-1 sm:mt-2 bg-background px-3 py-1 rounded-full border border-border">
+                                <p className="text-xs sm:text-xs text-muted-foreground font-bold uppercase tracking-widest mt-1 sm:mt-2 bg-background px-3 py-1 rounded-full border border-border">
                                     Supports JPG, PNG, WEBP (Max 5MB)
                                 </p>
                             </div>
@@ -246,7 +246,7 @@ export default function AlumniRegister() {
                                 <GraduationCap className="w-8 h-8" />
                             </div>
                             <h1 className="text-4xl font-black mb-4 leading-tight">Join Your Alumni Community</h1>
-                            <p className="text-lg text-slate-200 font-light max-w-md">Create an account to access exclusive opportunities, networking, and stay connected with your alma mater.</p>
+                            <p className="text-lg text-white/80 font-light max-w-md">Create an account to access exclusive opportunities, networking, and stay connected with your alma mater.</p>
                             <div className="mt-12 flex items-center gap-4">
                                 <div className="flex -space-x-4">
                                     <img className="w-11 h-11 rounded-full border-2 border-slate-900 object-cover relative z-30" alt="Alumni 1" src="https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=100&h=100&fit=crop" />
@@ -408,7 +408,7 @@ export default function AlumniRegister() {
 
                         {/* Footer Info Box */}
                         <div className="mt-8 flex flex-col items-center gap-2 relative z-10 shrink-0">
-                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Official Portal of</p>
+                            <p className="text-xs uppercase tracking-widest text-muted-foreground font-bold">Official Portal of</p>
                             <span className="text-foreground font-bold text-xs sm:text-sm text-center">RADHARAMAN GROUP OF INSTITUTES</span>
                             <div className="flex gap-4 mt-2">
                                 <a className="text-muted-foreground hover:text-brand transition-colors p-2 hover:bg-brand/5 rounded-full" href="#" aria-label="Website"><Earth className="w-4 h-4" /></a>
@@ -423,3 +423,5 @@ export default function AlumniRegister() {
         </div>
     );
 }
+
+

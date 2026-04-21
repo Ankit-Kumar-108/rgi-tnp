@@ -124,7 +124,7 @@ export default function Testimonials() {
 
           {/* Header Section */}
           <section className="max-w-7xl mx-auto px-6 md:px-8 mb-16 text-center space-y-6">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight">
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight">
               Hear From Our <span className="text-brand dark:text-brand">Community</span>
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto font-medium">
@@ -231,7 +231,7 @@ EmptyState.displayName = "EmptyState";
 /* --- 1. Recruiter Card (Corporate & Elegant) --- */
 const RecruiterCard = React.memo(({ data }: { data: RecruiterFeedback }) => {
   return (
-    <div className="group relative bg-card p-8 rounded-3xl border border-border hover:shadow-[var(--shadow-lg)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+    <div className="group relative bg-card p-5 md:p-8 rounded-2xl md:rounded-3xl border border-border hover:shadow-[var(--shadow-lg)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
       {/* Decorative Watermark */}
       <Building2 className="absolute -top-6 -right-6 w-32 h-32 text-muted/80 dark:text-muted/30 z-0 rotate-12 transition-transform group-hover:rotate-6 group-hover:scale-110 duration-500" />
       
@@ -241,7 +241,7 @@ const RecruiterCard = React.memo(({ data }: { data: RecruiterFeedback }) => {
             <h4 className="font-extrabold text-foreground text-lg uppercase tracking-tight">
               {data.recruiter.company}
             </h4>
-            <span className="inline-block mt-1 text-[10px] font-bold tracking-widest text-brand dark:text-brand uppercase bg-brand/10 px-2 py-1 rounded-md">
+            <span className="inline-block mt-1 text-xs font-bold tracking-widest text-brand dark:text-brand uppercase bg-brand/10 px-2 py-1 rounded-md">
               Industry Partner
             </span>
           </div>
@@ -271,7 +271,7 @@ RecruiterCard.displayName = "RecruiterCard";
 /* --- 2. Alumni Card (Nostalgic & Proud) --- */
 const AlumniCard = React.memo(({ data }: { data: AlumniFeedback }) => {
   return (
-    <div className="relative bg-linear-to-br from-card to-muted/30 p-8 rounded-3xl border border-border hover:shadow-[var(--shadow-lg)] hover:border-brand/30 transition-all duration-300">
+    <div className="relative bg-linear-to-br from-card to-muted/30 p-5 md:p-8 rounded-2xl md:rounded-3xl border border-border hover:shadow-[var(--shadow-lg)] hover:border-brand/30 transition-all duration-300">
       <div className="flex items-center gap-4 mb-6">
         <div className="relative shrink-0">
           <div className="w-14 h-14 rounded-full overflow-hidden bg-muted border-2 border-card shadow-sm">
@@ -293,7 +293,7 @@ const AlumniCard = React.memo(({ data }: { data: AlumniFeedback }) => {
           <p className="text-muted-foreground text-xs mt-0.5 truncate">
             {data.alumni.course} {data.alumni.branch ? `• ${data.alumni.branch}` : ''}
           </p>
-          <p className="text-brand dark:text-brand text-[11px] font-bold mt-0.5">
+          <p className="text-brand dark:text-brand text-xs font-bold mt-0.5">
             Class of {data.alumni.batch}
           </p>
         </div>
@@ -312,7 +312,7 @@ AlumniCard.displayName = "AlumniCard";
 /* --- 3. Student Card (Fresh & Vibrant) --- */
 const StudentCard = React.memo(({ data }: { data: StudentFeedback }) => {
   return (
-    <div className="relative bg-card p-8 rounded-3xl shadow-[var(--shadow-sm)] border border-border hover:shadow-[var(--shadow-lg)] transition-all duration-300 overflow-hidden">
+    <div className="relative bg-card p-5 md:p-8 rounded-2xl md:rounded-3xl shadow-[var(--shadow-sm)] border border-border hover:shadow-[var(--shadow-lg)] transition-all duration-300 overflow-hidden">
        {/* Left side accent line */}
       <div className="absolute top-0 left-0 bottom-0 w-1.5 bg-brand rounded-l-3xl" />
       

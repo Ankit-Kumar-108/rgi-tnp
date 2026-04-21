@@ -98,7 +98,7 @@ export default function ExternalStudentDashboard() {
         actionElement: (
           <div className="flex flex-col items-end">
             <span className="inline-flex items-center gap-1 text-red-500 text-xs font-bold"><XCircle className="w-4 h-4" /> Ineligible</span>
-            <span className="text-[10px] text-muted-foreground leading-none mt-1">{reason}</span>
+            <span className="text-xs text-muted-foreground leading-none mt-1">{reason}</span>
           </div>
         )
       };
@@ -409,19 +409,19 @@ export default function ExternalStudentDashboard() {
                     {/* Horizontal Grid Stats */}
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-0 pt-6 border-t border-border">
                       <div className="md:pr-6 md:border-r border-border">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Current CGPA</p>
+                        <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Current CGPA</p>
                         <p className="text-xl md:text-2xl font-bold text-brand">{student?.cgpa || "N/A"}</p>
                       </div>
                       <div className="md:px-6 md:border-r border-border">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Branch</p>
+                        <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Branch</p>
                         <p className="text-md md:text-lg font-bold text-foreground leading-tight truncate">{student?.branch || "N/A"}</p>
                       </div>
                       <div className="md:px-6 md:border-r border-border">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Batch</p>
+                        <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Batch</p>
                         <p className="text-xl md:text-2xl font-bold text-foreground">{student?.batch || "N/A"}</p>
                       </div>
                       <div className="md:pl-6">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Course</p>
+                        <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Course</p>
                         <p className="text-xl md:text-2xl font-bold text-foreground">{student?.course}</p>
                       </div>
                     </div>
@@ -488,18 +488,18 @@ export default function ExternalStudentDashboard() {
                                   <p className="text-xs text-muted-foreground">{drive.roleName}</p>
                                 </div>
                               </div>
-                              <span className={`text-[10px] px-2 py-1 rounded-full font-bold ${drive.driveType === "Open" ? "bg-green-500/10 text-green-600" : "bg-blue-500/10 text-blue-600"}`}>
+                              <span className={`text-xs px-2 py-1 rounded-full font-bold ${drive.driveType === "Open" ? "bg-green-500/10 text-green-600" : "bg-blue-500/10 text-blue-600"}`}>
                                 {drive.driveType}
                               </span>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4 py-2 border-y border-border/50">
                               <div>
-                                <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">CTC</p>
+                                <p className="text-xs uppercase font-black text-muted-foreground tracking-widest">CTC</p>
                                 <p className="text-sm font-bold text-foreground">{drive.ctc}</p>
                               </div>
                               <div>
-                                <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">Date</p>
+                                <p className="text-xs uppercase font-black text-muted-foreground tracking-widest">Date</p>
                                 <p className="text-sm font-bold text-foreground">{new Date(drive.driveDate).toLocaleDateString()}</p>
                               </div>
                             </div>
@@ -516,7 +516,7 @@ export default function ExternalStudentDashboard() {
                     <div className="hidden md:block bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
                       <table className="w-full text-sm">
                         <thead className="bg-muted/50 border-b border-border">
-                          <tr className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          <tr className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                             <th className="text-left px-5 py-3">Company</th>
                             <th className="text-left px-5 py-3">Role</th>
                             <th className="text-left px-5 py-3">CTC</th>
@@ -540,7 +540,7 @@ export default function ExternalStudentDashboard() {
                                 <td className="px-5 py-3.5 font-bold">{drive.ctc}</td>
                                 <td className="px-5 py-3.5 text-muted-foreground">{new Date(drive.driveDate).toLocaleDateString()}</td>
                                 <td className="px-5 py-3.5">
-                                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${drive.driveType === "Open" ? "bg-green-500/10 text-green-600" : "bg-blue-500/10 text-blue-600"}`}>
+                                  <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${drive.driveType === "Open" ? "bg-green-500/10 text-green-600" : "bg-blue-500/10 text-blue-600"}`}>
                                     {drive.driveType}
                                   </span>
                                 </td>
@@ -580,7 +580,7 @@ export default function ExternalStudentDashboard() {
                               <h3 className="font-bold text-foreground leading-tight">{reg.drive?.companyName}</h3>
                               <p className="text-xs text-muted-foreground">{reg.drive?.roleName}</p>
                             </div>
-                            <span className={`text-[10px] px-2 py-1 rounded-full font-bold capitalize ${reg.drive?.status === "active" ? "bg-green-500/10 text-green-600" :
+                            <span className={`text-xs px-2 py-1 rounded-full font-bold capitalize ${reg.drive?.status === "active" ? "bg-green-500/10 text-green-600" :
                               reg.drive?.status === "completed" ? "bg-blue-500/10 text-blue-600" :
                                 "bg-muted text-muted-foreground"
                               }`}>
@@ -590,8 +590,8 @@ export default function ExternalStudentDashboard() {
 
                           <div className="flex items-center justify-between py-3 border-y border-border/50">
                             <div className="space-y-1">
-                              <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">Action Status</p>
-                              <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider ${reg.status === "Selected" ? "bg-green-500/10 text-green-600" :
+                              <p className="text-xs uppercase font-black text-muted-foreground tracking-widest">Action Status</p>
+                              <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-bold tracking-wider ${reg.status === "Selected" ? "bg-green-500/10 text-green-600" :
                                 reg.status === "Rejected" ? "bg-red-500/10 text-red-500" :
                                   reg.status === "Shortlisted" ? "bg-yellow-500/10 text-yellow-600" :
                                     "bg-muted text-muted-foreground"
@@ -600,7 +600,7 @@ export default function ExternalStudentDashboard() {
                               </span>
                             </div>
                             <div className="text-right space-y-1">
-                              <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">Attendance</p>
+                              <p className="text-xs uppercase font-black text-muted-foreground tracking-widest">Attendance</p>
                               {reg.attended ? (
                                 <span className="text-green-600 text-xs font-bold flex items-center justify-end gap-1">
                                   <CheckCircle className="w-3.5 h-3.5" /> Present
@@ -613,7 +613,7 @@ export default function ExternalStudentDashboard() {
                             </div>
                           </div>
 
-                          <p className="text-[10px] text-muted-foreground italic">
+                          <p className="text-xs text-muted-foreground italic">
                             Drive Date: {reg.drive?.driveDate ? new Date(reg.drive.driveDate).toLocaleDateString() : "-"}
                           </p>
                         </div>
@@ -625,7 +625,7 @@ export default function ExternalStudentDashboard() {
                       <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left">
                           <thead>
-                            <tr className="bg-muted/50 border-b border-border text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                            <tr className="bg-muted/50 border-b border-border text-xs font-bold uppercase tracking-wider text-muted-foreground">
                               <th className="px-5 py-4">Company & Role</th>
                               <th className="px-5 py-4">Date</th>
                               <th className="px-5 py-4">Action Status</th>
@@ -644,7 +644,7 @@ export default function ExternalStudentDashboard() {
                                   {reg.drive?.driveDate ? new Date(reg.drive.driveDate).toLocaleDateString() : "-"}
                                 </td>
                                 <td className="px-5 py-3.5">
-                                  <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider ${reg.status === "Selected" ? "bg-green-500/10 text-green-600" :
+                                  <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-bold tracking-wider ${reg.status === "Selected" ? "bg-green-500/10 text-green-600" :
                                     reg.status === "Rejected" ? "bg-red-500/10 text-red-500" :
                                       reg.status === "Shortlisted" ? "bg-yellow-500/10 text-yellow-600" :
                                         "bg-muted text-muted-foreground"
@@ -653,7 +653,7 @@ export default function ExternalStudentDashboard() {
                                   </span>
                                 </td>
                                 <td className="px-5 py-3.5">
-                                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold capitalize ${reg.drive?.status === "active" ? "bg-green-500/10 text-green-600" :
+                                  <span className={`text-xs px-2 py-0.5 rounded-full font-bold capitalize ${reg.drive?.status === "active" ? "bg-green-500/10 text-green-600" :
                                     reg.drive?.status === "completed" ? "bg-blue-500/10 text-blue-600" :
                                       "bg-muted text-muted-foreground"
                                     }`}>
@@ -696,17 +696,17 @@ export default function ExternalStudentDashboard() {
                           <h3 className="text-sm font-bold text-foreground truncate max-w-37.5">
                             {drive.companyName}
                           </h3>
-                          <p className="text-[10px] text-muted-foreground">
+                          <p className="text-xs text-muted-foreground">
                             {drive.roleName} • {new Date(drive.driveDate).toLocaleDateString()}
                           </p>
                         </div>
                         <div>
                           {drive.isRegistered ? (
-                            <span className="bg-brand/10 text-brand text-[9px] px-2 py-0.5 rounded-full font-bold">
+                            <span className="bg-brand/10 text-brand text-xs px-2 py-0.5 rounded-full font-bold">
                               Registered
                             </span>
                           ) : (
-                            <span className="bg-muted text-muted-foreground text-[9px] px-2 py-0.5 rounded-full font-bold">
+                            <span className="bg-muted text-muted-foreground text-xs px-2 py-0.5 rounded-full font-bold">
                               Missed
                             </span>
                           )}
@@ -720,7 +720,7 @@ export default function ExternalStudentDashboard() {
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="bg-muted/50 border-b border-border text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          <tr className="bg-muted/50 border-b border-border text-xs font-bold uppercase tracking-wider text-muted-foreground">
                             <th className="text-left px-5 py-3">Company</th>
                             <th className="text-left px-5 py-3">Role</th>
                             <th className="text-left px-5 py-3">Date</th>
@@ -741,11 +741,11 @@ export default function ExternalStudentDashboard() {
                               </td>
                               <td className="px-5 py-3.5 text-right">
                                 {drive.isRegistered ? (
-                                  <span className="bg-brand/10 text-brand text-[10px] px-2 py-0.5 rounded-full font-bold">
+                                  <span className="bg-brand/10 text-brand text-xs px-2 py-0.5 rounded-full font-bold">
                                     Registered
                                   </span>
                                 ) : (
-                                  <span className="bg-muted text-muted-foreground text-[10px] px-2 py-0.5 rounded-full font-bold">
+                                  <span className="bg-muted text-muted-foreground text-xs px-2 py-0.5 rounded-full font-bold">
                                     Not Registered
                                   </span>
                                 )}
@@ -784,3 +784,4 @@ export default function ExternalStudentDashboard() {
     </>
   );
 }
+

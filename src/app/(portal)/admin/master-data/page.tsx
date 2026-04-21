@@ -143,7 +143,7 @@ export default function AdminMasterDataPage() {
               <p className="text-2xl font-black text-foreground">
                 {loading ? "..." : counts.studentMaster}
               </p>
-              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">
+              <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">
                 Student Master Records
               </p>
             </div>
@@ -156,7 +156,7 @@ export default function AdminMasterDataPage() {
               <p className="text-2xl font-black text-foreground">
                 {loading ? "..." : counts.alumniMaster}
               </p>
-              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">
+              <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">
                 Alumni Master Records
               </p>
             </div>
@@ -247,7 +247,7 @@ export default function AdminMasterDataPage() {
                   <thead>
                     <tr className="bg-muted/50 border-b border-border sticky top-0">
                       {Object.keys(preview[0]).map((key) => (
-                        <th key={key} className="text-left px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                        <th key={key} className="text-left px-3 py-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                           {key}
                         </th>
                       ))}
@@ -287,3 +287,4 @@ export default function AdminMasterDataPage() {
     </div>
   );
 }
+

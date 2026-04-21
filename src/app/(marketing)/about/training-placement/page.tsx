@@ -52,7 +52,7 @@ export default function ImpactCommunity() {
                                         <div className="relative">
                                             <div className="text-5xl font-black text-brand mb-1">85%</div>
                                             <div className="h-px bg-linear-to-r from-brand/50 to-transparent mb-3"></div>
-                                            <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                                            <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
                                                 Community Impact Rate
                                             </div>
                                         </div>
@@ -61,7 +61,7 @@ export default function ImpactCommunity() {
                                                 120+
                                             </div>
                                             <div className="h-px bg-linear-to-r from-brand/50 to-transparent mb-3"></div>
-                                            <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                                            <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
                                                 Active NGO Partners
                                             </div>
                                         </div>
@@ -70,7 +70,7 @@ export default function ImpactCommunity() {
                                                 15k+
                                             </div>
                                             <div className="h-px bg-linear-to-r from-brand/50 to-transparent mb-3"></div>
-                                            <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                                            <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
                                                 Volunteer Hours Yearly
                                             </div>
                                         </div>
@@ -79,7 +79,7 @@ export default function ImpactCommunity() {
                                                 Top 5
                                             </div>
                                             <div className="h-px bg-linear-to-r from-brand/50 to-transparent mb-3"></div>
-                                            <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                                            <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
                                                 Ethical Leadership Ranking
                                             </div>
                                         </div>
@@ -93,7 +93,7 @@ export default function ImpactCommunity() {
                     <section className="bg-background py-32 px-8 overflow-hidden">
                         <div className="max-w-250 mx-auto">
                             <div className="mb-24 flex flex-col items-center">
-                                <span className="text-brand font-bold uppercase tracking-[0.5em] text-[10px] mb-6 block text-center italic">
+                                <span className="text-brand font-bold uppercase tracking-[0.5em] text-xs mb-6 block text-center italic">
                                     The Social Mandate
                                 </span>
                                 <h2 className="text-5xl md:text-7xl font-bold text-foreground text-center leading-[1.1] tracking-tight max-w-4xl">
@@ -298,7 +298,7 @@ export default function ImpactCommunity() {
                     <section className="px-8 py-32 max-w-360 mx-auto overflow-hidden">
                         <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-12">
                             <div className="max-w-2xl">
-                                <span className="text-brand font-bold uppercase tracking-[0.5em] text-[10px] mb-6 block">
+                                <span className="text-brand font-bold uppercase tracking-[0.5em] text-xs mb-6 block">
                                     NGO & Social Partners
                                 </span>
                                 <h2 className="text-6xl font-black text-foreground tracking-tighter leading-none mb-6 italic">

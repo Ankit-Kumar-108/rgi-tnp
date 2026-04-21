@@ -217,7 +217,7 @@ export default function AlumniDiscovery() {
 
                     {/* Bio Section */}
                     <section>
-                      <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-4">Professional Bio</h2>
+                      <h2 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground mb-4">Professional Bio</h2>
                       <p className="text-lg text-foreground/80 leading-relaxed font-light">
                         {selectedAlumni?.about || "This alum has not added a bio yet."}
                       </p>
@@ -226,7 +226,7 @@ export default function AlumniDiscovery() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                       {/* Academic Background */}
                       <section className="space-y-6">
-                        <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">Academic Background</h2>
+                        <h2 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground">Academic Background</h2>
                         <div className="bg-muted/30 rounded-2xl p-6 flex gap-4 items-center border border-border/50 group hover:border-brand/30 transition-colors">
                           <div className="w-12 h-12 rounded-xl bg-brand/10 text-brand flex items-center justify-center shrink-0">
                             <BookOpen className="w-6 h-6" />
@@ -241,7 +241,7 @@ export default function AlumniDiscovery() {
 
                       {/* Career Highlights */}
                       <section className="space-y-6">
-                        <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">Career Highlights</h2>
+                        <h2 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground">Career Highlights</h2>
                         <div className="space-y-5">
                           <div className="flex items-start gap-4 group">
                             <span className="w-2 h-2 rounded-full bg-brand mt-2 ring-4 ring-brand/10"></span>

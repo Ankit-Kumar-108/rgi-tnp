@@ -236,7 +236,7 @@ export default function RecruiterDashboard() {
                 </div>
                 <p className="text-3xl md:text-4xl font-black text-foreground leading-none mb-2">{stats.totalDrives || 0}</p>
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total Drives</p>
-                <p className="text-[10px] text-blue-600/70 mt-2 hidden xs:block">Posted opportunities</p>
+                <p className="text-xs text-blue-600/70 mt-2 hidden xs:block">Posted opportunities</p>
               </div>
 
               {/* Active Drives */}
@@ -249,7 +249,7 @@ export default function RecruiterDashboard() {
                 </div>
                 <p className="text-3xl md:text-4xl font-black text-foreground leading-none mb-2">{stats.activeDrives || 0}</p>
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Active Drives</p>
-                <p className="text-[10px] text-green-600/70 mt-2 hidden xs:block">Now accepting</p>
+                <p className="text-xs text-green-600/70 mt-2 hidden xs:block">Now accepting</p>
               </div>
 
               {/* Pending Drives */}
@@ -262,7 +262,7 @@ export default function RecruiterDashboard() {
                 </div>
                 <p className="text-3xl md:text-4xl font-black text-foreground leading-none mb-2">{stats.pendingDrives || 0}</p>
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Pending Review</p>
-                <p className="text-[10px] text-yellow-600/70 mt-2 hidden xs:block">Under moderation</p>
+                <p className="text-xs text-yellow-600/70 mt-2 hidden xs:block">Under moderation</p>
               </div>
 
               {/* Total Applicants */}
@@ -275,7 +275,7 @@ export default function RecruiterDashboard() {
                 </div>
                 <p className="text-3xl md:text-4xl font-black text-brand leading-none mb-2">{stats.totalApplicants || 0}</p>
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total Applicants</p>
-                <p className="text-[10px] text-brand/70 mt-2 hidden xs:block">Interested candidates</p>
+                <p className="text-xs text-brand/70 mt-2 hidden xs:block">Interested candidates</p>
               </div>
             </section>
           )}
@@ -446,13 +446,13 @@ export default function RecruiterDashboard() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-muted/50 border-b border-border">
-                        <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Company</th>
-                        <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Role</th>
-                        <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Type</th>
-                        <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Date</th>
-                        <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Applicants</th>
-                        <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Status</th>
-                        <th className="text-right px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Action</th>
+                        <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">Company</th>
+                        <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">Role</th>
+                        <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">Type</th>
+                        <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">Date</th>
+                        <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">Applicants</th>
+                        <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">Status</th>
+                        <th className="text-right px-5 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">Action</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -461,12 +461,12 @@ export default function RecruiterDashboard() {
                           <td className="px-5 py-3.5 font-medium text-foreground">{drive.companyName}</td>
                           <td className="px-5 py-3.5 text-muted-foreground">{drive.roleName}</td>
                           <td className="px-5 py-3.5">
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${drive.driveType === "Open" ? "bg-green-500/10 text-green-600" : drive.driveType === "Pool" ? "bg-amber-500/10 text-amber-600" : "bg-blue-500/10 text-blue-600"}`}>{drive.driveType}</span>
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${drive.driveType === "Open" ? "bg-green-500/10 text-green-600" : drive.driveType === "Pool" ? "bg-amber-500/10 text-amber-600" : "bg-blue-500/10 text-blue-600"}`}>{drive.driveType}</span>
                           </td>
                           <td className="px-5 py-3.5 text-muted-foreground">{new Date(drive.driveDate).toLocaleDateString()}</td>
                           <td className="px-5 py-3.5 font-bold text-foreground">{drive.registrationCount}</td>
                           <td className="px-5 py-3.5">
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold capitalize ${getStatusBadge(drive.status)}`}>{drive.status}</span>
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-bold capitalize ${getStatusBadge(drive.status)}`}>{drive.status}</span>
                           </td>
                           <td className="px-5 py-3.5 text-right">
                             <div className="flex items-center justify-end gap-3">
@@ -536,12 +536,12 @@ export default function RecruiterDashboard() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="bg-muted/50 border-b border-border">
-                      <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Name</th>
-                      <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">College</th>
-                      <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Branch</th>
-                      <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">CGPA</th>
-                      <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Type</th>
-                      <th className="text-left px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Attended</th>
+                      <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">Name</th>
+                      <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">College</th>
+                      <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">Branch</th>
+                      <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">CGPA</th>
+                      <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">Type</th>
+                      <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">Attended</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -554,7 +554,7 @@ export default function RecruiterDashboard() {
                           <td className="px-5 py-3.5 text-muted-foreground">{a.branch}</td>
                           <td className="px-5 py-3.5 font-bold text-foreground">{a.cgpa}</td>
                           <td className="px-5 py-3.5">
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${a.type === "internal" ? "bg-brand/10 text-brand" : "bg-yellow-500/10 text-yellow-600"}`}>
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${a.type === "internal" ? "bg-brand/10 text-brand" : "bg-yellow-500/10 text-yellow-600"}`}>
                               {a.type === "internal" ? "RGI" : "External"}
                             </span>
                           </td>

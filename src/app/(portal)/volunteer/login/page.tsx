@@ -88,7 +88,7 @@ export default function VolunteerLogin() {
               <h1 className="text-4xl font-black mb-4 leading-tight">
                 Make a Difference
               </h1>
-              <p className="text-lg text-slate-200 font-light max-w-md">
+              <p className="text-lg text-white/80 font-light max-w-md">
                 Join our volunteer team, support fellow students, upload drive
                 photos, and help shape the future of our T&P Cell.
               </p>
@@ -210,7 +210,7 @@ export default function VolunteerLogin() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-brand text-primary-foreground rounded-xl font-bold hover:bg-brand/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-[var(--shadow-brand)]"
+                className="w-full py-3 bg-brand text-primary-foreground rounded-full font-bold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-[var(--shadow-brand)]"
               >
                 {loading ? (
                   <>

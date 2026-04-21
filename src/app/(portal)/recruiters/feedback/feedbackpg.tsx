@@ -130,7 +130,7 @@ export default function FeedbackCorporate({ onClose }: FeedbackCorporateProps = 
         {/* Rating Section */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <p className="text-[10px] md:text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">
+            <p className="text-xs md:text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">
               Your Rating
             </p>
             {activeRating > 0 && (
@@ -175,7 +175,7 @@ export default function FeedbackCorporate({ onClose }: FeedbackCorporateProps = 
 
         {/* Feedback Textarea */}
         <div className="space-y-2.5">
-          <label className="text-[10px] md:text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">
+          <label className="text-xs md:text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">
             Your Thoughts
           </label>
           <div className="relative group/textarea">
@@ -197,7 +197,7 @@ export default function FeedbackCorporate({ onClose }: FeedbackCorporateProps = 
                   style={{ width: `${Math.min((fbContent.length / 500) * 100, 100)}%` }}
                 />
               </div>
-              <span className={`text-[10px] font-bold tabular-nums ${
+              <span className={`text-xs font-bold tabular-nums ${
                 fbContent.length > 450 ? "text-amber-500" : "text-muted-foreground/60"
               }`}>
                 {fbContent.length}/500
@@ -231,7 +231,7 @@ export default function FeedbackCorporate({ onClose }: FeedbackCorporateProps = 
         </button>
 
         {/* Disclaimer */}
-        <p className="text-[10px] text-center text-muted-foreground/50 leading-relaxed">
+        <p className="text-xs text-center text-muted-foreground/50 leading-relaxed">
           Your feedback helps shape the training &amp; placement curriculum for future batches.
         </p>
       </div>

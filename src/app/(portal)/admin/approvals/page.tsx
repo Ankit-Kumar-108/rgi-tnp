@@ -263,16 +263,16 @@ export default function AdminApprovalsPage() {
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3">
-          <Link href="/admin/dashboard" className="text-slate-400 hover:text-brand transition-colors p-1">
+          <Link href="/admin/dashboard" className="text-muted-foreground hover:text-brand transition-colors p-1">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 sm:w-10 sm:h-10 bg-brand/10 rounded-lg sm:rounded-xl flex items-center justify-center">
               <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-brand" />
             </div>
-            <h1 className="text-base sm:text-lg font-bold tracking-tight text-slate-800">Queue</h1>
+            <h1 className="text-base sm:text-lg font-bold tracking-tight text-foreground">Queue</h1>
           </div>
 
           <div className="ml-auto flex gap-1.5 sm:gap-2">
@@ -281,7 +281,7 @@ export default function AdminApprovalsPage() {
                 <button
                     onClick={() => handleBulkAction("approve")}
                     disabled={bulkActionLoading !== null}
-                    className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-green-500 text-white rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold hover:bg-green-600 transition-all shadow-md shadow-green-500/10 disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-green-500 text-white rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-green-600 transition-all shadow-md shadow-green-500/10 disabled:opacity-50"
                   >
                     {bulkActionLoading === "approve" ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />}
                     <span className="hidden xs:inline">Approve All</span>
@@ -290,7 +290,7 @@ export default function AdminApprovalsPage() {
                   <button
                     onClick={() => handleBulkAction("reject")}
                     disabled={bulkActionLoading !== null}
-                    className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-white border border-slate-200 text-red-500 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold hover:bg-red-50 transition-all disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-white border border-border text-red-500 rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-red-50 transition-all disabled:opacity-50"
                   >
                     {bulkActionLoading === "reject" ? <Loader2 className="w-3 h-3 animate-spin" /> : <XCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5" />}
                     <span className="hidden xs:inline">Delete All</span>
@@ -319,15 +319,15 @@ export default function AdminApprovalsPage() {
               <button
                 key={tab.key}
                 onClick={() => { handleChangeTab(tab.key) }}
-                className={`relative flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-3 rounded-xl sm:rounded-2xl text-[12px] sm:text-sm font-bold whitespace-nowrap transition-all ${activeTab === tab.key
+                className={`relative flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-3 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${activeTab === tab.key
                     ? "bg-brand text-white shadow-lg shadow-brand/20"
-                    : "bg-white border border-slate-200 text-slate-500 hover:bg-slate-50"
+                    : "bg-white border border-border text-muted-foreground hover:bg-muted"
                   }`}
               >
                 <tab.icon className="w-4 h-4 shrink-0" />
                 <span>{tab.label}</span>
                 {count > 0 && (
-                  <span className={`ml-1 min-w-[20px] h-5 rounded-full text-[10px] flex items-center justify-center px-1.5 font-bold transition-all ${
+                  <span className={`ml-1 min-w-[20px] h-5 rounded-full text-xs flex items-center justify-center px-1.5 font-bold transition-all ${
                     activeTab === tab.key 
                       ? "bg-white text-brand shadow-sm" 
                       : "bg-red-500 text-white animate-pulse shadow-sm shadow-red-500/20"
@@ -342,14 +342,14 @@ export default function AdminApprovalsPage() {
 
         {/* Memories Sub-Tabs */}
         {activeTab === "memories" && (
-            <div className="flex items-center gap-1.5 mb-6 bg-white p-1 rounded-xl sm:rounded-2xl border border-slate-200 w-fit">
+            <div className="flex items-center gap-1.5 mb-6 bg-white p-1 rounded-xl sm:rounded-2xl border border-border w-fit">
               {SUBTABS.map((sub) => (
                 <button
                   key={sub.key}
                   onClick={() => setActiveSubTab(sub.key)}
-                  className={`flex items-center gap-1.5 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all ${activeSubTab === sub.key
-                      ? "bg-slate-100 text-brand"
-                      : "text-slate-400 hover:text-slate-600"
+                  className={`flex items-center gap-1.5 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold transition-all ${activeSubTab === sub.key
+                      ? "bg-muted text-brand"
+                      : "text-muted-foreground hover:text-muted-foreground"
                     }`}
                 >
                   <sub.icon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
@@ -361,7 +361,7 @@ export default function AdminApprovalsPage() {
 
         {/* Feedback Sub-Tabs */}
         {activeTab === "feedback" && (
-            <div className="flex items-center gap-1.5 mb-6 bg-white p-1 rounded-xl sm:rounded-2xl border border-slate-200 w-fit">
+            <div className="flex items-center gap-1.5 mb-6 bg-white p-1 rounded-xl sm:rounded-2xl border border-border w-fit">
               {FEEDBACKTABS.map((feedbackTab) => (
                 <button
                   key={feedbackTab.key}
@@ -371,9 +371,9 @@ export default function AdminApprovalsPage() {
                     setItems([]);
                     setHasMore(true);
                   }}
-                  className={`flex items-center gap-1.5 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all ${activeFeedbackSubTab === feedbackTab.key
-                      ? "bg-slate-100 text-brand"
-                      : "text-slate-400 hover:text-slate-600"
+                  className={`flex items-center gap-1.5 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold transition-all ${activeFeedbackSubTab === feedbackTab.key
+                      ? "bg-muted text-brand"
+                      : "text-muted-foreground hover:text-muted-foreground"
                     }`}
                 >
                   <feedbackTab.icon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
@@ -385,7 +385,7 @@ export default function AdminApprovalsPage() {
 
         {/* Unverified Email Sub-Tabs */}
         {activeTab === "unverified" && (
-            <div className="flex items-center gap-1.5 mb-6 bg-white p-1 rounded-xl sm:rounded-2xl border border-slate-200 w-fit">
+            <div className="flex items-center gap-1.5 mb-6 bg-white p-1 rounded-xl sm:rounded-2xl border border-border w-fit">
               {UNVERIFIEDTABS.map((unverTab) => (
                 <button
                   key={unverTab.key}
@@ -395,9 +395,9 @@ export default function AdminApprovalsPage() {
                     setItems([]);
                     setHasMore(true);
                   }}
-                  className={`flex items-center gap-1.5 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all ${activeUnverifiedSubTab === unverTab.key
-                      ? "bg-slate-100 text-brand"
-                      : "text-slate-400 hover:text-slate-600"
+                  className={`flex items-center gap-1.5 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold transition-all ${activeUnverifiedSubTab === unverTab.key
+                      ? "bg-muted text-brand"
+                      : "text-muted-foreground hover:text-muted-foreground"
                     }`}
                 >
                   <unverTab.icon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
@@ -410,13 +410,13 @@ export default function AdminApprovalsPage() {
         {loading && page == 1 ? (
           <div className="flex flex-col items-center justify-center py-24 sm:py-32 gap-3 sm:gap-4">
             <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 animate-spin text-brand" />
-            <p className="text-[12px] sm:text-sm font-bold text-slate-400">Loading...</p>
+            <p className="text-xs sm:text-sm font-bold text-muted-foreground">Loading...</p>
           </div>
         ) : displayedItems.length === 0 ? (
-          <div className="text-center py-20 sm:py-32 bg-white rounded-2xl sm:rounded-3xl border-2 border-dashed border-slate-200">
-            <Check className="w-8 h-8 sm:w-10 sm:h-10 text-slate-200 mx-auto mb-4" />
-            <h3 className="text-lg sm:text-xl font-bold text-slate-800">Clear!</h3>
-            <p className="text-[12px] sm:text-sm text-slate-400 mt-1 sm:mt-2">No pending items here.</p>
+          <div className="text-center py-20 sm:py-32 bg-white rounded-2xl sm:rounded-3xl border-2 border-dashed border-border">
+            <Check className="w-8 h-8 sm:w-10 sm:h-10 text-white/80 mx-auto mb-4" />
+            <h3 className="text-lg sm:text-xl font-bold text-foreground">Clear!</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-2">No pending items here.</p>
           </div>
         ) : (
           <div className={`grid gap-4 sm:gap-6 ${activeTab === "memories" ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" : "grid-cols-1 lg:grid-cols-2"}`}>
@@ -434,7 +434,7 @@ export default function AdminApprovalsPage() {
                     {activeTab === "memories" && (
                         <div 
                         onClick={() => setViewItem(item)}
-                        className="group relative aspect-square bg-slate-100 rounded-lg sm:rounded-2xl overflow-hidden cursor-pointer border border-slate-200 shadow-sm hover:shadow-md transition-all bg-top">
+                        className="group relative aspect-square bg-muted rounded-lg sm:rounded-2xl overflow-hidden cursor-pointer border border-border shadow-sm hover:shadow-md transition-all bg-top">
                             <img 
                               src={item.imageUrl} 
                               alt="Memory" 
@@ -442,8 +442,8 @@ export default function AdminApprovalsPage() {
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                             />
                             <div className="absolute inset-x-0 bottom-0 p-2 sm:p-3 bg-linear-to-t from-black/70 to-transparent">
-                                <p className="text-[8px] sm:text-[10px] font-bold text-white uppercase tracking-wider truncate">{item.title || "Untitled"}</p>
-                                <p className="text-[7px] sm:text-[9px] text-white/80">by {item.uploaderName}</p>
+                                <p className="text-[8px] sm:text-xs font-bold text-white uppercase tracking-wider truncate">{item.title || "Untitled"}</p>
+                                <p className="text-[7px] sm:text-xs text-white/80">by {item.uploaderName}</p>
                             </div>
                             <div className={`absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-full text-[7px] sm:text-[8px] font-bold uppercase tracking-tight ${item.status === "approved" ? "bg-green-500 text-white" : "bg-amber-500 text-white"}`}>
                                 {item.status === "approved" ? "OK" : "PEN"}
@@ -482,7 +482,7 @@ export default function AdminApprovalsPage() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Content - Media */}
-            <div className="w-full md:w-1/2 max-h-[60vh] md:max-h-[80vh] bg-slate-100 relative flex items-center justify-center overflow-hidden bg-top">
+            <div className="w-full md:w-1/2 max-h-[60vh] md:max-h-[80vh] bg-muted relative flex items-center justify-center overflow-hidden bg-top">
                 <img
                   src={viewItem.imageUrl || viewItem.profileImageUrl}
                   alt="Preview"
@@ -500,16 +500,16 @@ export default function AdminApprovalsPage() {
             <div className="w-full md:w-1/2 p-5 sm:p-8 flex flex-col overflow-hidden max-h-[30vh] md:max-h-[80vh] overflow-y-auto">
               <div className="flex items-center justify-between mb-4 sm:mb-6">
                 <div>
-                    <h3 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight leading-tight">
+                    <h3 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight leading-tight">
                         {activeTab === "memories" ? viewItem.title || "Untitled Memory" : viewItem.name}
                     </h3>
-                    <p className="text-[10px] sm:text-xs font-bold text-brand uppercase tracking-widest mt-1">
+                    <p className="text-xs sm:text-xs font-bold text-brand uppercase tracking-widest mt-1">
                         {activeTab === "memories" ? `Uploaded ${new Date(viewItem.createdAt).toLocaleDateString()}` : "Verification Details"}
                     </p>
                 </div>
                 <button
                   onClick={() => setViewItem(null)}
-                  className="hidden md:flex p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-800 transition-all"
+                  className="hidden md:flex p-2 rounded-xl hover:bg-muted text-muted-foreground hover:text-foreground transition-all"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -517,10 +517,10 @@ export default function AdminApprovalsPage() {
 
               <div className="flex-1 overflow-y-auto space-y-4 sm:space-y-6 pr-1 scrollbar-thin">
                 {activeTab === "memories" && (
-                    <div className="bg-slate-50 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-100">
-                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-3">Uploader</p>
+                    <div className="bg-muted p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-100">
+                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3">Uploader</p>
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center font-bold text-brand overflow-hidden shrink-0 bg-top">
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white border border-border shadow-sm flex items-center justify-center font-bold text-brand overflow-hidden shrink-0 bg-top">
                                 {viewItem.student?.profileImageUrl || viewItem.alumni?.profileImageUrl ? (
                                     <img 
                                       src={viewItem.student?.profileImageUrl || viewItem.alumni?.profileImageUrl} 
@@ -530,8 +530,8 @@ export default function AdminApprovalsPage() {
                                 ) : viewItem.uploaderName?.charAt(0)}
                             </div>
                             <div>
-                                <p className="font-bold text-slate-800 text-sm">{viewItem.uploaderName}</p>
-                                <p className="text-[10px] sm:text-xs text-slate-500 font-medium">ID: {viewItem.student?.enrollmentNumber || viewItem.alumni?.enrollmentNumber || "External"}</p>
+                                <p className="font-bold text-foreground text-sm">{viewItem.uploaderName}</p>
+                                <p className="text-xs sm:text-xs text-muted-foreground font-medium">ID: {viewItem.student?.enrollmentNumber || viewItem.alumni?.enrollmentNumber || "External"}</p>
                             </div>
                         </div>
                     </div>
@@ -544,10 +544,10 @@ export default function AdminApprovalsPage() {
 
                         return (
                             <div key={key} className="flex flex-col gap-0.5">
-                                <span className="text-[8px] sm:text-[9px] uppercase font-bold text-slate-400 tracking-wider">
+                                <span className="text-[8px] sm:text-xs uppercase font-bold text-muted-foreground tracking-wider">
                                     {key.replace(/([A-Z])/g, " $1")}
                                 </span>
-                                <span className="text-[12px] sm:text-sm text-slate-700 font-bold break-words leading-snug">
+                                <span className="text-xs sm:text-sm text-foreground font-bold break-words leading-snug">
                                     {typeof value === "object" ? JSON.stringify(value) : String(value)}
                                 </span>
                             </div>
@@ -572,7 +572,7 @@ export default function AdminApprovalsPage() {
                 <button
                   onClick={() => handleAction(viewItem.id, "reject")}
                   disabled={actionLoading === viewItem.id}
-                  className="px-4 sm:px-6 bg-white border border-slate-200 text-red-500 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold hover:bg-red-50 transition-all flex items-center justify-center gap-2 active:scale-95"
+                  className="px-4 sm:px-6 bg-white border border-border text-red-500 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold hover:bg-red-50 transition-all flex items-center justify-center gap-2 active:scale-95"
                 >
                   <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span className="hidden xs:inline">{activeTab === "memories" ? "Delete" : "Reject"}</span>
@@ -590,40 +590,40 @@ export default function AdminApprovalsPage() {
 
 function DriveRequestCard({ item, onAction, loading }: { item: any, onAction: any, loading: string | null }) {
     return (
-        <div className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all group">
+        <div className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-border shadow-sm hover:shadow-md transition-all group">
             <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3 sm:gap-4">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-50 rounded-lg sm:rounded-2xl flex items-center justify-center text-brand border border-slate-100">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-muted rounded-lg sm:rounded-2xl flex items-center justify-center text-brand border border-slate-100">
                         <Briefcase className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
                     <div>
-                        <h3 className="text-base sm:text-lg font-bold text-slate-800 tracking-tight leading-tight">{item.companyName}</h3>
-                        <p className="text-[11px] sm:text-[12px] font-medium text-slate-400">Recruiter: {item.recruiter?.name}</p>
+                        <h3 className="text-base sm:text-lg font-bold text-foreground tracking-tight leading-tight">{item.companyName}</h3>
+                        <p className="text-xs sm:text-xs font-medium text-muted-foreground">Recruiter: {item.recruiter?.name}</p>
                     </div>
                 </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
-                <div className="flex items-center gap-2 text-slate-600">
+                <div className="flex items-center gap-2 text-muted-foreground">
                     <GraduationCap className="w-3.5 h-3.5 text-brand" />
-                    <span className="text-[11px] sm:text-xs font-bold">{item.roleName}</span>
+                    <span className="text-xs sm:text-xs font-bold">{item.roleName}</span>
                 </div>
-                <div className="flex items-center gap-2 text-slate-600">
+                <div className="flex items-center gap-2 text-muted-foreground">
                     <CheckCircle2 className="w-3.5 h-3.5 text-brand" />
-                    <span className="text-[11px] sm:text-xs font-bold">{item.ctc} LPA</span>
+                    <span className="text-xs sm:text-xs font-bold">{item.ctc} LPA</span>
                 </div>
-                <div className="flex items-center gap-2 text-slate-600">
+                <div className="flex items-center gap-2 text-muted-foreground">
                     <Calendar className="w-3.5 h-3.5 text-brand" />
-                    <span className="text-[11px] sm:text-xs font-bold">{new Date(item.driveDate).toLocaleDateString()}</span>
+                    <span className="text-xs sm:text-xs font-bold">{new Date(item.driveDate).toLocaleDateString()}</span>
                 </div>
-                <div className="flex items-center gap-2 text-slate-600">
+                <div className="flex items-center gap-2 text-muted-foreground">
                     <MapPin className="w-3.5 h-3.5 text-brand" />
-                    <span className="text-[11px] sm:text-xs font-bold font-mono tracking-tight">{item.driveType}</span>
+                    <span className="text-xs sm:text-xs font-bold font-mono tracking-tight">{item.driveType}</span>
                 </div>
             </div>
 
-            <div className="p-3 sm:p-4 bg-slate-50 rounded-xl sm:rounded-2xl mb-4 sm:mb-6 border border-slate-100">
-                <p className="text-[11px] sm:text-xs text-slate-500 font-medium line-clamp-2 leading-relaxed">
+            <div className="p-3 sm:p-4 bg-muted rounded-xl sm:rounded-2xl mb-4 sm:mb-6 border border-slate-100">
+                <p className="text-xs sm:text-xs text-muted-foreground font-medium line-clamp-2 leading-relaxed">
                     {item.jobDescription}
                 </p>
             </div>
@@ -632,14 +632,14 @@ function DriveRequestCard({ item, onAction, loading }: { item: any, onAction: an
                 <button 
                 onClick={() => onAction(item.id, "approve")}
                 disabled={loading === item.id}
-                className="flex-1 py-2 sm:py-3 bg-brand text-white rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold hover:bg-brand/90 transition-all flex items-center justify-center gap-2 shadow-md shadow-brand/10 disabled:opacity-50">
+                className="flex-1 py-2 sm:py-3 bg-brand text-white rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-brand/90 transition-all flex items-center justify-center gap-2 shadow-md shadow-brand/10 disabled:opacity-50">
                      {loading === item.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
                      Approve
                 </button>
                 <button 
                 onClick={() => onAction(item.id, "reject")}
                 disabled={loading === item.id}
-                className="flex-1 py-2 sm:py-3 bg-white border border-slate-200 text-slate-500 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold hover:bg-red-50 hover:text-red-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+                className="flex-1 py-2 sm:py-3 bg-white border border-border text-muted-foreground rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-red-50 hover:text-red-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50">
                     Reject
                 </button>
             </div>
@@ -649,7 +649,7 @@ function DriveRequestCard({ item, onAction, loading }: { item: any, onAction: an
 
 function ReferralCard({ item, onAction, loading }: { item: any, onAction: any, loading: string | null }) {
     return (
-        <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all overflow-hidden">
+        <div className="bg-white rounded-2xl sm:rounded-3xl border border-border shadow-sm hover:shadow-md transition-all overflow-hidden">
             <div className="p-4 sm:p-6">
                 {/* Header */}
                 <div className="flex items-start justify-between mb-4 sm:mb-6">
@@ -658,8 +658,8 @@ function ReferralCard({ item, onAction, loading }: { item: any, onAction: any, l
                             <Users className="w-5 h-5 sm:w-6 sm:h-6" />
                         </div>
                         <div>
-                            <h3 className="text-base sm:text-lg font-bold text-slate-800 tracking-tight leading-tight">{item.companyName}</h3>
-                            <p className="text-[11px] sm:text-[12px] font-medium text-slate-400">Alumni: {item.alumni?.name}</p>
+                            <h3 className="text-base sm:text-lg font-bold text-foreground tracking-tight leading-tight">{item.companyName}</h3>
+                            <p className="text-xs sm:text-xs font-medium text-muted-foreground">Alumni: {item.alumni?.name}</p>
                         </div>
                     </div>
                 </div>
@@ -667,16 +667,16 @@ function ReferralCard({ item, onAction, loading }: { item: any, onAction: any, l
                 {/* Position & Job Type */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
                     <div className="space-y-1">
-                        <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-widest">Position</p>
-                        <p className="text-[12px] sm:text-[13px] font-bold text-slate-800 flex items-center gap-2">
+                        <p className="text-[8px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest">Position</p>
+                        <p className="text-xs sm:text-sm font-bold text-foreground flex items-center gap-2">
                             <Briefcase className="w-3.5 h-3.5 text-brand" />
                             {item.position}
                         </p>
                     </div>
                     {item.jobType && (
                         <div className="space-y-1">
-                            <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-widest">Job Type</p>
-                            <p className="text-[12px] sm:text-[13px] font-bold text-slate-800">{item.jobType}</p>
+                            <p className="text-[8px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest">Job Type</p>
+                            <p className="text-xs sm:text-sm font-bold text-foreground">{item.jobType}</p>
                         </div>
                     )}
                 </div>
@@ -685,17 +685,17 @@ function ReferralCard({ item, onAction, loading }: { item: any, onAction: any, l
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
                     {item.location && (
                         <div className="space-y-1">
-                            <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-widest">Location</p>
-                            <p className="text-[12px] sm:text-[13px] font-bold text-slate-800 flex items-center gap-2">
-                                <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                            <p className="text-[8px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest">Location</p>
+                            <p className="text-xs sm:text-sm font-bold text-foreground flex items-center gap-2">
+                                <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
                                 {item.location}
                             </p>
                         </div>
                     )}
                     {item.batchEligible && (
                         <div className="space-y-1">
-                            <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-widest">Batch Eligible</p>
-                            <p className="text-[12px] sm:text-[13px] font-bold text-slate-800">{item.batchEligible}</p>
+                            <p className="text-[8px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest">Batch Eligible</p>
+                            <p className="text-xs sm:text-sm font-bold text-foreground">{item.batchEligible}</p>
                         </div>
                     )}
                 </div>
@@ -704,14 +704,14 @@ function ReferralCard({ item, onAction, loading }: { item: any, onAction: any, l
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
                     {item.minCGPA && (
                         <div className="space-y-1">
-                            <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-widest">Min CGPA</p>
-                            <p className="text-[12px] sm:text-[13px] font-bold text-slate-800">{item.minCGPA}</p>
+                            <p className="text-[8px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest">Min CGPA</p>
+                            <p className="text-xs sm:text-sm font-bold text-foreground">{item.minCGPA}</p>
                         </div>
                     )}
                     {item.experience && (
                         <div className="space-y-1">
-                            <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-widest">Experience</p>
-                            <p className="text-[12px] sm:text-[13px] font-bold text-slate-800">{item.experience}</p>
+                            <p className="text-[8px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest">Experience</p>
+                            <p className="text-xs sm:text-sm font-bold text-foreground">{item.experience}</p>
                         </div>
                     )}
                 </div>
@@ -720,15 +720,15 @@ function ReferralCard({ item, onAction, loading }: { item: any, onAction: any, l
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
                     {item.referralCode && (
                         <div className="space-y-1">
-                            <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-widest">Referral Code</p>
-                            <p className="text-[12px] sm:text-[13px] font-bold text-slate-800 bg-blue-50 px-3 py-1 rounded-lg inline-block">{item.referralCode}</p>
+                            <p className="text-[8px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest">Referral Code</p>
+                            <p className="text-xs sm:text-sm font-bold text-foreground bg-blue-50 px-3 py-1 rounded-lg inline-block">{item.referralCode}</p>
                         </div>
                     )}
                     {item.deadline && (
                         <div className="space-y-1">
-                            <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-widest">Deadline</p>
-                            <p className="text-[12px] sm:text-[13px] font-bold text-slate-800 flex items-center gap-2">
-                                <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                            <p className="text-[8px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest">Deadline</p>
+                            <p className="text-xs sm:text-sm font-bold text-foreground flex items-center gap-2">
+                                <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
                                 {new Date(item.deadline).toLocaleDateString()}
                             </p>
                         </div>
@@ -737,8 +737,8 @@ function ReferralCard({ item, onAction, loading }: { item: any, onAction: any, l
 
                 {/* Description */}
                 <div className="mb-4 sm:mb-6">
-                    <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2">Description</p>
-                    <div className="p-3 sm:p-4 bg-slate-50 rounded-xl sm:rounded-2xl border border-slate-100 font-medium text-slate-600 text-[11px] sm:text-xs leading-relaxed">
+                    <p className="text-[8px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Description</p>
+                    <div className="p-3 sm:p-4 bg-muted rounded-xl sm:rounded-2xl border border-slate-100 font-medium text-muted-foreground text-xs sm:text-xs leading-relaxed">
                         {item.description}
                     </div>
                 </div>
@@ -746,13 +746,13 @@ function ReferralCard({ item, onAction, loading }: { item: any, onAction: any, l
                 {/* Links */}
                 <div className="flex flex-col gap-2 mb-4 sm:mb-6">
                     {item.applyLink && (
-                        <a href={item.applyLink} target="_blank" className="p-3 sm:p-4 bg-slate-50 rounded-xl sm:rounded-2xl border border-slate-100 flex items-center gap-2 text-brand text-[10px] sm:text-[11px] font-bold hover:bg-slate-100 transition-colors">
+                        <a href={item.applyLink} target="_blank" className="p-3 sm:p-4 bg-muted rounded-xl sm:rounded-2xl border border-slate-100 flex items-center gap-2 text-brand text-xs sm:text-xs font-bold hover:bg-muted transition-colors">
                             <LinkIcon className="w-3.5 h-3.5 shrink-0" />
                             <span className="truncate">Apply Link: {item.applyLink}</span>
                         </a>
                     )}
                     {item.refrerralLink && (
-                        <a href={item.refrerralLink} target="_blank" className="p-3 sm:p-4 bg-slate-50 rounded-xl sm:rounded-2xl border border-slate-100 flex items-center gap-2 text-slate-600 text-[10px] sm:text-[11px] font-bold hover:bg-slate-100 transition-colors">
+                        <a href={item.refrerralLink} target="_blank" className="p-3 sm:p-4 bg-muted rounded-xl sm:rounded-2xl border border-slate-100 flex items-center gap-2 text-muted-foreground text-xs sm:text-xs font-bold hover:bg-muted transition-colors">
                             <LinkIcon className="w-3.5 h-3.5 shrink-0" />
                             <span className="truncate">Referral Link: {item.refrerralLink}</span>
                         </a>
@@ -764,7 +764,7 @@ function ReferralCard({ item, onAction, loading }: { item: any, onAction: any, l
                     <button 
                         onClick={() => onAction(item.id, "approve")}
                         disabled={loading === item.id}
-                        className="flex-1 py-2 sm:py-3 bg-brand text-primary-foreground rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold hover:bg-brand/80 transition-all flex items-center justify-center gap-2 shadow-md shadow-brand/10 disabled:opacity-50"
+                        className="flex-1 py-2 sm:py-3 bg-brand text-primary-foreground rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-brand/80 transition-all flex items-center justify-center gap-2 shadow-md shadow-brand/10 disabled:opacity-50"
                     >
                         {loading === item.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
                         Publish
@@ -772,7 +772,7 @@ function ReferralCard({ item, onAction, loading }: { item: any, onAction: any, l
                     <button 
                         onClick={() => onAction(item.id, "reject")}
                         disabled={loading === item.id}
-                        className="flex-1 py-2 sm:py-3 bg-white border border-slate-200 text-slate-500 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold hover:bg-red-50 hover:text-red-600 transition-all disabled:opacity-50"
+                        className="flex-1 py-2 sm:py-3 bg-white border border-border text-muted-foreground rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-red-50 hover:text-red-600 transition-all disabled:opacity-50"
                     >
                         Reject
                     </button>
@@ -784,21 +784,21 @@ function ReferralCard({ item, onAction, loading }: { item: any, onAction: any, l
 
 function ExternalScreeningCard({ item, onAction, loading }: { item: any, onAction: any, loading: string | null }) {
     return (
-        <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all overflow-hidden font-medium">
+        <div className="bg-white rounded-2xl sm:rounded-3xl border border-border shadow-sm hover:shadow-md transition-all overflow-hidden font-medium">
             <div className="p-4 sm:p-6">
                 <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl bg-slate-100 border border-slate-200 overflow-hidden shrink-0 bg-top">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl bg-muted border border-border overflow-hidden shrink-0 bg-top">
                         {item.profileImageUrl ? (
                             <img src={item.profileImageUrl} loading="lazy" className="w-full h-full object-cover" />
                         ) : (
-                            <div className="w-full h-full flex items-center justify-center font-bold text-xl sm:text-2xl text-slate-300">
+                            <div className="w-full h-full flex items-center justify-center font-bold text-xl sm:text-2xl text-white/70">
                                 {item.name?.charAt(0)}
                             </div>
                         )}
                     </div>
                     <div>
-                        <h3 className="text-base sm:text-xl font-bold text-slate-800 tracking-tight leading-tight">{item.name}</h3>
-                        <p className="text-[9px] sm:text-[10px] font-bold text-orange-500 mt-1 uppercase tracking-widest flex items-center gap-1.5 leading-none">
+                        <h3 className="text-base sm:text-xl font-bold text-foreground tracking-tight leading-tight">{item.name}</h3>
+                        <p className="text-xs sm:text-xs font-bold text-orange-500 mt-1 uppercase tracking-widest flex items-center gap-1.5 leading-none">
                             <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-orange-500 animate-pulse" />
                             Screening
                         </p>
@@ -807,39 +807,39 @@ function ExternalScreeningCard({ item, onAction, loading }: { item: any, onActio
 
                 <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
                     <div className="space-y-0.5">
-                        <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-widest">College</p>
-                        <p className="text-[11px] sm:text-[12px] font-bold text-slate-700 truncate" title={item.collegeName}>{item.collegeName}</p>
+                        <p className="text-[8px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest">College</p>
+                        <p className="text-xs sm:text-xs font-bold text-foreground truncate" title={item.collegeName}>{item.collegeName}</p>
                     </div>
                     <div className="space-y-0.5">
-                        <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-widest">Perf</p>
-                        <p className="text-[11px] sm:text-[12px] font-bold text-slate-700">{item.cgpa} CGPA</p>
+                        <p className="text-[8px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest">Perf</p>
+                        <p className="text-xs sm:text-xs font-bold text-foreground">{item.cgpa} CGPA</p>
                     </div>
                     <div className="space-y-0.5">
-                        <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-widest">Branch</p>
-                        <p className="text-[11px] sm:text-[12px] font-bold text-slate-700 truncate">{item.branch}</p>
+                        <p className="text-[8px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest">Branch</p>
+                        <p className="text-xs sm:text-xs font-bold text-foreground truncate">{item.branch}</p>
                     </div>
                     <div className="space-y-0.5">
-                        <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-widest">Batch</p>
-                        <p className="text-[11px] sm:text-[12px] font-bold text-slate-700">{item.batch || "N/A"}</p>
+                        <p className="text-[8px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest">Batch</p>
+                        <p className="text-xs sm:text-xs font-bold text-foreground">{item.batch || "N/A"}</p>
                     </div>
                 </div>
 
-                <div className="space-y-2.5 p-3 sm:p-4 bg-slate-50 rounded-xl sm:rounded-2xl mb-4 sm:mb-6 border border-slate-100 text-[10px] sm:text-[11px] text-slate-600 break-words">
+                <div className="space-y-2.5 p-3 sm:p-4 bg-muted rounded-xl sm:rounded-2xl mb-4 sm:mb-6 border border-slate-100 text-xs sm:text-xs text-muted-foreground break-words">
                     <div className="flex items-center gap-2">
-                        <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <Mail className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                         <span className="truncate">{item.email}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <Phone className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                         <span>{item.phoneNumber}</span>
                     </div>
                 </div>
 
                 <div className="flex gap-2 mb-4 sm:mb-6 flex-wrap">
-                     <span className="px-2 py-1 bg-blue-50 text-blue-600 text-[8px] sm:text-[9px] font-bold rounded-md">10th: {item.tenthPercentage}%</span>
-                     <span className="px-2 py-1 bg-purple-50 text-purple-600 text-[8px] sm:text-[9px] font-bold rounded-md">12th: {item.twelfthPercentage}%</span>
+                     <span className="px-2 py-1 bg-blue-50 text-blue-600 text-[8px] sm:text-xs font-bold rounded-md">10th: {item.tenthPercentage}%</span>
+                     <span className="px-2 py-1 bg-purple-50 text-purple-600 text-[8px] sm:text-xs font-bold rounded-md">12th: {item.twelfthPercentage}%</span>
                      {item.resumeUrl && (
-                        <a href={item.resumeUrl} target="_blank" className="flex items-center gap-1.5 px-2 py-1 bg-green-50 text-green-600 text-[8px] sm:text-[9px] font-bold rounded-md hover:bg-green-100 transition-colors">
+                        <a href={item.resumeUrl} target="_blank" className="flex items-center gap-1.5 px-2 py-1 bg-green-50 text-green-600 text-[8px] sm:text-xs font-bold rounded-md hover:bg-green-100 transition-colors">
                             <FileText className="w-2.5 h-2.5 sm:w-3 sm:h-3" /> Resume
                         </a>
                      )}
@@ -849,14 +849,14 @@ function ExternalScreeningCard({ item, onAction, loading }: { item: any, onActio
                     <button 
                     onClick={() => onAction(item.id, "approve")}
                     disabled={loading === item.id}
-                    className="flex-1 py-2.5 sm:py-3.5 bg-orange-500 text-white rounded-xl sm:rounded-2xl text-[11px] sm:text-xs font-bold hover:bg-orange-600 transition-all shadow-md shadow-orange-500/10 disabled:opacity-50 flex items-center justify-center gap-4">
+                    className="flex-1 py-2.5 sm:py-3.5 bg-orange-500 text-white rounded-xl sm:rounded-2xl text-xs sm:text-xs font-bold hover:bg-orange-600 transition-all shadow-md shadow-orange-500/10 disabled:opacity-50 flex items-center justify-center gap-4">
                         {loading === item.id ? <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5 sm:size-5" />}
                         Approve
                     </button>
                     <button 
                     onClick={() => onAction(item.id, "reject")}
                     disabled={loading === item.id}
-                    className="px-3 sm:px-4 py-2.5 sm:py-3.5 bg-white border border-slate-200 text-slate-400 rounded-xl sm:rounded-2xl text-[11px] sm:text-xs font-bold hover:text-red-500 hover:border-red-100 transition-all disabled:opacity-50">
+                    className="px-3 sm:px-4 py-2.5 sm:py-3.5 bg-white border border-border text-muted-foreground rounded-xl sm:rounded-2xl text-xs sm:text-xs font-bold hover:text-red-500 hover:border-red-100 transition-all disabled:opacity-50">
                         <Trash2 className="w-3.5 h-3.5 sm:size-5" />
                     </button>
                 </div>
@@ -895,41 +895,41 @@ function FeedbackCard({ item, onAction, loading, feedbackType }: { item: any, on
     };
 
     return (
-        <div className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all">
+        <div className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-border shadow-sm hover:shadow-md transition-all">
             <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3 sm:gap-4">
                     <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-2xl flex items-center justify-center border ${getColor()}`}>
                         {getIcon()}
                     </div>
                     <div className="flex-1 min-w-0">
-                        <h3 className="text-sm sm:text-base font-bold text-slate-800 tracking-tight line-clamp-2">{getAuthorName()}</h3>
-                        <p className="text-[11px] sm:text-[12px] font-medium text-slate-400 truncate">{getAuthorEmail()}</p>
+                        <h3 className="text-sm sm:text-base font-bold text-foreground tracking-tight line-clamp-2">{getAuthorName()}</h3>
+                        <p className="text-xs sm:text-xs font-medium text-muted-foreground truncate">{getAuthorEmail()}</p>
                     </div>
                 </div>
-                <div className={`px-2.5 py-1 rounded-lg text-[10px] sm:text-[11px] font-bold uppercase tracking-tight ${getColor()}`}>
+                <div className={`px-2.5 py-1 rounded-lg text-xs sm:text-xs font-bold uppercase tracking-tight ${getColor()}`}>
                     {feedbackType}
                 </div>
             </div>
 
             <div className="mb-4 sm:mb-6">
                 <div className="flex items-center gap-2 text-brand mb-2">
-                    <span className="text-[12px] sm:text-sm font-bold">Rating: </span>
+                    <span className="text-xs sm:text-sm font-bold">Rating: </span>
                     <div className="flex gap-0.5">
                         {[...Array(5)].map((_, i) => (
-                            <span key={i} className={`text-lg ${i < item.rating ? "text-yellow-400" : "text-slate-200"}`}>
+                            <span key={i} className={`text-lg ${i < item.rating ? "text-yellow-400" : "text-white/80"}`}>
                                 ★
                             </span>
                         ))}
                     </div>
                 </div>
-                <div className="p-3 sm:p-4 bg-slate-50 rounded-xl sm:rounded-2xl border border-slate-100">
-                    <p className="text-[11px] sm:text-xs text-slate-600 line-clamp-3 leading-relaxed">
+                <div className="p-3 sm:p-4 bg-muted rounded-xl sm:rounded-2xl border border-slate-100">
+                    <p className="text-xs sm:text-xs text-muted-foreground line-clamp-3 leading-relaxed">
                         {item.content}
                     </p>
                 </div>
             </div>
 
-            <div className="text-[10px] sm:text-[11px] text-slate-400 mb-4">
+            <div className="text-xs sm:text-xs text-muted-foreground mb-4">
                 {new Date(item.createdAt).toLocaleDateString()} at {new Date(item.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
             </div>
 
@@ -937,14 +937,14 @@ function FeedbackCard({ item, onAction, loading, feedbackType }: { item: any, on
                 <button 
                 onClick={() => onAction(item.id, "approve")}
                 disabled={loading === item.id}
-                className="flex-1 py-2 sm:py-3 bg-brand text-white rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold hover:bg-brand/90 transition-all flex items-center justify-center gap-2 shadow-md shadow-brand/10 disabled:opacity-50">
+                className="flex-1 py-2 sm:py-3 bg-brand text-white rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-brand/90 transition-all flex items-center justify-center gap-2 shadow-md shadow-brand/10 disabled:opacity-50">
                      {loading === item.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
                      Approve
                 </button>
                 <button 
                 onClick={() => onAction(item.id, "reject")}
                 disabled={loading === item.id}
-                className="flex-1 py-2 sm:py-3 bg-white border border-slate-200 text-slate-500 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold hover:bg-red-50 hover:text-red-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+                className="flex-1 py-2 sm:py-3 bg-white border border-border text-muted-foreground rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-red-50 hover:text-red-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50">
                     Reject
                 </button>
             </div>
@@ -974,21 +974,21 @@ function UnverifiedEmailCard({ item, onAction, loading, userType }: { item: any,
     };
 
     return (
-        <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all overflow-hidden font-medium">
+        <div className="bg-white rounded-2xl sm:rounded-3xl border border-border shadow-sm hover:shadow-md transition-all overflow-hidden font-medium">
             <div className="p-4 sm:p-6">
                 <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl bg-slate-100 border border-slate-200 overflow-hidden shrink-0 bg-top">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl bg-muted border border-border overflow-hidden shrink-0 bg-top">
                         {item.profileImageUrl ? (
                             <img src={item.profileImageUrl} loading="lazy" className="w-full h-full object-cover" />
                         ) : (
-                            <div className="w-full h-full flex items-center justify-center font-bold text-xl sm:text-2xl text-slate-300">
+                            <div className="w-full h-full flex items-center justify-center font-bold text-xl sm:text-2xl text-white/70">
                                 {item.name?.charAt(0)}
                             </div>
                         )}
                     </div>
                     <div className="flex-1">
-                        <h3 className="text-base sm:text-xl font-bold text-slate-800 tracking-tight leading-tight">{item.name}</h3>
-                        <p className="text-[9px] sm:text-[10px] font-bold text-red-500 mt-1 uppercase tracking-widest flex items-center gap-1.5 leading-none">
+                        <h3 className="text-base sm:text-xl font-bold text-foreground tracking-tight leading-tight">{item.name}</h3>
+                        <p className="text-xs sm:text-xs font-bold text-red-500 mt-1 uppercase tracking-widest flex items-center gap-1.5 leading-none">
                             <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-red-500 animate-pulse" />
                             Email Failed
                         </p>
@@ -997,24 +997,24 @@ function UnverifiedEmailCard({ item, onAction, loading, userType }: { item: any,
 
                 <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
                     <div className="space-y-0.5">
-                        <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-widest">Type</p>
-                        <p className="text-[11px] sm:text-[12px] font-bold text-slate-700 capitalize">{userType.slice(0, -1)}</p>
+                        <p className="text-[8px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest">Type</p>
+                        <p className="text-xs sm:text-xs font-bold text-foreground capitalize">{userType.slice(0, -1)}</p>
                     </div>
                     <div className="space-y-0.5">
-                        <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-widest">Branch</p>
-                        <p className="text-[11px] sm:text-[12px] font-bold text-slate-700 truncate">{item.branch || "N/A"}</p>
+                        <p className="text-[8px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest">Branch</p>
+                        <p className="text-xs sm:text-xs font-bold text-foreground truncate">{item.branch || "N/A"}</p>
                     </div>
                     <div className="space-y-0.5">
-                        <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-widest">Batch</p>
-                        <p className="text-[11px] sm:text-[12px] font-bold text-slate-700">{item.batch || "N/A"}</p>
+                        <p className="text-[8px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest">Batch</p>
+                        <p className="text-xs sm:text-xs font-bold text-foreground">{item.batch || "N/A"}</p>
                     </div>
                     <div className="space-y-0.5">
-                        <p className="text-[8px] sm:text-[9px] font-bold text-slate-400 uppercase tracking-widest">Perf</p>
-                        <p className="text-[11px] sm:text-[12px] font-bold text-slate-700">{item.cgpa ? `${item.cgpa} CGPA` : "N/A"}</p>
+                        <p className="text-[8px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest">Perf</p>
+                        <p className="text-xs sm:text-xs font-bold text-foreground">{item.cgpa ? `${item.cgpa} CGPA` : "N/A"}</p>
                     </div>
                 </div>
 
-                <div className="space-y-2.5 p-3 sm:p-4 bg-red-50 rounded-xl sm:rounded-2xl mb-4 sm:mb-6 border border-red-100 text-[10px] sm:text-[11px] text-red-600 break-words">
+                <div className="space-y-2.5 p-3 sm:p-4 bg-red-50 rounded-xl sm:rounded-2xl mb-4 sm:mb-6 border border-red-100 text-xs sm:text-xs text-red-600 break-words">
                     <div className="flex items-center gap-2">
                         <Mail className="w-4 h-4 text-red-400 shrink-0" />
                         <span className="truncate">{getEmail()}</span>
@@ -1026,12 +1026,12 @@ function UnverifiedEmailCard({ item, onAction, loading, userType }: { item: any,
                     {item.emailVerificationError && (
                         <div className="flex items-start gap-2 mt-2 pt-2 border-t border-red-100">
                             <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-                            <span className="text-[9px]">{item.emailVerificationError}</span>
+                            <span className="text-xs">{item.emailVerificationError}</span>
                         </div>
                     )}
                 </div>
 
-                <div className="text-[10px] sm:text-[11px] text-slate-400 mb-4">
+                <div className="text-xs sm:text-xs text-muted-foreground mb-4">
                     Failed: {new Date(item.createdAt).toLocaleDateString()}
                 </div>
 
@@ -1039,14 +1039,14 @@ function UnverifiedEmailCard({ item, onAction, loading, userType }: { item: any,
                     <button 
                     onClick={() => onAction(item.id, "approve")}
                     disabled={loading === item.id}
-                    className="flex-1 py-2.5 sm:py-3.5 bg-brand text-white rounded-xl sm:rounded-2xl text-[11px] sm:text-xs font-bold hover:bg-brand/90 transition-all shadow-md shadow-brand/10 disabled:opacity-50 flex items-center justify-center gap-2">
+                    className="flex-1 py-2.5 sm:py-3.5 bg-brand text-white rounded-xl sm:rounded-2xl text-xs sm:text-xs font-bold hover:bg-brand/90 transition-all shadow-md shadow-brand/10 disabled:opacity-50 flex items-center justify-center gap-2">
                         {loading === item.id ? <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
                         <span>Approve</span>
                     </button>
                     <button 
                     onClick={() => onAction(item.id, "reject")}
                     disabled={loading === item.id}
-                    className="flex-1 py-2.5 sm:py-3.5 bg-white border border-slate-200 text-slate-400 rounded-xl sm:rounded-2xl text-[11px] sm:text-xs font-bold hover:text-red-500 hover:border-red-100 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+                    className="flex-1 py-2.5 sm:py-3.5 bg-white border border-border text-muted-foreground rounded-xl sm:rounded-2xl text-xs sm:text-xs font-bold hover:text-red-500 hover:border-red-100 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
                         <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         <span>Delete</span>
                     </button>
@@ -1055,3 +1055,5 @@ function UnverifiedEmailCard({ item, onAction, loading, userType }: { item: any,
         </div>
     )
 }
+
+

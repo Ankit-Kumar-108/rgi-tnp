@@ -46,7 +46,7 @@ export default function StudentsOverviewTabs({ students, loading = false }: Stud
     const [searchQuery, setSearchQuery] = React.useState("");
 
     const tabs: { id: TabType; label: string; status?: string; bg: string }[] = [
-        { id: "all", label: "All Students", bg: "bg-slate-100/20" },
+        { id: "all", label: "All Students", bg: "bg-muted/20" },
         { id: "selected", label: "Selected", status: "Selected", bg: "bg-green-500/20" },
         { id: "rejected", label: "Rejected", status: "Rejected", bg: "bg-red-500/20" },
         { id: "shortlisted", label: "Shortlisted", status: "Shortlisted", bg: "bg-yellow-500/20" },
@@ -307,3 +307,4 @@ export default function StudentsOverviewTabs({ students, loading = false }: Stud
         </div>
     );
 }
+

@@ -47,7 +47,7 @@ function StatChip({ value, label }: { value?: string | number; label: string }) 
   return (
     <span className="inline-flex flex-col items-center leading-tight">
       <span className="text-sm font-black text-foreground">{value}</span>
-      <span className="text-[9px] text-muted-foreground uppercase tracking-wide">{label}</span>
+      <span className="text-xs text-muted-foreground uppercase tracking-wide">{label}</span>
     </span>
   );
 }
@@ -226,7 +226,7 @@ export default function AdminUsersPage() {
               </div>
               <div>
                 <h1 className="text-sm font-black text-foreground tracking-tight truncate">User Management</h1>
-                <p className="text-[11px] text-muted-foreground hidden sm:block">
+                <p className="text-xs text-muted-foreground hidden sm:block">
                   {totalCount} total {activeTab}s registered
                 </p>
               </div>
@@ -381,13 +381,13 @@ export default function AdminUsersPage() {
                         <div className="flex items-start justify-between gap-2 mb-1.5">
                           <div className="flex items-center gap-2 flex-wrap min-w-0">
                             <h3 className="font-black text-foreground text-base leading-tight truncate">{user.name || "Unknown"}</h3>
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand/10 text-brand uppercase tracking-wide">
+                            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-brand/10 text-brand uppercase tracking-wide">
                               {activeTab}
                             </span>
                             
                             {/* Verification Badge (Hidden for recruiters as they lack the DB field) */}
                             {activeTab !== "recruiter" && (
-                              <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                              <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full ${
                                 isVerified 
                                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:border-emerald-800 dark:text-emerald-300"
                                   : "bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-900/30 dark:border-amber-800 dark:text-amber-300"
@@ -445,12 +445,12 @@ export default function AdminUsersPage() {
                             )}
                             {user.enrollmentNumber && (
                               <div className={user.cgpa ? "pl-3" : ""}>
-                                <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">{user.enrollmentNumber}</span>
+                                <span className="text-xs text-muted-foreground font-medium uppercase tracking-widest">{user.enrollmentNumber}</span>
                               </div>
                             )}
                             {user.semester && (
                               <div className={user.enrollmentNumber || user.cgpa ? "pl-3" : ""}>
-                                <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">Sem {user.semester}</span>
+                                <span className="text-xs text-muted-foreground font-medium uppercase tracking-widest">Sem {user.semester}</span>
                               </div>
                             )}
                           </div>
@@ -460,31 +460,31 @@ export default function AdminUsersPage() {
                         <div className="flex items-center gap-2 flex-wrap">
                           {email && (
                             <a href={`mailto:${email}`} onClick={e => e.stopPropagation()}
-                               className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-[11px] font-bold bg-muted text-muted-foreground hover:bg-muted/80 transition-colors">
+                               className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-xs font-bold bg-muted text-muted-foreground hover:bg-muted/80 transition-colors">
                               <Mail className="w-3 h-3" /> {email}
                             </a>
                           )}
                           {user.phoneNumber && (
                             <a href={`tel:${user.phoneNumber}`} onClick={e => e.stopPropagation()}
-                               className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-[11px] font-bold bg-muted text-muted-foreground hover:bg-muted/80 transition-colors">
+                               className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-xs font-bold bg-muted text-muted-foreground hover:bg-muted/80 transition-colors">
                               <Phone className="w-3 h-3" /> {user.phoneNumber}
                             </a>
                           )}
                           {user.resumeUrl && (
                             <a href={user.resumeUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
-                              className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-[11px] font-bold bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 hover:bg-blue-100 transition-colors">
+                              className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-xs font-bold bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 hover:bg-blue-100 transition-colors">
                               <FileText className="w-3 h-3" /> Resume
                             </a>
                           )}
                           {user.githubUrl && (
                             <a href={user.githubUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
-                              className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-[11px] font-bold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-200 transition-colors">
+                              className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-xs font-bold bg-muted text-foreground dark:bg-slate-800 dark:text-white/70 hover:bg-slate-200 transition-colors">
                               <Github className="w-3 h-3" /> GitHub
                             </a>
                           )}
                           {linkedinUrl && (
                             <a href={linkedinUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
-                              className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-[11px] font-bold bg-blue-700/10 text-blue-700 dark:text-blue-400 hover:bg-blue-700/20 transition-colors">
+                              className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-xs font-bold bg-blue-700/10 text-blue-700 dark:text-blue-400 hover:bg-blue-700/20 transition-colors">
                               <Linkedin className="w-3 h-3" /> LinkedIn
                             </a>
                           )}
@@ -526,3 +526,4 @@ export default function AdminUsersPage() {
     </div>
   );
 }
+

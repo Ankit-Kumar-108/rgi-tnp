@@ -129,7 +129,7 @@ export default function Nav() {
             <h1 className="sm:hidden text-[12px] font-bold leading-none tracking-tight text-foreground">Radharaman Group Of Institutes</h1>
             <h1 className="text-lg hidden sm:flex md:text-2xl font-bold leading-none tracking-tight text-foreground">Radharaman Group Of Institutes</h1>
             <p className="hidden md:text-[15px] md:block uppercase tracking-widest text-brand font-semibold">Department of Training & Placement</p>
-            <p className="text-[10px] md:hidden uppercase tracking-widest text-brand font-semibold">T&P Department</p>
+            <p className="text-xs md:hidden uppercase tracking-widest text-brand font-semibold">T&P Department</p>
           </div>
         </Link >
 

@@ -45,7 +45,7 @@ export default function DriveImagesAdminPage() {
                 <h1 className="text-lg font-black text-foreground tracking-tight">
                   Drive Images
                 </h1>
-                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">
+                <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest">
                   Admin Panel • RGI T&P Cell
                 </p>
               </div>
@@ -66,3 +66,4 @@ export default function DriveImagesAdminPage() {
     </div>
   );
 }
+

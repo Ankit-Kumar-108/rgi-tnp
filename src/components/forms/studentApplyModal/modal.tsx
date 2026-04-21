@@ -120,13 +120,13 @@ export default function JobDetailsModal({
                             </div>
                             <div className="space-y-2">
                                 <div className="flex flex-wrap items-center gap-2">
-                                    <span className="px-3 py-1 rounded-full bg-brand/10 text-brand text-[10px] font-bold uppercase tracking-widest">
+                                    <span className="px-3 py-1 rounded-full bg-brand/10 text-brand text-xs font-bold uppercase tracking-widest">
                                         {drive.jobType || "Full-Time"}
                                     </span>
-                                    <span className="px-3 py-1 rounded-full bg-muted text-muted-foreground text-[10px] font-bold uppercase tracking-widest">
+                                    <span className="px-3 py-1 rounded-full bg-muted text-muted-foreground text-xs font-bold uppercase tracking-widest">
                                         {drive.driveType || "Open"} Campus
                                     </span>
-                                    <span className="px-3 py-1 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 text-[10px] font-bold uppercase tracking-widest">
+                                    <span className="px-3 py-1 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 text-xs font-bold uppercase tracking-widest">
                                         {drive.ctc}
                                     </span>
                                 </div>
@@ -168,14 +168,14 @@ export default function JobDetailsModal({
                                 </h4>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="p-5 rounded-2xl bg-muted/50 border border-border group hover:border-brand/30 transition-colors">
-                                        <p className="text-[10px] font-bold text-brand uppercase tracking-wider mb-1">
+                                        <p className="text-xs font-bold text-brand uppercase tracking-wider mb-1">
                                             Academic Grade
                                         </p>
                                         <p className="text-lg font-bold text-foreground font-mono">CGPA: {drive.minCGPA}</p>
                                         <p className="text-xs text-muted-foreground mt-1">Minimum requirement to apply.</p>
                                     </div>
                                     <div className="p-5 rounded-2xl bg-muted/50 border border-border group hover:border-brand/30 transition-colors">
-                                        <p className="text-[10px] font-bold text-brand uppercase tracking-wider mb-1">
+                                        <p className="text-xs font-bold text-brand uppercase tracking-wider mb-1">
                                             Target Branches
                                         </p>
                                         <p className="text-lg font-bold text-foreground">
@@ -183,7 +183,7 @@ export default function JobDetailsModal({
                                         <p className="text-xs text-muted-foreground mt-1">Eligible candidates only.</p>
                                     </div>
                                     <div className="p-5 rounded-2xl bg-muted/50 border border-border group hover:border-brand/30 transition-colors sm:col-span-2">
-                                        <p className="text-[10px] font-bold text-brand uppercase tracking-wider mb-3">
+                                        <p className="text-xs font-bold text-brand uppercase tracking-wider mb-3">
                                             Eligible Courses
                                         </p>
                                         <p className="text-lg font-bold text-foreground">
@@ -209,7 +209,7 @@ export default function JobDetailsModal({
                                             <CalendarDays className="w-5 h-5" />
                                         </div>
                                         <div>
-                                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                                            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                                                 Registration Deadline
                                             </p>
                                             <p className="text-sm font-bold text-foreground">{new Date(drive.driveDate).toLocaleDateString()}</p>
@@ -220,7 +220,7 @@ export default function JobDetailsModal({
                                             <Users className="w-5 h-5" />
                                         </div>
                                         <div>
-                                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                                            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                                                 Interview Drive
                                             </p>
                                             <p className="text-sm font-bold text-foreground">Tentative</p>
@@ -231,7 +231,7 @@ export default function JobDetailsModal({
                                             <MapPin className="w-5 h-5" />
                                         </div>
                                         <div>
-                                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                                            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                                                 Interview Mode
                                             </p>
                                             <p className="text-sm font-bold text-foreground">{drive.driveType} Campus</p>
@@ -242,24 +242,24 @@ export default function JobDetailsModal({
 
                             {/* Drive Quick Info */}
                             <div className="p-6 rounded-3xl bg-brand/5 border border-brand/20">
-                                <h4 className="text-[10px] font-black uppercase tracking-widest text-brand mb-5">
+                                <h4 className="text-xs font-black uppercase tracking-widest text-brand mb-5">
                                     What to Expect
                                 </h4>
                                 <ul className="space-y-4 text-sm font-medium text-foreground">
                                     <li className="flex items-center gap-3">
-                                        <span className="w-6 h-6 rounded-full bg-brand text-primary-foreground text-[10px] font-bold flex items-center justify-center shrink-0">
+                                        <span className="w-6 h-6 rounded-full bg-brand text-primary-foreground text-xs font-bold flex items-center justify-center shrink-0">
                                             ₹
                                         </span>
                                         CTC: {drive.ctc}
                                     </li>
                                     <li className="flex items-center gap-3">
-                                        <span className="w-6 h-6 rounded-full bg-brand text-primary-foreground text-[10px] font-bold flex items-center justify-center shrink-0">
+                                        <span className="w-6 h-6 rounded-full bg-brand text-primary-foreground text-xs font-bold flex items-center justify-center shrink-0">
                                             ✓
                                         </span>
                                         Min CGPA: {drive.minCGPA}
                                     </li>
                                     <li className="flex items-center gap-3">
-                                        <span className="w-6 h-6 rounded-full bg-brand text-primary-foreground text-[10px] font-bold flex items-center justify-center shrink-0">
+                                        <span className="w-6 h-6 rounded-full bg-brand text-primary-foreground text-xs font-bold flex items-center justify-center shrink-0">
                                             📋
                                         </span>
                                         {drive.jobType || "Full-Time"} Role

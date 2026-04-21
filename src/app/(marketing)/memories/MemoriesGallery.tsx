@@ -152,7 +152,7 @@ export default function MemoriesGallery() {
               {/* Overlay Info */}
               <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
                 <h3 className="text-white font-bold text-lg leading-tight mb-1">{memory.title}</h3>
-                <span className="text-slate-400 text-[10px] font-black uppercase tracking-widest">
+                <span className="text-muted-foreground text-xs font-black uppercase tracking-widest">
                   Shared by {memory.uploaderName || "Anonymous"}
                 </span>
               </div>
@@ -203,7 +203,7 @@ export default function MemoriesGallery() {
               <div>
                 <h2 className="text-xl md:text-3xl font-black tracking-tight">{selectedImage.title}</h2>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-slate-400 font-bold text-sm md:text-base tracking-widest uppercase mb-0.5">Shared by {selectedImage.uploaderName}</span>
+                  <span className="text-muted-foreground font-bold text-sm md:text-base tracking-widest uppercase mb-0.5">Shared by {selectedImage.uploaderName}</span>
                 </div>
               </div>
             </div>
@@ -213,3 +213,5 @@ export default function MemoriesGallery() {
     </>
   );
 }
+
+

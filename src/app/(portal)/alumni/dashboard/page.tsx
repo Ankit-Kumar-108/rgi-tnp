@@ -361,19 +361,19 @@ export default function AlumniDashboard() {
 
                       <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-6 md:gap-y-0 md:pt-6 border-t border-border/50 pt-6">
                         <div className="px-2 md:pr-6 md:border-r border-border/50 text-left">
-                          <p className="text-[10px] md:text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Current Role</p>
+                          <p className="text-xs md:text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Current Role</p>
                           <p className="text-sm md:text-lg font-extrabold text-foreground leading-snug truncate">{alumni?.jobTitle || "â€”"}</p>
                         </div>
                         <div className="px-2 md:px-6 md:border-r border-border/50 text-left">
-                          <p className="text-[10px] md:text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Company</p>
+                          <p className="text-xs md:text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Company</p>
                           <p className="text-sm md:text-lg font-extrabold text-foreground leading-snug truncate">{alumni?.currentCompany || "â€”"}</p>
                         </div>
                         <div className="px-2 md:px-6 md:border-r border-border/50 text-left text-left">
-                          <p className="text-[10px] md:text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">City</p>
+                          <p className="text-xs md:text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">City</p>
                           <p className="text-sm md:text-lg font-extrabold text-foreground leading-snug truncate">{alumni?.city || "â€”"}</p>
                         </div>
                         <div className="px-2 md:pl-6 text-left">
-                          <p className="text-[10px] md:text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Country</p>
+                          <p className="text-xs md:text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Country</p>
                           <p className="text-sm md:text-lg font-extrabold text-foreground leading-snug truncate">{alumni?.country || "â€”"}</p>
                         </div>
                       </div>
@@ -441,7 +441,7 @@ export default function AlumniDashboard() {
 
                 <form onSubmit={handleSubmitProfile} className="space-y-8">
                   <div className="space-y-3 text-left">
-                    <label htmlFor="about" className="text-[10px] md:text-xs font-black uppercase tracking-widest text-brand ml-1 flex items-center gap-2">
+                    <label htmlFor="about" className="text-xs md:text-xs font-black uppercase tracking-widest text-brand ml-1 flex items-center gap-2">
                       <div className="w-1 h-1 bg-brand rounded-full" /> Tell Us About Your Journey
                     </label>
                     <div className="relative group">
@@ -458,7 +458,7 @@ export default function AlumniDashboard() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Current Company</label>
+                      <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Current Company</label>
                       <div className="relative group">
                         <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-background rounded-lg border border-border group-focus-within:border-brand/50 transition-colors">
                           <Briefcase className="w-3.5 h-3.5 text-muted-foreground" />
@@ -474,7 +474,7 @@ export default function AlumniDashboard() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Job Title</label>
+                      <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Job Title</label>
                       <div className="relative group">
                         <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-background rounded-lg border border-border group-focus-within:border-brand/50 transition-colors">
                           <TrendingUp className="w-3.5 h-3.5 text-muted-foreground" />
@@ -490,7 +490,7 @@ export default function AlumniDashboard() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">LinkedIn Profile</label>
+                      <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">LinkedIn Profile</label>
                       <div className="relative group">
                         <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-[#0077b5]/10 rounded-lg border border-[#0077b5]/20">
                           <Linkedin className="w-3.5 h-3.5 text-[#0077b5]" />
@@ -505,7 +505,7 @@ export default function AlumniDashboard() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Location (City)</label>
+                      <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Location (City)</label>
                       <div className="relative group">
                         <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-background rounded-lg border border-border">
                           <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
@@ -521,7 +521,7 @@ export default function AlumniDashboard() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Country</label>
+                      <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Country</label>
                       <input
                         value={profileForm.country}
                         onChange={(e) => setProfileForm({ ...profileForm, country: e.target.value })}
@@ -531,7 +531,7 @@ export default function AlumniDashboard() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Phone Number (Private)</label>
+                      <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Phone Number (Private)</label>
                       <div className="relative group">
                         <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-background rounded-lg border border-border">
                           <Phone className="w-3.5 h-3.5 text-muted-foreground" />
@@ -588,7 +588,7 @@ export default function AlumniDashboard() {
                 </div>
                 <p className="text-3xl md:text-4xl font-black text-foreground leading-none mb-2">{stats.totalReferrals || 0}</p>
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total Referrals</p>
-                <p className="text-[10px] text-blue-600/70 mt-2">Opportunities shared</p>
+                <p className="text-xs text-blue-600/70 mt-2">Opportunities shared</p>
               </div>
 
               {/* Stat Card: Approved Referrals */}
@@ -601,7 +601,7 @@ export default function AlumniDashboard() {
                 </div>
                 <p className="text-3xl md:text-4xl font-black text-foreground leading-none mb-2">{stats.approvedReferrals || 0}</p>
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Approved</p>
-                <p className="text-[10px] text-green-600/70 mt-2">Published opportunities</p>
+                <p className="text-xs text-green-600/70 mt-2">Published opportunities</p>
               </div>
 
               {/* Stat Card: Pending Review */}
@@ -614,7 +614,7 @@ export default function AlumniDashboard() {
                 </div>
                 <p className="text-3xl md:text-4xl font-black text-brand leading-none mb-2">{stats.pendingReferrals || 0}</p>
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Under Review</p>
-                <p className="text-[10px] text-brand/70 mt-2">Awaiting approval</p>
+                <p className="text-xs text-brand/70 mt-2">Awaiting approval</p>
               </div>
             </section>
           )}
@@ -674,11 +674,11 @@ export default function AlumniDashboard() {
                         <div className="w-6 h-6 rounded-lg bg-blue-500/10 flex items-center justify-center">
                           <Building2 className="w-3.5 h-3.5 text-blue-500" />
                         </div>
-                        <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Company & Role</span>
+                        <span className="text-xs md:text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Company & Role</span>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Company Name *</label>
+                          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Company Name *</label>
                           <div className="relative group/input">
                             <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-muted/80 rounded-xl flex items-center justify-center border border-border/50 group-focus-within/input:border-brand/30 group-focus-within/input:bg-brand/5 transition-all">
                               <Building2 className="w-3.5 h-3.5 text-muted-foreground group-focus-within/input:text-brand transition-colors" />
@@ -689,7 +689,7 @@ export default function AlumniDashboard() {
                           </div>
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Job Type *</label>
+                          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Job Type *</label>
                           <div className="relative group/input">
                             <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-muted/80 rounded-xl flex items-center justify-center border border-border/50 group-focus-within/input:border-brand/30 group-focus-within/input:bg-brand/5 transition-all">
                               <Briefcase className="w-3.5 h-3.5 text-muted-foreground group-focus-within/input:text-brand transition-colors" />
@@ -707,7 +707,7 @@ export default function AlumniDashboard() {
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Role / Position *</label>
+                          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Role / Position *</label>
                           <div className="relative group/input">
                             <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-muted/80 rounded-xl flex items-center justify-center border border-border/50 group-focus-within/input:border-brand/30 group-focus-within/input:bg-brand/5 transition-all">
                               <Award className="w-3.5 h-3.5 text-muted-foreground group-focus-within/input:text-brand transition-colors" />
@@ -718,7 +718,7 @@ export default function AlumniDashboard() {
                           </div>
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Location</label>
+                          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Location</label>
                           <div className="relative group/input">
                             <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-muted/80 rounded-xl flex items-center justify-center border border-border/50 group-focus-within/input:border-brand/30 group-focus-within/input:bg-brand/5 transition-all">
                               <MapPin className="w-3.5 h-3.5 text-muted-foreground group-focus-within/input:text-brand transition-colors" />
@@ -742,10 +742,10 @@ export default function AlumniDashboard() {
                         <div className="w-6 h-6 rounded-lg bg-purple-500/10 flex items-center justify-center">
                           <FileText className="w-3.5 h-3.5 text-purple-500" />
                         </div>
-                        <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Job Description</span>
+                        <span className="text-xs md:text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Job Description</span>
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Description *</label>
+                        <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Description *</label>
                         <textarea required value={refForm.description} onChange={(e) => setRefForm({ ...refForm, description: e.target.value })} rows={3}
                           className="w-full bg-muted/40 px-5 py-4 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none resize-none text-foreground font-medium placeholder:text-muted-foreground/40 min-h-[110px] leading-relaxed"
                           placeholder="Job details, responsibilities, required skills, eligibility criteria..." />
@@ -763,23 +763,23 @@ export default function AlumniDashboard() {
                         <div className="w-6 h-6 rounded-lg bg-amber-500/10 flex items-center justify-center">
                           <Users className="w-3.5 h-3.5 text-amber-500" />
                         </div>
-                        <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Requirements & Eligibility</span>
+                        <span className="text-xs md:text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Requirements & Eligibility</span>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Min CGPA</label>
+                          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Min CGPA</label>
                           <input type="number" step="0.01" value={refForm.minCGPA} onChange={(e) => setRefForm({ ...refForm, minCGPA: e.target.value })}
                             className="w-full bg-muted/40 px-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium placeholder:text-muted-foreground/40"
                             placeholder="e.g. 7.0" />
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Experience</label>
+                          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Experience</label>
                           <input value={refForm.experience} onChange={(e) => setRefForm({ ...refForm, experience: e.target.value })}
                             className="w-full bg-muted/40 px-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium placeholder:text-muted-foreground/40"
                             placeholder="e.g. 0-1 years" />
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Batch Eligible</label>
+                          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Batch Eligible</label>
                           <input value={refForm.batchEligible} onChange={(e) => setRefForm({ ...refForm, batchEligible: e.target.value })}
                             className="w-full bg-muted/40 px-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium placeholder:text-muted-foreground/40"
                             placeholder="e.g. 2024, 2025" />
@@ -798,11 +798,11 @@ export default function AlumniDashboard() {
                         <div className="w-6 h-6 rounded-lg bg-green-500/10 flex items-center justify-center">
                           <Link2 className="w-3.5 h-3.5 text-green-500" />
                         </div>
-                        <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Links & Deadline</span>
+                        <span className="text-xs md:text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Links & Deadline</span>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">
+                          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">
                             Referral Code <span className="text-brand/60 normal-case tracking-normal">(Optional)</span>
                           </label>
                           <input value={refForm.referralCode} onChange={(e) => setRefForm({ ...refForm, referralCode: e.target.value })}
@@ -810,7 +810,7 @@ export default function AlumniDashboard() {
                             placeholder="e.g. REF2024" />
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Deadline</label>
+                          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Deadline</label>
                           <div className="relative group/input">
                             <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-muted/80 rounded-xl flex items-center justify-center border border-border/50 group-focus-within/input:border-brand/30 group-focus-within/input:bg-brand/5 transition-all">
                               <Calendar className="w-3.5 h-3.5 text-muted-foreground group-focus-within/input:text-brand transition-colors" />
@@ -821,7 +821,7 @@ export default function AlumniDashboard() {
                         </div>
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">
+                        <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">
                           Referral Link <span className="text-brand/60 normal-case tracking-normal">(Optional)</span>
                         </label>
                         <div className="relative group/input">
@@ -834,7 +834,7 @@ export default function AlumniDashboard() {
                         </div>
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Apply Link / Email *</label>
+                        <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Apply Link / Email *</label>
                         <div className="relative group/input">
                           <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-brand/10 rounded-xl flex items-center justify-center border border-brand/20">
                             <ExternalLink className="w-3.5 h-3.5 text-brand" />
@@ -940,9 +940,9 @@ export default function AlumniDashboard() {
                     {/* Rating Section */}
                     <div className="space-y-2.5">
                       <div className="flex items-center justify-between">
-                        <p className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground">Your Rating</p>
+                        <p className="text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Your Rating</p>
                         {(hoverRating || fbRating) > 0 && (
-                          <span className="text-[10px] font-bold text-brand bg-brand/10 px-2.5 py-0.5 rounded-full animate-in fade-in duration-200">
+                          <span className="text-xs font-bold text-brand bg-brand/10 px-2.5 py-0.5 rounded-full animate-in fade-in duration-200">
                             {["", "Poor", "Fair", "Good", "Great", "Excellent"][hoverRating || fbRating]}
                           </span>
                         )}
@@ -978,7 +978,7 @@ export default function AlumniDashboard() {
 
                     {/* Feedback Textarea */}
                     <div className="space-y-2 flex-1 flex flex-col">
-                      <label className="text-[10px] font-black uppercase tracking-[0.15em] text-muted-foreground">Your Thoughts</label>
+                      <label className="text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Your Thoughts</label>
                       <textarea
                         value={fbContent}
                         onChange={(e) => setFbContent(e.target.value)}
@@ -996,7 +996,7 @@ export default function AlumniDashboard() {
                             style={{ width: `${Math.min((fbContent.length / 500) * 100, 100)}%` }}
                           />
                         </div>
-                        <span className={`text-[10px] font-bold tabular-nums ${fbContent.length > 450 ? "text-amber-500" : "text-muted-foreground/60"}`}>
+                        <span className={`text-xs font-bold tabular-nums ${fbContent.length > 450 ? "text-amber-500" : "text-muted-foreground/60"}`}>
                           {fbContent.length}/500
                         </span>
                       </div>
@@ -1019,7 +1019,7 @@ export default function AlumniDashboard() {
                     </button>
 
                     {/* Disclaimer */}
-                    <p className="text-[10px] text-center text-muted-foreground/50 leading-relaxed">
+                    <p className="text-xs text-center text-muted-foreground/50 leading-relaxed">
                       Your feedback is valued and helps shape the training & placement process.
                     </p>
                   </div>
@@ -1037,7 +1037,7 @@ export default function AlumniDashboard() {
               <div className="overflow-hidden rounded-[2.5rem] bg-card shadow-sm border border-border">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
-                    <thead className="bg-muted/50 border-b border-border text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                    <thead className="bg-muted/50 border-b border-border text-xs font-black uppercase tracking-widest text-muted-foreground">
                       <tr>
                         <th className="px-8 py-6">Company</th>
                         <th className="px-8 py-6">Position</th>
@@ -1052,7 +1052,7 @@ export default function AlumniDashboard() {
                           <td className="px-8 py-6 text-muted-foreground text-xs">{ref.position}</td>
                           <td className="px-8 py-6 text-brand text-xs font-bold truncate max-w-[150px]">{ref.applyLink}</td>
                           <td className="px-8 py-6 text-right">
-                            <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase ${getStatusBadge(ref.status)}`}>{ref.status}</span>
+                            <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase ${getStatusBadge(ref.status)}`}>{ref.status}</span>
                           </td>
                         </tr>
                       ))}
@@ -1068,3 +1068,4 @@ export default function AlumniDashboard() {
     </>
   );
 }
+

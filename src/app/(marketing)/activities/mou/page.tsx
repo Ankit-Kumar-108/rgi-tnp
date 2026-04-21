@@ -14,7 +14,7 @@ export default function StrategicAlliances() {
             <div className="bg-background text-foreground antialiased font-sans flex flex-col min-h-screen mt-20">
                 <main className="flex-1 w-full">
                     {/* Hero Section */}
-                    <section className="relative min-h-[716px] flex items-center overflow-hidden">
+                    <section className="relative min-h-[480px] md:min-h-[716px] flex items-center overflow-hidden">
                         <div className="absolute inset-0 z-0">
                             <img
                                 className="w-full h-full object-cover opacity-30"
@@ -25,12 +25,12 @@ export default function StrategicAlliances() {
                             <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-transparent"></div>
                         </div>
 
-                        <div className="relative z-10 max-w-7xl mx-auto px-8 py-20 w-full">
+                        <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 py-16 md:py-20 w-full">
                             <div className="max-w-3xl">
                                 <span className="inline-block px-4 py-1 rounded-full bg-brand/10 text-brand font-bold text-sm tracking-widest uppercase mb-6">
                                     Institutional Excellence
                                 </span>
-                                <h1 className="text-5xl md:text-7xl font-black tracking-tight text-foreground mb-8 leading-[1.1]">
+                                <h1 className="text-4xl md:text-5xl lg:text-7xl font-black tracking-tight text-foreground mb-6 md:mb-8 leading-[1.05]">
                                     Strategic Alliances <br /> & MoUs
                                 </h1>
                                 <p className="text-lg md:text-xl text-muted-foreground font-light leading-relaxed mb-10 max-w-2xl">
@@ -40,10 +40,10 @@ export default function StrategicAlliances() {
                                     professional growth opportunities.
                                 </p>
                                 <div className="flex flex-wrap gap-4">
-                                    <button className="bg-brand text-primary-foreground px-8 py-4 rounded-xl font-bold text-lg shadow-[var(--shadow-brand)] hover:scale-[1.02] transition-all">
+                                    <button className="bg-brand text-primary-foreground px-7 py-3.5 rounded-full font-bold text-base md:text-lg shadow-[var(--shadow-brand)] hover:opacity-90 transition-opacity">
                                         Explore Partnerships
                                     </button>
-                                    <button className="bg-transparent border-2 border-brand/20 text-brand px-8 py-4 rounded-xl font-bold text-lg hover:bg-brand/5 transition-all">
+                                    <button className="bg-transparent border-2 border-brand/20 text-brand px-7 py-3.5 rounded-full font-bold text-base md:text-lg hover:bg-brand/5 transition-colors">
                                         Corporate Inquiry
                                     </button>
                                 </div>
@@ -52,7 +52,7 @@ export default function StrategicAlliances() {
                     </section>
 
                     {/* MoU Categorization & Grid */}
-                    <section className="py-24 px-8 bg-muted/30">
+                    <section className="section-y px-4 md:px-8 bg-muted/30">
                         <div className="max-w-7xl mx-auto">
                             <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
                                 <div>
@@ -71,7 +71,7 @@ export default function StrategicAlliances() {
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
                                 {/* Partner Card 1 */}
-                                <div className="group bg-card p-8 rounded-[2rem] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-lg)] hover:scale-[1.01] transition-all flex flex-col items-center text-center border border-border">
+                                <div className="group bg-card p-6 md:p-8 rounded-2xl md:rounded-[2rem] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-lg)] transition-shadow duration-300 flex flex-col items-center text-center border border-border">
                                     <div className="w-20 h-20 bg-muted rounded-2xl flex items-center justify-center mb-6 overflow-hidden">
                                         <img
                                             className="w-12 h-12 object-contain"
@@ -96,7 +96,7 @@ export default function StrategicAlliances() {
                                 </div>
 
                                 {/* Partner Card 2 */}
-                                <div className="group bg-card p-8 rounded-[2rem] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-lg)] hover:scale-[1.01] transition-all flex flex-col items-center text-center border border-border">
+                                <div className="group bg-card p-6 md:p-8 rounded-2xl md:rounded-[2rem] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-lg)] transition-shadow duration-300 flex flex-col items-center text-center border border-border">
                                     <div className="w-20 h-20 bg-muted rounded-2xl flex items-center justify-center mb-6 overflow-hidden p-2">
                                         <img
                                             className="w-full h-full object-contain"
@@ -121,7 +121,7 @@ export default function StrategicAlliances() {
                                 </div>
 
                                 {/* Partner Card 3 */}
-                                <div className="group bg-card p-8 rounded-[2rem] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-lg)] hover:scale-[1.01] transition-all flex flex-col items-center text-center border border-border">
+                                <div className="group bg-card p-6 md:p-8 rounded-2xl md:rounded-[2rem] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-lg)] transition-shadow duration-300 flex flex-col items-center text-center border border-border">
                                     <div className="w-20 h-20 bg-muted rounded-2xl flex items-center justify-center mb-6 overflow-hidden">
                                         <span className="text-2xl font-black text-foreground">NPTEL</span>
                                     </div>
@@ -138,7 +138,7 @@ export default function StrategicAlliances() {
                                 </div>
 
                                 {/* Partner Card 4 */}
-                                <div className="group bg-card p-8 rounded-[2rem] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-lg)] hover:scale-[1.01] transition-all flex flex-col items-center text-center border border-border">
+                                <div className="group bg-card p-6 md:p-8 rounded-2xl md:rounded-[2rem] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-lg)] transition-shadow duration-300 flex flex-col items-center text-center border border-border">
                                     <div className="w-20 h-20 bg-muted rounded-2xl flex items-center justify-center mb-6 overflow-hidden">
                                         <img
                                             className="w-12 h-12 object-contain"
@@ -165,7 +165,7 @@ export default function StrategicAlliances() {
                     </section>
 
                     {/* Impact & Benefits Section */}
-                    <section className="py-24 px-8 bg-background relative">
+                    <section className="section-y px-4 md:px-8 bg-background relative">
                         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                             <div className="relative">
                                 <div className="absolute -top-12 -left-12 w-64 h-64 bg-brand/10 blur-[100px] rounded-full"></div>
@@ -238,7 +238,7 @@ export default function StrategicAlliances() {
                     </section>
 
                     {/* Call to Action Section */}
-                    <section className="py-24 px-8 bg-foreground text-background overflow-hidden relative">
+                    <section className="section-y px-4 md:px-8 bg-foreground text-background overflow-hidden relative">
                         <div className="absolute top-0 right-0 w-1/2 h-full bg-brand/20 -skew-x-12 translate-x-1/4"></div>
 
                         <div className="max-w-4xl mx-auto relative z-10">

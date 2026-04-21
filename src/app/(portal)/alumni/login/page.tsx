@@ -80,7 +80,7 @@ export default function AlumniLogin() {
                             <h1 className="text-4xl font-black mb-4 leading-tight">
                                 Welcome Back, Alumni
                             </h1>
-                            <p className="text-lg text-slate-200 font-light max-w-md">
+                            <p className="text-lg text-white/80 font-light max-w-md">
                                 Reconnect with your alma mater. Share referrals, give feedback, and stay part of the RGI legacy.
                             </p>
                             <div className="mt-12 flex items-center gap-4">
@@ -195,7 +195,7 @@ export default function AlumniLogin() {
                         </div>
 
                         <div className="mt-10 flex flex-col items-center gap-2 relative z-10">
-                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
+                            <p className="text-xs uppercase tracking-widest text-muted-foreground font-bold">
                                 Official Portal of
                             </p>
                             <span className="text-foreground font-bold text-xs sm:text-sm text-center">
@@ -220,3 +220,5 @@ export default function AlumniLogin() {
         </div>
     );
 }
+
+

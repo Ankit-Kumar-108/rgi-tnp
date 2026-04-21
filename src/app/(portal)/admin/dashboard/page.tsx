@@ -169,7 +169,7 @@ export default function AdminDashboard() {
               <h1 className="text-lg font-black text-foreground tracking-tight">
                 Admin Panel
               </h1>
-              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">
+              <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest">
                 RGI T&P Cell
               </p>
             </div>
@@ -219,7 +219,7 @@ export default function AdminDashboard() {
                     <card.icon className={`w-5 h-5 ${card.color}`} />
                   </div>
                   <p className="text-2xl font-black text-foreground">{card.value}</p>
-                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mt-1">
+                  <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mt-1">
                     {card.label}
                   </p>
                 </div>
@@ -243,7 +243,7 @@ export default function AdminDashboard() {
                     <section.icon className="w-6 h-6 text-brand" />
                   </div>
                   {section.badge !== null && section.badge > 0 && (
-                    <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                    <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
                       {section.badge}
                     </span>
                   )}
@@ -261,3 +261,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+

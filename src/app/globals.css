@@ -60,16 +60,16 @@
 .dark {
   --brand: #8b5cf6;
 
-  --background: #0f0a1a;
+  --background: #09090b;
   --foreground: #f8fafc;
 
-  --card: #1e293b;
+  --card: #141419;
   --card-foreground: #f8fafc;
 
-  --surface: #1e293b;
+  --surface: #141419;
   --surface-foreground: #f8fafc;
 
-  --popover: #1e293b;
+  --popover: #141419;
   --popover-foreground: #f8fafc;
 
   --primary: oklch(0.922 0 0);
@@ -86,7 +86,7 @@
 
   --destructive: oklch(0.704 0.191 22.216);
 
-  --border: oklch(1 0 0 / 10%);
+  --border: oklch(1 0 0 / 8%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
 
@@ -96,7 +96,7 @@
   --chart-4: oklch(0.488 0.243 264.376);
   --chart-5: oklch(0.424 0.199 265.638);
 
-  --sidebar: #1e293b;
+  --sidebar: #141419;
   --sidebar-foreground: #f8fafc;
   --sidebar-primary: oklch(0.488 0.243 264.376);
   --sidebar-primary-foreground: oklch(0.985 0 0);
@@ -227,6 +227,32 @@
   background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(5px);
   /* border: 1px solid rgba(255, 255, 255, 0.2); */
+}
+
+/* ─── ElevenLabs-Inspired Mobile-First Utilities ─── */
+.section-y {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+@media (min-width: 768px) {
+  .section-y {
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+  }
+}
+@media (min-width: 1024px) {
+  .section-y {
+    padding-top: 8rem;
+    padding-bottom: 8rem;
+  }
+}
+
+/* Mobile-first: ensure touch targets are minimum 44px */
+@media (max-width: 767px) {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }
 
 /* ─── View Transition (Theme Toggle Animation) ─── */

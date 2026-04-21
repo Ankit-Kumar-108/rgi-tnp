@@ -58,7 +58,7 @@ export default function ExternalStudentLogin() {
                         <div className="relative z-10 text-white">
                             <div className="mb-4 inline-flex items-center justify-center p-3 bg-brand backdrop-blur-md rounded-2xl text-brand-50 shadow-inner"><GraduationCap className="w-8 h-8" /></div>
                             <h1 className="text-4xl font-black mb-4 leading-tight">External Student Portal</h1>
-                            <p className="text-lg text-slate-200 font-light max-w-md">Login to view and register for open campus placement drives hosted by RGI.</p>
+                            <p className="text-lg text-white/80 font-light max-w-md">Login to view and register for open campus placement drives hosted by RGI.</p>
                         </div>
                     </div>
                     <div className="p-6 sm:p-10 md:p-12 flex flex-col justify-center relative overflow-y-scroll overflow-x-hidden">
@@ -101,7 +101,7 @@ export default function ExternalStudentLogin() {
                             <Link href="/external-students/register" className="w-full py-3 sm:py-3.5 rounded-xl border-2 border-brand/20 text-brand font-bold bg-transparent hover:bg-brand/5 transition-all duration-200 flex items-center justify-center gap-2">Register as External Student</Link>
                         </div>
                          <div className="mt-10 flex flex-col items-center gap-2 relative z-10">
-                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
+                            <p className="text-xs uppercase tracking-widest text-muted-foreground font-bold">
                                 Official Portal of
                             </p>
                             <span className="text-foreground font-bold text-xs sm:text-sm text-center">
@@ -126,3 +126,5 @@ export default function ExternalStudentLogin() {
         </div>
     )
 }
+
+

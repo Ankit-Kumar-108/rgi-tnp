@@ -171,7 +171,7 @@ export default function StudentDashboard() {
         actionElement: (
           <div className="flex flex-col items-end">
             <span className="inline-flex items-center gap-1 text-red-500 text-xs font-bold"><XCircle className="w-4 h-4" /> Ineligible</span>
-            <span className="text-[10px] text-muted-foreground leading-none mt-1">{reason}</span>
+            <span className="text-xs text-muted-foreground leading-none mt-1">{reason}</span>
           </div>
         )
       };
@@ -375,7 +375,7 @@ export default function StudentDashboard() {
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Batch Title (Optional)</label>
+                <label className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Batch Title (Optional)</label>
                 <input 
                   type="text"
                   value={memBatchTitle}
@@ -383,7 +383,7 @@ export default function StudentDashboard() {
                   placeholder="e.g. Campus Farewell..."
                   className="w-full bg-muted px-6 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand outline-none text-foreground font-medium transition-all"
                 />
-                <p className="text-[10px] text-muted-foreground ml-1">This title will be applied to all {selectedMemFiles.length} images.</p>
+                <p className="text-xs text-muted-foreground ml-1">This title will be applied to all {selectedMemFiles.length} images.</p>
               </div>
 
               <div className="flex gap-3">
@@ -596,19 +596,19 @@ export default function StudentDashboard() {
                         {/* Horizontal Grid Stats */}
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-0 pt-6 border-t border-border">
                           <div className="md:pr-6 md:border-r border-border">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Current CGPA</p>
+                            <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Current CGPA</p>
                             <p className="text-xl md:text-2xl font-bold text-brand">{student?.cgpa}</p>
                           </div>
                           <div className="md:px-6 md:border-r border-border">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Branch</p>
+                            <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Branch</p>
                             <p className="text-md md:text-lg font-bold text-foreground leading-tight">{student?.branch}</p>
                           </div>
                           <div className="md:px-6 md:border-r border-border">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Semester</p>
+                            <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Semester</p>
                             <p className="text-xl md:text-2xl font-bold text-foreground">{student?.semester}</p>
                           </div>
                           <div className="md:px-6 md:border-r border-border">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Course</p>
+                            <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Course</p>
                             <p className="text-xl md:text-2xl font-bold text-foreground">{student?.course}</p>
                           </div>
                         </div>
@@ -649,7 +649,7 @@ export default function StudentDashboard() {
                     </div>
                     <p className="text-3xl md:text-4xl font-black text-foreground leading-none mb-2">{drives.length}</p>
                     <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Eligible Drives</p>
-                    <p className="text-[10px] text-blue-600/70 mt-2 hidden xs:block">Ready to apply</p>
+                    <p className="text-xs text-blue-600/70 mt-2 hidden xs:block">Ready to apply</p>
                   </div>
 
                   {/* Stat Card: Registrations */}
@@ -662,7 +662,7 @@ export default function StudentDashboard() {
                     </div>
                     <p className="text-3xl md:text-4xl font-black text-foreground leading-none mb-2">{registrations.length}</p>
                     <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Applied</p>
-                    <p className="text-[10px] text-green-600/70 mt-2 hidden xs:block">Submitted applications</p>
+                    <p className="text-xs text-green-600/70 mt-2 hidden xs:block">Submitted applications</p>
                   </div>
 
                   {/* Stat Card: Memories */}
@@ -675,7 +675,7 @@ export default function StudentDashboard() {
                     </div>
                     <p className="text-3xl md:text-4xl font-black text-foreground leading-none mb-2">{memories.length}</p>
                     <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Memories</p>
-                    <p className="text-[10px] text-purple-600/70 mt-2 hidden xs:block">Campus moments</p>
+                    <p className="text-xs text-purple-600/70 mt-2 hidden xs:block">Campus moments</p>
                   </div>
 
                   {/* Stat Card: Attended */}
@@ -688,7 +688,7 @@ export default function StudentDashboard() {
                     </div>
                     <p className="text-3xl md:text-4xl font-black text-brand leading-none mb-2">{registrations.filter((r: any) => r.attended).length}</p>
                     <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Attended</p>
-                    <p className="text-[10px] text-brand/70 mt-2 hidden xs:block">Drive participation</p>
+                    <p className="text-xs text-brand/70 mt-2 hidden xs:block">Drive participation</p>
                   </div>
                 </section>
               )}
@@ -742,18 +742,18 @@ export default function StudentDashboard() {
                                   <p className="text-xs text-muted-foreground truncate">{drive.roleName}</p>
                                 </div>
                               </div>
-                              <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold whitespace-nowrap ml-2 ${drive.driveType === "Open" ? "bg-green-500/15 text-green-700" : "bg-blue-500/15 text-blue-700"}`}>
+                              <span className={`text-xs px-2.5 py-1 rounded-full font-bold whitespace-nowrap ml-2 ${drive.driveType === "Open" ? "bg-green-500/15 text-green-700" : "bg-blue-500/15 text-blue-700"}`}>
                                 {drive.driveType}
                               </span>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4 py-3 border-y border-border/50">
                               <div>
-                                <p className="text-[9px] uppercase font-black text-muted-foreground tracking-wider mb-1">CTC</p>
+                                <p className="text-xs uppercase font-black text-muted-foreground tracking-wider mb-1">CTC</p>
                                 <p className="text-sm font-bold text-foreground">{drive.ctc}</p>
                               </div>
                               <div>
-                                <p className="text-[9px] uppercase font-black text-muted-foreground tracking-wider mb-1">Date</p>
+                                <p className="text-xs uppercase font-black text-muted-foreground tracking-wider mb-1">Date</p>
                                 <p className="text-sm font-bold text-foreground">{new Date(drive.driveDate).toLocaleDateString('en-IN', {month: 'short', day: 'numeric'})}</p>
                               </div>
                             </div>
@@ -855,15 +855,15 @@ export default function StudentDashboard() {
                               <h3 className="font-bold text-foreground leading-tight truncate">{reg.drive?.companyName}</h3>
                               <p className="text-xs text-muted-foreground truncate">{reg.drive?.roleName}</p>
                             </div>
-                            <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold whitespace-nowrap ${reg.drive?.status === "active" ? "bg-green-500/15 text-green-700" : reg.drive?.status === "completed" ? "bg-blue-500/15 text-blue-700" : "bg-muted text-muted-foreground"}`}>
+                            <span className={`text-xs px-2.5 py-1 rounded-full font-bold whitespace-nowrap ${reg.drive?.status === "active" ? "bg-green-500/15 text-green-700" : reg.drive?.status === "completed" ? "bg-blue-500/15 text-blue-700" : "bg-muted text-muted-foreground"}`}>
                               {reg.drive?.status}
                             </span>
                           </div>
 
                           <div className="flex items-center justify-between py-3 border-y border-border/50">
                             <div className="space-y-1">
-                              <p className="text-[9px] uppercase font-black text-muted-foreground tracking-wider">Status</p>
-                              <span className={`inline-flex px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-wider ${reg.status === "Selected" ? "bg-green-500/15 text-green-700" :
+                              <p className="text-xs uppercase font-black text-muted-foreground tracking-wider">Status</p>
+                              <span className={`inline-flex px-2.5 py-1 rounded-lg text-xs font-bold tracking-wider ${reg.status === "Selected" ? "bg-green-500/15 text-green-700" :
                                 reg.status === "Rejected" ? "bg-red-500/15 text-red-600" :
                                   reg.status === "Shortlisted" ? "bg-yellow-500/15 text-yellow-700" :
                                     "bg-muted text-muted-foreground"
@@ -872,7 +872,7 @@ export default function StudentDashboard() {
                               </span>
                             </div>
                             <div className="text-right space-y-1">
-                              <p className="text-[9px] uppercase font-black text-muted-foreground tracking-wider">Attendance</p>
+                              <p className="text-xs uppercase font-black text-muted-foreground tracking-wider">Attendance</p>
                               {reg.attended ? (
                                 <span className="text-green-600 text-xs font-bold flex items-center justify-end gap-1.5">
                                   <CheckCircle className="w-3.5 h-3.5" /> Present
@@ -885,7 +885,7 @@ export default function StudentDashboard() {
                             </div>
                           </div>
 
-                          <p className="text-[10px] text-muted-foreground">
+                          <p className="text-xs text-muted-foreground">
                             📅 {reg.drive?.driveDate ? new Date(reg.drive.driveDate).toLocaleDateString('en-IN') : "—"}
                           </p>
                         </div>
@@ -978,17 +978,17 @@ export default function StudentDashboard() {
                           <h3 className="text-sm font-bold text-foreground truncate max-w-37.5">
                             {drive.companyName}
                           </h3>
-                          <p className="text-[10px] text-muted-foreground">
+                          <p className="text-xs text-muted-foreground">
                             {drive.roleName} • {new Date(drive.driveDate).toLocaleDateString()}
                           </p>
                         </div>
                         <div>
                           {drive.isRegistered ? (
-                            <span className="bg-brand/10 text-brand text-[9px] px-2 py-0.5 rounded-full font-bold">
+                            <span className="bg-brand/10 text-brand text-xs px-2 py-0.5 rounded-full font-bold">
                               Registered
                             </span>
                           ) : (
-                            <span className="bg-muted text-muted-foreground text-[9px] px-2 py-0.5 rounded-full font-bold">
+                            <span className="bg-muted text-muted-foreground text-xs px-2 py-0.5 rounded-full font-bold">
                               Missed
                             </span>
                           )}
@@ -1002,7 +1002,7 @@ export default function StudentDashboard() {
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="bg-muted/50 border-b border-border text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          <tr className="bg-muted/50 border-b border-border text-xs font-bold uppercase tracking-wider text-muted-foreground">
                             <th className="text-left px-5 py-3">Company</th>
                             <th className="text-left px-5 py-3">Role</th>
                             <th className="text-left px-5 py-3">Date</th>
@@ -1023,11 +1023,11 @@ export default function StudentDashboard() {
                               </td>
                               <td className="px-5 py-3.5 text-right">
                                 {drive.isRegistered ? (
-                                  <span className="bg-brand/10 text-brand text-[10px] px-2 py-0.5 rounded-full font-bold">
+                                  <span className="bg-brand/10 text-brand text-xs px-2 py-0.5 rounded-full font-bold">
                                     Registered
                                   </span>
                                 ) : (
-                                  <span className="bg-muted text-muted-foreground text-[10px] px-2 py-0.5 rounded-full font-bold">
+                                  <span className="bg-muted text-muted-foreground text-xs px-2 py-0.5 rounded-full font-bold">
                                     Not Registered
                                   </span>
                                 )}
@@ -1067,7 +1067,7 @@ export default function StudentDashboard() {
                           
                         </div>
                         <div className="p-3 flex items-center justify-between">
-                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${m.status === "approved" ? "bg-green-500/10 text-green-600"
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${m.status === "approved" ? "bg-green-500/10 text-green-600"
                             : m.status === "rejected" ? "bg-red-500/10 text-red-500"
                               : "bg-yellow-500/10 text-yellow-600"
                             }`}>{m.status === "pending_moderation" ? "Pending" : m.status}</span>
@@ -1097,3 +1097,4 @@ export default function StudentDashboard() {
     </>
   );
 }
+

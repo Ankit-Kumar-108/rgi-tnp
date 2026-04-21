@@ -53,7 +53,7 @@ export default function RecruiterRegister() {
                         <div className="relative z-10 text-white">
                             <div className="mb-4 inline-flex items-center justify-center p-3 bg-brand backdrop-blur-md rounded-2xl text-brand-50 shadow-inner"><Briefcase className="w-8 h-8"/></div>
                             <h1 className="text-4xl font-black mb-4 leading-tight">Partner With Excellence</h1>
-                            <p className="text-lg text-slate-200 font-light max-w-md">Register your company to access a pool of talented, driven, and industry-ready professionals.</p>
+                            <p className="text-lg text-white/80 font-light max-w-md">Register your company to access a pool of talented, driven, and industry-ready professionals.</p>
                             <div className="mt-12"><span className="text-sm font-medium text-white/90">Join 500+ top recruiters hiring from us</span></div>
                         </div>
                     </div>
@@ -154,7 +154,7 @@ export default function RecruiterRegister() {
                         </div>
                         
                         <div className="mt-8 flex flex-col items-center gap-2 relative z-10">
-                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Official Portal of</p>
+                            <p className="text-xs uppercase tracking-widest text-muted-foreground font-bold">Official Portal of</p>
                             <span className="text-foreground font-bold text-xs sm:text-sm text-center">RADHARAMAN GROUP OF INSTITUTES</span>
                             <div className="flex gap-4 mt-2">
                                 <a className="text-muted-foreground hover:text-brand transition-colors p-2 hover:bg-brand/5 rounded-full" href="#" aria-label="Website"><Earth className="w-4 h-4"/></a>
@@ -169,3 +169,5 @@ export default function RecruiterRegister() {
         </div>
     )
 }
+
+

@@ -163,27 +163,27 @@ export default function Home() {
       <main className="pt-20">
         {/* Hero Section */}
         <section className="bg-brand/5">
-          <div className="max-w-7xl mx-auto px-3 lg:px-20 py-12 lg:py-20">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div className="order-2 lg:order-1 flex flex-col gap-6 md:gap-8">
+          <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-20 py-16 lg:py-24">
+            <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+              <div className="order-2 lg:order-1 flex flex-col gap-5 md:gap-8">
                 <div className="hidden md:inline-flex items-center gap-2 bg-brand/10 text-brand px-4 py-1.5 rounded-full w-fit">
                   <BadgeCheck className="text-lg" />
                   <span className="text-xs font-bold uppercase tracking-wider">Top Rated Placement Cell</span>
                 </div>
-                <h1 className="text-3xl md:text-5xl lg:text-7xl font-black leading-tight tracking-tight">
+                <h1 className="text-4xl md:text-5xl lg:text-7xl font-black leading-[1.05] tracking-tight">
                   Empowering Careers at <span className="text-brand">RGI</span>
                 </h1>
-                <p className="text-[14px] md:text-lg text-muted-foreground max-w-lg leading-relaxed">
+                <p className="text-sm md:text-lg text-muted-foreground max-w-lg leading-relaxed">
                   Connecting top-tier talent with global industry leaders. Join our legacy of excellence and secure your future with world-class opportunities.
                 </p>
-                <div className="flex flex-wrap gap-2 md:gap-4">
+                <div className="flex flex-wrap gap-3 md:gap-4">
                   <Link href="/recruiters/register">
-                    <button className="bg-brand text-white px-6 py-2.5 rounded-xl text-base font-bold flex items-center gap-2 hover:scale-105 transition-transform group cursor-pointer">
-                      Hire from Us <div className="group-hover:translate-x-2 transition-all duration-300"><MoveRight /></div>
+                    <button className="bg-brand text-white px-7 py-3 rounded-full text-sm md:text-base font-bold flex items-center gap-2 hover:opacity-90 transition-opacity group cursor-pointer">
+                      Hire from Us <div className="group-hover:translate-x-1 transition-all duration-300"><MoveRight className="w-4 h-4" /></div>
                     </button>
                   </Link>
                   <Link href="/students/login">
-                    <button className="bg-background border-2 border-brand/20 text-foreground px-6 py-2.5 rounded-xl text-base font-bold hover:bg-surface cursor-pointer hover:scale-105 transition-all duration-300">
+                    <button className="bg-background border-2 border-border text-foreground px-7 py-3 rounded-full text-sm md:text-base font-bold hover:bg-muted cursor-pointer transition-colors duration-300">
                       Student Portal
                     </button>
                   </Link>
@@ -194,9 +194,8 @@ export default function Home() {
                   <BadgeCheck className="text-lg" />
                   <span className="text-xs font-bold uppercase tracking-wider">Top Rated Placement Cell</span>
                 </div>
-                <div className="relative group">
-                  <div className="absolute -inset-4 bg-brand/10 rounded-3xl blur-xl group-hover:bg-brand/15 transition-all"></div>
-                  <div className="relative h-112.5 w-full rounded-2xl bg-cover bg-center shadow-2xl overflow-hidden border-4 border-background" data-alt="Modern college campus students collaborating outdoors" style={{ backgroundImage: "url(/images/RGI.jpg)" }}>
+                <div className="relative">
+                  <div className="relative h-80 md:h-112.5 w-full rounded-2xl md:rounded-3xl bg-cover bg-center shadow-[var(--shadow-lg)] overflow-hidden" data-alt="Modern college campus students collaborating outdoors" style={{ backgroundImage: "url(/images/RGI.jpg)" }}>
                   </div>
                 </div>
               </div>
@@ -346,9 +345,9 @@ export default function Home() {
         )}
 
         {/* Director's Section */}
-        <section className="py-24 px-6 lg:px-20 max-w-7xl mx-auto" id="about">
+        <section className="section-y px-4 md:px-8 lg:px-20 max-w-7xl mx-auto" id="about">
           <div
-            className="bg-card/80 backdrop-blur-[3px] rounded-2xl shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-lg)] overflow-hidden border border-border hover:scale-[1.01] transition-all duration-300"
+            className="bg-card rounded-2xl md:rounded-3xl shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] overflow-hidden border border-border transition-shadow duration-300"
           >
             <div className="flex flex-col lg:flex-row">
               <div className="lg:w-1/3 aspect-square lg:aspect-auto">
@@ -366,7 +365,7 @@ export default function Home() {
                   <p className="text-brand font-semibold text-lg">James Kuttappan, Director (T&P)</p>
                 </div>
                 <Quote className="text-brand text-5xl mb-4" />
-                <p className="text-muted-foreground text-[13px] md:text-lg leading-relaxed mb-8 italic">
+                <p className="text-muted-foreground text-sm md:text-lg leading-relaxed mb-8 italic">
                   &quot;Welcome to the gateway of professional excellence. At Radharaman Group, our commitment is to bridge the gap between academic brilliance and global corporate requirements. We don&apos;t just place students we architect careers by fostering an environment of continuous learning and industry exposure.&quot;
                 </p>
               </div>
@@ -375,9 +374,9 @@ export default function Home() {
         </section>
 
         {/* Deputy Director's Section */}
-        <section className="pb-24 px-6 lg:px-20 max-w-7xl mx-auto">
+        <section className="pb-16 md:pb-24 px-4 md:px-8 lg:px-20 max-w-7xl mx-auto">
           <div
-            className="bg-card/80 backdrop-blur-[3px] rounded-2xl shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-lg)] overflow-hidden border border-border hover:scale-[1.01] transition-all duration-300">
+            className="bg-card rounded-2xl md:rounded-3xl shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] overflow-hidden border border-border transition-shadow duration-300">
             <div className="flex flex-col lg:flex-row-reverse">
               <div className="lg:w-1/3 aspect-square lg:aspect-auto">
                 <img
@@ -395,7 +394,7 @@ export default function Home() {
                   <p className="text-brand font-semibold text-lg">Robin P. Samuel, Dy Director (T&amp;P)</p>
                 </div>
                 <Quote className="text-brand text-5xl mb-4" />
-                <p className="text-muted-foreground text-[14px] md:text-lg leading-relaxed mb-8 italic">
+                <p className="text-muted-foreground text-sm md:text-lg leading-relaxed mb-8 italic">
                   &quot;Our focus is on the holistic development of our students. Through rigorous aptitude training, soft skills workshops, and technical certifications, we ensure our graduates are not just job-ready, but industry-leading. We value our partnerships with recruiters and strive to provide a seamless hiring experience.&quot;
                 </p>
               </div>
@@ -403,44 +402,44 @@ export default function Home() {
           </div>
         </section>
         {/* Placement Team Grid */}
-        <section className="max-w-7xl mx-auto px-3 lg:px-20 py-16">
-          <div className="flex justify-between items-end mb-12">
+        <section className="max-w-7xl mx-auto px-4 md:px-8 lg:px-20 section-y">
+          <div className="flex justify-between items-end mb-10 md:mb-14">
             <div>
-              <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-2" >The Placement Team</h2>
-              <p className="text-muted-foreground text-xs md:text-lg" >The dedicated minds behind our student success.</p>
+              <h2 className="text-2xl md:text-4xl font-black tracking-tight mb-1 md:mb-2" >The Placement Team</h2>
+              <p className="text-muted-foreground text-sm md:text-lg" >The dedicated minds behind our student success.</p>
             </div>
-            <button className="text-brand font-bold flex items-center gap-1 hover:gap-2 transition-all" >View All <ChevronRight className="text-brand w-4 h-4" /></button>
+            <button className="text-brand font-bold flex items-center gap-1 hover:gap-2 transition-all text-sm" >View All <ChevronRight className="w-4 h-4" /></button>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 md:gap-5 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {/* <!-- Card 1 --> */}
-            <div className="bg-card rounded-xl hover:scale-[1.01] border overflow-hidden border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
+            <div className="bg-card rounded-xl hover:shadow-[var(--shadow-lg)] border overflow-hidden border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
               <div className="aspect-2.5/3 bg-cover bg-top transition-transform" data-alt="Female staff member profile" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuCwfoJsfJpSlw13cw9oHHcBFpUmlThTV4dahXFh0Qj0CAh37D3VkPF5Vy1WZ84fBrK27NKLkXJe9RdG7AK2_YVd56NxRE4WEisDxlGzpaHsjKPTDR4U181mIlvvE1U5v6IWNlaG_DgTioYwka5jHwh_pve2IGBpiChT2QMrlz4k151kkJSQh6DP0UchBMNC4_S69_b1AMPjNTlMUv9w1e1pD9_ibxhXkKedP9XEQnEHpH6UEZbIhd1RaiUAIFn7iUNBNm1Piuq4rA)" }}></div>
               <div className="p-4">
-                <h3 className="font-bold text-sm md:text-lg" >Dr. Anjali Sharma</h3>
+                <h3 className="font-bold text-base md:text-lg" >Dr. Anjali Sharma</h3>
                 <p className="text-brand text-xs md:text-sm font-medium" >Corporate Relations</p>
               </div>
             </div>
             {/* <!-- Card 2 --> */}
-            <div className="bg-card rounded-xl overflow-hidden border hover:scale-[1.01] border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
+            <div className="bg-card rounded-xl overflow-hidden border hover:shadow-[var(--shadow-lg)] border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
               <div className="aspect-2.5/3 bg-cover bg-top transition-transform" data-alt="Male staff member profile" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuAlBGcrKwosCrkAFG1qE2hMewRAhTS-EYKa7SX5VzKmhlBmcIztS0GsQ0_Rgz9VISZXklQKDWvsxaR_LvJAkVsHULlHlXfyZ4nWerTDPLdIe3qjX8LxGmJ3zuGiOPazUvP0C2eJvz1M6jzY3GQqrki-7wjTCNTNln4d3_JSSh3Es0CreOhKnzrPJfaIyqQ8jMSk_X8uCLGzJoYfiYyXC4HpIGJ7IJ-ERWVMjRjgv78yuEYpx2COfNFV579HNLl8x406i5IuTeIzAA)" }}></div>
               <div className="p-4">
-                <h3 className="font-bold text-sm md:text-lg" >Vikram Malhotra</h3>
+                <h3 className="font-bold text-base md:text-lg" >Vikram Malhotra</h3>
                 <p className="text-brand text-xs md:text-sm font-medium" >Technical Trainer</p>
               </div>
             </div>
             {/* <!-- Card 3 --> */}
-            <div className="bg-card rounded-xl hover:scale-[1.01] overflow-hidden border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
+            <div className="bg-card rounded-xl hover:shadow-[var(--shadow-lg)] overflow-hidden border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
               <div className="aspect-2.5/3 bg-cover bg-top" data-alt="Female student volunteer" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuBvMtr2p2ngRt9hK1Jn6FrV4XHZlxx9MzK655JpTskmWj_hS4QAP6MX1VA4MFE8Po0VpwOr8M6vd2CZaeq3Da1fYO-6cMzMVaSOKbqJaXyP-O3kiQo3iYP7wqUb7DB_j3HahZcUqeW8hCdtz_hdJPm_ocN6cwLxwCbPVw2mnl-cwSyCjX8jq6bXiu_yHsaYt6HTLHOztoOuHm-Lym8KraBLLFh8MDKLUuBBxjG9xv1dbyZvYdy2Mqj-_EohWc67WEV4fgoYMBFSSQ)" }}></div>
               <div className="p-4">
-                <h3 className="font-bold text-sm md:text-lg" >Neha Singh</h3>
+                <h3 className="font-bold text-base md:text-lg" >Neha Singh</h3>
                 <p className="text-brand text-xs md:text-sm font-medium" >Student Lead</p>
               </div>
             </div>
             {/* <!-- Card 4 --> */}
-            <div className="bg-card rounded-xl hover:scale-[1.01] overflow-hidden border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
+            <div className="bg-card rounded-xl hover:shadow-[var(--shadow-lg)] overflow-hidden border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
               <div className="aspect-2.5/3 bg-cover bg-top" data-alt="Male student volunteer" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuDcieaOwaB_8kavE_tydgpoKCMmW8zgXo46rbL1ABkBG2Xl4Ugae-0S9ZfXIhXGD86rFKMPXpNiw_XsXOlrp4KlaL87K1DgrihXRXIQqxow3qW_fXec3xCOiOGV8TeBp5dhzAlRguHWBBmJJj2xqUdmMvJ_VwzkhQoYKarT-AjNU_9KDusbNsiA6i9S1dt0RwqUepiImzSPwAq8IzU1sXLpDl88wppHQdcrIsM3jwFOxaA3PtZXtNmtclNuTgVmxZeNOH_yFkBJFA)" }}></div>
               <div className="p-4">
-                <h3 className="font-bold text-sm md:text-lg" >Rahul Verma</h3>
+                <h3 className="font-bold text-base md:text-lg" >Rahul Verma</h3>
                 <p className="text-brand text-xs md:text-sm font-medium" >Event Coordinator</p>
               </div>
             </div>
@@ -448,7 +447,7 @@ export default function Home() {
         </section>
 
         {/* Stakeholder Sections */}
-        <section className="py-24 px-3 lg:px-20 max-w-7xl mx-auto">
+        <section className="section-y px-4 md:px-8 lg:px-20 max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {[
               {
@@ -486,7 +485,7 @@ export default function Home() {
                 <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent"></div>
                 <div className="absolute bottom-0 p-8 w-full">
                   <h3 className="text-white text-2xl font-bold mb-2">{item.title}</h3>
-                  <p className="text-slate-300 text-sm mb-4">{item.desc}</p>
+                  <p className="text-white/70 text-sm mb-4">{item.desc}</p>
                   <Link href={item.link} className="text-brand font-bold flex items-center gap-2 hover:translate-x-2 transition-transform w-fit">
                     {item.btn} <ArrowRight className="w-4 h-4" />
                   </Link>
@@ -497,17 +496,17 @@ export default function Home() {
         </section>
 
         {/* Testimonials Section */}
-        <section className="bg-brand/5 py-24" id="alumni">
-          <div className="max-w-7xl mx-auto px-3 lg:px-20">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-black tracking-tight mb-4" >Voices of Success</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto" >Hear from our alumni who are now leading the tech world from top global corporations.</p>
+        <section className="bg-brand/5 section-y" id="alumni">
+          <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-20">
+            <div className="text-center mb-12 md:mb-16">
+              <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-3 md:mb-4" >Voices of Success</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto text-sm md:text-base" >Hear from our alumni who are now leading the tech world from top global corporations.</p>
             </div>
             {/* Testimonial Cards */}
             {loadingTestimonials ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                 {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="bg-card p-4 md:p-10 rounded-3xl shadow-[var(--shadow-sm)] border border-border flex flex-col items-center">
+                  <div key={i} className="bg-card p-6 md:p-10 rounded-2xl md:rounded-3xl shadow-[var(--shadow-sm)] border border-border flex flex-col items-center">
                     <div className="w-32 h-32 rounded-full skeleton-shimmer mb-6" />
                     <div className="h-5 w-32 rounded skeleton-shimmer mb-2" />
                     <div className="h-3 w-24 rounded skeleton-shimmer mb-6" />
@@ -520,17 +519,17 @@ export default function Home() {
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                 {testimonials.map((testimonial) => (
-                  <div key={testimonial.id} className="bg-card p-4 md:p-10 rounded-3xl shadow-[var(--shadow-sm)] border border-border hover:shadow-[var(--shadow-lg)] hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center group">
-                    <div className="w-32 h-32 rounded-full bg-cover bg-center mb-6 ring-4 ring-brand/10 group-hover:ring-brand/30 transition-all" data-alt="Alumni testimonial" style={{ backgroundImage: testimonial.profileImageUrl ? `url('${testimonial.profileImageUrl}')` : "url('https://lh3.googleusercontent.com/aida-public/AB6AXuD-4qpQG9rSHLujKoHhrbgWRAg81sFBu41MDA54QQ14Y6yYxoww19N7Hs6lybLRgvZCg5yNw-06wJ8p2GwAuZrN9ytupLwK1aRZSm47WIYXx5ld9vONPYIsuhD5KGlStRJhFuJTFHl_Hc-t-2CxveYwpsep0lUKrYPz6ghsEv9_r2NE8H2tzkba6XLY91OoOHMGHGA4iF6n7TtSxX_Dr3zeJ206-8b6lxuPWVgO5R0mihIiXboKj1OEPXe_2qH9vxxFdK4gE9e5YQ')" }}></div>
-                    <div className="mb-6">
-                      <h3 className="text-lg md:text-xl font-bold text-foreground">{testimonial.name || "Anonymous"}</h3>
+                  <div key={testimonial.id} className="bg-card p-6 md:p-10 rounded-2xl md:rounded-3xl shadow-[var(--shadow-sm)] border border-border hover:shadow-[var(--shadow-md)] transition-shadow duration-300 flex flex-col items-center text-center group">
+                    <div className="w-20 h-20 md:w-32 md:h-32 rounded-full bg-cover bg-center mb-4 md:mb-6 ring-4 ring-brand/10 group-hover:ring-brand/20 transition-all" data-alt="Alumni testimonial" style={{ backgroundImage: testimonial.profileImageUrl ? `url('${testimonial.profileImageUrl}')` : "url('https://lh3.googleusercontent.com/aida-public/AB6AXuD-4qpQG9rSHLujKoHhrbgWRAg81sFBu41MDA54QQ14Y6yYxoww19N7Hs6lybLRgvZCg5yNw-06wJ8p2GwAuZrN9ytupLwK1aRZSm47WIYXx5ld9vONPYIsuhD5KGlStRJhFuJTFHl_Hc-t-2CxveYwpsep0lUKrYPz6ghsEv9_r2NE8H2tzkba6XLY91OoOHMGHGA4iF6n7TtSxX_Dr3zeJ206-8b6lxuPWVgO5R0mihIiXboKj1OEPXe_2qH9vxxFdK4gE9e5YQ')" }}></div>
+                    <div className="mb-4 md:mb-6">
+                      <h3 className="text-base md:text-xl font-bold text-foreground">{testimonial.name || "Anonymous"}</h3>
                       <p className="text-xs md:text-sm text-brand font-semibold uppercase tracking-wider">{testimonial.jobTitle ? `${testimonial.jobTitle} at ${testimonial.currentCompany}` : "Alumni"}</p>
                     </div>
                     <div className="relative px-1 md:px-4">
-                      <Quote className="text-brand/60  md:text-4xl absolute -top-5 -left-2" />
-                      <p className="text-muted-foreground text-xs md:text-md leading-relaxed italic">
+                      <Quote className="text-brand/40 text-2xl md:text-4xl absolute -top-4 -left-2" />
+                      <p className="text-muted-foreground text-sm md:text-base leading-relaxed italic">
                         &ldquo;{testimonial.content || "No content available."}&rdquo;
                       </p>
                     </div>
@@ -542,11 +541,11 @@ export default function Home() {
         </section>
 
         {/* Memories Gallery — Dynamic from approved memories */}
-        <section className="max-w-7xl mx-auto px-3 lg:px-20 py-24">
-          <div className="flex flex-col md:flex-row items-center justify-between mb-12 gap-4">
+        <section className="max-w-7xl mx-auto px-4 md:px-8 lg:px-20 section-y">
+          <div className="flex flex-col md:flex-row items-center justify-between mb-10 md:mb-14 gap-4">
             <div className="text-center md:text-left">
-              <h2 className="text-3xl md:text-4xl font-bold">Life at Radharaman <span className="text-brand">Placements</span></h2>
-              <p className="text-muted-foreground text-sm mt-2">Captured by our students and alumni community</p>
+              <h2 className="text-2xl md:text-4xl font-black tracking-tight">Life at Radharaman <span className="text-brand">Placements</span></h2>
+              <p className="text-muted-foreground text-sm md:text-base mt-2">Captured by our students and alumni community</p>
             </div>
             <Link
               href="/memories"
@@ -591,7 +590,7 @@ export default function Home() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
                   <p className="text-white text-xs font-bold">{memories[1].title}</p>
-                  <p className="text-white/70 text-[10px] mt-0.5">by {memories[1].uploaderName}</p>
+                  <p className="text-white/70 text-xs mt-0.5">by {memories[1].uploaderName}</p>
                 </div>
               </div>
               {/* Memory 3 */}
@@ -604,7 +603,7 @@ export default function Home() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
                   <p className="text-white text-xs font-bold">{memories[2].title}</p>
-                  <p className="text-white/70 text-[10px] mt-0.5">by {memories[2].uploaderName}</p>
+                  <p className="text-white/70 text-xs mt-0.5">by {memories[2].uploaderName}</p>
                 </div>
               </div>
               {/* Memory 4 — Wide (2 cols × 1 row) */}
@@ -657,3 +656,4 @@ export default function Home() {
     </div>
   )
 }
+

@@ -317,28 +317,28 @@ export default function AdminDrivesPage() {
               <Briefcase className="w-5 h-5 text-green-500" />
             </div>
             <p className="text-2xl font-black text-foreground">{drives.filter(d => d.status === "active").length}</p>
-            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mt-1">Active</p>
+            <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mt-1">Active</p>
           </div>
           <div className="bg-card p-5 rounded-2xl border border-border shadow-sm">
             <div className="w-10 h-10 bg-yellow-500/10 rounded-xl flex items-center justify-center mb-3">
               <Calendar className="w-5 h-5 text-yellow-500" />
             </div>
             <p className="text-2xl font-black text-foreground">{drives.filter(d => d.status === "pending").length}</p>
-            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mt-1">Pending</p>
+            <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mt-1">Pending</p>
           </div>
           <div className="bg-card p-5 rounded-2xl border border-border shadow-sm">
             <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center mb-3">
               <BarChart3 className="w-5 h-5 text-blue-500" />
             </div>
             <p className="text-2xl font-black text-foreground">{drives.filter(d => d.status === "completed").length}</p>
-            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mt-1">Completed</p>
+            <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mt-1">Completed</p>
           </div>
           <div className="bg-card p-5 rounded-2xl border border-border shadow-sm">
             <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center mb-3">
               <Users className="w-5 h-5 text-brand" />
             </div>
             <p className="text-2xl font-black text-foreground">{drives.reduce((sum, d) => sum + (d.registrationCount || 0), 0)}</p>
-            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mt-1">Total Registrations</p>
+            <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mt-1">Total Registrations</p>
           </div>
         </div>
 
@@ -392,9 +392,9 @@ export default function AdminDrivesPage() {
                           )}
                           <div className="flex-1 min-w-0">
                             <h2 className="text-base font-extrabold text-foreground leading-tight truncate">{drive.companyName}</h2>
-                            <p className="text-[13px] text-muted-foreground font-medium truncate mt-0.5">{drive.roleName}</p>
+                            <p className="text-sm text-muted-foreground font-medium truncate mt-0.5">{drive.roleName}</p>
                           </div>
-                          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${sc.bg} flex-shrink-0`}>
+                          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${sc.bg} flex-shrink-0`}>
                             <span className={`w-1.5 h-1.5 rounded-full ${sc.dot} ${drive.status === "active" ? "animate-pulse" : ""}`} />
                             {sc.label}
                           </div>
@@ -421,7 +421,7 @@ export default function AdminDrivesPage() {
                         </div>
 
                         {/* Description */}
-                        <p className="text-[13px] text-muted-foreground/80 leading-relaxed line-clamp-2 min-h-10">
+                        <p className="text-sm text-muted-foreground/80 leading-relaxed line-clamp-2 min-h-10">
                           {drive.jobDescription || <span className="italic opacity-60">No description provided.</span>}
                         </p>
 
@@ -433,7 +433,7 @@ export default function AdminDrivesPage() {
                           >
                             <Users className="w-4 h-4 text-brand" />
                             <span className="text-sm font-bold text-brand">{drive.registrationCount || 0}</span>
-                            <span className="text-[11px] text-brand/70 font-medium">applicants</span>
+                            <span className="text-xs text-brand/70 font-medium">applicants</span>
                           </Link>
 
                           <div className="flex items-center gap-1">
@@ -528,3 +528,4 @@ export default function AdminDrivesPage() {
     </div>
   );
 }
+
