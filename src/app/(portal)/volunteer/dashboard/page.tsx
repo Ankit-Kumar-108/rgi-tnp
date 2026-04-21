@@ -187,7 +187,7 @@ export default function VolunteerDashboard() {
           <div className="absolute -top-12 -left-12 w-64 h-64 bg-brand/10 rounded-full blur-3xl -z-10"></div>
           <div className="absolute top-24 -right-12 w-48 h-48 bg-foreground/5 rounded-full blur-3xl -z-10"></div>
 
-          <div className="bg-card rounded-2xl p-6 md:p-8 shadow-sm border border-border flex flex-col md:flex-row gap-8 md:items-center relative overflow-hidden group hover:shadow-xl transition-shadow duration-500">
+          <div className="bg-card rounded-2xl p-6 md:p-8 shadow-[var(--shadow-sm)] border border-border flex flex-col md:flex-row gap-8 md:items-center relative overflow-hidden group hover:shadow-[var(--shadow-lg)] transition-shadow duration-500">
             {/* Decorative Gradient Accent */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-bl from-brand/10 to-transparent rounded-bl-[5rem]"></div>
 
@@ -275,7 +275,7 @@ export default function VolunteerDashboard() {
         {/* Stats Cards */}
         {data && (
           <section className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-card border border-border rounded-xl p-6 hover:shadow-[var(--shadow-md)] transition-shadow">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-muted-foreground text-sm font-medium">
                   Drive Images
@@ -290,7 +290,7 @@ export default function VolunteerDashboard() {
               </p>
             </div>
 
-            <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-card border border-border rounded-xl p-6 hover:shadow-[var(--shadow-md)] transition-shadow">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-muted-foreground text-sm font-medium">
                   Active Drives
@@ -305,7 +305,7 @@ export default function VolunteerDashboard() {
               </p>
             </div>
 
-            <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-card border border-border rounded-xl p-6 hover:shadow-[var(--shadow-md)] transition-shadow">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-muted-foreground text-sm font-medium">
                   Students
@@ -320,7 +320,7 @@ export default function VolunteerDashboard() {
               </p>
             </div>
 
-            <div className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-card border border-border rounded-xl p-6 hover:shadow-[var(--shadow-md)] transition-shadow">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-muted-foreground text-sm font-medium">
                   Pending Tasks

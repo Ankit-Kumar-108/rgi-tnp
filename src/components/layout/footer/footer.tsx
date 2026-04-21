@@ -89,7 +89,7 @@ export default function Footer() {
           <p className="text-center md:text-left">&copy; {new Date().getFullYear()} Radharaman Group of Institutes. All rights reserved.</p>
           
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
-            <p className="text-slate-400 dark:text-slate-500">
+            <p className="text-muted-foreground">
               Developed by <span className="text-foreground font-bold tracking-wide">Ankit Kumar</span>
             </p>
             <div className="flex items-center gap-3">
@@ -97,7 +97,7 @@ export default function Footer() {
                 href="https://github.com/Ankit-Kumar-108"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-slate-400 hover:text-foreground transition-colors duration-200"
+                className="text-muted-foreground hover:text-foreground transition-colors duration-200"
                 title="GitHub Profile"
               >
                 <svg className="size-5 fill-current" viewBox="0 0 24 24">
@@ -108,7 +108,7 @@ export default function Footer() {
                 href="https://www.linkedin.com/in/ankit-kumar-98102b24a/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-400 hover:text-blue-500 transition-colors duration-200"
+                className="text-blue-400 hover:text-blue-300 transition-colors duration-200"
                 title="LinkedIn Profile"
               >
                 <svg className="size-5 fill-current" viewBox="0 0 24 24">

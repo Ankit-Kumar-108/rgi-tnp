@@ -66,7 +66,7 @@ export default function DriveImagesPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-xl text-gray-600">Loading drive images...</p>
+          <p className="text-xl text-muted-foreground">Loading drive images...</p>
         </div>
       </div>
     );
@@ -76,8 +76,8 @@ export default function DriveImagesPage() {
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-3 lg:px-20 py-12">
         <div className="mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-2">Drive Images Gallery</h1>
-          <p className="text-slate-500 text-lg">Moments from our campus recruitment drives</p>
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-2">Drive Images Gallery</h1>
+          <p className="text-muted-foreground text-lg">Moments from our campus recruitment drives</p>
         </div>
 
         {drives.length > 0 && (
@@ -86,7 +86,7 @@ export default function DriveImagesPage() {
             <select
               value={selectedDrive}
               onChange={(e) => setSelectedDrive(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg dark:bg-slate-800 text-base"
+              className="w-full px-4 py-2 border border-border rounded-lg bg-card text-base"
             >
               {drives.map((drive) => (
                 <option key={drive.id} value={drive.id}>
@@ -99,14 +99,14 @@ export default function DriveImagesPage() {
 
         {images.length === 0 ? (
           <div className="text-center py-24">
-            <p className="text-xl text-gray-600">No images available for this drive</p>
+            <p className="text-xl text-muted-foreground">No images available for this drive</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {images.map((image) => (
               <div
                 key={image.id}
-                className="group rounded-lg overflow-hidden bg-white dark:bg-slate-800 shadow-md hover:shadow-xl transition-all duration-300"
+                className="group rounded-lg overflow-hidden bg-card shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300"
               >
                 <div className="relative h-64 overflow-hidden">
                   <img
@@ -117,7 +117,7 @@ export default function DriveImagesPage() {
                 </div>
                 <div className="p-4">
                   <h3 className="font-semibold text-lg mb-1 line-clamp-2">{image.title}</h3>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-muted-foreground">
                     {new Date(image.createdAt).toLocaleDateString()}
                   </p>
                 </div>

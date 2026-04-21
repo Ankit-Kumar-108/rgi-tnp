@@ -70,7 +70,7 @@ export default function VolunteerLogin() {
     <div className="min-h-screen flex flex-col bg-background">
       <Nav />
       <main className="flex-1 flex w-full items-center justify-center p-4 sm:p-6 sm:mt-10 md:mt-0 pt-24 md:pt-32 pb-12 lg:h-screen lg:max-h-screen lg:py-24">
-        <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-background/50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-2xl shadow-brand/10 border border-brand/10 lg:h-[85vh] lg:max-h-200 mt-10 overflow-hidden">
+        <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-background/50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-[var(--shadow-xl)] border border-border lg:h-[85vh] lg:max-h-200 mt-10 overflow-hidden">
           {/* Left Side: Visual/Branding */}
           <div className="relative hidden lg:flex flex-col justify-end p-10 xl:p-12 overflow-hidden bg-brand/5">
             <div
@@ -210,7 +210,7 @@ export default function VolunteerLogin() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-brand text-primary-foreground rounded-xl font-bold hover:bg-brand/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand/20"
+                className="w-full py-3 bg-brand text-primary-foreground rounded-xl font-bold hover:bg-brand/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-[var(--shadow-brand)]"
               >
                 {loading ? (
                   <>

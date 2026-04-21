@@ -195,7 +195,7 @@ export default function Home() {
                   <span className="text-xs font-bold uppercase tracking-wider">Top Rated Placement Cell</span>
                 </div>
                 <div className="relative group">
-                  <div className="absolute -inset-4 bg-brand/20 rounded-3xl blur-2xl group-hover:bg-brand/30 transition-all"></div>
+                  <div className="absolute -inset-4 bg-brand/10 rounded-3xl blur-xl group-hover:bg-brand/15 transition-all"></div>
                   <div className="relative h-112.5 w-full rounded-2xl bg-cover bg-center shadow-2xl overflow-hidden border-4 border-background" data-alt="Modern college campus students collaborating outdoors" style={{ backgroundImage: "url(/images/RGI.jpg)" }}>
                   </div>
                 </div>
@@ -348,7 +348,7 @@ export default function Home() {
         {/* Director's Section */}
         <section className="py-24 px-6 lg:px-20 max-w-7xl mx-auto" id="about">
           <div
-            className="bg-card/80 backdrop-blur-[3px] rounded-2xl shadow-md hover:shadow-xl overflow-hidden border border-brand/5 hover:scale-105 transition-all duration-300"
+            className="bg-card/80 backdrop-blur-[3px] rounded-2xl shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-lg)] overflow-hidden border border-border hover:scale-[1.01] transition-all duration-300"
           >
             <div className="flex flex-col lg:flex-row">
               <div className="lg:w-1/3 aspect-square lg:aspect-auto">
@@ -377,7 +377,7 @@ export default function Home() {
         {/* Deputy Director's Section */}
         <section className="pb-24 px-6 lg:px-20 max-w-7xl mx-auto">
           <div
-            className="bg-white dark:bg-card/80 rounded-2xl shadow-md hover:shadow-xl overflow-hidden border border-brand/5 hover:scale-105 transition-all duration-300">
+            className="bg-card/80 backdrop-blur-[3px] rounded-2xl shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-lg)] overflow-hidden border border-border hover:scale-[1.01] transition-all duration-300">
             <div className="flex flex-col lg:flex-row-reverse">
               <div className="lg:w-1/3 aspect-square lg:aspect-auto">
                 <img
@@ -406,44 +406,42 @@ export default function Home() {
         <section className="max-w-7xl mx-auto px-3 lg:px-20 py-16">
           <div className="flex justify-between items-end mb-12">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-2" >The Placement Team</h2>
-              <p className="text-slate-500 text-xs md:text-lg" >The dedicated minds behind our student success.</p>
+              <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-2" >The Placement Team</h2>
+              <p className="text-muted-foreground text-xs md:text-lg" >The dedicated minds behind our student success.</p>
             </div>
-          </div>
-          <div className="flex items-end justify-end mb-5">
-            <button className="text-brand font-bold flex items-center gap-1 " >View All <ChevronRight className="text-brand" /></button>
+            <button className="text-brand font-bold flex items-center gap-1 hover:gap-2 transition-all" >View All <ChevronRight className="text-brand w-4 h-4" /></button>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 md:gap-5 gap-3">
             {/* <!-- Card 1 --> */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl hover:scale-105 border overflow-hidden border-brand/5 shadow-md hover:shadow-xl transition-all duration-300">
-              <div className="aspect-2.5/3 bg-cover bg-top mb-4 transition-transform" data-alt="Female staff member profile" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuCwfoJsfJpSlw13cw9oHHcBFpUmlThTV4dahXFh0Qj0CAh37D3VkPF5Vy1WZ84fBrK27NKLkXJe9RdG7AK2_YVd56NxRE4WEisDxlGzpaHsjKPTDR4U181mIlvvE1U5v6IWNlaG_DgTioYwka5jHwh_pve2IGBpiChT2QMrlz4k151kkJSQh6DP0UchBMNC4_S69_b1AMPjNTlMUv9w1e1pD9_ibxhXkKedP9XEQnEHpH6UEZbIhd1RaiUAIFn7iUNBNm1Piuq4rA)" }}></div>
-              <div className="ml-2">
+            <div className="bg-card rounded-xl hover:scale-[1.01] border overflow-hidden border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
+              <div className="aspect-2.5/3 bg-cover bg-top transition-transform" data-alt="Female staff member profile" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuCwfoJsfJpSlw13cw9oHHcBFpUmlThTV4dahXFh0Qj0CAh37D3VkPF5Vy1WZ84fBrK27NKLkXJe9RdG7AK2_YVd56NxRE4WEisDxlGzpaHsjKPTDR4U181mIlvvE1U5v6IWNlaG_DgTioYwka5jHwh_pve2IGBpiChT2QMrlz4k151kkJSQh6DP0UchBMNC4_S69_b1AMPjNTlMUv9w1e1pD9_ibxhXkKedP9XEQnEHpH6UEZbIhd1RaiUAIFn7iUNBNm1Piuq4rA)" }}></div>
+              <div className="p-4">
                 <h3 className="font-bold text-sm md:text-lg" >Dr. Anjali Sharma</h3>
-                <p className="text-brand text-xs md:text-sm font-medium mb-4" >Corporate Relations</p>
+                <p className="text-brand text-xs md:text-sm font-medium" >Corporate Relations</p>
               </div>
             </div>
             {/* <!-- Card 2 --> */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl overflow-hidden border hover:scale-105 border-brand/5 shadow-md hover:shadow-xl transition-all duration-300">
-              <div className="aspect-2.5/3 bg-cover bg-top mb-4 transition-transform" data-alt="Male staff member profile" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuAlBGcrKwosCrkAFG1qE2hMewRAhTS-EYKa7SX5VzKmhlBmcIztS0GsQ0_Rgz9VISZXklQKDWvsxaR_LvJAkVsHULlHlXfyZ4nWerTDPLdIe3qjX8LxGmJ3zuGiOPazUvP0C2eJvz1M6jzY3GQqrki-7wjTCNTNln4d3_JSSh3Es0CreOhKnzrPJfaIyqQ8jMSk_X8uCLGzJoYfiYyXC4HpIGJ7IJ-ERWVMjRjgv78yuEYpx2COfNFV579HNLl8x406i5IuTeIzAA)" }}></div>
-              <div className="ml-2">
+            <div className="bg-card rounded-xl overflow-hidden border hover:scale-[1.01] border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
+              <div className="aspect-2.5/3 bg-cover bg-top transition-transform" data-alt="Male staff member profile" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuAlBGcrKwosCrkAFG1qE2hMewRAhTS-EYKa7SX5VzKmhlBmcIztS0GsQ0_Rgz9VISZXklQKDWvsxaR_LvJAkVsHULlHlXfyZ4nWerTDPLdIe3qjX8LxGmJ3zuGiOPazUvP0C2eJvz1M6jzY3GQqrki-7wjTCNTNln4d3_JSSh3Es0CreOhKnzrPJfaIyqQ8jMSk_X8uCLGzJoYfiYyXC4HpIGJ7IJ-ERWVMjRjgv78yuEYpx2COfNFV579HNLl8x406i5IuTeIzAA)" }}></div>
+              <div className="p-4">
                 <h3 className="font-bold text-sm md:text-lg" >Vikram Malhotra</h3>
-                <p className="text-brand text-xs md:text-sm font-medium mb-4" >Technical Trainer</p>
+                <p className="text-brand text-xs md:text-sm font-medium" >Technical Trainer</p>
               </div>
             </div>
             {/* <!-- Card 3 --> */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl hover:scale-105 overflow-hidden border border-brand/5 shadow-md hover:shadow-xl transition-all duration-300">
-              <div className="aspect-2.5/3 bg-cover bg-top mb-4" data-alt="Female student volunteer" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuBvMtr2p2ngRt9hK1Jn6FrV4XHZlxx9MzK655JpTskmWj_hS4QAP6MX1VA4MFE8Po0VpwOr8M6vd2CZaeq3Da1fYO-6cMzMVaSOKbqJaXyP-O3kiQo3iYP7wqUb7DB_j3HahZcUqeW8hCdtz_hdJPm_ocN6cwLxwCbPVw2mnl-cwSyCjX8jq6bXiu_yHsaYt6HTLHOztoOuHm-Lym8KraBLLFh8MDKLUuBBxjG9xv1dbyZvYdy2Mqj-_EohWc67WEV4fgoYMBFSSQ)" }}></div>
-              <div className="ml-2">
+            <div className="bg-card rounded-xl hover:scale-[1.01] overflow-hidden border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
+              <div className="aspect-2.5/3 bg-cover bg-top" data-alt="Female student volunteer" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuBvMtr2p2ngRt9hK1Jn6FrV4XHZlxx9MzK655JpTskmWj_hS4QAP6MX1VA4MFE8Po0VpwOr8M6vd2CZaeq3Da1fYO-6cMzMVaSOKbqJaXyP-O3kiQo3iYP7wqUb7DB_j3HahZcUqeW8hCdtz_hdJPm_ocN6cwLxwCbPVw2mnl-cwSyCjX8jq6bXiu_yHsaYt6HTLHOztoOuHm-Lym8KraBLLFh8MDKLUuBBxjG9xv1dbyZvYdy2Mqj-_EohWc67WEV4fgoYMBFSSQ)" }}></div>
+              <div className="p-4">
                 <h3 className="font-bold text-sm md:text-lg" >Neha Singh</h3>
-                <p className="text-brand text-xs md:text-sm font-medium mb-4" >Student Lead</p>
+                <p className="text-brand text-xs md:text-sm font-medium" >Student Lead</p>
               </div>
             </div>
             {/* <!-- Card 4 --> */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl hover:scale-105 overflow-hidden border border-brand/5 shadow-md hover:shadow-xl transition-all duration-300">
-              <div className="aspect-2.5/3 bg-cover bg-top mb-4" data-alt="Male student volunteer" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuDcieaOwaB_8kavE_tydgpoKCMmW8zgXo46rbL1ABkBG2Xl4Ugae-0S9ZfXIhXGD86rFKMPXpNiw_XsXOlrp4KlaL87K1DgrihXRXIQqxow3qW_fXec3xCOiOGV8TeBp5dhzAlRguHWBBmJJj2xqUdmMvJ_VwzkhQoYKarT-AjNU_9KDusbNsiA6i9S1dt0RwqUepiImzSPwAq8IzU1sXLpDl88wppHQdcrIsM3jwFOxaA3PtZXtNmtclNuTgVmxZeNOH_yFkBJFA)" }}></div>
-              <div className="ml-2">
+            <div className="bg-card rounded-xl hover:scale-[1.01] overflow-hidden border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
+              <div className="aspect-2.5/3 bg-cover bg-top" data-alt="Male student volunteer" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuDcieaOwaB_8kavE_tydgpoKCMmW8zgXo46rbL1ABkBG2Xl4Ugae-0S9ZfXIhXGD86rFKMPXpNiw_XsXOlrp4KlaL87K1DgrihXRXIQqxow3qW_fXec3xCOiOGV8TeBp5dhzAlRguHWBBmJJj2xqUdmMvJ_VwzkhQoYKarT-AjNU_9KDusbNsiA6i9S1dt0RwqUepiImzSPwAq8IzU1sXLpDl88wppHQdcrIsM3jwFOxaA3PtZXtNmtclNuTgVmxZeNOH_yFkBJFA)" }}></div>
+              <div className="p-4">
                 <h3 className="font-bold text-sm md:text-lg" >Rahul Verma</h3>
-                <p className="text-brand text-xs md:text-sm font-medium mb-4" >Event Coordinator</p>
+                <p className="text-brand text-xs md:text-sm font-medium" >Event Coordinator</p>
               </div>
             </div>
           </div>
@@ -502,14 +500,14 @@ export default function Home() {
         <section className="bg-brand/5 py-24" id="alumni">
           <div className="max-w-7xl mx-auto px-3 lg:px-20">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4" >Voices of Success</h2>
-              <p className="text-slate-500 max-w-2xl mx-auto" >Hear from our alumni who are now leading the tech world from top global corporations.</p>
+              <h2 className="text-4xl font-black tracking-tight mb-4" >Voices of Success</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto" >Hear from our alumni who are now leading the tech world from top global corporations.</p>
             </div>
             {/* Testimonial Cards */}
             {loadingTestimonials ? (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-8">
                 {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="bg-white dark:bg-slate-900 p-4 md:p-10 rounded-3xl shadow-sm border border-brand/10 flex flex-col items-center">
+                  <div key={i} className="bg-card p-4 md:p-10 rounded-3xl shadow-[var(--shadow-sm)] border border-border flex flex-col items-center">
                     <div className="w-32 h-32 rounded-full skeleton-shimmer mb-6" />
                     <div className="h-5 w-32 rounded skeleton-shimmer mb-2" />
                     <div className="h-3 w-24 rounded skeleton-shimmer mb-6" />
@@ -524,15 +522,15 @@ export default function Home() {
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-8">
                 {testimonials.map((testimonial) => (
-                  <div key={testimonial.id} className="bg-white dark:bg-slate-900 p-4 md:p-10 rounded-3xl shadow-sm border border-brand/10 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center group">
+                  <div key={testimonial.id} className="bg-card p-4 md:p-10 rounded-3xl shadow-[var(--shadow-sm)] border border-border hover:shadow-[var(--shadow-lg)] hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center group">
                     <div className="w-32 h-32 rounded-full bg-cover bg-center mb-6 ring-4 ring-brand/10 group-hover:ring-brand/30 transition-all" data-alt="Alumni testimonial" style={{ backgroundImage: testimonial.profileImageUrl ? `url('${testimonial.profileImageUrl}')` : "url('https://lh3.googleusercontent.com/aida-public/AB6AXuD-4qpQG9rSHLujKoHhrbgWRAg81sFBu41MDA54QQ14Y6yYxoww19N7Hs6lybLRgvZCg5yNw-06wJ8p2GwAuZrN9ytupLwK1aRZSm47WIYXx5ld9vONPYIsuhD5KGlStRJhFuJTFHl_Hc-t-2CxveYwpsep0lUKrYPz6ghsEv9_r2NE8H2tzkba6XLY91OoOHMGHGA4iF6n7TtSxX_Dr3zeJ206-8b6lxuPWVgO5R0mihIiXboKj1OEPXe_2qH9vxxFdK4gE9e5YQ')" }}></div>
                     <div className="mb-6">
-                      <h3 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white">{testimonial.name || "Anonymous"}</h3>
+                      <h3 className="text-lg md:text-xl font-bold text-foreground">{testimonial.name || "Anonymous"}</h3>
                       <p className="text-xs md:text-sm text-brand font-semibold uppercase tracking-wider">{testimonial.jobTitle ? `${testimonial.jobTitle} at ${testimonial.currentCompany}` : "Alumni"}</p>
                     </div>
                     <div className="relative px-1 md:px-4">
                       <Quote className="text-brand/60  md:text-4xl absolute -top-5 -left-2" />
-                      <p className="text-slate-600 text-xs md:text-md dark:text-slate-400 leading-relaxed italic">
+                      <p className="text-muted-foreground text-xs md:text-md leading-relaxed italic">
                         &ldquo;{testimonial.content || "No content available."}&rdquo;
                       </p>
                     </div>

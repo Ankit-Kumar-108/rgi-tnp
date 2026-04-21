@@ -80,7 +80,7 @@ export default function PublicOpenDrivesPage() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {drives.map((drive) => (
-                  <div key={drive.id} className="group flex flex-col bg-card rounded-[2rem] p-8 shadow-sm border border-border hover:shadow-2xl hover:border-brand/30 transition-all duration-300">
+                  <div key={drive.id} className="group flex flex-col bg-card rounded-[2rem] p-8 shadow-[var(--shadow-sm)] border border-border hover:shadow-[var(--shadow-xl)] hover:border-brand/30 transition-all duration-300">
                     <div className="flex items-start justify-between mb-6">
                       <div className="w-14 h-14 rounded-2xl bg-brand/10 flex items-center justify-center border border-brand/20">
                         <Building2 className="w-6 h-6 text-brand" />

@@ -127,12 +127,12 @@ export default function Testimonials() {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight">
               Hear From Our <span className="text-brand dark:text-brand">Community</span>
             </h1>
-            <p className="text-slate-500 dark:text-slate-400 text-lg max-w-2xl mx-auto font-medium">
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto font-medium">
               Discover what our students, alumni, and top recruiting partners have to say about their experience.
             </p>
 
             {/* Filter Tabs */}
-            <div className="flex flex-wrap justify-center gap-2 p-1.5 bg-white dark:bg-slate-800 shadow-sm rounded-2xl w-fit mx-auto border border-slate-200 dark:border-slate-700">
+            <div className="flex flex-wrap justify-center gap-2 p-1.5 bg-card shadow-[var(--shadow-xs)] rounded-2xl w-fit mx-auto border border-border">
               {TABS.map((tab) => (
                 <button
                   key={tab}
@@ -142,8 +142,8 @@ export default function Testimonials() {
                   }}
                   className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ${
                     activeFilter === tab
-                      ? "bg-brand text-white shadow-md shadow-brand/20"
-                      : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700"
+                      ? "bg-brand text-white shadow-[var(--shadow-brand)]"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   }`}
                 >
                   {tab}
@@ -179,7 +179,7 @@ export default function Testimonials() {
             {/* Infinite Scroll Loading Indicator */}
             {isLoading && page > 1 && (
               <div className="flex justify-center py-12 mt-8">
-                <div className="bg-white dark:bg-slate-800 p-4 rounded-full shadow-sm border border-slate-200 dark:border-slate-700">
+                <div className="bg-card p-4 rounded-full shadow-[var(--shadow-sm)] border border-border">
                   <Loader2 className="w-6 h-6 animate-spin text-brand" />
                 </div>
               </div>
@@ -187,7 +187,7 @@ export default function Testimonials() {
             
             {/* End of list message */}
             {!hasMore && displayedFeedbacks.length > 0 && (
-              <div className="text-center py-12 mt-8 text-slate-400 dark:text-slate-500 font-medium text-sm">
+              <div className="text-center py-12 mt-8 text-muted-foreground font-medium text-sm">
                 You've reached the end of the feedback.
               </div>
             )}
@@ -209,7 +209,7 @@ const StarRating = React.memo(({ rating }: { rating: number }) => (
         className={`w-4 h-4 transition-colors ${
           i < rating 
             ? "fill-yellow-400 text-yellow-400" 
-            : "text-slate-200 dark:text-slate-700"
+            : "text-muted-foreground/30"
         }`} 
       />
     ))}
@@ -218,11 +218,11 @@ const StarRating = React.memo(({ rating }: { rating: number }) => (
 StarRating.displayName = "StarRating";
 
 const EmptyState = React.memo(() => (
-  <div className="flex flex-col items-center justify-center py-32 text-slate-400 dark:text-slate-500">
-    <div className="bg-slate-100 dark:bg-slate-800/50 p-6 rounded-3xl mb-6">
+  <div className="flex flex-col items-center justify-center py-32 text-muted-foreground">
+    <div className="bg-muted p-6 rounded-3xl mb-6">
       <Quote className="w-12 h-12 opacity-50" />
     </div>
-    <h3 className="font-bold text-xl text-slate-900 dark:text-slate-100 mb-2">No feedback found</h3>
+    <h3 className="font-bold text-xl text-foreground mb-2">No feedback found</h3>
     <p className="text-sm">There are currently no testimonials in this category.</p>
   </div>
 ));
@@ -231,14 +231,14 @@ EmptyState.displayName = "EmptyState";
 /* --- 1. Recruiter Card (Corporate & Elegant) --- */
 const RecruiterCard = React.memo(({ data }: { data: RecruiterFeedback }) => {
   return (
-    <div className="group relative bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-200/80 dark:border-slate-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+    <div className="group relative bg-card p-8 rounded-3xl border border-border hover:shadow-[var(--shadow-lg)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
       {/* Decorative Watermark */}
-      <Building2 className="absolute -top-6 -right-6 w-32 h-32 text-slate-50 dark:text-slate-900 z-0 rotate-12 transition-transform group-hover:rotate-6 group-hover:scale-110 duration-500" />
+      <Building2 className="absolute -top-6 -right-6 w-32 h-32 text-muted/80 dark:text-muted/30 z-0 rotate-12 transition-transform group-hover:rotate-6 group-hover:scale-110 duration-500" />
       
       <div className="relative z-10">
         <div className="flex justify-between items-start mb-6">
           <div>
-            <h4 className="font-extrabold text-slate-900 dark:text-slate-50 text-lg uppercase tracking-tight">
+            <h4 className="font-extrabold text-foreground text-lg uppercase tracking-tight">
               {data.recruiter.company}
             </h4>
             <span className="inline-block mt-1 text-[10px] font-bold tracking-widest text-brand dark:text-brand uppercase bg-brand/10 px-2 py-1 rounded-md">
@@ -249,17 +249,17 @@ const RecruiterCard = React.memo(({ data }: { data: RecruiterFeedback }) => {
         
         <StarRating rating={data.rating} />
         
-        <blockquote className="text-slate-600 dark:text-slate-300 font-medium text-[15px] leading-relaxed mb-8">
+        <blockquote className="text-muted-foreground font-medium text-[15px] leading-relaxed mb-8">
           "{data.content}"
         </blockquote>
         
-        <div className="flex items-center gap-3 pt-6 border-t border-slate-100 dark:border-slate-700">
-          <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center shrink-0">
-             <UserCircle2 className="w-5 h-5 text-slate-400" />
+        <div className="flex items-center gap-3 pt-6 border-t border-border">
+          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center shrink-0">
+             <UserCircle2 className="w-5 h-5 text-muted-foreground" />
           </div>
           <div>
-            <p className="font-bold text-sm text-slate-900 dark:text-slate-100">{data.recruiter.name}</p>
-            <p className="text-slate-500 dark:text-slate-400 text-xs font-medium">{data.recruiter.designation}</p>
+            <p className="font-bold text-sm text-foreground">{data.recruiter.name}</p>
+            <p className="text-muted-foreground text-xs font-medium">{data.recruiter.designation}</p>
           </div>
         </div>
       </div>
@@ -271,10 +271,10 @@ RecruiterCard.displayName = "RecruiterCard";
 /* --- 2. Alumni Card (Nostalgic & Proud) --- */
 const AlumniCard = React.memo(({ data }: { data: AlumniFeedback }) => {
   return (
-    <div className="relative bg-linear-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 p-8 rounded-3xl border border-slate-200/80 dark:border-slate-700 hover:shadow-xl hover:border-brand/30 transition-all duration-300">
+    <div className="relative bg-linear-to-br from-card to-muted/30 p-8 rounded-3xl border border-border hover:shadow-[var(--shadow-lg)] hover:border-brand/30 transition-all duration-300">
       <div className="flex items-center gap-4 mb-6">
         <div className="relative shrink-0">
-          <div className="w-14 h-14 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-700 border-2 border-white dark:border-slate-600 shadow-sm">
+          <div className="w-14 h-14 rounded-full overflow-hidden bg-muted border-2 border-card shadow-sm">
             {data.alumni.profileImageUrl ? (
               <img className="w-full h-full object-cover" alt={data.alumni.name} src={data.alumni.profileImageUrl} loading="lazy" />
             ) : (
@@ -283,14 +283,14 @@ const AlumniCard = React.memo(({ data }: { data: AlumniFeedback }) => {
               </div>
             )}
           </div>
-            <div className="absolute -bottom-1 -right-1 bg-brand text-white p-1.5 rounded-full ring-2 ring-white dark:ring-slate-900">
+            <div className="absolute -bottom-1 -right-1 bg-brand text-white p-1.5 rounded-full ring-2 ring-card">
             <GraduationCap className="w-3 h-3" />
           </div>
         </div>
         
         <div className="flex-1 min-w-0">
-          <h4 className="font-bold text-slate-900 dark:text-slate-100 text-[15px] truncate">{data.alumni.name}</h4>
-          <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5 truncate">
+          <h4 className="font-bold text-foreground text-[15px] truncate">{data.alumni.name}</h4>
+          <p className="text-muted-foreground text-xs mt-0.5 truncate">
             {data.alumni.course} {data.alumni.branch ? `• ${data.alumni.branch}` : ''}
           </p>
           <p className="text-brand dark:text-brand text-[11px] font-bold mt-0.5">
@@ -301,7 +301,7 @@ const AlumniCard = React.memo(({ data }: { data: AlumniFeedback }) => {
       
       <StarRating rating={data.rating} />
       
-      <blockquote className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed relative z-10">
+      <blockquote className="text-muted-foreground text-sm leading-relaxed relative z-10">
         "{data.content}"
       </blockquote>
     </div>
@@ -312,32 +312,32 @@ AlumniCard.displayName = "AlumniCard";
 /* --- 3. Student Card (Fresh & Vibrant) --- */
 const StudentCard = React.memo(({ data }: { data: StudentFeedback }) => {
   return (
-    <div className="relative bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-slate-200/80 dark:border-slate-700 hover:shadow-xl transition-all duration-300 overflow-hidden">
+    <div className="relative bg-card p-8 rounded-3xl shadow-[var(--shadow-sm)] border border-border hover:shadow-[var(--shadow-lg)] transition-all duration-300 overflow-hidden">
        {/* Left side accent line */}
       <div className="absolute top-0 left-0 bottom-0 w-1.5 bg-brand rounded-l-3xl" />
       
       <div className="pl-2">
         <StarRating rating={data.rating} />
         
-        <blockquote className="text-slate-800 dark:text-slate-200 font-medium text-[15px] leading-relaxed mb-8 relative z-10">
+        <blockquote className="text-foreground/80 font-medium text-[15px] leading-relaxed mb-8 relative z-10">
           "{data.content}"
         </blockquote>
         
         <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-700 shrink-0">
+          <div className="w-10 h-10 rounded-full overflow-hidden bg-muted shrink-0">
             {data.student.profileImageUrl ? (
               <img className="w-full h-full object-cover" alt={data.student.name} src={data.student.profileImageUrl} loading="lazy" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center font-bold text-slate-500">
+              <div className="w-full h-full flex items-center justify-center font-bold text-muted-foreground">
                 {data.student.name.charAt(0)}
               </div>
             )}
           </div>
           <div className="min-w-0">
-            <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 truncate">{data.student.name}</h4>
+            <h4 className="font-bold text-sm text-foreground truncate">{data.student.name}</h4>
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-              <p className="text-slate-500 dark:text-slate-400 text-xs truncate">
+              <p className="text-muted-foreground text-xs truncate">
                 Current Student • {data.student.course}
               </p>
             </div>

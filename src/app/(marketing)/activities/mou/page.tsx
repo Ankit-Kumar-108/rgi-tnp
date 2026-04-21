@@ -40,7 +40,7 @@ export default function StrategicAlliances() {
                                     professional growth opportunities.
                                 </p>
                                 <div className="flex flex-wrap gap-4">
-                                    <button className="bg-brand text-primary-foreground px-8 py-4 rounded-xl font-bold text-lg shadow-xl shadow-brand/20 hover:scale-105 transition-all">
+                                    <button className="bg-brand text-primary-foreground px-8 py-4 rounded-xl font-bold text-lg shadow-[var(--shadow-brand)] hover:scale-[1.02] transition-all">
                                         Explore Partnerships
                                     </button>
                                     <button className="bg-transparent border-2 border-brand/20 text-brand px-8 py-4 rounded-xl font-bold text-lg hover:bg-brand/5 transition-all">
@@ -71,7 +71,7 @@ export default function StrategicAlliances() {
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
                                 {/* Partner Card 1 */}
-                                <div className="group bg-card p-8 rounded-[2rem] shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all flex flex-col items-center text-center border border-border">
+                                <div className="group bg-card p-8 rounded-[2rem] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-lg)] hover:scale-[1.01] transition-all flex flex-col items-center text-center border border-border">
                                     <div className="w-20 h-20 bg-muted rounded-2xl flex items-center justify-center mb-6 overflow-hidden">
                                         <img
                                             className="w-12 h-12 object-contain"
@@ -96,7 +96,7 @@ export default function StrategicAlliances() {
                                 </div>
 
                                 {/* Partner Card 2 */}
-                                <div className="group bg-card p-8 rounded-[2rem] shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all flex flex-col items-center text-center border border-border">
+                                <div className="group bg-card p-8 rounded-[2rem] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-lg)] hover:scale-[1.01] transition-all flex flex-col items-center text-center border border-border">
                                     <div className="w-20 h-20 bg-muted rounded-2xl flex items-center justify-center mb-6 overflow-hidden p-2">
                                         <img
                                             className="w-full h-full object-contain"
@@ -121,7 +121,7 @@ export default function StrategicAlliances() {
                                 </div>
 
                                 {/* Partner Card 3 */}
-                                <div className="group bg-card p-8 rounded-[2rem] shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all flex flex-col items-center text-center border border-border">
+                                <div className="group bg-card p-8 rounded-[2rem] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-lg)] hover:scale-[1.01] transition-all flex flex-col items-center text-center border border-border">
                                     <div className="w-20 h-20 bg-muted rounded-2xl flex items-center justify-center mb-6 overflow-hidden">
                                         <span className="text-2xl font-black text-foreground">NPTEL</span>
                                     </div>
@@ -138,7 +138,7 @@ export default function StrategicAlliances() {
                                 </div>
 
                                 {/* Partner Card 4 */}
-                                <div className="group bg-card p-8 rounded-[2rem] shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all flex flex-col items-center text-center border border-border">
+                                <div className="group bg-card p-8 rounded-[2rem] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-lg)] hover:scale-[1.01] transition-all flex flex-col items-center text-center border border-border">
                                     <div className="w-20 h-20 bg-muted rounded-2xl flex items-center justify-center mb-6 overflow-hidden">
                                         <img
                                             className="w-12 h-12 object-contain"
@@ -296,7 +296,7 @@ export default function StrategicAlliances() {
                                         ></textarea>
                                     </div>
                                     <div className="md:col-span-2 mt-4">
-                                        <button className="w-full bg-brand text-primary-foreground font-bold py-5 rounded-xl text-lg shadow-xl shadow-brand/30 hover:scale-[1.01] transition-all">
+                                        <button className="w-full bg-brand text-primary-foreground font-bold py-5 rounded-xl text-lg shadow-[var(--shadow-brand)] hover:scale-[1.01] transition-all">
                                             Submit Collaboration Inquiry
                                         </button>
                                     </div>
