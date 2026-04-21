@@ -268,7 +268,7 @@ export default function AdminUsersPage() {
             <button key={tab.key} onClick={() => handleTabChange(tab.key)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${
                 activeTab === tab.key
-                  ? "bg-brand text-white shadow-lg shadow-brand/20"
+                  ? "bg-brand text-white shadow-[var(--shadow-brand)]"
                   : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-brand/40"
               }`}>
               <tab.icon className="w-4 h-4" />

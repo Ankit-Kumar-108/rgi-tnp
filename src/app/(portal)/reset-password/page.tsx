@@ -101,7 +101,7 @@ function ResetPasswordContent() {
             <p className="text-muted-foreground text-sm leading-relaxed">{message}</p>
             <Link
               href={getLoginHref()}
-              className="flex items-center justify-center gap-2 w-full py-3 bg-brand text-primary-foreground rounded-xl font-bold hover:bg-brand/90 transition-all shadow-lg shadow-brand/20"
+              className="flex items-center justify-center gap-2 w-full py-3 bg-brand text-primary-foreground rounded-xl font-bold hover:bg-brand/90 transition-all shadow-[var(--shadow-brand)]"
             >
               Go to Login
             </Link>
@@ -160,7 +160,7 @@ function ResetPasswordContent() {
             <button
               type="submit"
               disabled={status === "loading"}
-              className="w-full py-3 bg-brand text-primary-foreground rounded-xl font-bold hover:bg-brand/90 transition-all shadow-lg shadow-brand/20 disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-3 bg-brand text-primary-foreground rounded-xl font-bold hover:bg-brand/90 transition-all shadow-[var(--shadow-brand)] disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {status === "loading" ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /> Resetting...</>

@@ -111,7 +111,7 @@ function VerifyEmailContent() {
           <div className="space-y-3">
             <Link
               href={getLoginHref()}
-              className="flex items-center justify-center gap-2 w-full py-3 bg-brand text-primary-foreground rounded-xl font-bold hover:bg-brand/90 transition-all shadow-lg shadow-brand/20 group"
+              className="flex items-center justify-center gap-2 w-full py-3 bg-brand text-primary-foreground rounded-xl font-bold hover:bg-brand/90 transition-all shadow-[var(--shadow-brand)] group"
             >
               Go to Login
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -123,7 +123,7 @@ function VerifyEmailContent() {
           <div className="space-y-3">
             <Link
               href={getLoginHref()}
-              className="flex items-center justify-center gap-2 w-full py-3 bg-brand text-primary-foreground rounded-xl font-bold hover:bg-brand/90 transition-all shadow-lg shadow-brand/20 group"
+              className="flex items-center justify-center gap-2 w-full py-3 bg-brand text-primary-foreground rounded-xl font-bold hover:bg-brand/90 transition-all shadow-[var(--shadow-brand)] group"
             >
               Go to Login
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

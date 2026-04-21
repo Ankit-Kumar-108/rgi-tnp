@@ -175,7 +175,7 @@ export default function AdminMasterDataPage() {
             <button
               onClick={() => { setUploadType("student"); setPreview([]); setResult(null); }}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${uploadType === "student"
-                  ? "bg-brand text-white shadow-lg shadow-brand/20"
+                  ? "bg-brand text-white shadow-[var(--shadow-brand)]"
                   : "bg-muted border border-border text-muted-foreground hover:text-foreground"
                 }`}
             >
@@ -185,7 +185,7 @@ export default function AdminMasterDataPage() {
             <button
               onClick={() => { setUploadType("alumni"); setPreview([]); setResult(null); }}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${uploadType === "alumni"
-                  ? "bg-brand text-white shadow-lg shadow-brand/20"
+                  ? "bg-brand text-white shadow-[var(--shadow-brand)]"
                   : "bg-muted border border-border text-muted-foreground hover:text-foreground"
                 }`}
             >

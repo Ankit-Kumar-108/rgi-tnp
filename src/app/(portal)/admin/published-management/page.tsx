@@ -217,7 +217,7 @@ export default function PublishedManagementPage() {
               key={tab.key}
               onClick={() => { handleChangeTab(tab.key) }}
               className={`flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-3 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${activeTab === tab.key
-                ? "bg-brand text-white shadow-lg shadow-brand/20"
+                ? "bg-brand text-white shadow-[var(--shadow-brand)]"
                 : "bg-white border border-border text-muted-foreground hover:bg-muted"
               }`}
             >

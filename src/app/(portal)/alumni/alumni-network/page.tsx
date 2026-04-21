@@ -261,7 +261,7 @@ export default function AlumniDiscovery() {
                       {/* Connect Button */}
                       <button
                         onClick={rout}
-                        className="flex-1 md:flex-none px-10 py-4 bg-[#0077b5] text-white rounded-2xl font-bold text-sm shadow-xl shadow-blue-500/20 hover:scale-[1.03] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group"
+                        className="flex-1 md:flex-none px-10 py-4 bg-[#0077b5] text-white rounded-2xl font-bold text-sm shadow-xl shadow-blue-500/20 transition-all flex items-center justify-center gap-3 group"
                       >
                         Connect on LinkedIn
                         <Send className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />

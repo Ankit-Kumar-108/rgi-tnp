@@ -320,7 +320,7 @@ export default function AdminApprovalsPage() {
                 key={tab.key}
                 onClick={() => { handleChangeTab(tab.key) }}
                 className={`relative flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-3 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${activeTab === tab.key
-                    ? "bg-brand text-white shadow-lg shadow-brand/20"
+                    ? "bg-brand text-white shadow-[var(--shadow-brand)]"
                     : "bg-white border border-border text-muted-foreground hover:bg-muted"
                   }`}
               >
@@ -562,7 +562,7 @@ export default function AdminApprovalsPage() {
                     <button
                         onClick={() => handleAction(viewItem.id, "approve")}
                         disabled={actionLoading === viewItem.id}
-                        className="flex-1 bg-brand text-white py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold hover:bg-brand/90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand/10 disabled:opacity-50 active:scale-95"
+                        className="flex-1 bg-brand text-white py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold hover:bg-brand/90 transition-all flex items-center justify-center gap-2 shadow-[var(--shadow-brand)] disabled:opacity-50"
                     >
                         {actionLoading === viewItem.id ? <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" /> : <Check className="w-4 h-4 sm:w-5 sm:h-5" />}
                         Approve
@@ -572,7 +572,7 @@ export default function AdminApprovalsPage() {
                 <button
                   onClick={() => handleAction(viewItem.id, "reject")}
                   disabled={actionLoading === viewItem.id}
-                  className="px-4 sm:px-6 bg-white border border-border text-red-500 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold hover:bg-red-50 transition-all flex items-center justify-center gap-2 active:scale-95"
+                  className="px-4 sm:px-6 bg-white border border-border text-red-500 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold hover:bg-red-50 transition-all flex items-center justify-center gap-2"
                 >
                   <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span className="hidden xs:inline">{activeTab === "memories" ? "Delete" : "Reject"}</span>

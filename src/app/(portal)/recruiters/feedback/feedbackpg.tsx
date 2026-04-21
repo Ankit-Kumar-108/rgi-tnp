@@ -210,7 +210,7 @@ export default function FeedbackCorporate({ onClose }: FeedbackCorporateProps = 
         <button
           onClick={handleSubmitFeedback}
           disabled={submittingFb || !fbContent.trim() || fbRating === 0}
-          className="group/btn w-full relative overflow-hidden bg-gradient-to-r from-brand via-brand to-brand/90 hover:from-brand/90 hover:via-brand/95 hover:to-brand/80 disabled:from-muted disabled:via-muted disabled:to-muted/80 text-primary-foreground py-3 rounded-xl font-black text-sm md:text-base transition-all duration-300 shadow-lg shadow-brand/20 hover:shadow-xl hover:shadow-brand/30 disabled:shadow-none active:scale-[0.98] flex items-center justify-center gap-3"
+          className="group/btn w-full relative overflow-hidden bg-brand hover:opacity-90 disabled:bg-muted text-primary-foreground py-3 rounded-xl font-black text-sm md:text-base transition-all duration-300 shadow-[var(--shadow-brand)]  disabled:shadow-none flex items-center justify-center gap-3"
         >
           {/* Shimmer effect */}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out" />

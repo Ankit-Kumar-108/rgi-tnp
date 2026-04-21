@@ -158,7 +158,7 @@ export default function StudentDashboard() {
         // 2. Make this a clickable button so they can still read the job details
         <button 
           onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
-          className="inline-flex items-center gap-1.5 text-green-600 bg-green-500/10 hover:bg-green-500/20 px-4 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95"
+          className="inline-flex items-center gap-1.5 text-green-600 bg-green-500/10 hover:bg-green-500/20 px-4 py-2.5 rounded-xl text-xs font-bold transition-all"
         >
           <CheckCircle className="w-4 h-4" /> View Details
         </button>
@@ -181,7 +181,7 @@ export default function StudentDashboard() {
       actionElement: (
         <button
           onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
-          className="bg-linear-to-r from-brand to-brand/80 hover:from-brand/90 hover:to-brand/70 text-white px-6 py-2.5 rounded-xl text-xs font-bold shadow-lg shadow-brand/20 hover:shadow-xl hover:shadow-brand/30 transition-all active:scale-95 flex items-center gap-2 group"
+          className="bg-brand hover:opacity-90 text-white px-6 py-2.5 rounded-full text-xs font-bold shadow-[var(--shadow-brand)] transition-opacity flex items-center gap-2 group"
         >
           <span>Apply Now</span>
           <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
@@ -389,14 +389,14 @@ export default function StudentDashboard() {
               <div className="flex gap-3">
                 <button 
                   onClick={() => { setIsMemModalOpen(false); setSelectedMemFiles([]); setMemPreviews([]); }}
-                  className="flex-1 bg-muted text-foreground px-6 py-4 rounded-xl font-bold hover:bg-muted/80 transition-all active:scale-95 text-sm"
+                  className="flex-1 bg-muted text-foreground px-6 py-4 rounded-xl font-bold hover:bg-muted/80 transition-all text-sm"
                 >
                   Cancel
                 </button>
                 <button 
                   onClick={startMemoryUpload}
                   disabled={memUploading}
-                  className="flex-2 bg-brand text-white px-6 py-4 rounded-xl font-bold hover:bg-brand/90 transition-all active:scale-95 text-sm disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2 shadow-lg shadow-brand/20"
+                  className="flex-2 bg-brand text-white px-6 py-4 rounded-xl font-bold hover:bg-brand/90 transition-all text-sm disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2 shadow-[var(--shadow-brand)]"
                 >
                   {memUploading ? (
                     <>
@@ -505,7 +505,7 @@ export default function StudentDashboard() {
                 {profileMsg && <p className={`text-sm font-medium ${profileMsg.ok ? "text-green-600" : "text-red-500"}`}>{profileMsg.msg}</p>}
                 <div className="flex gap-4">
                   <button type="submit" disabled={submittingProfile}
-                    className="bg-brand text-primary-foreground px-8 py-3.5 rounded-xl font-bold hover:scale-105 transition-transform shadow-lg shadow-brand/20 disabled:opacity-50 flex items-center gap-2"
+                    className="bg-brand text-primary-foreground px-8 py-3.5 rounded-full font-bold hover:opacity-90 transition-opacity shadow-[var(--shadow-brand)] disabled:opacity-50 flex items-center gap-2"
                   >
                     {submittingProfile ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
                     Save Profile
@@ -544,7 +544,7 @@ export default function StudentDashboard() {
                     <div className="absolute -top-12 -left-12 w-64 h-64 bg-brand/10 rounded-full blur-3xl -z-10"></div>
                     <div className="absolute top-24 -right-12 w-48 h-48 bg-foreground/5 rounded-full blur-3xl -z-10"></div>
 
-                    <div className="bg-card rounded-2xl p-6 md:p-8 shadow-sm border border-border flex flex-col md:flex-row gap-8 md:items-center relative overflow-hidden group hover:shadow-xl transition-shadow duration-500">
+                    <div className="bg-card rounded-2xl p-6 md:p-8 shadow-[var(--shadow-sm)] border border-border flex flex-col md:flex-row gap-8 md:items-center relative overflow-hidden group hover:shadow-[var(--shadow-md)] transition-shadow duration-300">
 
                       {/* Decorative Gradient Accent */}
                       <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-bl from-brand/10 to-transparent rounded-bl-[5rem]"></div>
@@ -640,55 +640,47 @@ export default function StudentDashboard() {
               {!loading && data && (
                 <section className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                   {/* Stat Card: Eligible Drives */}
-                  <div className="bg-linear-to-br from-blue-500/10 to-blue-500/5 rounded-[1.75rem] p-6 border border-blue-500/20 shadow-sm hover:-translate-y-1 transition-all duration-300 group cursor-pointer">
+                  <div className="bg-card rounded-2xl p-5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
                     <div className="flex items-start justify-between mb-4">
-                      <div className="w-12 h-12 bg-blue-500/20 rounded-2xl flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
-                        <Briefcase className="w-6 h-6 text-blue-600" />
+                      <div className="w-11 h-11 bg-brand/10 rounded-xl flex items-center justify-center">
+                        <Briefcase className="w-5 h-5 text-brand" />
                       </div>
-                      <ChevronRight className="w-4 h-4 text-blue-500/40 group-hover:text-blue-500/60 group-hover:translate-x-1 transition-all" />
                     </div>
-                    <p className="text-3xl md:text-4xl font-black text-foreground leading-none mb-2">{drives.length}</p>
+                    <p className="text-3xl md:text-4xl font-black text-foreground leading-none mb-1">{drives.length}</p>
                     <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Eligible Drives</p>
-                    <p className="text-xs text-blue-600/70 mt-2 hidden xs:block">Ready to apply</p>
                   </div>
 
                   {/* Stat Card: Registrations */}
-                  <div className="bg-linear-to-br from-green-500/10 to-green-500/5 rounded-[1.75rem] p-6 border border-green-500/20 shadow-sm hover:-translate-y-1 transition-all duration-300 group cursor-pointer">
+                  <div className="bg-card rounded-2xl p-5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
                     <div className="flex items-start justify-between mb-4">
-                      <div className="w-12 h-12 bg-green-500/20 rounded-2xl flex items-center justify-center group-hover:bg-green-500/30 transition-colors">
-                        <CheckCircle className="w-6 h-6 text-green-600" />
+                      <div className="w-11 h-11 bg-brand/10 rounded-xl flex items-center justify-center">
+                        <CheckCircle className="w-5 h-5 text-brand" />
                       </div>
-                      <ChevronRight className="w-4 h-4 text-green-500/40 group-hover:text-green-500/60 group-hover:translate-x-1 transition-all" />
                     </div>
-                    <p className="text-3xl md:text-4xl font-black text-foreground leading-none mb-2">{registrations.length}</p>
+                    <p className="text-3xl md:text-4xl font-black text-foreground leading-none mb-1">{registrations.length}</p>
                     <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Applied</p>
-                    <p className="text-xs text-green-600/70 mt-2 hidden xs:block">Submitted applications</p>
                   </div>
 
                   {/* Stat Card: Memories */}
-                  <div className="bg-linear-to-br from-purple-500/10 to-purple-500/5 rounded-[1.75rem] p-6 border border-purple-500/20 shadow-sm hover:-translate-y-1 transition-all duration-300 group cursor-pointer">
+                  <div className="bg-card rounded-2xl p-5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
                     <div className="flex items-start justify-between mb-4">
-                      <div className="w-12 h-12 bg-purple-500/20 rounded-2xl flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
-                        <Camera className="w-6 h-6 text-purple-600" />
+                      <div className="w-11 h-11 bg-brand/10 rounded-xl flex items-center justify-center">
+                        <Camera className="w-5 h-5 text-brand" />
                       </div>
-                      <ChevronRight className="w-4 h-4 text-purple-500/40 group-hover:text-purple-500/60 group-hover:translate-x-1 transition-all" />
                     </div>
-                    <p className="text-3xl md:text-4xl font-black text-foreground leading-none mb-2">{memories.length}</p>
+                    <p className="text-3xl md:text-4xl font-black text-foreground leading-none mb-1">{memories.length}</p>
                     <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Memories</p>
-                    <p className="text-xs text-purple-600/70 mt-2 hidden xs:block">Campus moments</p>
                   </div>
 
                   {/* Stat Card: Attended */}
-                  <div className="bg-linear-to-br from-brand/15 to-brand/5 rounded-[1.75rem] p-6 border border-brand/30 shadow-md hover:-translate-y-1 transition-all duration-300 group cursor-pointer hover:shadow-lg hover:shadow-brand/10">
+                  <div className="bg-card rounded-2xl p-5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
                     <div className="flex items-start justify-between mb-4">
-                      <div className="w-12 h-12 bg-brand/30 rounded-2xl flex items-center justify-center group-hover:bg-brand/40 transition-colors">
-                        <TrendingUp className="w-6 h-6 text-brand" />
+                      <div className="w-11 h-11 bg-brand/10 rounded-xl flex items-center justify-center">
+                        <TrendingUp className="w-5 h-5 text-brand" />
                       </div>
-                      <ChevronRight className="w-4 h-4 text-brand/50 group-hover:text-brand/70 group-hover:translate-x-1 transition-all" />
                     </div>
-                    <p className="text-3xl md:text-4xl font-black text-brand leading-none mb-2">{registrations.filter((r: any) => r.attended).length}</p>
+                    <p className="text-3xl md:text-4xl font-black text-brand leading-none mb-1">{registrations.filter((r: any) => r.attended).length}</p>
                     <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Attended</p>
-                    <p className="text-xs text-brand/70 mt-2 hidden xs:block">Drive participation</p>
                   </div>
                 </section>
               )}

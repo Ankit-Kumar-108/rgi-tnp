@@ -170,7 +170,7 @@ export default function VolunteerDashboard() {
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-colors font-medium text-sm"
+            className="flex items-center gap-2 px-4 py-2 bg-muted text-foreground rounded-full hover:bg-muted/80 transition-colors font-medium text-sm"
           >
             <div className="flex items-center gap-1 bg-destructive/10 text-destructive rounded-md px-1.5 py-1">
             <LogOut className="w-4 h-4" />
@@ -275,7 +275,7 @@ export default function VolunteerDashboard() {
         {/* Stats Cards */}
         {data && (
           <section className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div className="bg-card border border-border rounded-xl p-6 hover:shadow-[var(--shadow-md)] transition-shadow">
+            <div className="bg-card border border-border rounded-2xl p-6 shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-muted-foreground text-sm font-medium">
                   Drive Images
@@ -290,7 +290,7 @@ export default function VolunteerDashboard() {
               </p>
             </div>
 
-            <div className="bg-card border border-border rounded-xl p-6 hover:shadow-[var(--shadow-md)] transition-shadow">
+            <div className="bg-card border border-border rounded-2xl p-6 shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-muted-foreground text-sm font-medium">
                   Active Drives
@@ -305,7 +305,7 @@ export default function VolunteerDashboard() {
               </p>
             </div>
 
-            <div className="bg-card border border-border rounded-xl p-6 hover:shadow-[var(--shadow-md)] transition-shadow">
+            <div className="bg-card border border-border rounded-2xl p-6 shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-muted-foreground text-sm font-medium">
                   Students
@@ -320,7 +320,7 @@ export default function VolunteerDashboard() {
               </p>
             </div>
 
-            <div className="bg-card border border-border rounded-xl p-6 hover:shadow-[var(--shadow-md)] transition-shadow">
+            <div className="bg-card border border-border rounded-2xl p-6 shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-muted-foreground text-sm font-medium">
                   Pending Tasks

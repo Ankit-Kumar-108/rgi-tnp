@@ -88,12 +88,12 @@ export default function AdminDashboard() {
 
   const statCards = stats
     ? [
-        { label: "Total Students", value: stats.totalStudents, icon: GraduationCap, color: "text-blue-500", bg: "bg-blue-500/10" },
-        { label: "Total Alumni", value: stats.totalAlumni, icon: UserCheck, color: "text-green-500", bg: "bg-green-500/10" },
-        { label: "Recruiters", value: stats.totalRecruiters, icon: Building2, color: "text-purple-500", bg: "bg-purple-500/10" },
-        { label: "External Students", value: stats.totalExternalStudents, icon: Users, color: "text-orange-500", bg: "bg-orange-500/10" },
-        { label: "Active Drives", value: stats.activeDrives, icon: Briefcase, color: "text-brand", bg: "bg-brand/10" },
-        { label: "Pending Approvals", value: stats.pendingApprovals, icon: AlertCircle, color: "text-red-500", bg: "bg-red-500/10" },
+        { label: "Total Students", value: stats.totalStudents, icon: GraduationCap },
+        { label: "Total Alumni", value: stats.totalAlumni, icon: UserCheck },
+        { label: "Recruiters", value: stats.totalRecruiters, icon: Building2 },
+        { label: "External Students", value: stats.totalExternalStudents, icon: Users },
+        { label: "Active Drives", value: stats.activeDrives, icon: Briefcase },
+        { label: "Pending Approvals", value: stats.pendingApprovals, icon: AlertCircle, highlight: true },
       ]
     : [];
 
@@ -213,12 +213,12 @@ export default function AdminDashboard() {
               {statCards.map((card) => (
                 <div
                   key={card.label}
-                  className="bg-card p-5 rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow"
+                  className="bg-card p-5 rounded-2xl border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow"
                 >
-                  <div className={`w-10 h-10 ${card.bg} rounded-xl flex items-center justify-center mb-3`}>
-                    <card.icon className={`w-5 h-5 ${card.color}`} />
+                  <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center mb-3">
+                    <card.icon className="w-5 h-5 text-brand" />
                   </div>
-                  <p className="text-2xl font-black text-foreground">{card.value}</p>
+                  <p className={`text-2xl font-black ${card.highlight ? 'text-brand' : 'text-foreground'}`}>{card.value}</p>
                   <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mt-1">
                     {card.label}
                   </p>
@@ -236,7 +236,7 @@ export default function AdminDashboard() {
               <Link
                 key={section.title}
                 href={section.href}
-                className="bg-card p-6 rounded-2xl border border-border shadow-sm hover:shadow-lg hover:border-brand/30 transition-all group"
+                className="bg-card p-6 rounded-2xl border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] hover:border-brand/30 transition-all group"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="w-12 h-12 bg-brand/10 rounded-xl flex items-center justify-center group-hover:bg-brand/20 transition-colors">

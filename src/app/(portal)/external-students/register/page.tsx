@@ -242,7 +242,7 @@ export default function ExternalStudentRegister() {
                                     accept="image/png, image/jpeg, image/webp"
                                     className="hidden"
                                 />
-                                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-brand text-primary-foreground flex items-center justify-center shadow-lg shadow-brand/20 group-hover:scale-110 transition-transform">
+                                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-brand text-primary-foreground flex items-center justify-center shadow-[var(--shadow-brand)] group-hover:scale-110 transition-transform">
                                     <UploadCloud className="w-5 h-5 sm:w-6 sm:h-6" />
                                 </div>
                                 <div className="text-center">
@@ -260,7 +260,7 @@ export default function ExternalStudentRegister() {
                                 disabled={!profileImageFile}
                                 onClick={() => setIsProfileImgModalOpen(false)}
                                 className={`flex-1 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm transition-all ${profileImageFile
-                                        ? "bg-brand text-primary-foreground shadow-lg shadow-brand/20 hover:scale-[1.02] active:scale-[0.98]"
+                                        ? "bg-brand text-primary-foreground shadow-[var(--shadow-brand)]"
                                         : "bg-muted text-muted-foreground cursor-not-allowed"
                                     }`}
                             >
@@ -272,7 +272,7 @@ export default function ExternalStudentRegister() {
                                     setImgPreviewURL(null);
                                     setProfileImageFile(null);
                                 }}
-                                className="flex-1 py-3 sm:py-4 bg-background border-2 border-border text-foreground rounded-xl sm:rounded-2xl font-bold text-sm hover:bg-muted transition-all active:scale-[0.98]"
+                                className="flex-1 py-3 sm:py-4 bg-background border-2 border-border text-foreground rounded-xl sm:rounded-2xl font-bold text-sm hover:bg-muted transition-all"
                             >
                                 Cancel
                             </button>
@@ -315,7 +315,7 @@ export default function ExternalStudentRegister() {
                             <button
                                 type="button"
                                 onClick={() => setIsResumePreviewOpen(false)}
-                                className="px-6 py-2.5 bg-brand text-primary-foreground rounded-xl font-bold text-sm hover:scale-[1.02] active:scale-[0.98] transition-all"
+                                className="px-6 py-2.5 bg-brand text-primary-foreground rounded-xl font-bold text-sm transition-all"
                             >
                                 Looks Good
                             </button>
@@ -374,7 +374,7 @@ export default function ExternalStudentRegister() {
                                     <button
                                         type="button"
                                         onClick={() => setIsProfileImgModalOpen(true)}
-                                        className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-brand/10 text-brand rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm border border-brand/20 hover:bg-brand/20 hover:scale-[1.02] active:scale-[0.98] transition-all w-full sm:w-auto"
+                                        className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-brand/10 text-brand rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm border border-brand/20 hover:bg-brand/20 transition-all w-full sm:w-auto"
                                     >
                                         <User className="w-4 h-4 sm:w-5 sm:h-5" /> Upload Profile Image*
                                     </button>

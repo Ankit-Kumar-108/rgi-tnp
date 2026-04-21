@@ -85,7 +85,7 @@ export default function ExternalStudentDashboard() {
       actionElement: (
         <button 
           onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
-          className="inline-flex items-center gap-1.5 text-green-600 bg-green-500/10 hover:bg-green-500/20 px-4 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95"
+          className="inline-flex items-center gap-1.5 text-green-600 bg-green-500/10 hover:bg-green-500/20 px-4 py-2.5 rounded-xl text-xs font-bold transition-all"
         >
           <CheckCircle className="w-4 h-4" /> View Details
         </button>
@@ -108,7 +108,7 @@ export default function ExternalStudentDashboard() {
       actionElement: (
         <button
           onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
-          className="bg-brand text-white px-5 py-2 rounded-xl text-xs font-bold hover:bg-brand/90 transition-all active:scale-95"
+          className="bg-brand text-white px-5 py-2 rounded-xl text-xs font-bold hover:bg-brand/90 transition-all"
         >
           Register
         </button>
@@ -323,7 +323,7 @@ export default function ExternalStudentDashboard() {
                 {profileMsg && <p className={`text-sm font-medium ${profileMsg.ok ? "text-green-600" : "text-red-500"}`}>{profileMsg.msg}</p>}
                 <div className="flex gap-4">
                   <button type="submit" disabled={submittingProfile}
-                    className="bg-brand text-primary-foreground px-8 py-3.5 rounded-xl font-bold hover:scale-105 transition-transform shadow-lg shadow-brand/20 disabled:opacity-50 flex items-center gap-2"
+                    className="bg-brand text-primary-foreground px-8 py-3.5 rounded-full font-bold hover:opacity-90 transition-opacity shadow-[var(--shadow-brand)] disabled:opacity-50 flex items-center gap-2"
                   >
                     {submittingProfile ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
                     Save Profile

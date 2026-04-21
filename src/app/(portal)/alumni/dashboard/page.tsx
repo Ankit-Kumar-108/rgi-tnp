@@ -319,12 +319,12 @@ export default function AlumniDashboard() {
                   <div className="absolute -top-12 -left-12 w-48 h-48 md:w-64 md:h-64 bg-brand/10 rounded-full blur-3xl -z-10 animate-pulse"></div>
                   <div className="absolute top-24 -right-12 w-32 h-32 md:w-48 md:h-48 bg-foreground/5 rounded-full blur-3xl -z-10"></div>
 
-                  <div className="bg-card/80 backdrop-blur-sm rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-10 lg:p-12 shadow-xl shadow-brand/5 border border-border/60 flex flex-col md:flex-row gap-8 items-center md:items-start relative overflow-hidden transition-all duration-500 hover:border-brand/30">
+                  <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-6 md:p-10 lg:p-12 shadow-[var(--shadow-md)] border border-border/60 flex flex-col md:flex-row gap-8 items-center md:items-start relative overflow-hidden transition-shadow duration-300 hover:shadow-[var(--shadow-lg)]">
 
                     <div className="absolute top-0 right-0 w-24 h-24 md:w-40 md:h-40 bg-gradient-to-bl from-brand/10 via-transparent to-transparent rounded-bl-[3rem] md:rounded-bl-[6rem]"></div>
 
-                    <div className="relative shrink-0 transition-transform duration-500 hover:scale-105">
-                      <div className="w-32 h-32 md:w-44 lg:w-52 md:h-44 lg:h-52 rounded-full p-1 md:p-1.5 bg-gradient-to-tr from-brand via-brand/60 to-orange-400">
+                    <div className="relative shrink-0">
+                      <div className="w-32 h-32 md:w-44 lg:w-52 md:h-44 lg:h-52 rounded-full p-1 md:p-1.5 bg-gradient-to-tr from-brand to-brand/50">
                         <div className="w-full h-full rounded-full border-[3px] md:border-[5px] border-background overflow-hidden bg-muted flex items-center justify-center">
                           {alumni?.profileImageUrl ? (
                             <img
@@ -384,7 +384,7 @@ export default function AlumniDashboard() {
                             href={alumni.linkedInUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 bg-[#0077b5] text-white hover:bg-[#0077b5]/90 px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md active:scale-95"
+                            className="flex items-center gap-2 bg-[#0077b5] text-white hover:bg-[#0077b5]/90 px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md"
                           >
                             <Linkedin className="w-4 h-4" />
                             <span className="hidden xs:inline">LinkedIn Profile</span>
@@ -393,7 +393,7 @@ export default function AlumniDashboard() {
                         )}
                         <button
                           onClick={() => setShowProfileForm(!showProfileForm)}
-                          className="relative flex items-center gap-2 text-sm font-bold border border-border bg-background hover:bg-muted px-5 py-2.5 rounded-xl transition-all active:scale-95"
+                          className="relative flex items-center gap-2 text-sm font-bold border border-border bg-background hover:bg-muted px-5 py-2.5 rounded-xl transition-all"
                         >
                           {showProfileForm ? "Close Form" : "Update Profile"}
                           <ChevronRight className={`w-4 h-4 transition-transform duration-300 ${showProfileForm ? "rotate-90" : ""}`} />
@@ -557,7 +557,7 @@ export default function AlumniDashboard() {
                     <button
                       type="submit"
                       disabled={submittingProfile}
-                      className="flex-1 bg-brand text-primary-foreground px-8 py-4 rounded-2xl font-black hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-brand/20 disabled:opacity-50 flex items-center justify-center gap-3"
+                      className="flex-1 bg-brand text-primary-foreground px-8 py-4 rounded-full font-black hover:opacity-90 transition-opacity shadow-[var(--shadow-brand)] disabled:opacity-50 flex items-center justify-center gap-3"
                     >
                       {submittingProfile ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle className="w-5 h-5" />}
                       <span className="tracking-tight uppercase text-xs md:text-sm">Save Profile changes</span>
@@ -565,7 +565,7 @@ export default function AlumniDashboard() {
                     <button
                       type="button"
                       onClick={() => setShowProfileForm(false)}
-                      className="bg-muted text-foreground px-8 py-4 rounded-2xl font-bold hover:bg-muted/80 transition-all uppercase text-xs md:text-sm tracking-widest"
+                      className="bg-muted text-foreground px-8 py-4 rounded-full font-bold hover:bg-muted/80 transition-all uppercase text-xs md:text-sm tracking-widest"
                     >
                       Discard
                     </button>
@@ -579,42 +579,36 @@ export default function AlumniDashboard() {
           {!loading && !fetchError && (
             <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Stat Card: Total Referrals */}
-              <div className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 rounded-[1.75rem] p-6 md:p-8 border border-blue-500/20 shadow-sm hover:-translate-y-1 transition-all duration-300 group cursor-pointer">
+              <div className="bg-card rounded-2xl p-6 md:p-8 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
                 <div className="flex items-start justify-between mb-6">
-                  <div className="w-14 h-14 bg-blue-500/20 rounded-2xl flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
-                    <UserPlus className="w-7 h-7 text-blue-600" />
+                  <div className="w-12 h-12 bg-brand/10 rounded-xl flex items-center justify-center">
+                    <UserPlus className="w-6 h-6 text-brand" />
                   </div>
-                  <ChevronRight className="w-4 h-4 text-blue-500/40 group-hover:text-blue-500/60 group-hover:translate-x-1 transition-all" />
                 </div>
                 <p className="text-3xl md:text-4xl font-black text-foreground leading-none mb-2">{stats.totalReferrals || 0}</p>
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total Referrals</p>
-                <p className="text-xs text-blue-600/70 mt-2">Opportunities shared</p>
               </div>
 
               {/* Stat Card: Approved Referrals */}
-              <div className="bg-gradient-to-br from-green-500/10 to-green-500/5 rounded-[1.75rem] p-6 md:p-8 border border-green-500/20 shadow-sm hover:-translate-y-1 transition-all duration-300 group cursor-pointer">
+              <div className="bg-card rounded-2xl p-6 md:p-8 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
                 <div className="flex items-start justify-between mb-6">
-                  <div className="w-14 h-14 bg-green-500/20 rounded-2xl flex items-center justify-center group-hover:bg-green-500/30 transition-colors">
-                    <Briefcase className="w-7 h-7 text-green-600" />
+                  <div className="w-12 h-12 bg-brand/10 rounded-xl flex items-center justify-center">
+                    <Briefcase className="w-6 h-6 text-brand" />
                   </div>
-                  <ChevronRight className="w-4 h-4 text-green-500/40 group-hover:text-green-500/60 group-hover:translate-x-1 transition-all" />
                 </div>
                 <p className="text-3xl md:text-4xl font-black text-foreground leading-none mb-2">{stats.approvedReferrals || 0}</p>
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Approved</p>
-                <p className="text-xs text-green-600/70 mt-2">Published opportunities</p>
               </div>
 
               {/* Stat Card: Pending Review */}
-              <div className="bg-gradient-to-br from-brand/15 to-brand/5 rounded-[1.75rem] p-6 md:p-8 border border-brand/30 shadow-md hover:-translate-y-1 transition-all duration-300 group cursor-pointer hover:shadow-lg hover:shadow-brand/10">
+              <div className="bg-card rounded-2xl p-6 md:p-8 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
                 <div className="flex items-start justify-between mb-6">
-                  <div className="w-14 h-14 bg-brand/30 rounded-2xl flex items-center justify-center group-hover:bg-brand/40 transition-colors">
-                    <TrendingUp className="w-7 h-7 text-brand" />
+                  <div className="w-12 h-12 bg-brand/10 rounded-xl flex items-center justify-center">
+                    <TrendingUp className="w-6 h-6 text-brand" />
                   </div>
-                  <ChevronRight className="w-4 h-4 text-brand/50 group-hover:text-brand/70 group-hover:translate-x-1 transition-all" />
                 </div>
                 <p className="text-3xl md:text-4xl font-black text-brand leading-none mb-2">{stats.pendingReferrals || 0}</p>
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Under Review</p>
-                <p className="text-xs text-brand/70 mt-2">Awaiting approval</p>
               </div>
             </section>
           )}
@@ -869,7 +863,7 @@ export default function AlumniDashboard() {
 
                     {/* Submit Button */}
                     <button type="submit" disabled={submittingRef}
-                      className="group/btn w-full md:w-auto relative overflow-hidden bg-gradient-to-r from-brand via-brand to-brand/90 hover:from-brand/90 hover:via-brand/95 hover:to-brand/80 text-primary-foreground px-8 py-3 rounded-xl font-black shadow-lg shadow-brand/20 hover:shadow-xl hover:shadow-brand/30 disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-3 transition-all duration-300 active:scale-[0.98]"
+                      className="group/btn w-full md:w-auto relative overflow-hidden bg-brand hover:opacity-90 text-primary-foreground px-8 py-3 rounded-xl font-black shadow-[var(--shadow-brand)]  disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-3 transition-all duration-300"
                     >
                       {/* Shimmer */}
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out" />
@@ -1006,7 +1000,7 @@ export default function AlumniDashboard() {
                     <button
                       onClick={handleSubmitFeedback}
                       disabled={submittingFb || !fbContent.trim() || fbRating === 0}
-                      className="group/btn mt-auto w-full relative overflow-hidden bg-gradient-to-r from-brand via-brand to-brand/90 hover:from-brand/90 hover:via-brand/95 hover:to-brand/80 disabled:from-muted disabled:via-muted disabled:to-muted/80 text-primary-foreground py-3 rounded-xl font-black text-sm transition-all duration-300 shadow-lg shadow-brand/20 hover:shadow-xl hover:shadow-brand/30 disabled:shadow-none active:scale-[0.98] flex items-center justify-center gap-2.5"
+                      className="group/btn mt-auto w-full relative overflow-hidden bg-brand hover:opacity-90 disabled:bg-muted text-primary-foreground py-3 rounded-xl font-black text-sm transition-all duration-300 shadow-[var(--shadow-brand)]  disabled:shadow-none flex items-center justify-center gap-2.5"
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out" />
                       <span className="relative flex items-center gap-2.5">
