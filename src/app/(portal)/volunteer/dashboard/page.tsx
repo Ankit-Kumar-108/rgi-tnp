@@ -150,7 +150,7 @@ export default function VolunteerDashboard() {
   const volunteer = data?.volunteer;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-hidden">
 
       {/* Header */}
       <header className="sticky z-40 bg-card/80 backdrop-blur-xl border-b border-border">
@@ -172,8 +172,10 @@ export default function VolunteerDashboard() {
             onClick={handleLogout}
             className="flex items-center gap-2 px-4 py-2 bg-muted text-foreground rounded-lg hover:bg-muted/80 transition-colors font-medium text-sm"
           >
+            <div className="flex items-center gap-1 bg-destructive/10 text-destructive rounded-md px-1.5 py-1">
             <LogOut className="w-4 h-4" />
-            Logout
+            <span className="hidden md:block">Logout</span>
+            </div>
           </button>
         </div>
       </header>
