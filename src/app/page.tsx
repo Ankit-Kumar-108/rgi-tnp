@@ -486,6 +486,7 @@ export default function Home() {
               <>
                 {volunteers.map((volunteer) => (
                   <div
+                  key={volunteer.id}
                   id={volunteer.id}
                   className="bg-card rounded-xl hover:shadow-[var(--shadow-lg)] border overflow-hidden border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
                     <div className="aspect-2.5/3 bg-cover bg-top transition-transform" data-alt="Female staff member profile" style={{ backgroundImage: `url(${volunteer.student.profileImageUrl})` }}></div>
