@@ -105,7 +105,7 @@ export async function PUT(
     }
 
     const body = await req.json() as any
-    const { designation, isVerified, verificationNotes, isActive } = body;
+    const { designation, isVerified, verificationNotes } = body;
 
     const updatedVolunteer = await db.volunteer.update({
       where: { id },
@@ -113,7 +113,6 @@ export async function PUT(
         designation: designation ?? volunteer.designation,
         isVerified: isVerified ?? volunteer.isVerified,
         verificationNotes: verificationNotes ?? volunteer.verificationNotes,
-        isActive: isActive ?? volunteer.isActive,
         updatedAt: new Date(),
       },
       include: {
@@ -176,28 +175,14 @@ export async function DELETE(
       );
     }
 
-    // Soft delete - mark as inactive
-    const updatedVolunteer = await db.volunteer.update({
+    // Hard delete
+    await db.volunteer.delete({
       where: { id },
-      data: {
-        isActive: false,
-        updatedAt: new Date(),
-      },
-      include: {
-        student: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
     });
 
     return NextResponse.json({
       success: true,
-      message: "Volunteer deactivated successfully",
-      data: updatedVolunteer,
+      message: "Volunteer deleted successfully",
     });
   } catch (error) {
     console.error("Error deactivating volunteer:", error);

@@ -378,6 +378,39 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: true, items, totalCount });
     }
 
+    if (type === "volunteers") {
+      const where = { isVerified: false };
+      const [items, totalCount] = await Promise.all([
+        db.volunteer.findMany({
+          where,
+          select: {
+            id: true,
+            studentId: true,
+            designation: true,
+            createdAt: true,
+            student: {
+              select: {
+                name: true,
+                enrollmentNumber: true,
+                profileImageUrl: true,
+                email: true,
+                branch: true,
+                batch: true,
+                course: true,
+                cgpa: true,
+                phoneNumber: true,
+              },
+            },
+          },
+          orderBy: { createdAt: "desc" },
+          take: limit,
+          skip,
+        }),
+        db.volunteer.count({ where }),
+      ]);
+      return NextResponse.json({ success: true, items, totalCount });
+    }
+
     return NextResponse.json(
       { success: false, message: "Invalid type" },
       { status: 400 },
@@ -528,6 +561,17 @@ export async function POST(req: NextRequest) {
         });
       } else {
         await db.externalStudent.deleteMany({
+          where: { id: { in: targetIds } },
+        });
+      }
+    } else if (type === "volunteers") {
+      if (action === "approve") {
+        await db.volunteer.updateMany({
+          where: { id: { in: targetIds } },
+          data: { isVerified: true, assignedAt: new Date() },
+        });
+      } else {
+        await db.volunteer.deleteMany({
           where: { id: { in: targetIds } },
         });
       }

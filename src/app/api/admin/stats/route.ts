@@ -17,6 +17,13 @@ export async function GET(req: NextRequest) {
       pendingReferrals,
       pendingMemories,
       pendingExternalScreening,
+      pendingVolunteers,
+      pendingStudentFeedback,
+      pendingAlumniFeedback,
+      pendingCorporateFeedback,
+      pendingUnverifiedStudents,
+      pendingUnverifiedAlumni,
+      pendingUnverifiedExternal,
     ] = await Promise.all([
       db.student.count(),
       db.alumni.count(),
@@ -27,10 +34,17 @@ export async function GET(req: NextRequest) {
       db.referral.count({ where: { status: "pending" } }),
       db.memory.count({ where: { status: "pending_moderation" } }),
       db.externalStudent.count({ where: { isVerified: false } }),
+      db.volunteer.count({ where: { isVerified: false } }),
+      db.studentFeedback.count({ where: { isApproved: false } }),
+      db.alumniFeedback.count({ where: { isApproved: false } }),
+      db.corporateFeedback.count({ where: { isApproved: false } }),
+      db.student.count({ where: { emailVerificationFailed: true } }),
+      db.alumni.count({ where: { emailVerificationFailed: true } }),
+      db.externalStudent.count({ where: { emailVerificationFailed: true } }),
     ]);
 
     const pendingApprovals =
-      pendingDrives + pendingReferrals + pendingMemories + pendingExternalScreening;
+      pendingDrives + pendingReferrals + pendingMemories + pendingExternalScreening + pendingVolunteers + pendingStudentFeedback + pendingAlumniFeedback + pendingCorporateFeedback + pendingUnverifiedStudents + pendingUnverifiedAlumni + pendingUnverifiedExternal;
 
     return NextResponse.json({
       success: true,
@@ -44,7 +58,14 @@ export async function GET(req: NextRequest) {
         pendingDrives,
         pendingReferrals,
         pendingMemories,
-        pendingExternalScreening: pendingExternalScreening,
+        pendingExternalScreening,
+        pendingVolunteers,
+        pendingStudentFeedback,
+        pendingAlumniFeedback,
+        pendingCorporateFeedback,
+        pendingUnverifiedStudents,
+        pendingUnverifiedAlumni,
+        pendingUnverifiedExternal,
       },
     });
   } catch (error: any) {

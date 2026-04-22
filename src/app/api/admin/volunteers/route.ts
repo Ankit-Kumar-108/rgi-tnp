@@ -137,7 +137,6 @@ export async function POST(req: NextRequest) {
         verificationNotes: verificationNotes || null,
         assignedBy: adminTokenData.email,
         assignedAt: new Date(),
-        isActive: true,
       },
       include: {
         student: {
