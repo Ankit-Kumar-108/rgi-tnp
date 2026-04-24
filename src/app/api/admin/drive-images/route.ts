@@ -124,7 +124,7 @@ export async function GET(req: NextRequest) {
         take: limit,
         skip,
         include: {
-          drive: { select: { id: true, title: true, companyName: true, driveDate: true } },
+          drive: { select: { id: true, roleName: true, companyName: true, driveDate: true } },
         },
         orderBy: { createdAt: "desc" },
       }),
