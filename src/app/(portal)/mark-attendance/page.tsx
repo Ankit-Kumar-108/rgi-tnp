@@ -151,3 +151,15 @@ function MarkAttendanceContent() {
     </div>
   );
 }
+
+export default function MarkAttendancePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Loader2 className="w-16 h-16 text-brand animate-spin" />
+      </div>
+    }>
+      <MarkAttendanceContent />
+    </Suspense>
+  );
+}
