@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { getToken } from "@/lib/auth-client";
 import { CheckCircle2, XCircle, Loader2, AlertTriangle } from "lucide-react";
@@ -8,7 +8,7 @@ import Link from "next/link";
 
 type Status = "loading" | "success" | "already" | "error" | "no-token";
 
-export default function MarkAttendancePage() {
+function MarkAttendanceContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const attendanceToken = searchParams.get("token");
