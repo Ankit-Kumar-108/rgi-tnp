@@ -6,7 +6,7 @@ import {
   ArrowRightCircle, XCircle, FileText, Download, ExternalLink,
   Github, Linkedin,
   ChevronDown, SlidersHorizontal, BarChart3, Clock,
-  Mail, Phone, UserCheck, QrCode
+  Mail, Phone, UserCheck, QrCode, AlertCircle
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
