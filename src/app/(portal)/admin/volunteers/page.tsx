@@ -16,12 +16,13 @@ import {
   BookOpen,
   Hash,
   Search,
+  ArrowLeft,
+  UserCheck,
 } from "lucide-react";
-import Nav from "@/components/layout/nav/nav";
-import Footer from "@/components/layout/footer/footer";
 import { useAuth } from "@/hooks/useAuth";
 import { getToken } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { toast } from "sonner";
 
 interface Volunteer {
@@ -80,7 +81,6 @@ export default function VolunteersManagement() {
     isVerified: false,
   });
   const [submitting, setSubmitting] = useState(false);
-  const [students, setStudents] = useState<any[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -247,22 +247,29 @@ export default function VolunteersManagement() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Nav />
-      <main className="flex-1 w-full p-4 md:p-8 mt-20">
-        <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-              Volunteer Management
-            </h1>
-            <p className="text-muted-foreground">
-              Manage and assign volunteers to the T&P program
-            </p>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-xl border-b border-border">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center gap-4">
+          <Link href="/admin/dashboard" className="text-muted-foreground hover:text-brand transition-colors">
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center">
+              <UserCheck className="w-5 h-5 text-brand" />
+            </div>
+            <div>
+              <h1 className="text-lg font-black text-foreground tracking-tight">
+                Volunteer Management
+              </h1>
+            </div>
           </div>
+        </div>
+      </header>
 
-          {/* Action Bar */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-8">
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        {/* Action Bar */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-8">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <input
@@ -447,7 +454,6 @@ export default function VolunteersManagement() {
               <p className="text-3xl font-bold">
                 {volunteers.filter((v) => !v.isVerified && v.isActive).length}
               </p>
-            </div>
           </div>
         </div>
       </main>
@@ -623,8 +629,6 @@ export default function VolunteersManagement() {
           </div>
         </div>
       )}
-
-      <Footer />
     </div>
   );
 }

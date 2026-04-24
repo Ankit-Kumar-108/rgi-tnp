@@ -416,7 +416,7 @@ export default function StudentDashboard() {
         </div>
       )}
 
-      <div className="bg-background text-foreground antialiased font-sans min-h-screen mt-15">
+      <div className="bg-background text-foreground antialiased font-sans min-h-screen mt-15 overflow-hidden">
         <div className="fixed bottom-0 right-0 w-96 h-96 bg-brand/5 rounded-full blur-[120px] -z-10" />
         <div className="fixed top-1/2 left-0 w-64 h-64 bg-brand/5 rounded-full blur-[100px] -z-10" />
 
@@ -541,18 +541,18 @@ export default function StudentDashboard() {
                 <div className="space-y-8">
                   <section className="relative">
                     {/* Background Glows */}
-                    <div className="absolute -top-12 -left-12 w-64 h-64 bg-brand/10 rounded-full blur-3xl -z-10"></div>
-                    <div className="absolute top-24 -right-12 w-48 h-48 bg-foreground/5 rounded-full blur-3xl -z-10"></div>
+                    <div className="absolute -top-12 -left-12 size-64 bg-brand/10 rounded-full blur-3xl -z-10"></div>
+                    <div className="absolute top-24 -right-12 size-48 bg-foreground/5 rounded-full blur-3xl -z-10"></div>
 
                     <div className="bg-card rounded-2xl p-6 md:p-8 shadow-[var(--shadow-sm)] border border-border flex flex-col md:flex-row gap-8 md:items-center relative overflow-hidden group hover:shadow-[var(--shadow-md)] transition-shadow duration-300">
 
                       {/* Decorative Gradient Accent */}
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-bl from-brand/10 to-transparent rounded-bl-[5rem]"></div>
+                      <div className="absolute top-0 right-0 size-32 bg-linear-to-bl from-brand/10 to-transparent rounded-bl-[5rem]"></div>
 
                       {/* Avatar Section */}
                       <div className="relative shrink-0 mx-auto md:mx-0">
-                        <div className="w-32 h-32 md:w-48 md:h-48 rounded-full p-2 bg-linear-to-tr from-brand to-brand/40 transition-transform duration-500 group-hover:rotate-6">
-                          <div className="w-full h-full rounded-full border-4 border-background overflow-hidden bg-muted object-top object">
+                        <div className="w-32 h-32 md:size-48 rounded-full p-1 md:p-2 bg-linear-to-tr from-brand to-brand/40 transition-transform duration-500 group-hover:rotate-6">
+                          <div className="w-full h-full rounded-full border-2 md:border-4 border-background overflow-hidden bg-muted">
                             {student?.profileImageUrl ? (
                               <img
                                 alt="Student Portrait"
@@ -569,11 +569,11 @@ export default function StudentDashboard() {
                         </div>
 
                         {/* Verified Badge */}
-                        <div className="absolute bottom-4 bg-background right-0 md:right-4 size-10 rounded-full flex shrink-0 items-center justify-center">
+                        <div className="absolute bottom-4 bg-background right-0 md:right-4 size-7 md:size-10 rounded-full flex shrink-0 items-center justify-center">
                           {student?.isVerified || student?.isEmailVerified ? (
-                            <BadgeCheck className={`size-11 text-center text-green-500`} />
+                            <BadgeCheck className={`size-7 md:size-10 text-center text-green-500`} />
                           ) : (
-                            <BadgeAlert className={`size-11 text-center text-red-500`} />
+                            <BadgeAlert className={`size-7 md:size-10 text-center text-red-500`} />
                           )}
                         </div>
 

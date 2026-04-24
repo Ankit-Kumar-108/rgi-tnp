@@ -180,7 +180,7 @@ export default function Home() {
   }, [driveGroups.length]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground overflow-hidden">
       {/* Fixed Top Navigation */}
       <Nav />
       <main className="pt-20">
@@ -433,10 +433,10 @@ export default function Home() {
             </div>
           </div>
           <div className="flex w-full items-center justify-end mb-5">
-          <button
+            <button
               onClick={() => setShowAllVolunteers((prev) => !prev)}
-            className="text-brand font-bold flex items-center gap-1 hover:gap-2 transition-all text-sm" >View All <ChevronRight className="w-4 h-4" />
-          </button>
+              className="text-brand font-bold flex items-center gap-1 hover:gap-2 transition-all text-sm" >View All <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {volunteers.length === 0 && !loading && (
@@ -477,34 +477,33 @@ export default function Home() {
             )}
             {loading ? (
               <div className="col-span-full flex justify-center items-center py-10">
-              <LoaderCircle className="size-12 text-brand mx-auto animate-spin" />
+                <LoaderCircle className="size-12 text-brand mx-auto animate-spin" />
               </div>
             ) : (
               <>
                 {volunteers.map((volunteer) => (
                   <div
-                  key={volunteer.id}
-                  id={volunteer.id}
-                  className="bg-card rounded-xl hover:shadow-[var(--shadow-lg)] border overflow-hidden border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
-                    <div className="aspect-2.5/3 bg-cover bg-top transition-transform" data-alt="Female staff member profile" style={{ backgroundImage: `url(${volunteer.student.profileImageUrl})` }}></div>
-                    <div className="p-4">
+                    key={volunteer.id}
+                    id={volunteer.id}
+                    className="bg-card relative rounded-xl hover:shadow-[var(--shadow-lg)] border overflow-hidden border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 group">
+                    <div className="aspect-2.5/3 bg-cover bg-top transition-transform" data-alt="Staff member profile" style={{ backgroundImage: `url(${volunteer.student.profileImageUrl})` }}></div>
+                    <div className="p-3">
+                      <a
+                        href={volunteer.student.linkedinUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="absolute top-2 right-2 p-2 bg-white/90 backdrop-blur-md rounded-lg shadow-lg text-[#0077b5] translate-x-12 -translate-y-12 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-500 ease-out hover:bg-[#0077b5] hover:text-white z-10"
+                        title="LinkedIn Profile"
+                      >
+                        <svg className="size-7 md:size-7 fill-current" viewBox="0 0 24 24">
+                          <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                        </svg>
+                      </a>
                       <div className="flex justify-between items-center">
                         <h3 className="font-bold text-sm md:text-lg" >{volunteer.student.name}</h3>
-                        <a
-                          href={volunteer.student.linkedinUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-500 hover:text-blue-400 transition-colors duration-200"
-                          title="LinkedIn Profile"
-                        >
-                          <svg className="size-3 md:size-5 fill-current" viewBox="0 0 24 24">
-                            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-                          </svg>
-                        </a>
                       </div>
                       <div className="flex justify-between items-center">
                         <p className="text-brand text-xs md:text-sm font-medium" >{volunteer.designation}</p>
-                        <p className="text-muted-foreground text-[7px] md:text-xs" >{new Date(volunteer.createdAt).toLocaleDateString()}</p>
                       </div>
                     </div>
                   </div>

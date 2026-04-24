@@ -73,7 +73,7 @@ export default function DriveImagesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-hidden">
       <div className="max-w-7xl mx-auto px-3 lg:px-20 py-12">
         <div className="mb-12">
           <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-2">Drive Images Gallery</h1>

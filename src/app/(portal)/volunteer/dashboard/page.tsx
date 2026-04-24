@@ -195,7 +195,7 @@ export default function VolunteerDashboard() {
 
             {/* Avatar Section */}
             <div className="relative shrink-0 mx-auto md:mx-0">
-              <div className="w-32 h-32 md:w-48 md:h-48 rounded-full p-1 bg-linear-to-tr from-brand to-brand/40 transition-transform duration-500 group-hover:rotate-6">
+              <div className="w-32 h-32 md:w-48 md:h-48 rounded-full p-1 md:p-2 bg-linear-to-tr from-brand to-brand/40 transition-transform duration-500 group-hover:rotate-6">
                 <div className="w-full h-full rounded-full border-2 border-background overflow-hidden bg-muted object-top">
                   {student?.profileImageUrl ? (
                     <img
@@ -215,9 +215,9 @@ export default function VolunteerDashboard() {
               {/* Verification Badge */}
               <div className="absolute bottom-4 bg-background right-0 md:right-4 size-10 rounded-full flex shrink-0 items-center justify-center">
                 {volunteer?.isVerified ? (
-                  <BadgeCheck className="size-11 text-center text-green-500" />
+                  <BadgeCheck className="size-7 md:size-10 text-center text-green-500" />
                 ) : (
-                  <BadgeAlert className="size-11 text-center text-yellow-500" />
+                  <BadgeAlert className="size-7 md:size-10 text-center text-yellow-500" />
                 )}
               </div>
             </div>

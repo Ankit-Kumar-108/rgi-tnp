@@ -268,7 +268,7 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
       const matchesStatus = statusFilter === "All" || p.status === statusFilter;
       const isInternal = !!p.student;
       const matchesType = typeFilter === "All" || (typeFilter === "Internal" ? isInternal : !isInternal);
-      const matchesAttandance = attandanceFilter === "All" || (attandanceFilter === "Present" ? p.attended : !p.attended);
+      const matchesAttandance = attandanceFilter === "All" || (attandanceFilter === "Present" ? p.attended === true : p.attended === false);
       return matchesSearch && matchesStatus && matchesType && matchesAttandance;
     });
 
@@ -281,10 +281,11 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
     });
 
     return list;
-  }, [participants, searchQuery, statusFilter, typeFilter, sortBy]);
+  }, [participants, searchQuery, statusFilter, typeFilter, sortBy, attandanceFilter]);
 
   const uniqueStatuses = useMemo(() => {
-    const s = new Set(participants.map(p => p.status || "Applied"));
+    const standardStatuses = ["Applied", "Shortlisted", "Selected", "Rejected"];
+    const s = new Set([...standardStatuses, ...participants.map(p => p.status || "Applied")]);
     return ["All", ...Array.from(s)];
   }, [participants]);
 
@@ -324,7 +325,7 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
 
   //  Render 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-hidden">
 
       {/*  Sticky Header */}
       <header className="sticky top-0 z-40 bg-card/80 backdrop-blur-xl border-b border-border">
@@ -516,6 +517,25 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
                     {t}
                   </button>
                 ))}
+              </div>
+              <div className="w-px bg-border mx-1 hidden sm:block" />
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Attendance:</span>
+                <div className="flex items-center bg-card border border-border rounded-lg p-0.5">
+                  {(["All", "Present", "Absent"] as ("All" | "Present" | "Absent")[]).map(att => (
+                    <button
+                      key={att}
+                      onClick={() => setAttandanceFilter(att)}
+                      className={`px-3 h-6 rounded-md text-xs font-bold transition-all ${
+                        attandanceFilter === att 
+                          ? "bg-brand text-white shadow-sm" 
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                      }`}
+                    >
+                      {att}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           )}

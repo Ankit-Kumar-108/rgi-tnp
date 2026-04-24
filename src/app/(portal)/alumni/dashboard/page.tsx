@@ -273,7 +273,7 @@ export default function AlumniDashboard() {
   return (
     <>
       <Nav />
-      <div className="bg-background text-foreground antialiased font-sans min-h-screen mt-15">
+      <div className="bg-background text-foreground antialiased font-sans min-h-screen mt-15 overflow-hidden">
         <div className="fixed bottom-0 right-0 w-96 h-96 bg-brand/5 rounded-full blur-[120px] -z-10" />
         <div className="fixed top-1/2 left-0 w-64 h-64 bg-brand/5 rounded-full blur-[100px] -z-10" />
 
@@ -324,12 +324,12 @@ export default function AlumniDashboard() {
                     <div className="absolute top-0 right-0 w-24 h-24 md:w-40 md:h-40 bg-gradient-to-bl from-brand/10 via-transparent to-transparent rounded-bl-[3rem] md:rounded-bl-[6rem]"></div>
 
                     <div className="relative shrink-0">
-                      <div className="w-32 h-32 md:w-44 lg:w-52 md:h-44 lg:h-52 rounded-full p-1 md:p-1.5 bg-gradient-to-tr from-brand to-brand/50">
-                        <div className="w-full h-full rounded-full border-[3px] md:border-[5px] border-background overflow-hidden bg-muted flex items-center justify-center object-top">
+                      <div className="w-32 h-32 md:w-44 lg:w-52 md:h-44 lg:h-52 rounded-full p-1 md:p-2 bg-gradient-to-tr from-brand to-brand/50">
+                        <div className="w-full h-full rounded-full border-[3px] md:border-[5px] border-background overflow-hidden bg-muted flex items-center justify-center">
                           {alumni?.profileImageUrl ? (
                             <img
                               alt="Alumni Portrait"
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-cover object-top"
                               src={alumni.profileImageUrl}
                             />
                           ) : (
@@ -340,11 +340,11 @@ export default function AlumniDashboard() {
                         </div>
                       </div>
 
-                      <div className="absolute bottom-1 md:bottom-2 right-1 md:right-4 bg-background rounded-full p-1 shadow-md">
+                      <div className="absolute bottom-1 md:bottom-2 right-1 md:right-4 bg-background rounded-full shadow-md">
                         {alumni?.isVerified ? (
-                          <BadgeCheck className="w-8 h-8 md:w-10 md:h-10 text-green-500" />
+                          <BadgeCheck className="w-7 h-7 md:w-10 md:h-10 text-green-500" />
                         ) : (
-                          <BadgeAlert className="w-8 h-8 md:w-10 md:h-10 text-destructive/80" />
+                          <BadgeAlert className="w-7 h-7 md:w-10 md:h-10 text-destructive/80" />
                         )}
                       </div>
                     </div>

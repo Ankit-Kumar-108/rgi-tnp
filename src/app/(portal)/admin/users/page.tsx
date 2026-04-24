@@ -124,7 +124,7 @@ export default function AdminUsersPage() {
     loadUsers();
   }, [authenticated, activeTab, branch, submittedSearch, page]);
 
-  // ─── Handlers ──────────────────────────────────────────────────────────────
+  //  Handlers 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(1);
@@ -207,11 +207,11 @@ export default function AdminUsersPage() {
     );
   }
 
-  // ─── Render ────────────────────────────────────────────────────────────────
+  // Render 
   return (
-    <div className="min-h-screen bg-background pb-12">
+    <div className="min-h-screen bg-background pb-12 overflow-hidden">
       
-      {/* ── Sticky Header ─────────────────────────────────────────────────── */}
+      {/* Sticky Header */}
       <header className="sticky top-0 z-40 bg-card/80 backdrop-blur-xl border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 min-h-16 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
           
