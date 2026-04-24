@@ -552,12 +552,12 @@ export default function StudentDashboard() {
                       {/* Avatar Section */}
                       <div className="relative shrink-0 mx-auto md:mx-0">
                         <div className="w-32 h-32 md:w-48 md:h-48 rounded-full p-2 bg-linear-to-tr from-brand to-brand/40 transition-transform duration-500 group-hover:rotate-6">
-                          <div className="w-full h-full rounded-full border-4 border-background overflow-hidden bg-muted object-top">
+                          <div className="w-full h-full rounded-full border-4 border-background overflow-hidden bg-muted object-top object">
                             {student?.profileImageUrl ? (
                               <img
                                 alt="Student Portrait"
                                 loading="lazy"
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-cover object-top"
                                 src={student.profileImageUrl}
                               />
                             ) : (
