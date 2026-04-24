@@ -4,12 +4,12 @@ import Nav from "@/components/layout/nav/nav"
 import Footer from "@/components/layout/footer/footer"
 import { LogIn, Mail, LockKeyhole, Earth, Info, Share2, GraduationCap, Loader2, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { saveAuth } from "@/lib/auth-client"
 import { toast } from "sonner"
 
-export default function ExternalStudentLogin() {
+function ExternalLoginContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [email, setEmail] = useState("");
@@ -128,6 +128,14 @@ export default function ExternalStudentLogin() {
             </main>
             <Footer />
         </div>
+    )
+}
+
+export default function ExternalStudentLogin() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <ExternalLoginContent />
+        </Suspense>
     )
 }
 
