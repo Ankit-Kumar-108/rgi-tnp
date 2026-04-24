@@ -15,12 +15,12 @@ import {
     EyeOff
 } from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { saveAuth } from "@/lib/auth-client"
 import { toast } from "sonner"
 
-export default function StudentLogin() {
+function StudentLoginContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [email, setEmail] = useState("");
@@ -186,5 +186,13 @@ export default function StudentLogin() {
             </main>
             <Footer/>
         </div>
+    )
+}
+
+export default function StudentLogin() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <StudentLoginContent />
+        </Suspense>
     )
 }
