@@ -141,6 +141,9 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
   const [qrExpiresAt, setQrExpiresAt] = useState<number | null>(null);
   const [timeLeft, setTimeLeft] = useState<string>("");
 
+  // state for attandance 
+  const [attandanceFilter, setAttandanceFilter] = useState<"All" | "Present" | "Absent">("All");
+
   useEffect(() => {
     if (!showQrModal || !qrExpiresAt) return;
 
@@ -265,7 +268,8 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
       const matchesStatus = statusFilter === "All" || p.status === statusFilter;
       const isInternal = !!p.student;
       const matchesType = typeFilter === "All" || (typeFilter === "Internal" ? isInternal : !isInternal);
-      return matchesSearch && matchesStatus && matchesType;
+      const matchesAttandance = attandanceFilter === "All" || (attandanceFilter === "Present" ? p.attended : !p.attended);
+      return matchesSearch && matchesStatus && matchesType && matchesAttandance;
     });
 
     list.sort((a, b) => {

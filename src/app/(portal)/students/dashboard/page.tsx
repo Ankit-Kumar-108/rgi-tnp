@@ -1054,7 +1054,7 @@ export default function StudentDashboard() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {memories.map((m: any) => (
                       <div key={m.id} className="bg-card rounded-2xl border border-border overflow-hidden">
-                        <div className="aspect-square bg-muted flex items-center justify-center">
+                        <div className="aspect-square bg-muted flex items-center justify-center object-top">
                           <img src={m.imageUrl} alt="Memory" loading="lazy" className="w-full h-full object-cover" />
                           
                         </div>

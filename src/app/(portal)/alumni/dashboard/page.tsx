@@ -325,7 +325,7 @@ export default function AlumniDashboard() {
 
                     <div className="relative shrink-0">
                       <div className="w-32 h-32 md:w-44 lg:w-52 md:h-44 lg:h-52 rounded-full p-1 md:p-1.5 bg-gradient-to-tr from-brand to-brand/50">
-                        <div className="w-full h-full rounded-full border-[3px] md:border-[5px] border-background overflow-hidden bg-muted flex items-center justify-center">
+                        <div className="w-full h-full rounded-full border-[3px] md:border-[5px] border-background overflow-hidden bg-muted flex items-center justify-center object-top">
                           {alumni?.profileImageUrl ? (
                             <img
                               alt="Alumni Portrait"

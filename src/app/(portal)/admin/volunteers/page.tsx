@@ -332,7 +332,7 @@ export default function VolunteersManagement() {
                         className="border-b border-border hover:bg-muted/50 transition-colors"
                       >
                         <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-3 object-top">
                             {volunteer.student?.profileImageUrl && (
                               <img
                                 src={volunteer.student.profileImageUrl}
