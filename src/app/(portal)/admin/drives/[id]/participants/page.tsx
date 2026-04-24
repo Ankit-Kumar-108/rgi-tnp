@@ -6,11 +6,12 @@ import {
   ArrowRightCircle, XCircle, FileText, Download, ExternalLink,
   Github, Linkedin,
   ChevronDown, SlidersHorizontal, BarChart3, Clock,
-  Mail, Phone, UserCheck
+  Mail, Phone, UserCheck, QrCode
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
 import { toast } from "sonner";
+import QRCode from "qrcode";
 
 // Types
 type Participant = {
@@ -132,6 +133,60 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
   const [sortBy, setSortBy] = useState<"date" | "cgpa" | "name">("date");
   const [showFilters, setShowFilters] = useState(false);
   const [typeFilter, setTypeFilter] = useState<"All" | "Internal" | "External">("All");
+
+  const [showQrModal, setShowQrModal] = useState(false);
+  const [qrImageUrl, setQrImageUrl] = useState("");
+  const [qrDriveName, setQrDriveName] = useState("");
+  const [qrLoading, setQrLoading] = useState(false);
+  const [qrExpiresAt, setQrExpiresAt] = useState<number | null>(null);
+  const [timeLeft, setTimeLeft] = useState<string>("");
+
+  useEffect(() => {
+    if (!showQrModal || !qrExpiresAt) return;
+
+    const updateTimer = () => {
+      const now = Date.now();
+      const difference = qrExpiresAt - now;
+
+      if (difference <= 0) {
+        setTimeLeft("Expired");
+        return;
+      }
+
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+      setTimeLeft(
+        `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+      );
+    };
+
+    updateTimer();
+    const timerId = setInterval(updateTimer, 1000);
+
+    return () => clearInterval(timerId);
+  }, [showQrModal, qrExpiresAt]);
+
+  const generateQr = async () => {
+    setQrLoading(true);
+    try {
+      const res = await fetch(`/api/admin/drives/${id}/attendance-qr`);
+      const data = (await res.json()) as any;
+      if (data.success) {
+        setQrDriveName(data.driveName);
+        setQrExpiresAt(data.expiresAt);
+        const imgUrl = await QRCode.toDataURL(data.qrUrl, { width: 400, margin: 2 });
+        setQrImageUrl(imgUrl);
+        setShowQrModal(true);
+      } else {
+        toast.error(data.message || "Failed to generate QR");
+      }
+    } catch {
+      toast.error("Failed to generate QR");
+    }
+    setQrLoading(false);
+  };
 
   // Infinite scroll
   const observer = useRef<IntersectionObserver | null>(null);
@@ -298,6 +353,11 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
                 <ExternalLink className="w-3.5 h-3.5" /> Sheet
               </a>
             )}
+            <button onClick={generateQr} disabled={qrLoading}
+              className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-purple-500/10 text-purple-700 dark:text-purple-400 hover:bg-purple-500/20 text-xs font-bold transition-colors disabled:opacity-50">
+              {qrLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <QrCode className="w-3.5 h-3.5" />}
+              <span className="hidden sm:inline">Attendance QR</span>
+            </button>
             <button onClick={exportToCSV} disabled={!filteredParticipants.length}
               className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-brand text-white hover:bg-brand/90 text-xs font-bold transition-colors disabled:opacity-40">
               <Download className="w-3.5 h-3.5" />
@@ -676,6 +736,57 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
           )}
         </section>
       </main>
+
+      {showQrModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+          onClick={() => setShowQrModal(false)}>
+          <div className="bg-card border border-border rounded-[2rem] p-8 max-w-sm w-full text-center relative overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300"
+            onClick={e => e.stopPropagation()}>
+            <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-brand/10 text-brand text-[10px] font-bold uppercase tracking-widest mb-3">
+              Ready to Scan
+            </div>
+            
+            <h2 className="text-2xl font-black text-foreground mb-1 tracking-tight">Attendance QR</h2>
+            <p className="text-sm text-muted-foreground mb-6 font-medium">For <span className="text-foreground font-bold">{qrDriveName}</span></p>
+            
+            {qrImageUrl && (
+              <div className="relative p-5 bg-white rounded-[1.5rem] shadow-xl border border-border/50 inline-block group hover:scale-[1.02] transition-transform duration-300">
+                <div className="absolute inset-0 bg-gradient-to-br from-brand/5 to-transparent rounded-[1.5rem] opacity-0 group-hover:opacity-100 transition-opacity" />
+                <img src={qrImageUrl} alt="Attendance QR Code" className="w-56 h-56 relative z-10 mx-auto" />
+              </div>
+            )}
+            
+            {timeLeft === "Expired" ? (
+              <div className="mt-6 inline-flex items-center gap-2 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 px-5 py-2 rounded-full font-bold text-sm border border-red-200 dark:border-red-500/20 shadow-sm">
+                <AlertCircle className="w-4 h-4" /> QR Code Expired
+              </div>
+            ) : (
+              <div className="mt-6 flex flex-col items-center gap-1.5">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                  Expires In
+                </p>
+                <div className="font-mono text-2xl font-black text-brand tracking-tight drop-shadow-sm">
+                  {timeLeft}
+                </div>
+              </div>
+            )}
+            
+            <div className="flex gap-3 mt-8 justify-center">
+              {qrImageUrl && timeLeft !== "Expired" && (
+                <a href={qrImageUrl} download={`${qrDriveName}-attendance-qr.png`}
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-brand to-brand/90 text-white rounded-xl text-xs font-bold hover:shadow-lg hover:shadow-brand/20 transition-all">
+                  Download
+                </a>
+              )}
+              <button onClick={() => setShowQrModal(false)}
+                className="flex-1 px-4 py-3 bg-muted text-foreground rounded-xl text-xs font-bold hover:bg-muted/80 transition-colors border border-border/50">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

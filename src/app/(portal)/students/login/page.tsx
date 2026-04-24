@@ -16,12 +16,13 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { saveAuth } from "@/lib/auth-client"
 import { toast } from "sonner"
 
 export default function StudentLogin() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
@@ -51,7 +52,9 @@ export default function StudentLogin() {
             saveAuth("student", data.token!, data.student);
             toast.success("Login successful");
             setTimeout(() => {
-                router.push("/students/dashboard");
+                const redirect = searchParams.get("redirect");
+                const safeRedirect = redirect?.startsWith("/") ? redirect : "/students/dashboard";
+                router.push(safeRedirect);
             }, 1000);
         } catch (error: any) {
             console.error("Error during login", error);

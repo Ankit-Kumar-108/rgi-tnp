@@ -6,7 +6,6 @@ import {
   ArrowRight,
   BadgeCheck,
   MoveRight,
-  Loader,
   LoaderCircle,
 } from "lucide-react"
 import Nav from "../components/layout/nav/nav"
@@ -16,9 +15,7 @@ import { useEffect, useState } from "react";
 import { Camera } from "lucide-react";
 import { toast } from "sonner";
 
-/* ──────────────────────────────────────
-   Types
-   ────────────────────────────────────── */
+/* Types */
 
 interface DriveImageData {
   id: string;
@@ -43,7 +40,7 @@ interface MemoryData {
 
 interface HomeDrive {
   id: string;
-  companyName: string;
+  title: string;
   driveDate: string;
   driveImages: DriveImageData[];
 }
@@ -94,7 +91,7 @@ export default function Home() {
           .filter((drive) => drive.driveImages.length > 0)
           .map((drive) => ({
             driveId: drive.id,
-            title: drive.companyName,
+            title: drive.title,
             images: drive.driveImages,
           }));
 
@@ -288,14 +285,14 @@ export default function Home() {
                         <div className="bg-card border border-border rounded-2xl px-6 py-3 shadow-md flex items-center gap-3">
                           <div className="w-2 h-2 rounded-full bg-brand animate-pulse" />
                           <h3 className="text-base md:text-lg font-bold text-foreground">
-                            Successful Campus Drive of{" "}
-                            <span className="text-brand">{group.title}</span>
+                            {/* Successful Campus Drive of{" "} */}
+                            <span className="text-brand">{group.images[0]?.title}</span>
                           </h3>
                         </div>
                       </div>
 
                       {/* 4-image asymmetric grid */}
-                      <div className="grid grid-cols-4 grid-rows-2 gap-3 md:gap-4 h-[280px] md:h-[420px]">
+                      <div className="grid grid-cols-4 grid-rows-2 gap-3 md:gap-4 h-70 md:h-105">
                         {/* Image 1 — large (spans 2 cols, 2 rows) */}
                         {group.images[0] && (
                           <div className="col-span-2 row-span-2 rounded-2xl overflow-hidden relative group/img shadow-lg">
@@ -305,7 +302,7 @@ export default function Home() {
                               className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700"
                               loading="lazy"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
+                            <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
                           </div>
                         )}
                         {/* Image 2 — top right */}
@@ -317,7 +314,7 @@ export default function Home() {
                               className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700"
                               loading="lazy"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
+                            <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
                           </div>
                         )}
                         {/* Image 3 — top far-right */}
@@ -329,7 +326,7 @@ export default function Home() {
                               className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700"
                               loading="lazy"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
+                            <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
                           </div>
                         )}
                         {/* Image 4 — bottom right (spans 2 cols) */}
@@ -341,7 +338,7 @@ export default function Home() {
                               className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700"
                               loading="lazy"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
+                            <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
                           </div>
                         )}
                       </div>
@@ -361,7 +358,7 @@ export default function Home() {
                         ? "w-8 bg-brand"
                         : "w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50"
                         }`}
-                      aria-label={`Go to ${group.title}`}
+                      aria-label={`Go to ${group.images[0]?.title} drive images`}
                     />
                   ))}
                 </div>

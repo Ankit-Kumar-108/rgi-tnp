@@ -309,9 +309,7 @@ export default function DriveImageManagement() {
         </div>
       </div>
 
-      {/* ═══════════════════════════════════════════
-          Upload Card
-          ═══════════════════════════════════════════ */}
+      {/*Upload Card */}
       <div className="relative overflow-hidden rounded-3xl border border-brand/10 bg-card shadow-xl">
         {/* Decorative gradient stripe */}
         <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand via-purple-500 to-pink-500" />

@@ -14,6 +14,7 @@ import {
   Users,
   Award,
   AlertCircle,
+  QrCode,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { getToken, logout } from "@/lib/auth-client";
@@ -21,6 +22,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import VolunteerDriveImageManagement from "@/components/volunteer/VolunteerDriveImageManagement";
 import StudentsOverviewTabs, { type StudentData } from "@/components/volunteer/StudentsOverviewTabs";
+import VolunteerAttendanceQR from "@/components/volunteer/VolunteerAttendanceQR";
 
 interface VolunteerData {
   volunteer: {
@@ -65,7 +67,7 @@ export default function VolunteerDashboard() {
   const [data, setData] = useState<VolunteerData | null>(null);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"students-overview" | "drive-images" | "overview">("students-overview");
+  const [activeTab, setActiveTab] = useState<"students-overview" | "drive-images" | "overview" | "attendance-qr">("students-overview");
   const [studentsOverviewData, setStudentsOverviewData] = useState<StudentData[]>([]);
   const [studentsOverviewLoading, setStudentsOverviewLoading] = useState(false);
 
@@ -364,6 +366,18 @@ export default function VolunteerDashboard() {
             </div>
           </button>
           <button
+            onClick={() => setActiveTab("attendance-qr")}
+            className={`pb-4 px-4 font-bold text-sm transition-colors whitespace-nowrap ${activeTab === "attendance-qr"
+                ? "text-brand border-b-2 border-brand"
+                : "text-muted-foreground hover:text-foreground"
+              }`}
+          >
+            <div className="flex items-center gap-2">
+              <QrCode className="size-6" />
+              <span className="hidden md:block">Attendance QR</span>
+            </div>
+          </button>
+          <button
             onClick={() => setActiveTab("overview")}
             className={`pb-4 px-4 font-bold text-sm transition-colors ${activeTab === "overview"
                 ? "text-brand border-b-2 border-brand"
@@ -475,6 +489,10 @@ export default function VolunteerDashboard() {
 
             {activeTab === "drive-images" && (
               <VolunteerDriveImageManagement />
+            )}
+
+            {activeTab === "attendance-qr" && (
+              <VolunteerAttendanceQR />
             )}
           </>
         )}

@@ -77,7 +77,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       db.driveRegistration.count({ where: { driveId: id } }),
       db.placementDrive.findUnique({
         where: { id },
-        select: { googleSheetUrl: true, companyName: true, roleName: true }
+        select: { googleSheetUrl: true, companyName: true, roleName: true, status: true }
       })
     ])
 

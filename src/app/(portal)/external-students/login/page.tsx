@@ -5,12 +5,13 @@ import Footer from "@/components/layout/footer/footer"
 import { LogIn, Mail, LockKeyhole, Earth, Info, Share2, GraduationCap, Loader2, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { saveAuth } from "@/lib/auth-client"
 import { toast } from "sonner"
 
 export default function ExternalStudentLogin() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
@@ -39,7 +40,10 @@ export default function ExternalStudentLogin() {
 
             saveAuth("external_student", data.token!, data.student);
             toast.success("Logged in successfully!");
-            router.push("/students/external-dashboard");
+            
+            const redirect = searchParams.get("redirect");
+            const safeRedirect = redirect?.startsWith("/") ? redirect : "/students/external-dashboard";
+            router.push(safeRedirect);
         } catch (error: any) {
             setError("Something went wrong. Please try again.");
             toast.error(error.message || "Something went wrong. Please try again.");
