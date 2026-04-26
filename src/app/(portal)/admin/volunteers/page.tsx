@@ -113,9 +113,6 @@ export default function VolunteersManagement() {
   const fetchStudents = async () => {
     try {
       const token = getToken("admin");
-      // This would fetch all students from a new endpoint
-      // For now, we'll assume the assignment form will search or select from a list
-      // You may need to create a /api/admin/students endpoint
     } catch (err: any) {
       console.error("Failed to fetch students:", err);
     }
@@ -249,7 +246,7 @@ export default function VolunteersManagement() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-xl border-b border-border">
+      <header className="fixed w-full top-0 z-50 bg-card/80 backdrop-blur-xl border-b border-border">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center gap-4">
           <Link href="/admin/dashboard" className="text-muted-foreground hover:text-brand transition-colors">
             <ArrowLeft className="w-5 h-5" />
@@ -260,24 +257,24 @@ export default function VolunteersManagement() {
             </div>
             <div>
               <h1 className="text-lg font-black text-foreground tracking-tight">
-                Volunteer Management
+                Volunteer <span className="text-brand">Management</span>
               </h1>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mt-15 mx-auto px-6 py-8">
         {/* Action Bar */}
         <div className="flex flex-col sm:flex-row gap-4 mb-8">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-brand" />
               <input
                 type="text"
                 placeholder="Search by name, email, or enrollment..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-muted border border-border rounded-lg focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none"
+                className="w-full pl-10 pr-4 py-2 bg-card border border-border rounded-lg focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none"
               />
             </div>
             <button
@@ -297,8 +294,8 @@ export default function VolunteersManagement() {
             </div>
           )}
 
-          {/* Volunteers Table */}
-          <div className="bg-card border border-border rounded-lg overflow-hidden shadow-lg">
+          {/* Volunteers Table - Desktop View */}
+          <div className="bg-card border border-border rounded-lg overflow-hidden shadow-lg hidden md:block">
             {filteredVolunteers.length === 0 ? (
               <div className="p-8 text-center text-muted-foreground">
                 <User className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -421,6 +418,138 @@ export default function VolunteersManagement() {
                   </tbody>
                 </table>
               </div>
+            )}
+          </div>
+
+          {/* Volunteers Cards - Mobile View */}
+          <div className="md:hidden space-y-4">
+            {filteredVolunteers.length === 0 ? (
+              <div className="p-8 text-center text-muted-foreground bg-card border border-border rounded-lg">
+                <User className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>No volunteers found</p>
+              </div>
+            ) : (
+              filteredVolunteers.map((volunteer) => (
+                <div
+                  key={volunteer.id}
+                  className="bg-card border border-border rounded-lg p-4 space-y-3"
+                >
+                  {/* Header with Profile */}
+                  <div className="flex items-start gap-3">
+                    {volunteer.student?.profileImageUrl && (
+                      <img
+                        src={volunteer.student.profileImageUrl}
+                        alt={volunteer.student.name}
+                        className="w-10 h-10 rounded-full flex-shrink-0"
+                      />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-foreground truncate">
+                        {volunteer.student?.name}
+                      </h3>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {volunteer.student?.email}
+                      </p>
+                    </div>
+                    {/* Status Badge */}
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      {volunteer.isActive ? (
+                        volunteer.isVerified ? (
+                          <>
+                            <CheckCircle className="w-4 h-4 text-green-600" />
+                            <span className="text-xs font-bold text-green-600">
+                              Verified
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <Clock className="w-4 h-4 text-yellow-600" />
+                            <span className="text-xs font-bold text-yellow-600">
+                              Pending
+                            </span>
+                          </>
+                        )
+                      ) : (
+                        <>
+                          <AlertCircle className="w-4 h-4 text-red-600" />
+                          <span className="text-xs font-bold text-red-600">
+                            Inactive
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="h-px bg-border" />
+
+                  {/* Details Grid */}
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <p className="text-xs text-muted-foreground font-semibold mb-1">
+                        Enrollment
+                      </p>
+                      <p className="font-mono text-foreground">
+                        {volunteer.student?.enrollmentNumber}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground font-semibold mb-1">
+                        Designation
+                      </p>
+                      <p className="text-foreground">{volunteer.designation}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground font-semibold mb-1">
+                        Branch
+                      </p>
+                      <p className="text-foreground">{volunteer.student?.branch}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground font-semibold mb-1">
+                        Assigned
+                      </p>
+                      <p className="text-foreground">
+                        {volunteer.assignedAt
+                          ? new Date(volunteer.assignedAt).toLocaleDateString()
+                          : "-"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Verification Notes */}
+                  {volunteer.verificationNotes && (
+                    <div className="bg-muted/50 rounded p-2">
+                      <p className="text-xs text-muted-foreground font-semibold mb-1">
+                        Notes
+                      </p>
+                      <p className="text-xs text-foreground">
+                        {volunteer.verificationNotes}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Actions */}
+                  <div className="flex gap-2 pt-2">
+                    <button
+                      onClick={() => openEditModal(volunteer)}
+                      className="flex-1 px-3 py-2 bg-brand/10 text-brand rounded-lg font-semibold text-sm hover:bg-brand/20 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                      Edit
+                    </button>
+                    {volunteer.isActive && (
+                      <button
+                        onClick={() => handleDeactivateVolunteer(volunteer.id)}
+                        className="flex-1 px-3 py-2 bg-red-500/10 text-red-600 rounded-lg font-semibold text-sm hover:bg-red-500/20 transition-colors flex items-center justify-center gap-2"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Deactivate
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))
             )}
           </div>
 

@@ -159,7 +159,7 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-background overflow-hidden">
       {/* Top Bar */}
-      <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-xl border-b border-border">
+      <header className="fixed w-full top-0 z-50 bg-card/80 backdrop-blur-xl border-b border-border">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center">
@@ -169,7 +169,7 @@ export default function AdminDashboard() {
               <h1 className="text-lg font-black text-foreground tracking-tight">
                 Admin Panel
               </h1>
-              <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest">
+              <p className="text-xs text-brand font-medium uppercase tracking-widest">
                 RGI T&P Cell
               </p>
             </div>

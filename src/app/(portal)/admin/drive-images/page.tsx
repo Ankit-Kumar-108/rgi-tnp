@@ -41,22 +41,16 @@ export default function DriveImagesAdminPage() {
               <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center">
                 <Shield className="w-5 h-5 text-brand" />
               </div>
-              <div>
+              <div className="flex gap-3">
                 <h1 className="text-lg font-black text-foreground tracking-tight">
                   Drive Images
                 </h1>
-                <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest">
-                  Admin Panel • RGI T&P Cell
-                </p>
+                <h1 className="hidden font-bold md:block text-lg text-brand tracking-tight">
+                  Management
+                </h1>
               </div>
             </div>
           </div>
-          <Link
-            href="/admin/dashboard"
-            className="text-sm text-muted-foreground hover:text-foreground font-medium transition-colors"
-          >
-            ← Back to Dashboard
-          </Link>
         </div>
       </header>
 

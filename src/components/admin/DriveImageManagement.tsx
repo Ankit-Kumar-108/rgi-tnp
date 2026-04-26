@@ -51,9 +51,7 @@ const EMPTY_SLOTS: ImageSlot[] = Array.from({ length: 4 }, () => ({
   preview: null,
 }));
 
-/* ──────────────────────────────────────────────
-   Component
-   ────────────────────────────────────────────── */
+/* Component*/
 
 export default function DriveImageManagement() {
   // ── State ──
@@ -289,21 +287,19 @@ export default function DriveImageManagement() {
     >,
   );
 
-  /* ──────────────────────────────────────────────
-     Render
-     ────────────────────────────────────────────── */
+  /* Render*/
   return (
     <div className="space-y-10">
       {/* ── Header ── */}
       <div className="flex items-center gap-4">
-        <div className="w-12 h-12 bg-brand/10 rounded-2xl flex items-center justify-center">
+        <div className="w-12 h-12 bg-brand/10 rounded-2xl flex items-center justify-center shrink-0">
           <Images className="w-6 h-6 text-brand" />
         </div>
         <div>
-          <h2 className="text-2xl font-black tracking-tight text-foreground">
+          <h2 className="text-lg md:text-xl lg:text-2xl font-black tracking-tight text-foreground">
             Drive Image Management
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground flex flex-wrap gap-1 items-center">
             Upload up to 4 images per placement drive for the homepage marquee
           </p>
         </div>
@@ -412,7 +408,7 @@ export default function DriveImageManagement() {
                       htmlFor={`slot-input-${index}`}
                       onDragOver={(e) => e.preventDefault()}
                       onDrop={(e) => handleSlotDrop(index, e)}
-                      className="aspect-[4/3] rounded-2xl border-2 border-dashed border-border hover:border-brand/50 bg-muted/30 hover:bg-brand/5 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all group/slot"
+                      className="aspect-4/3 rounded-2xl border-2 border-dashed border-border hover:border-brand/50 bg-muted/30 hover:bg-brand/5 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all group/slot"
                     >
                       <div className="w-10 h-10 rounded-xl bg-brand/10 flex items-center justify-center group-hover/slot:bg-brand/20 transition-colors">
                         <ImagePlus className="w-5 h-5 text-brand" />
@@ -493,9 +489,7 @@ export default function DriveImageManagement() {
         </div>
       </div>
 
-      {/* ═══════════════════════════════════════════
-          Uploaded Images (grouped by drive)
-          ═══════════════════════════════════════════ */}
+      {/*Uploaded Images (grouped by drive)*/}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold text-foreground">
@@ -542,11 +536,13 @@ export default function DriveImageManagement() {
                         {drive.companyName}
                       </h4>
                       <p className="text-xs text-muted-foreground">
-                        {groupTitle} •{" "}
+                        {groupTitle}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
                         {new Date(drive.driveDate).toLocaleDateString()}
                       </p>
                     </div>
-                    <span className="text-xs font-bold text-brand bg-brand/10 px-3 py-1 rounded-full">
+                    <span className="text-xs font-bold text-brand bg-brand/10 px-3 py-2 rounded-full flex items-center gap-1">
                       {groupImages.length}/4 images
                     </span>
                   </div>
@@ -556,7 +552,7 @@ export default function DriveImageManagement() {
                     {groupImages.map((image) => (
                       <div
                         key={image.id}
-                        className="relative group rounded-xl overflow-hidden aspect-[4/3] bg-muted"
+                        className="relative group rounded-xl overflow-hidden aspect-4/3 bg-muted"
                       >
                         <img
                           src={image.imageUrl}

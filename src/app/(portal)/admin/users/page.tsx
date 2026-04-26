@@ -32,7 +32,7 @@ const BRANCHES = [
 function Avatar({ url, name, isVerified }: { url?: string; name?: string; isVerified?: boolean }) {
   const ringColor = isVerified ? "ring-emerald-500" : isVerified === false ? "ring-amber-400" : "ring-border";
   return (
-    <div className={`w-12 h-12 rounded-full ring-2 ${ringColor} ring-offset-2 ring-offset-card overflow-hidden bg-muted flex items-center justify-center shrink-0`}>
+    <div className={`size-32 rounded-full ring-2 ${ringColor} ring-offset-2 ring-offset-card overflow-hidden bg-muted flex items-center justify-center shrink-0`}>
       {url ? (
         <img src={url} alt={name} className="w-full h-full object-cover object-top" />
       ) : (
@@ -212,7 +212,7 @@ export default function AdminUsersPage() {
     <div className="min-h-screen bg-background pb-12 overflow-hidden">
       
       {/* Sticky Header */}
-      <header className="sticky top-0 z-40 bg-card/80 backdrop-blur-xl border-b border-border">
+      <header className="fixed w-full top-0 z-40 bg-card/80 backdrop-blur-xl border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 min-h-16 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
           
           {/* Left: back + title */}
@@ -260,9 +260,9 @@ export default function AdminUsersPage() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+      <main className="max-w-7xl mx-auto px-4 mt-15 sm:px-6 py-6 space-y-6">
         
-        {/* ── Tabs ────────────────────────────────────────────────────────── */}
+        {/* Tabs */}
         <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
           {TABS.map((tab) => (
             <button key={tab.key} onClick={() => handleTabChange(tab.key)}
@@ -277,7 +277,7 @@ export default function AdminUsersPage() {
           ))}
         </div>
 
-        {/* ── Search & Filters ───────────────────────────────────────────── */}
+        {/*Search & Filters */}
         <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
@@ -365,14 +365,20 @@ export default function AdminUsersPage() {
                     className={`group bg-card border rounded-xl px-5 py-4 transition-all cursor-pointer select-none
                       ${isSelected ? "border-brand ring-1 ring-brand/20 bg-brand/15" : "border-border hover:border-border/80 hover:shadow-sm"}`}>
                     
-                    <div className="flex items-start gap-4">
+                    <div className="flex flex-col md:flex-row items-start gap-4">
                       {/* Checkbox */}
                       <input type="checkbox" onClick={e => e.stopPropagation()}
                         className="mt-1 w-4 h-4 rounded border-border accent-brand cursor-pointer shrink-0"
                         checked={isSelected} onChange={() => toggleSelection(user.id)} />
 
-                      {/* Avatar */}
+                      {/* Avatar Desktop */}
+                      <div className="hidden md:block">
                       <Avatar url={user.profileImageUrl} name={user.name} isVerified={isVerified} />
+                      </div>
+                      {/* Avatar Mobile */}
+                      <div className="md:hidden w-full flex justify-center">
+                        <Avatar url={user.profileImageUrl} name={user.name} isVerified={isVerified} />
+                      </div>
 
                       {/* Content */}
                       <div className="flex-1 min-w-0">

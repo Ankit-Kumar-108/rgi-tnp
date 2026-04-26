@@ -170,7 +170,7 @@ export default function PublishedManagementPage() {
   return (
     <div className="min-h-screen bg-background overflow-hidden">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-card/90 backdrop-blur-md border-b border-border">
+      <header className="fixed w-full top-0 z-50 bg-card/90 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3">
           <Link href="/admin/dashboard" className="text-muted-foreground hover:text-brand transition-colors p-1">
             <ArrowLeft className="w-5 h-5" />
@@ -179,7 +179,7 @@ export default function PublishedManagementPage() {
             <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-lg sm:rounded-xl flex items-center justify-center">
               <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
             </div>
-            <h1 className="text-base sm:text-lg font-bold tracking-tight text-foreground">Published Management</h1>
+            <h1 className="text-base sm:text-lg font-bold tracking-tight text-foreground flex gap-3">Published <span className="text-brand hidden sm:block">Management</span></h1>
           </div>
 
           <div className="ml-auto flex gap-1.5 sm:gap-2">
@@ -209,7 +209,7 @@ export default function PublishedManagementPage() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <main className="max-w-7xl mt-15 mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Category Tabs */}
         <div className="flex gap-1.5 sm:gap-2 mb-6 sm:mb-8 overflow-x-auto pb-2 scrollbar-none">
           {TABS.map((tab) => (
@@ -245,7 +245,12 @@ export default function PublishedManagementPage() {
                 }`}
               >
                 <feedbackTab.icon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                {feedbackTab.label}
+                <div className="hidden md:block">
+                  {feedbackTab.label}
+                </div>
+                <div className="md:hidden">
+                  {feedbackTab.label.split(" ")[0]}
+                </div>
               </button>
             ))}
           </div>
