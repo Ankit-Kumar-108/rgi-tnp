@@ -261,7 +261,7 @@ export default function Home() {
               </div>
 
               {/* Carousel viewport — all slides stacked, crossfade via opacity */}
-              <div className="relative" style={{ minHeight: "480px" }}>
+              <div className="relative">
                 {driveGroups.map((group, idx) => {
                   const isActive = idx === currentGroupIndex;
                   return (
