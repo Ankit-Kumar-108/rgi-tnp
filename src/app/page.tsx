@@ -183,7 +183,7 @@ export default function Home() {
     <div className="min-h-screen bg-background text-foreground overflow-hidden">
       {/* Fixed Top Navigation */}
       <Nav />
-      <main className="pt-20">
+      <main className="pt-10">
         {/* Hero Section */}
         <section className="bg-brand/5">
           <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-20 py-16 lg:py-24">
