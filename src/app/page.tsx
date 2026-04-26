@@ -299,7 +299,7 @@ export default function Home() {
                             <img
                               src={group.images[0].imageUrl}
                               alt={group.images[0].title}
-                              className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700"
+                              className="w-full h-full object-cover object-top group-hover/img:scale-105 transition-transform duration-700"
                               loading="lazy"
                             />
                             <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
@@ -311,7 +311,7 @@ export default function Home() {
                             <img
                               src={group.images[1].imageUrl}
                               alt={group.images[1].title}
-                              className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700"
+                              className="w-full h-full object-cover object-top group-hover/img:scale-105 transition-transform duration-700"
                               loading="lazy"
                             />
                             <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
@@ -323,7 +323,7 @@ export default function Home() {
                             <img
                               src={group.images[2].imageUrl}
                               alt={group.images[2].title}
-                              className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700"
+                              className="w-full h-full object-cover object-top group-hover/img:scale-105 transition-transform duration-700"
                               loading="lazy"
                             />
                             <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
@@ -335,7 +335,7 @@ export default function Home() {
                             <img
                               src={group.images[3].imageUrl}
                               alt={group.images[3].title}
-                              className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700"
+                              className="w-full h-full object-cover object-top group-hover/img:scale-105 transition-transform duration-700"
                               loading="lazy"
                             />
                             <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
