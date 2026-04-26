@@ -326,7 +326,7 @@ export default function ExternalStudentDashboard() {
                     className="bg-brand text-primary-foreground px-8 py-3.5 rounded-full font-bold hover:opacity-90 transition-opacity shadow-[var(--shadow-brand)] disabled:opacity-50 flex items-center gap-2"
                   >
                     {submittingProfile ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                    Save Profile
+                    Save <span className="hidden sm:block"></span>
                   </button>
                   <button type="button" onClick={() => setShowProfileForm(false)}
                     className="bg-muted text-foreground px-8 py-3.5 rounded-xl font-bold hover:bg-muted/80 transition-colors"

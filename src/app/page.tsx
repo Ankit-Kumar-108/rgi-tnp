@@ -292,7 +292,7 @@ export default function Home() {
                       </div>
 
                       {/* 4-image asymmetric grid */}
-                      <div className="grid grid-cols-4 grid-rows-2 gap-3 md:gap-4 h-70 md:h-105">
+                      <div className="grid grid-cols-4 grid-rows-2 gap-2 md:gap-4 h-70 md:h-105">
                         {/* Image 1 — large (spans 2 cols, 2 rows) */}
                         {group.images[0] && (
                           <div className="col-span-2 row-span-2 rounded-2xl overflow-hidden relative group/img shadow-lg">

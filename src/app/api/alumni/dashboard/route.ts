@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Get referrals with counts at database level (avoid filtering in-memory)
-    const [referrals, feedbacks, referralCounts] = await Promise.all([
+    const [referrals, feedbacks, memories, referralCounts] = await Promise.all([
       db.referral.findMany({
         where: { alumniId: alumni.id },
         orderBy: { id: "desc" },
@@ -48,6 +48,11 @@ export async function GET(req: NextRequest) {
       }),
       db.alumniFeedback.findMany({
         where: { alumniId: alumni.id },
+      }),
+      db.memory.findMany({
+        where: { alumniId: alumni.id },
+        take: 20,
+        orderBy: { createdAt: "desc" },
       }),
       Promise.all([
         db.referral.count({ where: { alumniId: alumni.id } }),
@@ -62,6 +67,7 @@ export async function GET(req: NextRequest) {
       success: true,
       alumni: alumniData,
       referrals,
+      memories,
       stats: {
         totalReferrals,
         approvedReferrals,

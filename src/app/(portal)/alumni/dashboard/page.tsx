@@ -29,7 +29,10 @@ import {
   Calendar,
   Users,
   Award,
-  ExternalLink
+  ExternalLink,
+  Camera,
+  Trash2,
+  Upload
 } from "lucide-react";
 import Nav from "@/components/layout/nav/nav";
 import Footer from "@/components/layout/footer/footer";
@@ -37,20 +40,21 @@ import { useAuth } from "@/hooks/useAuth";
 import { getToken, logout } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { DriveRegistration, Memory, PlacementDrive, Student } from "@/types";
+import { uploadFileToR2 } from "@/lib/upload-r2";
 
 export default function AlumniDashboard() {
   const { loading: authLoading, authenticated, user } = useAuth("alumni", "/alumni/login");
-  const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const router = useRouter();
 
   // Referral form
-  const [refForm, setRefForm] = useState({ 
-    companyName: "", 
+  const [refForm, setRefForm] = useState({
+    companyName: "",
     jobType: "",
-    position: "", 
-    description: "", 
+    position: "",
+    description: "",
     location: "",
     minCGPA: "",
     experience: "",
@@ -58,7 +62,7 @@ export default function AlumniDashboard() {
     refrerralLink: "",
     referralCode: "",
     deadline: "",
-    applyLink: "" 
+    applyLink: ""
   });
   const [submittingRef, setSubmittingRef] = useState(false);
   const [refMsg, setRefMsg] = useState<{ msg: string; ok: boolean; errors?: any } | null>(null);
@@ -70,6 +74,15 @@ export default function AlumniDashboard() {
   const [submittingFb, setSubmittingFb] = useState(false);
   const [fbMsg, setFbMsg] = useState<{ msg: string; ok: boolean } | null>(null);
   const [fbSubmitted, setFbSubmitted] = useState(false);
+
+  // Memory Modal State
+    const [isMemModalOpen, setIsMemModalOpen] = useState(false);
+    const [selectedMemFiles, setSelectedMemFiles] = useState<File[]>([]);
+    const [memBatchTitle, setMemBatchTitle] = useState("");
+    const [memPreviews, setMemPreviews] = useState<string[]>([]);
+  const [data, setData] = useState<any>(null);
+  const [memUploading, setMemUploading] = useState(false);
+  
 
   // Profile Form
   const [profileForm, setProfileForm] = useState({
@@ -145,14 +158,14 @@ export default function AlumniDashboard() {
       });
       const d = (await res.json()) as any;
       setRefMsg({ msg: d.message, ok: d.success, errors: d.errors });
-      
+
       if (d.success) {
         toast.success("Referral submitted successfully! Awaiting admin approval.");
-        setRefForm({ 
-          companyName: "", 
+        setRefForm({
+          companyName: "",
           jobType: "",
-          position: "", 
-          description: "", 
+          position: "",
+          description: "",
           location: "",
           minCGPA: "",
           experience: "",
@@ -160,7 +173,7 @@ export default function AlumniDashboard() {
           refrerralLink: "",
           referralCode: "",
           deadline: "",
-          applyLink: "" 
+          applyLink: ""
         });
         fetchDashboard();
       } else {
@@ -248,6 +261,106 @@ export default function AlumniDashboard() {
   const [showReferralModal, setShowReferralModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
+  const handleMemoryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    const oversized = files.some(f => f.size > 10 * 1024 * 1024);
+    if (oversized) {
+      toast.error("One or more images are larger than 10MB");
+      return;
+    }
+
+    setSelectedMemFiles(files);
+    setMemBatchTitle("");
+
+    const previewPromises = files.map(file => {
+      return new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(file);
+      });
+    });
+
+    const results = await Promise.all(previewPromises);
+    setMemPreviews(results);
+    setIsMemModalOpen(true);
+  };
+
+  const startMemoryUpload = async () => {
+    if (selectedMemFiles.length === 0) {
+      toast.error("Please select at least one image.");
+      return;
+    }
+
+    try {
+      setMemUploading(true);
+
+      const uploadPromises = selectedMemFiles.map((file) =>
+        uploadFileToR2(file, "memories", { role: "alumni" }),
+      );
+      const imageUrls = await Promise.all(uploadPromises);
+
+      const memories = imageUrls.map(url => ({
+        imageUrl: url,
+        title: memBatchTitle || "Untitled Memory"
+      }));
+
+      const token = getToken("alumni");
+      const res = await fetch("/api/alumni/memories", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ memories }),
+      });
+
+      const d = await res.json() as any
+      if (d.success) {
+        toast.success(d.message || "Memories uploaded! They will appear after moderation.");
+        setIsMemModalOpen(false);
+        setSelectedMemFiles([]);
+        setMemPreviews([]);
+        setMemBatchTitle("");
+        fetchDashboard();
+      } else {
+        throw new Error(d.message);
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Upload failed: " + err.message);
+    } finally {
+      setMemUploading(false);
+    }
+  };
+
+  const handleDeleteMemory = async (id: string) => {
+    try {
+      if (!window.confirm("Are you sure you want to delete this memory?")) return;
+      const token = getToken("alumni");
+      const res = await fetch("/api/alumni/memories", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ memoryIds: [id] })
+      });
+      const d = await res.json() as any;
+      if (d.success) {
+        toast.success("Memory deleted successfully!");
+        fetchDashboard();
+      } else {
+        throw new Error(d.message);
+      }
+
+    } catch (error: any) {
+      console.error("Error deleting memory:", error);
+      toast.error("Failed to delete memory. Please try again.");
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "published": return "bg-green-500/10 text-green-600";
@@ -269,6 +382,7 @@ export default function AlumniDashboard() {
   const isProfileIncomplete = alumni && (!alumni.jobTitle || !alumni.currentCompany || !alumni.city || !alumni.linkedInUrl);
   const referrals = data?.referrals || [];
   const stats = data?.stats || {};
+  const memories = data?.memories || [];
 
   return (
     <>
@@ -413,11 +527,11 @@ export default function AlumniDashboard() {
           {showProfileForm && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6">
               {/* Backdrop */}
-              <div 
+              <div
                 className="absolute w-full h-[120%] bg-background/60 backdrop-blur-xl animate-in fade-in duration-300"
                 onClick={() => setShowProfileForm(false)}
               />
-              
+
               {/* Modal Container */}
               <section className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-card rounded-[2.5rem] p-6 md:p-10 shadow-2xl border border-brand/20 animate-in zoom-in-95 duration-300">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6 border-b border-border/50">
@@ -435,7 +549,7 @@ export default function AlumniDashboard() {
                     onClick={() => setShowProfileForm(false)}
                     className="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground hover:text-foreground"
                   >
-                    <X className="size-7" /> 
+                    <X className="size-7" />
                   </button>
                 </div>
 
@@ -637,394 +751,454 @@ export default function AlumniDashboard() {
                     <button onClick={() => setShowReferralModal(false)} className="absolute top-4 right-4 z-10 p-2 text-muted-foreground hover:bg-muted rounded-full">
                       <X className="w-5 h-5" />
                     </button>
-                {/* Decorative accents */}
-                <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-brand/[0.06] via-brand/[0.02] to-transparent rounded-bl-[6rem]" />
-                <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-blue-500/[0.04] to-transparent rounded-tr-[4rem]" />
-                <div className="absolute top-1/3 -right-6 w-12 h-12 bg-brand/5 rounded-full blur-xl" />
+                    {/* Decorative accents */}
+                    <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-brand/[0.06] via-brand/[0.02] to-transparent rounded-bl-[6rem]" />
+                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-blue-500/[0.04] to-transparent rounded-tr-[4rem]" />
+                    <div className="absolute top-1/3 -right-6 w-12 h-12 bg-brand/5 rounded-full blur-xl" />
 
-                <div className="relative p-5 md:p-6 space-y-6">
-                  {/* Header */}
-                  <div className="flex items-start gap-3">
-                    <div className="relative shrink-0">
-                      <div className="w-10 h-10 bg-gradient-to-br from-brand/25 to-brand/10 rounded-xl flex items-center justify-center shadow-inner">
-                        <Send className="w-5 h-5 text-brand" />
+                    <div className="relative p-5 md:p-6 space-y-6">
+                      {/* Header */}
+                      <div className="flex items-start gap-3">
+                        <div className="relative shrink-0">
+                          <div className="w-10 h-10 bg-gradient-to-br from-brand/25 to-brand/10 rounded-xl flex items-center justify-center shadow-inner">
+                            <Send className="w-5 h-5 text-brand" />
+                          </div>
+                          <div className="absolute -top-1 -right-1 w-3 h-3 bg-brand/20 rounded-full flex items-center justify-center">
+                            <Sparkles className="w-2 h-2 text-brand" />
+                          </div>
+                        </div>
+                        <div>
+                          <h2 className="text-lg md:text-xl font-black text-foreground tracking-tight leading-tight">Post a Referral</h2>
+                          <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed max-w-md">
+                            Share job opportunities with RGI students. Admin reviews before publishing.
+                          </p>
+                        </div>
                       </div>
-                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-brand/20 rounded-full flex items-center justify-center">
-                        <Sparkles className="w-2 h-2 text-brand" />
-                      </div>
-                    </div>
-                    <div>
-                      <h2 className="text-lg md:text-xl font-black text-foreground tracking-tight leading-tight">Post a Referral</h2>
-                      <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed max-w-md">
-                        Share job opportunities with RGI students. Admin reviews before publishing.
-                      </p>
+
+                      <form onSubmit={handleSubmitReferral} className="space-y-5">
+                        {/* Section 1: Company & Role */}
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-2 mb-1">
+                            <div className="w-6 h-6 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                              <Building2 className="w-3.5 h-3.5 text-blue-500" />
+                            </div>
+                            <span className="text-xs md:text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Company & Role</span>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Company Name *</label>
+                              <div className="relative group/input">
+                                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-muted/80 rounded-xl flex items-center justify-center border border-border/50 group-focus-within/input:border-brand/30 group-focus-within/input:bg-brand/5 transition-all">
+                                  <Building2 className="w-3.5 h-3.5 text-muted-foreground group-focus-within/input:text-brand transition-colors" />
+                                </div>
+                                <input required value={refForm.companyName} onChange={(e) => setRefForm({ ...refForm, companyName: e.target.value })}
+                                  className="w-full bg-muted/40 pl-14 pr-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium placeholder:text-muted-foreground/40"
+                                  placeholder="e.g. Google" />
+                              </div>
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Job Type *</label>
+                              <div className="relative group/input">
+                                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-muted/80 rounded-xl flex items-center justify-center border border-border/50 group-focus-within/input:border-brand/30 group-focus-within/input:bg-brand/5 transition-all">
+                                  <Briefcase className="w-3.5 h-3.5 text-muted-foreground group-focus-within/input:text-brand transition-colors" />
+                                </div>
+                                <select value={refForm.jobType} onChange={(e) => setRefForm({ ...refForm, jobType: e.target.value })}
+                                  className="w-full bg-muted/40 pl-14 pr-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium appearance-none cursor-pointer">
+                                  <option value="">Select Type</option>
+                                  <option value="Full-time">Full-time</option>
+                                  <option value="Part-time">Part-time</option>
+                                  <option value="Internship">Internship</option>
+                                  <option value="Contract/Bond">Contract</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Role / Position *</label>
+                              <div className="relative group/input">
+                                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-muted/80 rounded-xl flex items-center justify-center border border-border/50 group-focus-within/input:border-brand/30 group-focus-within/input:bg-brand/5 transition-all">
+                                  <Award className="w-3.5 h-3.5 text-muted-foreground group-focus-within/input:text-brand transition-colors" />
+                                </div>
+                                <input required value={refForm.position} onChange={(e) => setRefForm({ ...refForm, position: e.target.value })}
+                                  className="w-full bg-muted/40 pl-14 pr-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium placeholder:text-muted-foreground/40"
+                                  placeholder="e.g. SDE Intern" />
+                              </div>
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Location</label>
+                              <div className="relative group/input">
+                                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-muted/80 rounded-xl flex items-center justify-center border border-border/50 group-focus-within/input:border-brand/30 group-focus-within/input:bg-brand/5 transition-all">
+                                  <MapPin className="w-3.5 h-3.5 text-muted-foreground group-focus-within/input:text-brand transition-colors" />
+                                </div>
+                                <input value={refForm.location} onChange={(e) => setRefForm({ ...refForm, location: e.target.value })}
+                                  className="w-full bg-muted/40 pl-14 pr-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium placeholder:text-muted-foreground/40"
+                                  placeholder="e.g. Bangalore, India" />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Divider */}
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+                        </div>
+
+                        {/* Section 2: Description */}
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-2 mb-1">
+                            <div className="w-6 h-6 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                              <FileText className="w-3.5 h-3.5 text-purple-500" />
+                            </div>
+                            <span className="text-xs md:text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Job Description</span>
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Description *</label>
+                            <textarea required value={refForm.description} onChange={(e) => setRefForm({ ...refForm, description: e.target.value })} rows={3}
+                              className="w-full bg-muted/40 px-5 py-4 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none resize-none text-foreground font-medium placeholder:text-muted-foreground/40 min-h-[110px] leading-relaxed"
+                              placeholder="Job details, responsibilities, required skills, eligibility criteria..." />
+                          </div>
+                        </div>
+
+                        {/* Divider */}
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+                        </div>
+
+                        {/* Section 3: Requirements */}
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-2 mb-1">
+                            <div className="w-6 h-6 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                              <Users className="w-3.5 h-3.5 text-amber-500" />
+                            </div>
+                            <span className="text-xs md:text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Requirements & Eligibility</span>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Min CGPA</label>
+                              <input type="number" step="0.01" value={refForm.minCGPA} onChange={(e) => setRefForm({ ...refForm, minCGPA: e.target.value })}
+                                className="w-full bg-muted/40 px-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium placeholder:text-muted-foreground/40"
+                                placeholder="e.g. 7.0" />
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Experience</label>
+                              <input value={refForm.experience} onChange={(e) => setRefForm({ ...refForm, experience: e.target.value })}
+                                className="w-full bg-muted/40 px-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium placeholder:text-muted-foreground/40"
+                                placeholder="e.g. 0-1 years" />
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Batch Eligible</label>
+                              <input value={refForm.batchEligible} onChange={(e) => setRefForm({ ...refForm, batchEligible: e.target.value })}
+                                className="w-full bg-muted/40 px-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium placeholder:text-muted-foreground/40"
+                                placeholder="e.g. 2024, 2025" />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Divider */}
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+                        </div>
+
+                        {/* Section 4: Links & Deadline */}
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-2 mb-1">
+                            <div className="w-6 h-6 rounded-lg bg-green-500/10 flex items-center justify-center">
+                              <Link2 className="w-3.5 h-3.5 text-green-500" />
+                            </div>
+                            <span className="text-xs md:text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Links & Deadline</span>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">
+                                Referral Code <span className="text-brand/60 normal-case tracking-normal">(Optional)</span>
+                              </label>
+                              <input value={refForm.referralCode} onChange={(e) => setRefForm({ ...refForm, referralCode: e.target.value })}
+                                className="w-full bg-muted/40 px-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium placeholder:text-muted-foreground/40"
+                                placeholder="e.g. REF2024" />
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Deadline</label>
+                              <div className="relative group/input">
+                                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-muted/80 rounded-xl flex items-center justify-center border border-border/50 group-focus-within/input:border-brand/30 group-focus-within/input:bg-brand/5 transition-all">
+                                  <Calendar className="w-3.5 h-3.5 text-muted-foreground group-focus-within/input:text-brand transition-colors" />
+                                </div>
+                                <input type="date" value={refForm.deadline} onChange={(e) => setRefForm({ ...refForm, deadline: e.target.value })}
+                                  className="w-full bg-muted/40 pl-14 pr-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium" />
+                              </div>
+                            </div>
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">
+                              Referral Link <span className="text-brand/60 normal-case tracking-normal">(Optional)</span>
+                            </label>
+                            <div className="relative group/input">
+                              <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-muted/80 rounded-xl flex items-center justify-center border border-border/50 group-focus-within/input:border-brand/30 group-focus-within/input:bg-brand/5 transition-all">
+                                <ExternalLink className="w-3.5 h-3.5 text-muted-foreground group-focus-within/input:text-brand transition-colors" />
+                              </div>
+                              <input value={refForm.refrerralLink} onChange={(e) => setRefForm({ ...refForm, refrerralLink: e.target.value })}
+                                className="w-full bg-muted/40 pl-14 pr-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium placeholder:text-muted-foreground/40"
+                                placeholder="https://referral-link.com" />
+                            </div>
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Apply Link / Email *</label>
+                            <div className="relative group/input">
+                              <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-brand/10 rounded-xl flex items-center justify-center border border-brand/20">
+                                <ExternalLink className="w-3.5 h-3.5 text-brand" />
+                              </div>
+                              <input required value={refForm.applyLink} onChange={(e) => setRefForm({ ...refForm, applyLink: e.target.value })}
+                                className="w-full bg-muted/40 pl-14 pr-5 py-3.5 rounded-xl border border-transparent hover:border-brand/20 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium placeholder:text-muted-foreground/40"
+                                placeholder="https://careers.google.com/..." />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Validation Messages */}
+                        {refMsg && (
+                          <div className={`p-4 rounded-xl flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-300 ${refMsg.ok
+                              ? "bg-green-500/10 border border-green-500/20 text-green-600"
+                              : "bg-destructive/10 border border-destructive/20 text-destructive"
+                            }`}>
+                            {refMsg.ok ? <CheckCircle className="w-4 h-4 mt-0.5 shrink-0" /> : <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />}
+                            <div className="space-y-1">
+                              <p className="text-sm font-bold">{refMsg.msg}</p>
+                              {refMsg.errors?.fieldErrors && (
+                                <ul className="text-xs space-y-0.5 opacity-80">
+                                  {Object.entries(refMsg.errors.fieldErrors).map(([field, errors]: [string, any]) => (
+                                    <li key={field}>â€¢ <span className="font-semibold capitalize">{field.replace(/([A-Z])/g, ' $1')}:</span> {errors[0]}</li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Submit Button */}
+                        <button type="submit" disabled={submittingRef}
+                          className="group/btn w-full md:w-auto relative overflow-hidden bg-brand hover:opacity-90 text-primary-foreground px-8 py-3 rounded-xl font-black shadow-[var(--shadow-brand)]  disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-3 transition-all duration-300"
+                        >
+                          {/* Shimmer */}
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out" />
+                          <span className="relative flex items-center gap-2.5 text-sm">
+                            {submittingRef ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform duration-300" />}
+                            {submittingRef ? "Submitting..." : "Submit Referral"}
+                          </span>
+                        </button>
+                      </form>
                     </div>
                   </div>
+                </div>
+              )}
 
-                  <form onSubmit={handleSubmitReferral} className="space-y-5">
-                    {/* Section 1: Company & Role */}
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="w-6 h-6 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                          <Building2 className="w-3.5 h-3.5 text-blue-500" />
+              {/*Feedback Modal*/}
+              {showFeedbackModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                  <div className="absolute inset-0 bg-background/60 backdrop-blur-xl animate-in fade-in duration-300" onClick={() => setShowFeedbackModal(false)} />
+                  <div className="relative w-full max-w-2xl animate-in zoom-in-95 duration-300">
+                    {fbSubmitted ? (
+                      <div className="relative overflow-hidden rounded-2xl border border-green-500/30 bg-gradient-to-br from-green-500/5 via-emerald-500/5 to-teal-500/5 p-6 md:p-8 text-center flex flex-col items-center justify-center bg-card">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-green-500/10 to-transparent rounded-bl-[4rem]" />
+                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-emerald-500/10 to-transparent rounded-tr-[3rem]" />
+                        <div className="relative space-y-4">
+                          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-500/15 mx-auto">
+                            <Heart className="w-10 h-10 text-green-500 fill-green-500 animate-pulse" />
+                          </div>
+                          <h3 className="text-2xl md:text-3xl font-black text-foreground tracking-tight">Thank You!</h3>
+                          <p className="text-sm text-muted-foreground max-w-xs mx-auto leading-relaxed">
+                            Your feedback helps us build a better experience for everyone at RGI.
+                          </p>
                         </div>
-                        <span className="text-xs md:text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Company & Role</span>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Company Name *</label>
-                          <div className="relative group/input">
-                            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-muted/80 rounded-xl flex items-center justify-center border border-border/50 group-focus-within/input:border-brand/30 group-focus-within/input:bg-brand/5 transition-all">
-                              <Building2 className="w-3.5 h-3.5 text-muted-foreground group-focus-within/input:text-brand transition-colors" />
+                    ) : (
+                      <div className="relative overflow-hidden rounded-2xl border border-brand/20 bg-gradient-to-br from-brand/[0.03] via-background to-background shadow-xl shadow-brand/[0.04] text-left flex flex-col bg-card">
+                        <button onClick={() => setShowFeedbackModal(false)} className="absolute top-4 right-4 z-10 p-2 text-muted-foreground hover:bg-muted rounded-full">
+                          <X className="w-5 h-5" />
+                        </button>
+                        {/* Decorative Elements */}
+                        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-brand/8 via-brand/3 to-transparent rounded-bl-[5rem]" />
+                        <div className="absolute bottom-0 left-0 w-28 h-28 bg-gradient-to-tr from-brand/5 to-transparent rounded-tr-[3rem]" />
+
+                        <div className="relative p-5 md:p-6 space-y-5 flex flex-col flex-1">
+                          {/* Header */}
+                          <div className="flex items-start gap-3">
+                            <div className="relative shrink-0">
+                              <div className="w-10 h-10 bg-gradient-to-br from-brand/25 to-brand/10 rounded-xl flex items-center justify-center shadow-inner">
+                                <MessageSquareShare className="w-5 h-5 text-brand" />
+                              </div>
+                              <div className="absolute -top-1 -right-1 w-3 h-3 bg-brand/20 rounded-full flex items-center justify-center">
+                                <Sparkles className="w-2 h-2 text-brand" />
+                              </div>
                             </div>
-                            <input required value={refForm.companyName} onChange={(e) => setRefForm({ ...refForm, companyName: e.target.value })}
-                              className="w-full bg-muted/40 pl-14 pr-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium placeholder:text-muted-foreground/40"
-                              placeholder="e.g. Google" />
-                          </div>
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Job Type *</label>
-                          <div className="relative group/input">
-                            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-muted/80 rounded-xl flex items-center justify-center border border-border/50 group-focus-within/input:border-brand/30 group-focus-within/input:bg-brand/5 transition-all">
-                              <Briefcase className="w-3.5 h-3.5 text-muted-foreground group-focus-within/input:text-brand transition-colors" />
+                            <div>
+                              <h2 className="text-lg md:text-xl font-black text-foreground tracking-tight leading-tight">Share Feedback</h2>
+                              <p className="text-xs text-muted-foreground mt-0.5 font-medium">Your voice shapes our future</p>
                             </div>
-                            <select value={refForm.jobType} onChange={(e) => setRefForm({ ...refForm, jobType: e.target.value })}
-                              className="w-full bg-muted/40 pl-14 pr-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium appearance-none cursor-pointer">
-                              <option value="">Select Type</option>
-                              <option value="Full-time">Full-time</option>
-                              <option value="Part-time">Part-time</option>
-                              <option value="Internship">Internship</option>
-                              <option value="Contract/Bond">Contract</option>
-                            </select>
                           </div>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Role / Position *</label>
-                          <div className="relative group/input">
-                            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-muted/80 rounded-xl flex items-center justify-center border border-border/50 group-focus-within/input:border-brand/30 group-focus-within/input:bg-brand/5 transition-all">
-                              <Award className="w-3.5 h-3.5 text-muted-foreground group-focus-within/input:text-brand transition-colors" />
+
+                          {/* Context */}
+                          <div className="bg-muted/30 rounded-xl px-4 py-3 border border-border/50">
+                            <p className="text-xs text-muted-foreground leading-relaxed">
+                              <span className="font-semibold text-foreground">Help us improve.</span>{" "}
+                              Rate the syllabus relevance, batch preparedness, and suggest improvements.
+                            </p>
+                          </div>
+
+                          {/* Rating Section */}
+                          <div className="space-y-2.5">
+                            <div className="flex items-center justify-between">
+                              <p className="text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Your Rating</p>
+                              {(hoverRating || fbRating) > 0 && (
+                                <span className="text-xs font-bold text-brand bg-brand/10 px-2.5 py-0.5 rounded-full animate-in fade-in duration-200">
+                                  {["", "Poor", "Fair", "Good", "Great", "Excellent"][hoverRating || fbRating]}
+                                </span>
+                              )}
                             </div>
-                            <input required value={refForm.position} onChange={(e) => setRefForm({ ...refForm, position: e.target.value })}
-                              className="w-full bg-muted/40 pl-14 pr-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium placeholder:text-muted-foreground/40"
-                              placeholder="e.g. SDE Intern" />
-                          </div>
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Location</label>
-                          <div className="relative group/input">
-                            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-muted/80 rounded-xl flex items-center justify-center border border-border/50 group-focus-within/input:border-brand/30 group-focus-within/input:bg-brand/5 transition-all">
-                              <MapPin className="w-3.5 h-3.5 text-muted-foreground group-focus-within/input:text-brand transition-colors" />
-                            </div>
-                            <input value={refForm.location} onChange={(e) => setRefForm({ ...refForm, location: e.target.value })}
-                              className="w-full bg-muted/40 pl-14 pr-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium placeholder:text-muted-foreground/40"
-                              placeholder="e.g. Bangalore, India" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Divider */}
-                    <div className="flex items-center gap-3">
-                      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-                    </div>
-
-                    {/* Section 2: Description */}
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="w-6 h-6 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                          <FileText className="w-3.5 h-3.5 text-purple-500" />
-                        </div>
-                        <span className="text-xs md:text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Job Description</span>
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Description *</label>
-                        <textarea required value={refForm.description} onChange={(e) => setRefForm({ ...refForm, description: e.target.value })} rows={3}
-                          className="w-full bg-muted/40 px-5 py-4 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none resize-none text-foreground font-medium placeholder:text-muted-foreground/40 min-h-[110px] leading-relaxed"
-                          placeholder="Job details, responsibilities, required skills, eligibility criteria..." />
-                      </div>
-                    </div>
-
-                    {/* Divider */}
-                    <div className="flex items-center gap-3">
-                      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-                    </div>
-
-                    {/* Section 3: Requirements */}
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="w-6 h-6 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                          <Users className="w-3.5 h-3.5 text-amber-500" />
-                        </div>
-                        <span className="text-xs md:text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Requirements & Eligibility</span>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Min CGPA</label>
-                          <input type="number" step="0.01" value={refForm.minCGPA} onChange={(e) => setRefForm({ ...refForm, minCGPA: e.target.value })}
-                            className="w-full bg-muted/40 px-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium placeholder:text-muted-foreground/40"
-                            placeholder="e.g. 7.0" />
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Experience</label>
-                          <input value={refForm.experience} onChange={(e) => setRefForm({ ...refForm, experience: e.target.value })}
-                            className="w-full bg-muted/40 px-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium placeholder:text-muted-foreground/40"
-                            placeholder="e.g. 0-1 years" />
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Batch Eligible</label>
-                          <input value={refForm.batchEligible} onChange={(e) => setRefForm({ ...refForm, batchEligible: e.target.value })}
-                            className="w-full bg-muted/40 px-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium placeholder:text-muted-foreground/40"
-                            placeholder="e.g. 2024, 2025" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Divider */}
-                    <div className="flex items-center gap-3">
-                      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-                    </div>
-
-                    {/* Section 4: Links & Deadline */}
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="w-6 h-6 rounded-lg bg-green-500/10 flex items-center justify-center">
-                          <Link2 className="w-3.5 h-3.5 text-green-500" />
-                        </div>
-                        <span className="text-xs md:text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Links & Deadline</span>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">
-                            Referral Code <span className="text-brand/60 normal-case tracking-normal">(Optional)</span>
-                          </label>
-                          <input value={refForm.referralCode} onChange={(e) => setRefForm({ ...refForm, referralCode: e.target.value })}
-                            className="w-full bg-muted/40 px-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium placeholder:text-muted-foreground/40"
-                            placeholder="e.g. REF2024" />
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Deadline</label>
-                          <div className="relative group/input">
-                            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-muted/80 rounded-xl flex items-center justify-center border border-border/50 group-focus-within/input:border-brand/30 group-focus-within/input:bg-brand/5 transition-all">
-                              <Calendar className="w-3.5 h-3.5 text-muted-foreground group-focus-within/input:text-brand transition-colors" />
-                            </div>
-                            <input type="date" value={refForm.deadline} onChange={(e) => setRefForm({ ...refForm, deadline: e.target.value })}
-                              className="w-full bg-muted/40 pl-14 pr-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium" />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">
-                          Referral Link <span className="text-brand/60 normal-case tracking-normal">(Optional)</span>
-                        </label>
-                        <div className="relative group/input">
-                          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-muted/80 rounded-xl flex items-center justify-center border border-border/50 group-focus-within/input:border-brand/30 group-focus-within/input:bg-brand/5 transition-all">
-                            <ExternalLink className="w-3.5 h-3.5 text-muted-foreground group-focus-within/input:text-brand transition-colors" />
-                          </div>
-                          <input value={refForm.refrerralLink} onChange={(e) => setRefForm({ ...refForm, refrerralLink: e.target.value })}
-                            className="w-full bg-muted/40 pl-14 pr-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium placeholder:text-muted-foreground/40"
-                            placeholder="https://referral-link.com" />
-                        </div>
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Apply Link / Email *</label>
-                        <div className="relative group/input">
-                          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-brand/10 rounded-xl flex items-center justify-center border border-brand/20">
-                            <ExternalLink className="w-3.5 h-3.5 text-brand" />
-                          </div>
-                          <input required value={refForm.applyLink} onChange={(e) => setRefForm({ ...refForm, applyLink: e.target.value })}
-                            className="w-full bg-muted/40 pl-14 pr-5 py-3.5 rounded-xl border border-transparent hover:border-brand/20 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium placeholder:text-muted-foreground/40"
-                            placeholder="https://careers.google.com/..." />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Validation Messages */}
-                    {refMsg && (
-                      <div className={`p-4 rounded-xl flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-300 ${
-                        refMsg.ok
-                          ? "bg-green-500/10 border border-green-500/20 text-green-600"
-                          : "bg-destructive/10 border border-destructive/20 text-destructive"
-                      }`}>
-                        {refMsg.ok ? <CheckCircle className="w-4 h-4 mt-0.5 shrink-0" /> : <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />}
-                        <div className="space-y-1">
-                          <p className="text-sm font-bold">{refMsg.msg}</p>
-                          {refMsg.errors?.fieldErrors && (
-                            <ul className="text-xs space-y-0.5 opacity-80">
-                              {Object.entries(refMsg.errors.fieldErrors).map(([field, errors]: [string, any]) => (
-                                <li key={field}>â€¢ <span className="font-semibold capitalize">{field.replace(/([A-Z])/g, ' $1')}:</span> {errors[0]}</li>
+                            <div className="flex items-center gap-1">
+                              {[1, 2, 3, 4, 5].map((s) => (
+                                <button
+                                  key={s}
+                                  type="button"
+                                  onClick={() => setFbRating(s)}
+                                  onMouseEnter={() => setHoverRating(s)}
+                                  onMouseLeave={() => setHoverRating(0)}
+                                  className="relative group/star p-1.5 md:p-2 rounded-lg hover:bg-brand/5 transition-all duration-200"
+                                >
+                                  <Star
+                                    className={`w-6 h-6 transition-all duration-300 ${s <= (hoverRating || fbRating)
+                                        ? "text-amber-400 fill-amber-400 drop-shadow-[0_2px_8px_rgba(251,191,36,0.4)] scale-110"
+                                        : "text-border hover:text-muted-foreground/50"
+                                      }`}
+                                  />
+                                </button>
                               ))}
-                            </ul>
-                          )}
+                            </div>
+                            {/* Rating Progress */}
+                            <div className="h-0.5 bg-muted/50 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full transition-all duration-500 ease-out"
+                                style={{ width: `${((hoverRating || fbRating) / 5) * 100}%` }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Feedback Textarea */}
+                          <div className="space-y-2 flex-1 flex flex-col">
+                            <label className="text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Your Thoughts</label>
+                            <textarea
+                              value={fbContent}
+                              onChange={(e) => setFbContent(e.target.value)}
+                              maxLength={500}
+                              className="w-full flex-1 bg-background/80 backdrop-blur-sm px-4 py-3 rounded-xl border-2 border-border/60 hover:border-brand/20 focus:border-brand/40 focus:ring-4 focus:ring-brand/10 outline-none text-sm placeholder:text-muted-foreground/30 resize-none transition-all duration-300 min-h-[100px] leading-relaxed text-foreground"
+                              placeholder="What could be improved? Any suggestions for the placement cell?"
+                              rows={4}
+                            />
+                            <div className="flex items-center justify-end gap-2">
+                              <div className="h-1 w-12 bg-muted/50 rounded-full overflow-hidden">
+                                <div
+                                  className={`h-full rounded-full transition-all duration-300 ${fbContent.length > 450 ? "bg-amber-500" : "bg-brand/40"
+                                    }`}
+                                  style={{ width: `${Math.min((fbContent.length / 500) * 100, 100)}%` }}
+                                />
+                              </div>
+                              <span className={`text-xs font-bold tabular-nums ${fbContent.length > 450 ? "text-amber-500" : "text-muted-foreground/60"}`}>
+                                {fbContent.length}/500
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Submit Button */}
+                          <button
+                            onClick={handleSubmitFeedback}
+                            disabled={submittingFb || !fbContent.trim() || fbRating === 0}
+                            className="group/btn mt-auto w-full relative overflow-hidden bg-brand hover:opacity-90 disabled:bg-muted text-primary-foreground py-3 rounded-xl font-black text-sm transition-all duration-300 shadow-[var(--shadow-brand)]  disabled:shadow-none flex items-center justify-center gap-2.5"
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out" />
+                            <span className="relative flex items-center gap-2.5">
+                              {submittingFb ? (
+                                <><Loader2 className="w-5 h-5 animate-spin" /> <span>Submitting...</span></>
+                              ) : (
+                                <><Send className="w-4.5 h-4.5 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform duration-300" /> <span>Share Expertise</span></>
+                              )}
+                            </span>
+                          </button>
+
+                          {/* Disclaimer */}
+                          <p className="text-xs text-center text-muted-foreground/50 leading-relaxed">
+                            Your feedback is valued and helps shape the training & placement process.
+                          </p>
                         </div>
                       </div>
                     )}
-
-                    {/* Submit Button */}
-                    <button type="submit" disabled={submittingRef}
-                      className="group/btn w-full md:w-auto relative overflow-hidden bg-brand hover:opacity-90 text-primary-foreground px-8 py-3 rounded-xl font-black shadow-[var(--shadow-brand)]  disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-3 transition-all duration-300"
-                    >
-                      {/* Shimmer */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out" />
-                      <span className="relative flex items-center gap-2.5 text-sm">
-                        {submittingRef ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform duration-300" />}
-                        {submittingRef ? "Submitting..." : "Submit Referral"}
-                      </span>
-                    </button>
-                  </form>
+                  </div>
                 </div>
-              </div>
-            </div>
+              )}
+            </>
           )}
 
-          {/* â”€â”€ Feedback Modal â”€â”€ */}
-          {showFeedbackModal && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-              <div className="absolute inset-0 bg-background/60 backdrop-blur-xl animate-in fade-in duration-300" onClick={() => setShowFeedbackModal(false)} />
-              <div className="relative w-full max-w-2xl animate-in zoom-in-95 duration-300">
-                {fbSubmitted ? (
-                  <div className="relative overflow-hidden rounded-2xl border border-green-500/30 bg-gradient-to-br from-green-500/5 via-emerald-500/5 to-teal-500/5 p-6 md:p-8 text-center flex flex-col items-center justify-center bg-card">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-green-500/10 to-transparent rounded-bl-[4rem]" />
-                  <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-emerald-500/10 to-transparent rounded-tr-[3rem]" />
-                  <div className="relative space-y-4">
-                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-500/15 mx-auto">
-                      <Heart className="w-10 h-10 text-green-500 fill-green-500 animate-pulse" />
-                    </div>
-                    <h3 className="text-2xl md:text-3xl font-black text-foreground tracking-tight">Thank You!</h3>
-                    <p className="text-sm text-muted-foreground max-w-xs mx-auto leading-relaxed">
-                      Your feedback helps us build a better experience for everyone at RGI.
-                    </p>
-                  </div>
+          {isMemModalOpen && (
+            <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
+              <div className="bg-card w-full max-w-md rounded-2xl p-6 shadow-2xl border border-border space-y-6 animate-in zoom-in-95 duration-300">
+                <div className="text-center space-y-2">
+                  <h3 className="text-2xl font-black text-foreground tracking-tight">Create Memory</h3>
+                  <p className="text-sm text-muted-foreground">Share this special moment from your journey</p>
                 </div>
-                ) : (
-                  <div className="relative overflow-hidden rounded-2xl border border-brand/20 bg-gradient-to-br from-brand/[0.03] via-background to-background shadow-xl shadow-brand/[0.04] text-left flex flex-col bg-card">
-                    <button onClick={() => setShowFeedbackModal(false)} className="absolute top-4 right-4 z-10 p-2 text-muted-foreground hover:bg-muted rounded-full">
-                      <X className="w-5 h-5" />
-                    </button>
-                  {/* Decorative Elements */}
-                  <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-brand/8 via-brand/3 to-transparent rounded-bl-[5rem]" />
-                  <div className="absolute bottom-0 left-0 w-28 h-28 bg-gradient-to-tr from-brand/5 to-transparent rounded-tr-[3rem]" />
-
-                  <div className="relative p-5 md:p-6 space-y-5 flex flex-col flex-1">
-                    {/* Header */}
-                    <div className="flex items-start gap-3">
-                      <div className="relative shrink-0">
-                        <div className="w-10 h-10 bg-gradient-to-br from-brand/25 to-brand/10 rounded-xl flex items-center justify-center shadow-inner">
-                          <MessageSquareShare className="w-5 h-5 text-brand" />
-                        </div>
-                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-brand/20 rounded-full flex items-center justify-center">
-                          <Sparkles className="w-2 h-2 text-brand" />
-                        </div>
+    
+                {memPreviews.length > 0 && (
+                  <div className="grid grid-cols-2 gap-3 max-h-75 overflow-y-auto p-1 scrollbar-hide">
+                    {memPreviews.map((preview, idx) => (
+                      <div key={idx} className="relative aspect-square rounded-2xl overflow-hidden border-2 border-brand/20 bg-muted group">
+                        <img src={preview} alt={`Preview ${idx}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                        <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
-                      <div>
-                        <h2 className="text-lg md:text-xl font-black text-foreground tracking-tight leading-tight">Share Feedback</h2>
-                        <p className="text-xs text-muted-foreground mt-0.5 font-medium">Your voice shapes our future</p>
-                      </div>
-                    </div>
-
-                    {/* Context */}
-                    <div className="bg-muted/30 rounded-xl px-4 py-3 border border-border/50">
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        <span className="font-semibold text-foreground">Help us improve.</span>{" "}
-                        Rate the syllabus relevance, batch preparedness, and suggest improvements.
-                      </p>
-                    </div>
-
-                    {/* Rating Section */}
-                    <div className="space-y-2.5">
-                      <div className="flex items-center justify-between">
-                        <p className="text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Your Rating</p>
-                        {(hoverRating || fbRating) > 0 && (
-                          <span className="text-xs font-bold text-brand bg-brand/10 px-2.5 py-0.5 rounded-full animate-in fade-in duration-200">
-                            {["", "Poor", "Fair", "Good", "Great", "Excellent"][hoverRating || fbRating]}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        {[1, 2, 3, 4, 5].map((s) => (
-                          <button
-                            key={s}
-                            type="button"
-                            onClick={() => setFbRating(s)}
-                            onMouseEnter={() => setHoverRating(s)}
-                            onMouseLeave={() => setHoverRating(0)}
-                            className="relative group/star p-1.5 md:p-2 rounded-lg hover:bg-brand/5 transition-all duration-200"
-                          >
-                            <Star
-                              className={`w-6 h-6 transition-all duration-300 ${
-                                s <= (hoverRating || fbRating)
-                                  ? "text-amber-400 fill-amber-400 drop-shadow-[0_2px_8px_rgba(251,191,36,0.4)] scale-110"
-                                  : "text-border hover:text-muted-foreground/50"
-                              }`}
-                            />
-                          </button>
-                        ))}
-                      </div>
-                      {/* Rating Progress */}
-                      <div className="h-0.5 bg-muted/50 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full transition-all duration-500 ease-out"
-                          style={{ width: `${((hoverRating || fbRating) / 5) * 100}%` }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Feedback Textarea */}
-                    <div className="space-y-2 flex-1 flex flex-col">
-                      <label className="text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Your Thoughts</label>
-                      <textarea
-                        value={fbContent}
-                        onChange={(e) => setFbContent(e.target.value)}
-                        maxLength={500}
-                        className="w-full flex-1 bg-background/80 backdrop-blur-sm px-4 py-3 rounded-xl border-2 border-border/60 hover:border-brand/20 focus:border-brand/40 focus:ring-4 focus:ring-brand/10 outline-none text-sm placeholder:text-muted-foreground/30 resize-none transition-all duration-300 min-h-[100px] leading-relaxed text-foreground"
-                        placeholder="What could be improved? Any suggestions for the placement cell?"
-                        rows={4}
-                      />
-                      <div className="flex items-center justify-end gap-2">
-                        <div className="h-1 w-12 bg-muted/50 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full transition-all duration-300 ${
-                              fbContent.length > 450 ? "bg-amber-500" : "bg-brand/40"
-                            }`}
-                            style={{ width: `${Math.min((fbContent.length / 500) * 100, 100)}%` }}
-                          />
-                        </div>
-                        <span className={`text-xs font-bold tabular-nums ${fbContent.length > 450 ? "text-amber-500" : "text-muted-foreground/60"}`}>
-                          {fbContent.length}/500
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Submit Button */}
-                    <button
-                      onClick={handleSubmitFeedback}
-                      disabled={submittingFb || !fbContent.trim() || fbRating === 0}
-                      className="group/btn mt-auto w-full relative overflow-hidden bg-brand hover:opacity-90 disabled:bg-muted text-primary-foreground py-3 rounded-xl font-black text-sm transition-all duration-300 shadow-[var(--shadow-brand)]  disabled:shadow-none flex items-center justify-center gap-2.5"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-in-out" />
-                      <span className="relative flex items-center gap-2.5">
-                        {submittingFb ? (
-                          <><Loader2 className="w-5 h-5 animate-spin" /> <span>Submitting...</span></>
-                        ) : (
-                          <><Send className="w-4.5 h-4.5 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform duration-300" /> <span>Share Expertise</span></>
-                        )}
-                      </span>
-                    </button>
-
-                    {/* Disclaimer */}
-                    <p className="text-xs text-center text-muted-foreground/50 leading-relaxed">
-                      Your feedback is valued and helps shape the training & placement process.
-                    </p>
+                    ))}
                   </div>
-                </div>
                 )}
+    
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Batch Title (Optional)</label>
+                    <input 
+                      type="text"
+                      value={memBatchTitle}
+                      onChange={(e) => setMemBatchTitle(e.target.value)}
+                      placeholder="e.g. Campus Farewell..."
+                      className="w-full bg-muted px-6 py-4 rounded-2xl border-transparent focus:border-brand border focus:ring-2 focus:ring-brand outline-none text-foreground font-medium transition-all"
+                    />
+                    <p className="text-xs text-muted-foreground ml-1">This title will be applied to all {selectedMemFiles.length} images.</p>
+                  </div>
+    
+                  <div className="flex gap-3">
+                    <button 
+                      onClick={() => { setIsMemModalOpen(false); setSelectedMemFiles([]); setMemPreviews([]); }}
+                      className="flex-1 bg-muted text-foreground px-6 py-4 rounded-xl font-bold hover:bg-muted/80 transition-all text-sm"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      onClick={startMemoryUpload}
+                      disabled={memUploading}
+                      className="flex-2 bg-brand text-white px-6 py-4 rounded-xl font-bold hover:bg-brand/90 transition-all text-sm disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2 shadow-[var(--shadow-brand)]"
+                    >
+                      {memUploading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Uploading {selectedMemFiles.length} Photos...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4" />
+                          Upload All
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           )}
-          </>
-        )}
-        {/* Referrals Table */}
+
+          {/* Referrals Table */}
           {!loading && !fetchError && referrals.length > 0 && (
             <section className="space-y-6 text-left">
               <h2 className="text-2xl md:text-3xl font-black tracking-tight">My Referrals</h2>
@@ -1056,6 +1230,45 @@ export default function AlumniDashboard() {
               </div>
             </section>
           )}
+          {/* Memories Section */}
+          <section>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+                <Camera className="w-5 h-5 text-brand" />
+                My Memories
+              </h2>
+              <label className="flex items-center gap-2 px-4 py-2 bg-brand/10 text-brand rounded-xl text-xs font-bold hover:bg-brand/20 transition-all cursor-pointer">
+                {memUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                {memUploading ? "Uploading..." : "Upload Memory"}
+                <input type="file" accept="image/*" multiple className="hidden" onChange={handleMemoryUpload} disabled={memUploading} />
+              </label>
+            </div>
+            {memories.length === 0 ? (
+              <div className="bg-card rounded-2xl border border-border p-8 text-center text-muted-foreground">
+                <Camera className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                <p className="font-medium">No memories uploaded yet</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {memories.map((m: any) => (
+                  <div key={m.id} className="bg-card rounded-2xl border border-border overflow-hidden">
+                    <div className="aspect-square bg-muted flex items-center justify-center object-top">
+                      <img src={m.imageUrl} alt="Memory" loading="lazy" className="w-full h-full object-cover" />
+
+                    </div>
+                    <div className="p-3 flex items-center justify-between">
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${m.status === "approved" ? "bg-green-500/10 text-green-600"
+                        : m.status === "rejected" ? "bg-red-500/10 text-red-500"
+                          : "bg-yellow-500/10 text-yellow-600"
+                        }`}>{m.status === "pending_moderation" ? "Pending" : m.status}</span>
+                      <Trash2 className="text-red-500 cursor-pointer size-6" onClick={() => handleDeleteMemory(m.id)} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
         </main>
       </div>
       <Footer />

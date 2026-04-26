@@ -201,7 +201,7 @@ export default function VolunteerDashboard() {
                     <img
                       alt="Volunteer Portrait"
                       loading="lazy"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover object-top"
                       src={student.profileImageUrl}
                     />
                   ) : (
@@ -213,7 +213,7 @@ export default function VolunteerDashboard() {
               </div>
 
               {/* Verification Badge */}
-              <div className="absolute bottom-4 bg-background right-0 md:right-4 size-10 rounded-full flex shrink-0 items-center justify-center">
+              <div className="absolute bottom-4 bg-background right-0 md:right-4 size-7 md:size-10 rounded-full flex shrink-0 items-center justify-center">
                 {volunteer?.isVerified ? (
                   <BadgeCheck className="size-7 md:size-10 text-center text-green-500" />
                 ) : (

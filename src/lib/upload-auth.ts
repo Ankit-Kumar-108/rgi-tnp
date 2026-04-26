@@ -56,7 +56,7 @@ export const AUTHENTICATED_UPLOAD_PERMISSIONS: Record<UserRole, UploadFolder[]> 
   {
     student: ["profiles", "memories", "resumes"],
     recruiter: [],
-    alumni: ["profiles"],
+    alumni: ["profiles", "memories"],
     admin: ["drive-images"],
     external_student: ["profiles", "resumes"],
   };

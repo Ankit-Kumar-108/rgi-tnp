@@ -328,7 +328,7 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
     <div className="min-h-screen bg-background overflow-hidden">
 
       {/*  Sticky Header */}
-      <header className="sticky top-0 z-40 bg-card/80 backdrop-blur-xl border-b border-border">
+      <header className="fixed w-full top-0 z-40 bg-card/80 backdrop-blur-xl border-b border-border">
         {/* 1. Changed: Removed fixed h-16, added py-3, flex-wrap, and min-h-[4rem] */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 min-h-16 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
 
@@ -398,7 +398,7 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+      <main className="max-w-7xl mt-20 mx-auto px-4 sm:px-6 py-6 space-y-6">
 
         {/*  Pipeline Stats  */}
         <section>
