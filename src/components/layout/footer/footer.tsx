@@ -92,7 +92,7 @@ export default function Footer() {
           
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
             <p className="text-muted-foreground">
-              Developed by <span className="text-foreground font-bold tracking-wide">Ankit Kumar</span>
+              Cooked by <span className="text-foreground font-bold tracking-wide">Ankit Kumar</span>
             </p>
             <div className="flex items-center gap-3">
               <a

@@ -546,13 +546,25 @@ POST   /api/upload/presigned-url (get R2 upload URL)
 - [ ] **Volunteer Dashboard (Add Filter)  (to change on 20/04/2026 [Done])**
  - add filter to filter out selected, rejected and shortlisted students
 
-- [ ] **Admin Dashboard (Add back Button in volunteer section)  (to change on 21/04/2026 [To be Done])**
+- [ ] **Admin Dashboard (Add back Button in volunteer section)  (to change on 21/04/2026 [Done])**
  -  Admin ui imporovement and back button also add title in drive image section in homepage 
  
-- [ ] **Home Page (Add volunteers)  (to change on 21/04/2026 [To be Done])**
+- [ ] **Home Page (Add volunteers)  (to change on 21/04/2026 [Done])**
  -  Add volunteer card in home page with name linkedin and post 
  
+- [ ] **Register Page (Add gender)  (to change on 10/05/2026 [To Change ])** 
+ - Add Gender in register forms of student and external students. Also gender based eligibility check during register of drive. 
 
+- [ ] **Recruiter Page (Add gender input and contract/ bond)  (to change on 11/05/2026 [to be Done])**
+ - Add gender, contract/ bond with duration based criteria
+
+- [ ] **Drive Page (improve drive register page and add interview process)  (to change on 11/05/2026 [to be Done])**
+ - add interview process tab and improve tab of placement ctc..for better visibility
+
+- [ ] **Home Page (improve email content)  (to change on 11/05/2026 [to be Done])**
+ - improve email contnet of shortlist, select etc.
+
+- [ ] **Take Suggestion from sir about final selection and mail notification**
 
 ### Phase 2 (Next Quarter)
 - [ ] **Advanced Analytics Dashboard**

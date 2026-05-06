@@ -5,8 +5,8 @@ import {
   ChevronRight,
   ArrowRight,
   BadgeCheck,
-  MoveRight,
   LoaderCircle,
+  SquareArrowOutUpRight,
 } from "lucide-react"
 import Nav from "../components/layout/nav/nav"
 import Footer from "../components/layout/footer/footer"
@@ -202,7 +202,7 @@ export default function Home() {
                 <div className="flex flex-wrap gap-3 md:gap-4">
                   <Link href="/recruiters/register">
                     <button className="bg-brand text-white px-7 py-3 rounded-full text-sm md:text-base font-bold flex items-center gap-2 hover:opacity-90 transition-opacity group cursor-pointer">
-                      Hire from Us <div className="group-hover:translate-x-1 transition-all duration-300"><MoveRight className="w-4 h-4" /></div>
+                      Hire from Us <div className="group-hover:scale-125 transition-all duration-300"><SquareArrowOutUpRight className="w-4 h-4" /></div>
                     </button>
                   </Link>
                   <Link href="/students/login">
@@ -299,7 +299,7 @@ export default function Home() {
                             <img
                               src={group.images[0].imageUrl}
                               alt={group.images[0].title}
-                              className="w-full h-full object-cover object-top group-hover/img:scale-105 transition-transform duration-700"
+                              className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700"
                               loading="lazy"
                             />
                             <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
@@ -335,7 +335,7 @@ export default function Home() {
                             <img
                               src={group.images[3].imageUrl}
                               alt={group.images[3].title}
-                              className="w-full h-full object-cover object-top group-hover/img:scale-105 transition-transform duration-700"
+                              className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700"
                               loading="lazy"
                             />
                             <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />

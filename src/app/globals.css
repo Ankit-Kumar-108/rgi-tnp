@@ -6,6 +6,7 @@
 
 /* ─── Single Source of Truth: Light Mode ─── */
 :root {
+  color-scheme: light;
   --brand: #7c3aed;
 
   --background: #f7f6f8;
@@ -58,6 +59,7 @@
 
 /* ─── Single Source of Truth: Dark Mode ─── */
 .dark {
+  color-scheme: dark;
   --brand: #8b5cf6;
 
   --background: #09090b;
@@ -176,9 +178,11 @@
     color: var(--foreground);
     @apply bg-background text-foreground;
   }
+
   * {
     @apply border-border outline-ring/50;
   }
+
   html {
     @apply font-sans;
   }
@@ -186,21 +190,21 @@
 
 /* ─── Professional Shadow Scale ─── */
 :root {
-  --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
-  --shadow-md: 0 2px 4px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06);
-  --shadow-lg: 0 4px 6px rgba(0,0,0,0.03), 0 12px 32px rgba(0,0,0,0.08);
-  --shadow-xl: 0 8px 16px rgba(0,0,0,0.04), 0 20px 48px rgba(0,0,0,0.10);
-  --shadow-brand: 0 4px 14px rgba(124,58,237,0.25);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.03), 0 12px 32px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.04), 0 20px 48px rgba(0, 0, 0, 0.10);
+  --shadow-brand: 0 4px 14px rgba(124, 58, 237, 0.25);
 }
 
 .dark {
-  --shadow-xs: 0 1px 2px rgba(0,0,0,0.2);
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.2), 0 4px 12px rgba(0,0,0,0.15);
-  --shadow-md: 0 2px 4px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.2);
-  --shadow-lg: 0 4px 6px rgba(0,0,0,0.2), 0 12px 32px rgba(0,0,0,0.25);
-  --shadow-xl: 0 8px 16px rgba(0,0,0,0.2), 0 20px 48px rgba(0,0,0,0.3);
-  --shadow-brand: 0 4px 14px rgba(139,92,246,0.3);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.2), 0 8px 24px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.2), 0 12px 32px rgba(0, 0, 0, 0.25);
+  --shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.2), 0 20px 48px rgba(0, 0, 0, 0.3);
+  --shadow-brand: 0 4px 14px rgba(139, 92, 246, 0.3);
 }
 
 /* ─── Reusable Card Utility ─── */
@@ -234,12 +238,14 @@
   padding-top: 4rem;
   padding-bottom: 4rem;
 }
+
 @media (min-width: 768px) {
   .section-y {
     padding-top: 6rem;
     padding-bottom: 6rem;
   }
 }
+
 @media (min-width: 1024px) {
   .section-y {
     padding-top: 8rem;
@@ -265,50 +271,63 @@
 ::view-transition-old(root) {
   z-index: 1;
 }
+
 ::view-transition-new(root) {
   z-index: 999;
-  /* Prevent Firefox from briefly showing the new state before the
-     JS clip-path animation kicks in */
-  clip-path: circle(0% at 50% 50%);
+  /* Use 0px (not 0%) so the initial hidden state truly matches
+     the JS animation start value — prevents flash/flicker */
+  clip-path: circle(0px at 50% 50%);
+  /* Promote to GPU layer for smoother clip-path animation */
+  will-change: clip-path;
+}
+
+/* Disable view-transition animation entirely for reduced-motion users */
+@media (prefers-reduced-motion: reduce) {
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+    clip-path: none !important;
+    will-change: auto;
+  }
 }
 
 /* ─── Industry Skeleton Shimmer ─── */
 .skeleton-shimmer {
   position: relative;
   overflow: hidden;
-  background-color: #e5e7eb; /* gray-200 */
+  background-color: #e5e7eb;
+  /* gray-200 */
 }
 
 .skeleton-shimmer::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.6) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.6) 50%,
+      transparent 100%);
   animation: skeleton-wave 1.8s ease-in-out infinite;
 }
 
 .dark .skeleton-shimmer {
-  background-color: #334155; /* slate-700 */
+  background-color: #334155;
+  /* slate-700 */
 }
 
 .dark .skeleton-shimmer::before {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.08) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.08) 50%,
+      transparent 100%);
 }
 
 @keyframes skeleton-wave {
   0% {
     transform: translateX(-100%);
   }
+
   100% {
     transform: translateX(100%);
   }
