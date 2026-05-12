@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
       email: validatedData.email.trim(),
       branch: validatedData.branch.trim(),
       course: validatedData.course.trim(),
+      gender: validatedData.gender.trim(),
       batch: validatedData.batch.trim(),
       phoneNumber: validatedData.phoneNumber.trim(),
     };
@@ -48,6 +49,7 @@ export async function POST(req: NextRequest) {
         collegeName: trimmedData.collegeName,
         enrollmentNumber: trimmedData.enrollmentNumber,
         email: trimmedData.email,
+        gender: trimmedData.gender,
         branch: trimmedData.branch,
         course: trimmedData.course,
         batch: trimmedData.batch,

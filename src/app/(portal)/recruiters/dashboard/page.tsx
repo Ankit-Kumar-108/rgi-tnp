@@ -53,7 +53,10 @@ export default function RecruiterDashboard() {
     course: "B.Tech",
     driveDate: "",
     driveType: "Closed",
-    jobType: "Full-Time"
+    jobType: "Full-Time",
+    genderPreference: "Both",
+    duration: "",
+    interviewProcess: ""
   });
   const [editDriveId, setEditDriveId] = useState<string | null>(null);
   const [viewDrive, setViewDrive] = useState<any | null>(null);
@@ -124,7 +127,7 @@ export default function RecruiterDashboard() {
       setFormMsg({ msg: d.message, ok: d.success });
       if (d.success) {
         setTimeout(() => setShowForm(false), 1000);
-        setForm({ companyName: user?.company || "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full-Time" });
+        setForm({ companyName: user?.company || "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full-Time", genderPreference: "Both", duration: "", interviewProcess: "" });
         setEditDriveId(null);
         fetchDashboard();
       }
@@ -212,7 +215,7 @@ export default function RecruiterDashboard() {
             <button
               onClick={() => {
                 setEditDriveId(null);
-                setForm({ companyName: user?.company || "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full-Time" });
+                setForm({ companyName: user?.company || "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full-Time", genderPreference: "Both", duration: "", interviewProcess: "" });
                 setFormMsg(null);
                 setShowForm(true);
               }}
@@ -329,11 +332,38 @@ export default function RecruiterDashboard() {
                         className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none">
                         <option value="Full-Time">Full-Time</option>
                         <option value="Internship">Internship</option>
-                        <option value="Contract">Contract</option>
+                        <option value="Contract">Contract/ Bond</option>
                       </select>
                     </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Eligible Gender</label>
+                      <select required value={form.genderPreference} onChange={(e) => setForm({ ...form, genderPreference: e.target.value })}
+                        className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none">
+                        <option value="Both">Both Gender</option>
+                        <option value="Male">Male Only</option>
+                        <option value="Female">Female Only</option>
+                      </select>
+                    </div>
+                    {(form.jobType === "Internship" || form.jobType === "Contract/ Bond") && (
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">
+                          {form.jobType === "Internship" ? "Internship Duration" : "Bond/Contract Duration"}
+                        </label>
+                        <input required value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })}
+                          placeholder={form.jobType === "Internship" ? "e.g., 6 months" : "e.g., 2 years"}
+                          className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
+                      </div>
+                    )}
                   </div>
-                   {/* Course */}
+                  {/* Interview Process */}
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Interview Process</label>
+                    <textarea value={form.interviewProcess} onChange={(e) => setForm({ ...form, interviewProcess: e.target.value })}
+                      placeholder="e.g., Online Test (1 hour) → Technical Round → HR Round"
+                      rows={3}
+                      className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none resize-none" />
+                  </div>
+                  {/* Course */}
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Course</label>
                     <div className="flex flex-wrap gap-2">
@@ -484,7 +514,10 @@ export default function RecruiterDashboard() {
                                     course: drive.course || "B.Tech",
                                     driveDate: new Date(drive.driveDate).toISOString().split('T')[0],
                                     driveType: drive.driveType,
-                                    jobType: drive.jobType || "Full-Time"
+                                    jobType: drive.jobType || "Full-Time",
+                                    genderPreference: drive.genderPreference || "Both",
+                                    duration: drive.duration || "",
+                                    interviewProcess: drive.interviewProcess || ""
                                   });
                                   setFormMsg(null);
                                   setShowForm(true);

@@ -15,6 +15,7 @@ export const registrationSchema = z.object({
     .trim()
     .min(1, 'Enrollment number is required')
     .regex(/^[A-Za-z0-9]+$/, 'Enrollment number must be alphanumeric'),
+  gender: z.string().trim().min(1, 'Gender is required'),
   branch: z.enum(['Computer Science', 'Mechanical', 'Electrical', 'Civil', 'Electronics', 'Power Systems', 'Digital Communication', 'Thermal Engineering', 'Marketing', 'Finance', 'Human Resource']),
   course: z.string().trim().min(1, 'Course is required'),
   semester: z.coerce

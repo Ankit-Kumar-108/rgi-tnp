@@ -37,6 +37,9 @@ export async function POST(req: NextRequest) {
       driveDate: string;
       driveType: string;
       jobType: string;
+      genderPreference: string;
+      duration?: string;
+      interviewProcess?: string;
       isRegistered?: boolean;
     };
 
@@ -56,6 +59,9 @@ export async function POST(req: NextRequest) {
         driveDate: new Date(body.driveDate),
         driveType: body.driveType || "Closed",
         jobType: body.jobType || "Full-Time",
+        genderPreference: body.genderPreference || "Both",
+        duration: body.duration || null,
+        interviewProcess: body.interviewProcess || null,
         status: "pending",
         recruiter: { connect: { id: recruiter.id } },
       },
@@ -90,6 +96,9 @@ export async function PUT(req: NextRequest) {
       driveDate: string;
       driveType: string;
       jobType: string;
+      genderPreference: string;
+      duration?: string;
+      interviewProcess?: string;
     };
 
     const db = getDb();
@@ -118,6 +127,9 @@ export async function PUT(req: NextRequest) {
         driveDate: new Date(body.driveDate),
         driveType: body.driveType || existingDrive.driveType,
         jobType: body.jobType || existingDrive.jobType,
+        genderPreference: body.genderPreference || existingDrive.genderPreference,
+        duration: body.duration || existingDrive.duration,
+        interviewProcess: body.interviewProcess || existingDrive.interviewProcess,
       },
     });
 

@@ -158,6 +158,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: "CGPA requirement not met" }, { status: 403 });
     }
 
+    // Gender eligibility check
+    if (drive.genderPreference !== "Both" && student.gender !== drive.genderPreference) {
+      return NextResponse.json({ success: false, message: `This drive is open to ${drive.genderPreference} candidates only` }, { status: 403 });
+    }
+
     await db.driveRegistration.create({
       data: { driveId: body.driveId, externalStudentId: ext.id },
     });

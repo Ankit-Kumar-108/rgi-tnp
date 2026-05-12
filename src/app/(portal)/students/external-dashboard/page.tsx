@@ -53,7 +53,6 @@ export default function ExternalStudentDashboard() {
     linkedinUrl: "",
     githubUrl: "",
   });
-
   useEffect(() => {
     if (!authenticated) return;
     fetchDashboard();

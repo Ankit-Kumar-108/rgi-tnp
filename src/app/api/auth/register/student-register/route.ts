@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
       resumeUrl: (body.resumeUrl as string)?.trim(),
       cgpa: validatedData.cgpa,
       semester: validatedData.semester,
+      gender: validatedData.gender.trim(),
     };
 
     // 4. Verify Enrollment Number in Master Records
@@ -82,6 +83,7 @@ export async function POST(req: NextRequest) {
         name: trimmedData.name,
         enrollmentNumber: trimmedData.enrollmentNumber,
         email: trimmedData.email,
+        gender: trimmedData.gender,
         branch: trimmedData.branch,
         course: trimmedData.course,
         semester: trimmedData.semester,

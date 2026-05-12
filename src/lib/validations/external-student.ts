@@ -4,6 +4,7 @@ export const externalStudentRegistrationSchema = z.object({
     name: z.string().trim().min(1, 'Name is required').max(100),
     collegeName: z.string().trim().min(1, 'College name is required'),
     enrollmentNumber: z.string().trim().min(1, 'Enrollment number is required'),
+    gender: z.string().trim().min(1, 'Gender is required'),
     email: z.string().trim().email('Invalid email address'),
     branch: z.string().trim().min(1, 'Branch is required'),
     course: z.string().trim().min(1, 'Course is required'),

@@ -104,6 +104,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Check: Gender eligible?
+    if (drive.genderPreference !== "Both" && studentData.gender !== drive.genderPreference) {
+      return NextResponse.json(
+        { success: false, message: `This drive is open to ${drive.genderPreference} candidates only` },
+        { status: 403 }
+      );
+    }
+
     // Register
     await db.driveRegistration.create({
       data: { driveId, studentId: studentData.id },

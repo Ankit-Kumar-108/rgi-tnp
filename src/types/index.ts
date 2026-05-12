@@ -37,6 +37,9 @@ export interface PlacementDrive {
   maxBatch: string;
   course: string;
   eligibleBranches: string;
+  genderPreference?: string;
+  duration?: string;
+  interviewProcess?: string;
   driveDate: string | Date;
   driveType: string;
   status: string;

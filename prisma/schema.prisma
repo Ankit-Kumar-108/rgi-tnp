@@ -41,6 +41,7 @@ model Student {
   email                        String              @unique
   branch                       String
   semester                     Int
+  gender                       String
   cgpa                         Float
   isEmailVerified              Boolean             @default(false)
   isVerified                   Boolean             @default(false)
@@ -118,6 +119,7 @@ model ExternalStudent {
   linkedinUrl      String?
   githubUrl        String?
   resumeUrl        String
+  gender           String
   branch           String
   tenthPercentage    Float
   twelfthPercentage Float
@@ -152,6 +154,9 @@ model PlacementDrive {
   maxBatch         String
   course           String
   eligibleBranches String
+  genderPreference String
+  duration         String?
+  interviewProcess String?
   driveDate        DateTime
   driveType        String
   status           String              @default("pending")

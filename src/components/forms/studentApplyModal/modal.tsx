@@ -160,6 +160,19 @@ export default function JobDetailsModal({
                                 </div>
                             </section>
 
+                            {/* Interview Process */}
+                            {drive.interviewProcess && (
+                                <section className="space-y-5">
+                                    <h4 className="text-xl font-bold flex items-center gap-2 text-foreground">
+                                        <ClipboardCheck className="text-brand w-5 h-5" />
+                                        Interview Process
+                                    </h4>
+                                    <div className="text-muted-foreground leading-relaxed space-y-3 font-light text-sm md:text-base whitespace-pre-wrap">
+                                        {drive.interviewProcess}
+                                    </div>
+                                </section>
+                            )}
+
                             {/* Eligibility Criteria */}
                             <section className="space-y-5">
                                 <h4 className="text-xl font-bold flex items-center gap-2 text-foreground">
@@ -191,6 +204,15 @@ export default function JobDetailsModal({
                                         </p>
                                         <p className="text-xs text-muted-foreground mt-1">Eligible candidates only.</p>
                                     </div>
+                                    {drive.duration && (
+                                        <div className="p-5 rounded-2xl bg-blue-500/10 border border-blue-500/30 group hover:border-blue-500/50 transition-colors">
+                                            <p className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-1">
+                                                {drive.jobType === "Internship" ? "Internship Duration" : "Bond/Contract Duration"}
+                                            </p>
+                                            <p className="text-lg font-bold text-foreground">{drive.duration}</p>
+                                            <p className="text-xs text-muted-foreground mt-1">Duration of engagement.</p>
+                                        </div>
+                                    )}
                                 </div>
                             </section>
                         </div>

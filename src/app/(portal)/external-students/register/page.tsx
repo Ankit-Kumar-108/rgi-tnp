@@ -23,6 +23,7 @@ import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getRegistrationUploadToken, uploadFileToR2 } from "@/lib/upload-r2";
+import { getSemesterOptions, getBatchYears } from "@/lib/constants";
 import { toast } from "sonner";
 
 export default function ExternalStudentRegister() {
@@ -34,7 +35,7 @@ export default function ExternalStudentRegister() {
     const [success, setSuccess] = useState("");
     const [form, setForm] = useState({
         name: "", email: "", collegeName: "", enrollmentNumber: "", branch: "", course: "",
-        cgpa: "", batch: "", semester: "", phoneNumber: "", password: "", confirmPassword: "",
+        cgpa: "", batch: "", semester: "", phoneNumber: "", password: "", confirmPassword: "", gender: "",
     });
 
     // UI Toggle States
@@ -56,10 +57,7 @@ export default function ExternalStudentRegister() {
 
         // smart year dropdown generation based on current year
         useEffect(() => {
-            const currentYear = new Date().getFullYear();
-            const year = Array.from({ length: 4 }, (_, i) => currentYear + i);
-            
-            setYear(year);
+            setYear(getBatchYears());
         }, []);
 
     const update = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
@@ -413,6 +411,16 @@ export default function ExternalStudentRegister() {
                                 </div>
                             </div>
 
+                             <div className="space-y-1">
+                                <label className="text-xs sm:text-sm font-semibold text-foreground">Gender</label>
+                                <div className="relative">
+                                    <select className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} required value={form.gender} onChange={update("gender")}>
+                                        <option value="">Select Gender</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                </div>
+                            </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div className="space-y-1">
                                     <label className="text-xs sm:text-sm font-semibold text-foreground">Branch</label>
@@ -457,7 +465,7 @@ export default function ExternalStudentRegister() {
                                     <label className="text-xs sm:text-sm font-semibold text-foreground">Select Semester</label>
                                     <select className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} required value={form.semester} onChange={update("semester")}>
                                         <option value="">Select</option>
-                                        {[1,2,3,4,5,6,7,8].map(s => (
+                                        {getSemesterOptions().map(s => (
                                             <option key={s} value={s}>{s}</option>
                                         ))}
                                     </select>

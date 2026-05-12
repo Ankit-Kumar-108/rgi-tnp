@@ -20,7 +20,6 @@ import {
   ChevronRight,
   Linkedin,
   Github,
-  Delete,
   Trash2,
   MessageSquareShare,
 } from "lucide-react"
@@ -34,6 +33,7 @@ import { Student, PlacementDrive, DriveRegistration, Memory } from "@/types";
 import { uploadFileToR2 } from "@/lib/upload-r2";
 import { toast } from "sonner";
 import FeedbackComp from "../feedback/feedbakComp";
+import da from "zod/v4/locales/da.cjs";
 
 export default function StudentDashboard() {
   const { loading: authLoading, authenticated, user } = useAuth("student", "/students/login");
@@ -73,6 +73,27 @@ export default function StudentDashboard() {
   });
 
   const router = useRouter();
+
+  // it auto updates semester
+  useEffect(() => {
+    const updateSemester = async () => {
+      try {
+        const token = getToken("student");
+        const res = await fetch("/api/student/update-semester", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json() as any;
+        if(data.success && data.updated) {
+          toast.success(`Semester updated to ${data.semester}`);
+        }
+      } catch (error: any) {
+        console.error("Error updating semester:", error);
+        toast.error("Failed to update semester. Please try again.");
+      }
+    }
+    updateSemester(); 
+  }, [])
 
   useEffect(() => {
     if (!authenticated) return;
