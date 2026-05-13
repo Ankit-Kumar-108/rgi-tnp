@@ -552,10 +552,10 @@ POST   /api/upload/presigned-url (get R2 upload URL)
 - [ ] **Home Page (Add volunteers)  (to change on 21/04/2026 [Done])**
  -  Add volunteer card in home page with name linkedin and post 
  
-- [ ] **Register Page (Add gender)  (to change on 10/05/2026 [To Change ])** 
+- [ ] **Register Page (Add gender)  (to change on 10/05/2026 [Done])** 
  - Add Gender in register forms of student and external students. Also gender based eligibility check during register of drive. 
 
-- [ ] **Recruiter Page (Add gender input and contract/ bond)  (to change on 11/05/2026 [to be Done])**
+- [ ] **Recruiter Page (Add gender input and contract/ bond)  (to change on 11/05/2026 [Done])**
  - Add gender, contract/ bond with duration based criteria
 
 - [ ] **Drive Page (improve drive register page and add interview process)  (to change on 11/05/2026 [to be Done])**

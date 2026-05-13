@@ -6,6 +6,7 @@ import { Shield, Loader2, Eye, EyeOff } from "lucide-react";
 import { saveAuth } from "@/lib/auth-client";
 import Nav from "@/components/layout/nav/nav";
 import Footer from "@/components/layout/footer/footer";
+import { toast } from "sonner";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -30,6 +31,7 @@ export default function AdminLoginPage() {
 
       if (data.success) {
         saveAuth("admin", data.token!, data.admin);
+        toast.success("Login Success")
         router.push("/admin/dashboard");
       } else {
         setError(data.message || "Login failed");

@@ -332,7 +332,7 @@ export default function RecruiterDashboard() {
                         className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none">
                         <option value="Full-Time">Full-Time</option>
                         <option value="Internship">Internship</option>
-                        <option value="Contract">Contract/ Bond</option>
+                        <option value="Contract/ Bond">Contract/ Bond</option>
                       </select>
                     </div>
                     <div>
