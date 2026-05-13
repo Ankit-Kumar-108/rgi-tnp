@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import {
   Loader2,
   Briefcase,
@@ -27,13 +28,20 @@ import Nav from "@/components/layout/nav/nav"
 import Footer from "@/components/layout/footer/footer"
 import { useAuth } from "@/hooks/useAuth"
 import { getToken, logout } from "@/lib/auth-client"
-import JobDetailsModal from "@/components/forms/studentApplyModal/modal";
 import { useRouter } from "next/navigation";
 import { Student, PlacementDrive, DriveRegistration, Memory } from "@/types";
 import { uploadFileToR2 } from "@/lib/upload-r2";
 import { toast } from "sonner";
-import FeedbackComp from "../feedback/feedbakComp";
-import da from "zod/v4/locales/da.cjs";
+
+// Lazy load heavy modal components — only loaded when user interacts
+const JobDetailsModal = dynamic(
+  () => import("@/components/forms/studentApplyModal/modal"),
+  { ssr: false }
+);
+const FeedbackComp = dynamic(
+  () => import("../feedback/feedbakComp"),
+  { ssr: false }
+);
 
 export default function StudentDashboard() {
   const { loading: authLoading, authenticated, user } = useAuth("student", "/students/login");

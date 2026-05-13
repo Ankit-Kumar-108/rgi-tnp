@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import {
   Plus,
   Search,
@@ -18,13 +19,21 @@ import {
   MessageSquareShare,
 } from "lucide-react";
 import Nav from "@/components/layout/nav/nav";
-import JobDetailsModal from "@/components/forms/studentApplyModal/modal";
 import Footer from "@/components/layout/footer/footer";
 import { useAuth } from "@/hooks/useAuth";
 import { getToken, logout } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import FeedbackCorporate from "../feedback/feedbackpg";
+
+// Lazy load heavy modal components — only loaded when user interacts
+const JobDetailsModal = dynamic(
+  () => import("@/components/forms/studentApplyModal/modal"),
+  { ssr: false }
+);
+const FeedbackCorporate = dynamic(
+  () => import("../feedback/feedbackpg"),
+  { ssr: false }
+);
 
 const BRANCHES = ["Computer Science", "Civil", "Mechanical", "Electronics", "Electrical", "Power Systems", "Digital Communication", "Thermal Engineering", "Marketing", "Finance", "Human Resource"] //change courese here  for filtering
 

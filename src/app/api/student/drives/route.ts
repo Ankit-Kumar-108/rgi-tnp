@@ -4,7 +4,6 @@ import { getDb } from "@/lib/db";
 import * as jose from "jose";
 import { sendEmail } from "@/lib/send-email";
 import { driveRegistrationTemplate } from "@/lib/email-templates";
-import { email } from "zod";
 
 async function getStudentFromToken(req: NextRequest) {
   const authHeader = req.headers.get("authorization");

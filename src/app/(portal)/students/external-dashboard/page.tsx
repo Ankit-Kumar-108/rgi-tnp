@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import {
   Briefcase,
   CheckCircle,
@@ -28,9 +29,17 @@ import { getToken, logout } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { uploadFileToR2 } from "@/lib/upload-r2";
 import { PlacementDrive } from "@/types";
-import JobDetailsModal from "@/components/forms/studentApplyModal/modal";
 import { toast } from "sonner";
-import FeedbackComp from "../feedback/feedbakComp";
+
+// Lazy load heavy modal components — only loaded when user interacts
+const JobDetailsModal = dynamic(
+  () => import("@/components/forms/studentApplyModal/modal"),
+  { ssr: false }
+);
+const FeedbackComp = dynamic(
+  () => import("../feedback/feedbakComp"),
+  { ssr: false }
+);
 
 export default function ExternalStudentDashboard() {
   const router = useRouter();

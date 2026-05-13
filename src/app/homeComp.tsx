@@ -11,7 +11,6 @@ import {
 import Nav from "../components/layout/nav/nav"
 import Footer from "../components/layout/footer/footer"
 import Link from "next/link"
-import Image from "next/image"
 import { useEffect, useState } from "react";
 import { Camera } from "lucide-react";
 import { toast } from "sonner";
@@ -69,83 +68,104 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [showAllVolunteers, setShowAllVolunteers] = useState(false);
 
-  /* ── Fetch all initial data in parallel (drives + testimonials + memories) ── */
+  /* ── Fetch drive images ── */
   useEffect(() => {
     const controller = new AbortController();
-    const signal = controller.signal;
 
-    const fetchAll = async () => {
-      const [drivesResult, testimonialsResult, memoriesResult] = await Promise.allSettled([
-        fetch("/api/home/driveImages?limit=10", { signal }).then(r => r.json()),
-        fetch("/api/home/testimonial", { signal }).then(r => r.json()),
-        fetch("/api/memories?limit=6", { signal }).then(r => r.json()),
-      ]);
+    const fetchDriveImages = async () => {
+      try {
+        const drivesRes = await fetch("/api/home/driveImages?limit=10", {
+          signal: controller.signal
+        });
+        const drivesData = await drivesRes.json() as {
+          success: boolean;
+          drives: HomeDrive[];
+        };
 
-      // Process drive images
-      if (drivesResult.status === "fulfilled") {
-        const drivesData = drivesResult.value as { success: boolean; drives: HomeDrive[] };
-        if (drivesData.success && drivesData.drives) {
-          setDriveGroups(
-            drivesData.drives
-              .filter((d) => d.driveImages.length > 0)
-              .map((d) => ({ driveId: d.id, title: d.title, images: d.driveImages }))
-          );
+        if (!drivesData.success || !drivesData.drives) {
+          setLoadingDrives(false);
+          return;
         }
-      } else if (drivesResult.reason?.name !== "AbortError") {
-        console.error("Error fetching drive images:", drivesResult.reason);
-      }
-      setLoadingDrives(false);
 
-      // Process testimonials
-      if (testimonialsResult.status === "fulfilled") {
-        setTestimonials(testimonialsResult.value as TestimonialData[]);
-      } else if (testimonialsResult.reason?.name !== "AbortError") {
-        console.error("Error fetching testimonials:", testimonialsResult.reason);
-      }
-      setLoadingTestimonials(false);
+        const groups = drivesData.drives
+          .filter((drive) => drive.driveImages.length > 0)
+          .map((drive) => ({
+            driveId: drive.id,
+            title: drive.title,
+            images: drive.driveImages,
+          }));
 
-      // Process memories
-      if (memoriesResult.status === "fulfilled") {
-        const memData = memoriesResult.value as { success: boolean; memories: MemoryData[] };
-        if (memData.success && memData.memories) {
-          setMemories(memData.memories);
+        setDriveGroups(groups);
+      } catch (error) {
+        if (error instanceof Error && error.name !== 'AbortError') {
+          console.error("Error fetching drive images:", error);
         }
-      } else if (memoriesResult.reason?.name !== "AbortError") {
-        console.error("Error fetching memories:", memoriesResult.reason);
+      } finally {
+        setLoadingDrives(false);
       }
-      setLoadingMemories(false);
     };
 
-    fetchAll();
+    fetchDriveImages();
     return () => controller.abort();
   }, []);
 
-  /* ── Fetch volunteers (separate — depends on showAllVolunteers toggle) ── */
+  /* ── Fetch testimonials ── */
   useEffect(() => {
-    const controller = new AbortController();
-    setLoading(true);
+    const fetchTestimonials = async () => {
+      try {
+        const response = await fetch("/api/home/testimonial");
+        const data = (await response.json()) as TestimonialData[];
+        if (!response.ok) {
+          throw new Error("Failed to fetch testimonials");
+        }
+        setTestimonials(data);
+      } catch (error) {
+        console.error("Error fetching testimonials:", error);
+      } finally {
+        setLoadingTestimonials(false);
+      }
+    };
+    fetchTestimonials();
+  }, []);
 
+  /* ── Fetch approved memories ── */
+  useEffect(() => {
+    const fetchMemories = async () => {
+      try {
+        const res = await fetch("/api/memories?limit=6");
+        const data = (await res.json()) as { success: boolean; memories: MemoryData[] };
+        if (data.success && data.memories) {
+          setMemories(data.memories);
+        }
+      } catch (error) {
+        console.error("Error fetching memories:", error);
+      } finally {
+        setLoadingMemories(false);
+      }
+    };
+    fetchMemories();
+  }, []);
+
+  // Fetch active volunteers for the "Meet the Team" section
+
+  useEffect(() => {
+    setLoading(true);
     const fetchVolunteers = async () => {
       try {
         const limit = showAllVolunteers ? "all" : "4";
-        const res = await fetch(`/api/home/volunteerCards?limit=${limit}`, {
-          signal: controller.signal,
-        });
+        const res = await fetch(`/api/home/volunteerCards?limit=${limit}`);
         const data = (await res.json()) as { success: boolean; volunteers: any[] };
         if (data.success && data.volunteers) {
           setVolunteers(data.volunteers);
         }
-      } catch (error: any) {
-        if (error?.name !== "AbortError") {
-          console.error("Error fetching volunteers:", error);
-          toast.error("Failed to load volunteer data. Please try again later.");
-        }
+      } catch (error) {
+        console.error("Error fetching volunteers:", error);
+        toast.error("Failed to load volunteer data. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
     fetchVolunteers();
-    return () => controller.abort();
   }, [showAllVolunteers]);
 
   /* ── Auto-scroll carousel ── */
@@ -198,15 +218,7 @@ export default function Home() {
                   <span className="text-xs font-bold uppercase tracking-wider">Top Rated Placement Cell</span>
                 </div>
                 <div className="relative">
-                  <div className="relative h-80 md:h-112.5 w-full rounded-2xl md:rounded-3xl shadow-[var(--shadow-lg)] overflow-hidden">
-                    <Image
-                      src="/images/RGI.jpg"
-                      alt="Modern college campus students collaborating outdoors"
-                      fill
-                      className="object-cover"
-                      priority
-                      sizes="(max-width: 1024px) 100vw, 50vw"
-                    />
+                  <div className="relative h-80 md:h-112.5 w-full rounded-2xl md:rounded-3xl bg-cover bg-center shadow-[var(--shadow-lg)] overflow-hidden" data-alt="Modern college campus students collaborating outdoors" style={{ backgroundImage: "url(/images/RGI.jpg)" }}>
                   </div>
                 </div>
               </div>
@@ -284,12 +296,11 @@ export default function Home() {
                         {/* Image 1 — large (spans 2 cols, 2 rows) */}
                         {group.images[0] && (
                           <div className="col-span-2 row-span-2 rounded-2xl overflow-hidden relative group/img shadow-lg">
-                            <Image
+                            <img
                               src={group.images[0].imageUrl}
                               alt={group.images[0].title}
-                              className="object-cover group-hover/img:scale-105 transition-transform duration-700"
-                              fill
-                              sizes="(max-width: 768px) 50vw, 25vw"
+                              className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700"
+                              loading="lazy"
                             />
                             <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
                           </div>
@@ -297,12 +308,11 @@ export default function Home() {
                         {/* Image 2 — top right */}
                         {group.images[1] && (
                           <div className="col-span-1 row-span-1 rounded-2xl overflow-hidden relative group/img shadow-lg">
-                            <Image
+                            <img
                               src={group.images[1].imageUrl}
                               alt={group.images[1].title}
-                              className="object-cover object-top group-hover/img:scale-105 transition-transform duration-700"
-                              fill
-                              sizes="(max-width: 768px) 25vw, 12.5vw"
+                              className="w-full h-full object-cover object-top group-hover/img:scale-105 transition-transform duration-700"
+                              loading="lazy"
                             />
                             <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
                           </div>
@@ -310,12 +320,11 @@ export default function Home() {
                         {/* Image 3 — top far-right */}
                         {group.images[2] && (
                           <div className="col-span-1 row-span-1 rounded-2xl overflow-hidden relative group/img shadow-lg">
-                            <Image
+                            <img
                               src={group.images[2].imageUrl}
                               alt={group.images[2].title}
-                              className="object-cover object-top group-hover/img:scale-105 transition-transform duration-700"
-                              fill
-                              sizes="(max-width: 768px) 25vw, 12.5vw"
+                              className="w-full h-full object-cover object-top group-hover/img:scale-105 transition-transform duration-700"
+                              loading="lazy"
                             />
                             <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
                           </div>
@@ -323,12 +332,11 @@ export default function Home() {
                         {/* Image 4 — bottom right (spans 2 cols) */}
                         {group.images[3] && (
                           <div className="col-span-2 row-span-1 rounded-2xl overflow-hidden relative group/img shadow-lg">
-                            <Image
+                            <img
                               src={group.images[3].imageUrl}
                               alt={group.images[3].title}
-                              className="object-cover group-hover/img:scale-105 transition-transform duration-700"
-                              fill
-                              sizes="(max-width: 768px) 50vw, 25vw"
+                              className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700"
+                              loading="lazy"
                             />
                             <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
                           </div>
@@ -365,13 +373,12 @@ export default function Home() {
             className="bg-card rounded-2xl md:rounded-3xl shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] overflow-hidden border border-border transition-shadow duration-300"
           >
             <div className="flex flex-col lg:flex-row">
-              <div className="lg:w-1/3 aspect-square lg:aspect-auto relative">
-                <Image
+              <div className="lg:w-1/3 aspect-square lg:aspect-auto">
+                <img
                   alt="Robin Samuel, Director T&P"
-                  className="object-cover"
+                  loading="lazy"
+                  className="w-full h-full object-cover"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIBYviOOWoEn1D6xTyYMluquzqttL4SCoQ8YTdPoSTTNYQLCqya8DiCAs66JmTJiHyRmHxUpVjA4GCYy4fhForyUeFzidpP8yNMIkHu_oaQRp9Krmp-Gz1K9nwFA-4vEgEubQQch8uCbxjl-ImtNgvWcFKvMoDY-gPzvpkp5HvSUSDe_vCwfaHUk_I7xlMHmS6Z4yoMHaYo8erwwh2Y4C_p5eHMCF4UEtWfpnKSjQrYRwDmJRAQhUxaICeli4FyMR5td48o8_nWg"
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 33vw"
                   referrerPolicy="no-referrer"
                 />
               </div>
@@ -394,13 +401,13 @@ export default function Home() {
           <div
             className="bg-card rounded-2xl md:rounded-3xl shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] overflow-hidden border border-border transition-shadow duration-300">
             <div className="flex flex-col lg:flex-row-reverse">
-              <div className="lg:w-1/3 aspect-square lg:aspect-auto relative">
-                <Image
+              <div className="lg:w-1/3 aspect-square lg:aspect-auto">
+                <img
                   alt="Deputy Director T&amp;P"
-                  className="object-cover"
+                  loading="lazy"
+                  className="w-full h-full object-cover"
+                  data-alt="Professional portrait of Deputy Director in business attire"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIBYviOOWoEn1D6xTyYMluquzqttL4SCoQ8YTdPoSTTNYQLCqya8DiCAs66JmTJiHyRmHxUpVjA4GCYy4fhForyUeFzidpP8yNMIkHu_oaQRp9Krmp-Gz1K9nwFA-4vEgEubQQch8uCbxjl-ImtNgvWcFKvMoDY-gPzvpkp5HvSUSDe_vCwfaHUk_I7xlMHmS6Z4yoMHaYo8erwwh2Y4C_p5eHMCF4UEtWfpnKSjQrYRwDmJRAQhUxaICeli4FyMR5td48o8_nWg"
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 33vw"
                   referrerPolicy="no-referrer"
                 />
               </div>
@@ -435,10 +442,8 @@ export default function Home() {
             {volunteers.length === 0 && !loading && (
               <>
                 {/* <!-- Card 1 --> */}
-                <div className="bg-card rounded-xl hover:shadow-[var(--shadow-lg)] border overflow-hidden border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
-                  <div className="aspect-2.5/3 relative">
-                    <Image src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwfoJsfJpSlw13cw9oHHcBFpUmlThTV4dahXFh0Qj0CAh37D3VkPF5Vy1WZ84fBrK27NKLkXJe9RdG7AK2_YVd56NxRE4WEisDxlGzpaHsjKPTDR4U181mIlvvE1U5v6IWNlaG_DgTioYwka5jHwh_pve2IGBpiChT2QMrlz4k151kkJSQh6DP0UchBMNC4_S69_b1AMPjNTlMUv9w1e1pD9_ibxhXkKedP9XEQnEHpH6UEZbIhd1RaiUAIFn7iUNBNm1Piuq4rA" alt="Female staff member profile" className="object-cover object-top transition-transform" fill sizes="(max-width: 768px) 50vw, 25vw" />
-                  </div>
+                < div className="bg-card rounded-xl hover:shadow-[var(--shadow-lg)] border overflow-hidden border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
+                  <div className="aspect-2.5/3 bg-cover bg-top transition-transform" data-alt="Female staff member profile" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuCwfoJsfJpSlw13cw9oHHcBFpUmlThTV4dahXFh0Qj0CAh37D3VkPF5Vy1WZ84fBrK27NKLkXJe9RdG7AK2_YVd56NxRE4WEisDxlGzpaHsjKPTDR4U181mIlvvE1U5v6IWNlaG_DgTioYwka5jHwh_pve2IGBpiChT2QMrlz4k151kkJSQh6DP0UchBMNC4_S69_b1AMPjNTlMUv9w1e1pD9_ibxhXkKedP9XEQnEHpH6UEZbIhd1RaiUAIFn7iUNBNm1Piuq4rA)" }}></div>
                   <div className="p-4">
                     <h3 className="font-bold text-base md:text-lg" >Dr. Anjali Sharma</h3>
                     <p className="text-brand text-xs md:text-sm font-medium" >Corporate Relations</p>
@@ -446,9 +451,7 @@ export default function Home() {
                 </div>
                 {/* <!-- Card 2 --> */}
                 <div className="bg-card rounded-xl overflow-hidden border hover:shadow-[var(--shadow-lg)] border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
-                  <div className="aspect-2.5/3 relative">
-                    <Image src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlBGcrKwosCrkAFG1qE2hMewRAhTS-EYKa7SX5VzKmhlBmcIztS0GsQ0_Rgz9VISZXklQKDWvsxaR_LvJAkVsHULlHlXfyZ4nWerTDPLdIe3qjX8LxGmJ3zuGiOPazUvP0C2eJvz1M6jzY3GQqrki-7wjTCNTNln4d3_JSSh3Es0CreOhKnzrPJfaIyqQ8jMSk_X8uCLGzJoYfiYyXC4HpIGJ7IJ-ERWVMjRjgv78yuEYpx2COfNFV579HNLl8x406i5IuTeIzAA" alt="Male staff member profile" className="object-cover object-top transition-transform" fill sizes="(max-width: 768px) 50vw, 25vw" />
-                  </div>
+                  <div className="aspect-2.5/3 bg-cover bg-top transition-transform" data-alt="Male staff member profile" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuAlBGcrKwosCrkAFG1qE2hMewRAhTS-EYKa7SX5VzKmhlBmcIztS0GsQ0_Rgz9VISZXklQKDWvsxaR_LvJAkVsHULlHlXfyZ4nWerTDPLdIe3qjX8LxGmJ3zuGiOPazUvP0C2eJvz1M6jzY3GQqrki-7wjTCNTNln4d3_JSSh3Es0CreOhKnzrPJfaIyqQ8jMSk_X8uCLGzJoYfiYyXC4HpIGJ7IJ-ERWVMjRjgv78yuEYpx2COfNFV579HNLl8x406i5IuTeIzAA)" }}></div>
                   <div className="p-4">
                     <h3 className="font-bold text-base md:text-lg" >Vikram Malhotra</h3>
                     <p className="text-brand text-xs md:text-sm font-medium" >Technical Trainer</p>
@@ -456,9 +459,7 @@ export default function Home() {
                 </div>
                 {/* <!-- Card 3 --> */}
                 <div className="bg-card rounded-xl hover:shadow-[var(--shadow-lg)] overflow-hidden border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
-                  <div className="aspect-2.5/3 relative">
-                    <Image src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvMtr2p2ngRt9hK1Jn6FrV4XHZlxx9MzK655JpTskmWj_hS4QAP6MX1VA4MFE8Po0VpwOr8M6vd2CZaeq3Da1fYO-6cMzMVaSOKbqJaXyP-O3kiQo3iYP7wqUb7DB_j3HahZcUqeW8hCdtz_hdJPm_ocN6cwLxwCbPVw2mnl-cwSyCjX8jq6bXiu_yHsaYt6HTLHOztoOuHm-Lym8KraBLLFh8MDKLUuBBxjG9xv1dbyZvYdy2Mqj-_EohWc67WEV4fgoYMBFSSQ" alt="Female student volunteer" className="object-cover object-top transition-transform" fill sizes="(max-width: 768px) 50vw, 25vw" />
-                  </div>
+                  <div className="aspect-2.5/3 bg-cover bg-top" data-alt="Female student volunteer" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuBvMtr2p2ngRt9hK1Jn6FrV4XHZlxx9MzK655JpTskmWj_hS4QAP6MX1VA4MFE8Po0VpwOr8M6vd2CZaeq3Da1fYO-6cMzMVaSOKbqJaXyP-O3kiQo3iYP7wqUb7DB_j3HahZcUqeW8hCdtz_hdJPm_ocN6cwLxwCbPVw2mnl-cwSyCjX8jq6bXiu_yHsaYt6HTLHOztoOuHm-Lym8KraBLLFh8MDKLUuBBxjG9xv1dbyZvYdy2Mqj-_EohWc67WEV4fgoYMBFSSQ)" }}></div>
                   <div className="p-4">
                     <h3 className="font-bold text-base md:text-lg" >Neha Singh</h3>
                     <p className="text-brand text-xs md:text-sm font-medium" >Student Lead</p>
@@ -466,9 +467,7 @@ export default function Home() {
                 </div>
                 {/* <!-- Card 4 --> */}
                 <div className="bg-card rounded-xl hover:shadow-[var(--shadow-lg)] overflow-hidden border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
-                  <div className="aspect-2.5/3 relative">
-                    <Image src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcieaOwaB_8kavE_tydgpoKCMmW8zgXo46rbL1ABkBG2Xl4Ugae-0S9ZfXIhXGD86rFKMPXpNiw_XsXOlrp4KlaL87K1DgrihXRXIQqxow3qW_fXec3xCOiOGV8TeBp5dhzAlRguHWBBmJJj2xqUdmMvJ_VwzkhQoYKarT-AjNU_9KDusbNsiA6i9S1dt0RwqUepiImzSPwAq8IzU1sXLpDl88wppHQdcrIsM3jwFOxaA3PtZXtNmtclNuTgVmxZeNOH_yFkBJFA" alt="Male student volunteer" className="object-cover object-top transition-transform" fill sizes="(max-width: 768px) 50vw, 25vw" />
-                  </div>
+                  <div className="aspect-2.5/3 bg-cover bg-top" data-alt="Male student volunteer" style={{ backgroundImage: "url(https://lh3.googleusercontent.com/aida-public/AB6AXuDcieaOwaB_8kavE_tydgpoKCMmW8zgXo46rbL1ABkBG2Xl4Ugae-0S9ZfXIhXGD86rFKMPXpNiw_XsXOlrp4KlaL87K1DgrihXRXIQqxow3qW_fXec3xCOiOGV8TeBp5dhzAlRguHWBBmJJj2xqUdmMvJ_VwzkhQoYKarT-AjNU_9KDusbNsiA6i9S1dt0RwqUepiImzSPwAq8IzU1sXLpDl88wppHQdcrIsM3jwFOxaA3PtZXtNmtclNuTgVmxZeNOH_yFkBJFA)" }}></div>
                   <div className="p-4">
                     <h3 className="font-bold text-base md:text-lg" >Rahul Verma</h3>
                     <p className="text-brand text-xs md:text-sm font-medium" >Event Coordinator</p>
@@ -487,9 +486,7 @@ export default function Home() {
                     key={volunteer.id}
                     id={volunteer.id}
                     className="bg-card relative rounded-xl hover:shadow-[var(--shadow-lg)] border overflow-hidden border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 group">
-                    <div className="aspect-2.5/3 relative">
-                      <Image src={volunteer.student.profileImageUrl || "https://lh3.googleusercontent.com/aida-public/AB6AXuD-4qpQG9rSHLujKoHhrbgWRAg81sFBu41MDA54QQ14Y6yYxoww19N7Hs6lybLRgvZCg5yNw-06wJ8p2GwAuZrN9ytupLwK1aRZSm47WIYXx5ld9vONPYIsuhD5KGlStRJhFuJTFHl_Hc-t-2CxveYwpsep0lUKrYPz6ghsEv9_r2NE8H2tzkba6XLY91OoOHMGHGA4iF6n7TtSxX_Dr3zeJ206-8b6lxuPWVgO5R0mihIiXboKj1OEPXe_2qH9vxxFdK4gE9e5YQ"} alt={volunteer.student.name} className="object-cover object-top transition-transform" fill sizes="(max-width: 768px) 50vw, 25vw" />
-                    </div>
+                    <div className="aspect-2.5/3 bg-cover bg-top transition-transform" data-alt="Staff member profile" style={{ backgroundImage: `url(${volunteer.student.profileImageUrl})` }}></div>
                     <div className="p-3">
                       <a
                         href={volunteer.student.linkedinUrl}
@@ -546,12 +543,10 @@ export default function Home() {
                 key={i}
                 className="relative group overflow-hidden rounded-2xl h-100"
               >
-                <Image
+                <img
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  loading="lazy"
                   src={item.img}
-                  alt={item.title}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 33vw"
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent"></div>
@@ -594,9 +589,7 @@ export default function Home() {
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                 {testimonials.map((testimonial) => (
                   <div key={testimonial.id} className="bg-card p-6 md:p-10 rounded-2xl md:rounded-3xl shadow-[var(--shadow-sm)] border border-border hover:shadow-[var(--shadow-md)] transition-shadow duration-300 flex flex-col items-center text-center group">
-                    <div className="w-20 h-20 md:w-32 md:h-32 rounded-full mb-4 md:mb-6 ring-4 ring-brand/10 group-hover:ring-brand/20 transition-all relative overflow-hidden">
-                      <Image src={testimonial.profileImageUrl || "https://lh3.googleusercontent.com/aida-public/AB6AXuD-4qpQG9rSHLujKoHhrbgWRAg81sFBu41MDA54QQ14Y6yYxoww19N7Hs6lybLRgvZCg5yNw-06wJ8p2GwAuZrN9ytupLwK1aRZSm47WIYXx5ld9vONPYIsuhD5KGlStRJhFuJTFHl_Hc-t-2CxveYwpsep0lUKrYPz6ghsEv9_r2NE8H2tzkba6XLY91OoOHMGHGA4iF6n7TtSxX_Dr3zeJ206-8b6lxuPWVgO5R0mihIiXboKj1OEPXe_2qH9vxxFdK4gE9e5YQ"} alt="Alumni testimonial" fill className="object-cover" sizes="128px" />
-                    </div>
+                    <div className="w-20 h-20 md:w-32 md:h-32 rounded-full bg-cover bg-center mb-4 md:mb-6 ring-4 ring-brand/10 group-hover:ring-brand/20 transition-all" data-alt="Alumni testimonial" style={{ backgroundImage: testimonial.profileImageUrl ? `url('${testimonial.profileImageUrl}')` : "url('https://lh3.googleusercontent.com/aida-public/AB6AXuD-4qpQG9rSHLujKoHhrbgWRAg81sFBu41MDA54QQ14Y6yYxoww19N7Hs6lybLRgvZCg5yNw-06wJ8p2GwAuZrN9ytupLwK1aRZSm47WIYXx5ld9vONPYIsuhD5KGlStRJhFuJTFHl_Hc-t-2CxveYwpsep0lUKrYPz6ghsEv9_r2NE8H2tzkba6XLY91OoOHMGHGA4iF6n7TtSxX_Dr3zeJ206-8b6lxuPWVgO5R0mihIiXboKj1OEPXe_2qH9vxxFdK4gE9e5YQ')" }}></div>
                     <div className="mb-4 md:mb-6">
                       <h3 className="text-base md:text-xl font-bold text-foreground">{testimonial.name || "Anonymous"}</h3>
                       <p className="text-xs md:text-sm text-brand font-semibold uppercase tracking-wider">{testimonial.jobTitle ? `${testimonial.jobTitle} at ${testimonial.currentCompany}` : "Alumni"}</p>
@@ -643,12 +636,11 @@ export default function Home() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-[200px]">
               {/* Memory 1 — Large (2 cols × 2 rows) */}
               <div className="col-span-2 row-span-2 rounded-2xl overflow-hidden relative group">
-                <Image
-                  className="object-cover group-hover:scale-110 transition-transform duration-700"
+                <img
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   alt={memories[0].title}
+                  loading="lazy"
                   src={memories[0].imageUrl}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6">
                   <p className="text-white font-bold text-lg">{memories[0].title}</p>
@@ -657,12 +649,11 @@ export default function Home() {
               </div>
               {/* Memory 2 */}
               <div className="rounded-2xl overflow-hidden relative group">
-                <Image
-                  className="object-cover group-hover:scale-110 transition-transform duration-700"
+                <img
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   alt={memories[1].title}
+                  loading="lazy"
                   src={memories[1].imageUrl}
-                  fill
-                  sizes="(max-width: 768px) 50vw, 25vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
                   <p className="text-white text-xs font-bold">{memories[1].title}</p>
@@ -671,12 +662,11 @@ export default function Home() {
               </div>
               {/* Memory 3 */}
               <div className="rounded-2xl overflow-hidden relative group">
-                <Image
-                  className="object-cover group-hover:scale-110 transition-transform duration-700"
+                <img
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   alt={memories[2].title}
+                  loading="lazy"
                   src={memories[2].imageUrl}
-                  fill
-                  sizes="(max-width: 768px) 50vw, 25vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
                   <p className="text-white text-xs font-bold">{memories[2].title}</p>
@@ -685,12 +675,11 @@ export default function Home() {
               </div>
               {/* Memory 4 — Wide (2 cols × 1 row) */}
               <div className="col-span-2 rounded-2xl overflow-hidden relative group">
-                <Image
-                  className="object-cover group-hover:scale-110 transition-transform duration-700"
+                <img
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   alt={memories[3].title}
+                  loading="lazy"
                   src={memories[3].imageUrl}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6">
                   <p className="text-white font-bold">{memories[3].title}</p>
@@ -702,25 +691,25 @@ export default function Home() {
             /* ── Fallback: static placeholder grid ── */
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-[200px]">
               <div className="col-span-2 row-span-2 rounded-2xl overflow-hidden relative group">
-                <Image className="object-cover group-hover:scale-110 transition-transform duration-700" alt="Students celebrating" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC97PRhCgez5vt9saBg50a81NQl00I3X5oJekFcGncJ_rtn8lGAgg0R5rdfYKEJss12iI-MMSMIJO_5AAP8QVSVr4zN2sO4g-9DOSXkB3RmfbmhlPbFvFqLoOogUPSE6F3YveI_u4x8HKjtV1sfoBlbGstnVLEwiyLJLa2iTEAzgj0KRt5wgCCIJJNXoVXvwYpHWFpKlJf0wQX6LSTDrTEVnC8Aky63CuM1Q7s_mp2WIs1HYWn-q6LmaA5trwzhCtdW31OdBgx7zw" fill sizes="(max-width: 768px) 100vw, 50vw" />
+                <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Students celebrating" loading="lazy" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC97PRhCgez5vt9saBg50a81NQl00I3X5oJekFcGncJ_rtn8lGAgg0R5rdfYKEJss12iI-MMSMIJO_5AAP8QVSVr4zN2sO4g-9DOSXkB3RmfbmhlPbFvFqLoOogUPSE6F3YveI_u4x8HKjtV1sfoBlbGstnVLEwiyLJLa2iTEAzgj0KRt5wgCCIJJNXoVXvwYpHWFpKlJf0wQX6LSTDrTEVnC8Aky63CuM1Q7s_mp2WIs1HYWn-q6LmaA5trwzhCtdW31OdBgx7zw" />
                 <div className="absolute inset-0 bg-gradient-to-t from-brand/70 via-brand/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
                   <p className="text-white font-bold">Success Celebration 2023</p>
                 </div>
               </div>
               <div className="rounded-2xl overflow-hidden relative group">
-                <Image className="object-cover group-hover:scale-110 transition-transform duration-700" alt="Workshop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDh6hS3y3An0YD7BtmPrJjDJy3QqxeWstYyROERKY0bxcMmfi3NtKSgBtciSNen085rHJLes5JrTcoA5T4Vf2WNw2IM8kRVvRLyoasWkdNmfAov8REckXa_OE0be3DmEtrTvkNzzfew3SjV3XPxzdopBINZ2o5vzBcqR7jYZez5IOP6LzmIYnvjp5gPQWTS5tYpBwlhyiNkgeN9P4YOck_f3zhTSgxGGAeIEWsTG4EcdZH06oT7Si25K0FozYFtqQkSJaOn-hOc8g" fill sizes="(max-width: 768px) 50vw, 25vw" />
+                <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Workshop" loading="lazy" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDh6hS3y3An0YD7BtmPrJjDJy3QqxeWstYyROERKY0bxcMmfi3NtKSgBtciSNen085rHJLes5JrTcoA5T4Vf2WNw2IM8kRVvRLyoasWkdNmfAov8REckXa_OE0be3DmEtrTvkNzzfew3SjV3XPxzdopBINZ2o5vzBcqR7jYZez5IOP6LzmIYnvjp5gPQWTS5tYpBwlhyiNkgeN9P4YOck_f3zhTSgxGGAeIEWsTG4EcdZH06oT7Si25K0FozYFtqQkSJaOn-hOc8g" />
                 <div className="absolute inset-0 bg-gradient-to-t from-brand/70 via-brand/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
                   <p className="text-white text-xs font-bold">Industry Workshop</p>
                 </div>
               </div>
               <div className="rounded-2xl overflow-hidden relative group">
-                <Image className="object-cover group-hover:scale-110 transition-transform duration-700" alt="Career Fair" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfVL3bulkTn6s12N7oW80mh_GCLiSw_N7D4kSqzKOmW9UHhtz4eYA_dhYsnps6YBYyPDyK0b-VMfNHvHKsuz-q-4Wk3Oc1PfptLnBo8ms3ccnPWg14Cr7W6TOLNLmFWLeOvI30Uq3He2J8U-RWMqUpyfHiREvsA6uZZbhREsPCNnQJdqXfkBPrrT1a4qAvXr223gUxvoPH1wBvSTbad54mHToce10X7mwyZxOZYFstCQ1mfxW6UAe08UBm07ZZmtcUgM4KOPtGiQ" fill sizes="(max-width: 768px) 50vw, 25vw" />
+                <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Career Fair" loading="lazy" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfVL3bulkTn6s12N7oW80mh_GCLiSw_N7D4kSqzKOmW9UHhtz4eYA_dhYsnps6YBYyPDyK0b-VMfNHvHKsuz-q-4Wk3Oc1PfptLnBo8ms3ccnPWg14Cr7W6TOLNLmFWLeOvI30Uq3He2J8U-RWMqUpyfHiREvsA6uZZbhREsPCNnQJdqXfkBPrrT1a4qAvXr223gUxvoPH1wBvSTbad54mHToce10X7mwyZxOZYFstCQ1mfxW6UAe08UBm07ZZmtcUgM4KOPtGiQ" />
                 <div className="absolute inset-0 bg-gradient-to-t from-brand/70 via-brand/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
                   <p className="text-white text-xs font-bold">Career Fair</p>
                 </div>
               </div>
               <div className="col-span-2 rounded-2xl overflow-hidden relative group">
-                <Image className="object-cover group-hover:scale-110 transition-transform duration-700" alt="Mentorship" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTeMzT5fUnQNwQOk4-MtK4UKshACdx6vF5j3zM4xwJfWNXxO2LO9g37Nht5WGURIQCVpgw01qsuzaTli-rQkFp6_jc6PldL-Hpf43BoLX0IzXAY40OB3SudgNuAraLAVrJZjEdqdoj79narEEugwtM0OeghOU_Mggn4GTVSRHnsRfrzmzTZHeSi-9ndWU0iJYDWdBTVUAJV9uzq6lGBKYeXnGQIq1ziSdTYOhys206aN2QueMgXLfOFykuUFLCXSLK6WND8phzXg" fill sizes="(max-width: 768px) 100vw, 50vw" />
+                <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Mentorship" loading="lazy" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTeMzT5fUnQNwQOk4-MtK4UKshACdx6vF5j3zM4xwJfWNXxO2LO9g37Nht5WGURIQCVpgw01qsuzaTli-rQkFp6_jc6PldL-Hpf43BoLX0IzXAY40OB3SudgNuAraLAVrJZjEdqdoj79narEEugwtM0OeghOU_Mggn4GTVSRHnsRfrzmzTZHeSi-9ndWU0iJYDWdBTVUAJV9uzq6lGBKYeXnGQIq1ziSdTYOhys206aN2QueMgXLfOFykuUFLCXSLK6WND8phzXg" />
                 <div className="absolute inset-0 bg-gradient-to-t from-brand/70 via-brand/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
                   <p className="text-white font-bold">Corporate Mentorship</p>
                 </div>

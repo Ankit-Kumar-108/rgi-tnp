@@ -7,11 +7,26 @@ const __dirname = path.dirname(__filename);
 
 const nextConfig: NextConfig = {
   outputFileTracingRoot: __dirname,
+  // Required for @cloudflare/next-on-pages static asset serving
+  skipTrailingSlashRedirect: true,
+  skipMiddlewareUrlNormalize: true,
   images: {
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'pub-1b5e6b5b4fbe4c89940f9bb74b08fa75.r2.dev',
         port: '',
         pathname: '/**',
       },

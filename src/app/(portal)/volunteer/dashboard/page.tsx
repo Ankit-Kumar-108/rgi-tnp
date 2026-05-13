@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import {
   Loader2,
   Briefcase,
@@ -20,9 +21,39 @@ import { useAuth } from "@/hooks/useAuth";
 import { getToken, logout } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import VolunteerDriveImageManagement from "@/components/volunteer/VolunteerDriveImageManagement";
-import StudentsOverviewTabs, { type StudentData } from "@/components/volunteer/StudentsOverviewTabs";
-import VolunteerAttendanceQR from "@/components/volunteer/VolunteerAttendanceQR";
+import type { StudentData } from "@/components/volunteer/StudentsOverviewTabs";
+
+// Lazy load heavy tab components — only loaded when user switches to that tab
+const VolunteerDriveImageManagement = dynamic(
+  () => import("@/components/volunteer/VolunteerDriveImageManagement"),
+  {
+    loading: () => (
+      <div className="flex justify-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-brand" />
+      </div>
+    ),
+  }
+);
+const StudentsOverviewTabs = dynamic(
+  () => import("@/components/volunteer/StudentsOverviewTabs"),
+  {
+    loading: () => (
+      <div className="flex justify-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-brand" />
+      </div>
+    ),
+  }
+);
+const VolunteerAttendanceQR = dynamic(
+  () => import("@/components/volunteer/VolunteerAttendanceQR"),
+  {
+    loading: () => (
+      <div className="flex justify-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-brand" />
+      </div>
+    ),
+  }
+);
 
 interface VolunteerData {
   volunteer: {

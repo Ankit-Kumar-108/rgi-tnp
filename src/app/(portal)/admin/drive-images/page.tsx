@@ -2,11 +2,23 @@
 export const runtime = "edge";
 
 import React from "react";
+import dynamic from "next/dynamic";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
-import DriveImageManagement from "@/components/admin/DriveImageManagement";
 import { ArrowLeft, Shield, Loader2 } from "lucide-react";
 import Link from "next/link";
+
+// Lazy load heavy management component
+const DriveImageManagement = dynamic(
+  () => import("@/components/admin/DriveImageManagement"),
+  {
+    loading: () => (
+      <div className="flex justify-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-brand" />
+      </div>
+    ),
+  }
+);
 
 export default function DriveImagesAdminPage() {
   const { loading: authLoading, authenticated } = useAuth("admin", "/admin/login");
