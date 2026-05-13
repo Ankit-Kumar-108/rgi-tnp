@@ -7,19 +7,12 @@ import { getRequestContext } from "@cloudflare/next-on-pages";
 let prismaClientInstance: PrismaClient | null = null;
 
 export const getDb = () => {
-  // Reuse existing instance within the same request context
-  if (prismaClientInstance) {
-    return prismaClientInstance;
-  }
-
   const { env } = getRequestContext() as any;
   const adapter = new PrismaD1(env.DB);
   
-  prismaClientInstance = new PrismaClient({ 
+  return new PrismaClient({ 
     adapter,
     // Optimize connection pool for edge runtime
     log: process.env.NODE_ENV === 'development' ? ['error'] : ['error'],
   } as any);
-
-  return prismaClientInstance;
 };
