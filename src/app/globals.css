@@ -1,4 +1,14 @@
 @import "tailwindcss";
+
+/* 
+ * Specify the source directories for Tailwind v4. 
+ * Since this file is inside src/app, it will only scan src/app by default.
+ * We must include components and other directories to scan for utility classes. 
+ */
+@source "../components";
+@source "../lib";
+@source "../hooks";
+
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
