@@ -29,6 +29,7 @@ export async function GET(req: NextRequest) {
 
     const db = getDb();
 
+
     // Get recruiter's drives WITHOUT nested registrations (avoid N+1)
     const drives = await db.placementDrive.findMany({
       where: { 
@@ -67,11 +68,15 @@ export async function GET(req: NextRequest) {
     let applicants: any[] = [];
     let applicantsCount = 0;
 
+    
+    const driveParams = searchParams.get("driveId")
+    const targetDriveId = driveParams || drives[0]?.id
+
     if (drives.length > 0) {
       const firstDriveId = drives[0].id;
       [applicants, applicantsCount] = await Promise.all([
         db.driveRegistration.findMany({
-          where: { driveId: firstDriveId },
+          where: { driveId: targetDriveId },
           select: {
             id: true,
             attended: true,
@@ -85,7 +90,7 @@ export async function GET(req: NextRequest) {
           orderBy: { createdAt: "desc" },
         }),
         db.driveRegistration.count({
-          where: { driveId: firstDriveId }
+          where: { driveId: targetDriveId }
         })
       ]);
 
@@ -143,6 +148,7 @@ export async function GET(req: NextRequest) {
       eligibleBranches: d.eligibleBranches,
       minCGPA: d.minCGPA,
       registrationCount: registrationCounts[idx],
+      applicants: d.applicants
     }));
 
     const totalApplicants = registrationCounts.reduce((sum, count) => sum + count, 0);

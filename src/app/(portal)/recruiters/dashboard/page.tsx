@@ -98,6 +98,21 @@ export default function RecruiterDashboard() {
     }
   };
 
+  const fetchApplicants = async (driveId: string) => {
+    try {
+      const token = getToken("recruiter")
+      const response = await fetch(`/api/recruiter/dashboard?driveId=${driveId}`, {
+        headers: {Authorization: `Bearer ${token}`}
+      })
+      const data = await response.json()
+      if(data.success){
+        setSelectedDrive({...selectedDrive, applicants: data.firstDriveApplicants})
+      }
+    } catch (error: any) {
+      console.error("Error fetching applicants")
+    }
+  }
+
   const handleLogout = () => {
     if (!window.confirm("Are you sure you want to logout?")) return;
     logout("recruiter");
@@ -538,7 +553,14 @@ export default function RecruiterDashboard() {
                               </button>
                               {drive.registrationCount > 0 && (
                                 <button
-                                  onClick={() => setSelectedDrive(selectedDrive?.id === drive.id ? null : drive)}
+                                  onClick={() => {
+                                    if (selectedDrive?.id === drive.id) {
+                                      setSelectedDrive(null);
+                                    } else {
+                                      setSelectedDrive(drive);
+                                      fetchApplicants(drive.id);
+                                    }
+                                  }}
                                   className="text-brand text-xs font-bold hover:underline flex items-center gap-1 ml-2"
                                 >
                                   {selectedDrive?.id === drive.id ? "Close" : "Applicants"} <ChevronRight className="w-3 h-3" />
@@ -555,52 +577,107 @@ export default function RecruiterDashboard() {
             )}
           </section>
 
-          {/* Applicant Detail */}
+          {/* Applicants Modal */}
           {selectedDrive && (
-            <section className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
-              <div className="px-5 py-4 bg-muted/30 border-b border-border flex items-center justify-between">
-                <h3 className="font-bold text-foreground">Applicants — {selectedDrive.companyName} ({selectedDrive.roleName})</h3>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search..."
-                    className="pl-9 pr-4 py-1.5 bg-background border border-border rounded-lg text-xs text-foreground outline-none focus:ring-2 focus:ring-brand" />
+            <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setSelectedDrive(null)}>
+              <div className="bg-card rounded-2xl border border-border shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+                {/* Header */}
+                <div className="px-6 py-4 bg-muted/30 border-b border-border flex items-center justify-between sticky top-0 z-10">
+                  <div>
+                    <h2 className="text-xl font-bold text-foreground">{selectedDrive.companyName} — {selectedDrive.roleName}</h2>
+                    <p className="text-xs text-muted-foreground mt-1">{(selectedDrive.applicants ?? []).length} applicant{(selectedDrive.applicants ?? []).length !== 1 ? 's' : ''}</p>
+                  </div>
+                  <button onClick={() => setSelectedDrive(null)} className="text-muted-foreground hover:text-foreground transition-colors">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Search Bar */}
+                <div className="px-6 py-3 bg-background border-b border-border sticky top-16 z-10">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <input 
+                      value={search} 
+                      onChange={(e) => setSearch(e.target.value)} 
+                      placeholder="Search by name, college, or branch..." 
+                      className="w-full pl-10 pr-4 py-2.5 bg-muted/50 border border-border rounded-xl text-sm text-foreground outline-none focus:ring-2 focus:ring-brand transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* Applicants Grid */}
+                <div className="overflow-y-auto flex-1 p-6">
+                  {(selectedDrive.applicants ?? []).length === 0 ? (
+                    <div className="flex items-center justify-center py-12 text-muted-foreground">
+                      <p>No applicants found</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {(selectedDrive.applicants ?? [])
+                        .filter((a: any) => !search || a.name.toLowerCase().includes(search.toLowerCase()) || a.college.toLowerCase().includes(search.toLowerCase()) || a.branch.toLowerCase().includes(search.toLowerCase()))
+                        .map((a: any) => (
+                          <div key={a.id} className="bg-muted/30 rounded-xl border border-border p-4 hover:border-brand/50 transition-all hover:shadow-md">
+                            {/* Avatar */}
+                            <div className="flex justify-center mb-3">
+                              <div className="w-20 h-20 rounded-full bg-brand/10 flex items-center justify-center text-2xl font-bold text-brand border-2 border-brand/20">
+                                {a.name?.charAt(0) ?? '?'}
+                              </div>
+                            </div>
+
+                            {/* Name and Type */}
+                            <h3 className="font-bold text-foreground text-center text-sm mb-1">{a.name}</h3>
+                            <div className="flex justify-center mb-3">
+                              <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${a.type === "internal" ? "bg-brand/10 text-brand" : "bg-yellow-500/10 text-yellow-600"}`}>
+                                {a.type === "internal" ? "RGI Student" : "External"}
+                              </span>
+                            </div>
+
+                            {/* Details */}
+                            <div className="space-y-2 text-xs mb-3">
+                              <div className="flex items-start gap-2">
+                                <span className="text-muted-foreground min-w-fit font-semibold">College:</span>
+                                <span className="text-foreground">{a.college}</span>
+                              </div>
+                              <div className="flex items-start gap-2">
+                                <span className="text-muted-foreground min-w-fit font-semibold">Branch:</span>
+                                <span className="text-foreground">{a.branch}</span>
+                              </div>
+                              <div className="flex items-start gap-2">
+                                <span className="text-muted-foreground min-w-fit font-semibold">CGPA:</span>
+                                <span className="text-foreground font-bold">{a.cgpa}</span>
+                              </div>
+                              <div className="flex items-start gap-2">
+                                <span className="text-muted-foreground min-w-fit font-semibold">Email:</span>
+                                <a href={`mailto:${a.email}`} className="text-brand hover:underline break-all">{a.email}</a>
+                              </div>
+                            </div>
+
+                            {/* Status */}
+                            <div className="flex items-center justify-between pt-3 border-t border-border">
+                              <div className="flex items-center gap-1">
+                                {a.attended ? (
+                                  <>
+                                    <CheckCircle className="w-4 h-4 text-green-500" />
+                                    <span className="text-xs font-semibold text-green-600">Attended</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Clock className="w-4 h-4 text-muted-foreground" />
+                                    <span className="text-xs font-semibold text-muted-foreground">Pending</span>
+                                  </>
+                                )}
+                              </div>
+                              <span className="text-xs text-muted-foreground">
+                                {new Date(a.createdAt).toLocaleDateString()}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-muted/50 border-b border-border">
-                      <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">Name</th>
-                      <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">College</th>
-                      <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">Branch</th>
-                      <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">CGPA</th>
-                      <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">Type</th>
-                      <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">Attended</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedDrive.applicants
-                      .filter((a: any) => !search || a.name.toLowerCase().includes(search.toLowerCase()) || a.college.toLowerCase().includes(search.toLowerCase()))
-                      .map((a: any) => (
-                        <tr key={a.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
-                          <td className="px-5 py-3.5 font-medium text-foreground">{a.name}</td>
-                          <td className="px-5 py-3.5 text-muted-foreground">{a.college}</td>
-                          <td className="px-5 py-3.5 text-muted-foreground">{a.branch}</td>
-                          <td className="px-5 py-3.5 font-bold text-foreground">{a.cgpa}</td>
-                          <td className="px-5 py-3.5">
-                            <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${a.type === "internal" ? "bg-brand/10 text-brand" : "bg-yellow-500/10 text-yellow-600"}`}>
-                              {a.type === "internal" ? "RGI" : "External"}
-                            </span>
-                          </td>
-                          <td className="px-5 py-3.5">
-                            {a.attended ? <CheckCircle className="w-4 h-4 text-green-500" /> : <Clock className="w-4 h-4 text-muted-foreground" />}
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
+            </div>
           )}
           {/* Feedback Modal */}
           {showFeedbackModal && (
