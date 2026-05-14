@@ -104,7 +104,7 @@ export default function RecruiterDashboard() {
       const response = await fetch(`/api/recruiter/dashboard?driveId=${driveId}`, {
         headers: {Authorization: `Bearer ${token}`}
       })
-      const data = await response.json()
+      const data = (await response.json()) as any
       if(data.success){
         setSelectedDrive({...selectedDrive, applicants: data.firstDriveApplicants})
       }
