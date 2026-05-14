@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "pages:build": "npx @cloudflare/next-on-pages@1",
+    "pages:build": "next-on-pages",
     "db:generate": "prisma generate",
     "db:migrate:local": "wrangler d1 migrations apply placement-db --local",
     "db:migrate:remote": "wrangler d1 migrations apply placement-db --remote"
