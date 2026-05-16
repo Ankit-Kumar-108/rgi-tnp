@@ -27,6 +27,9 @@ import { useRouter } from "next/navigation";
 import { getRegistrationUploadToken, uploadFileToR2 } from "@/lib/upload-r2";
 import { getSemesterOptions, getBatchYears } from "@/lib/constants";
 import { toast } from "sonner";
+import { fetchWithRetry } from "@/lib/fetch-utils";
+
+const FORM_STORAGE_KEY = "rgi_register_form";
 
 export default function StudentRegister() {
     const router = useRouter();
@@ -68,6 +71,31 @@ export default function StudentRegister() {
     useEffect(() => {
         smartYearOptions()
     }, [])
+
+    // Restore form data from sessionStorage on mount
+    useEffect(() => {
+        try {
+            const saved = sessionStorage.getItem(FORM_STORAGE_KEY);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                // Don't restore passwords for security
+                setForm((prev) => ({
+                    ...prev,
+                    ...parsed,
+                    password: "",
+                    confirmPassword: "",
+                }));
+            }
+        } catch {}
+    }, []);
+
+    // Persist form data to sessionStorage on change (excluding passwords)
+    useEffect(() => {
+        try {
+            const { password, confirmPassword, ...safeFields } = form;
+            sessionStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(safeFields));
+        } catch {}
+    }, [form]);
 
 
     const update = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
@@ -141,7 +169,7 @@ export default function StudentRegister() {
             const profileImageUrl = await uploadFileToR2(profileImageFile, "profiles", { uploadToken });
             const resumeUrl = await uploadFileToR2(resumeFile, "resumes", { uploadToken });
 
-            const res = await fetch("/api/auth/register/student-register", {
+            const res = await fetchWithRetry("/api/auth/register/student-register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -151,6 +179,8 @@ export default function StudentRegister() {
                     profileImageUrl,
                     resumeUrl 
                 }),
+                retries: 2,
+                retryDelay: 2000,
             });
             const data = (await res.json()) as { success?: boolean; message?: string };
             
@@ -160,6 +190,8 @@ export default function StudentRegister() {
                 return; 
             }
             
+            // Clear saved form data on success
+            sessionStorage.removeItem(FORM_STORAGE_KEY);
             setSuccess("Registration successful! Check your email for the verification link.");
             toast.success("Registration successful! Check your email for the verification link.");
             setTimeout(() => router.push(`/students/login`), 1000);

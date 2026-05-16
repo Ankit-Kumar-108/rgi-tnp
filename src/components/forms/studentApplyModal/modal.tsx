@@ -1,5 +1,6 @@
 import React from "react";
 import { getToken } from "@/lib/auth-client";
+import { fetchWithRetry } from "@/lib/fetch-utils";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -67,10 +68,12 @@ export default function JobDetailsModal({
         try {
             const token = getToken(role);
             const endpoint = role === "external_student" ? "/api/external/dashboard" : "/api/student/drives";
-            const res = await fetch(endpoint, {
+            const res = await fetchWithRetry(endpoint, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
                 body: JSON.stringify({ driveId: drive.id }),
+                retries: 2,
+                retryDelay: 1500,
             })
             const d = (await res.json()) as any;
             if (d.success) {

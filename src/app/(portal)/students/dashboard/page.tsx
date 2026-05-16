@@ -23,6 +23,7 @@ import {
   Github,
   Trash2,
   MessageSquareShare,
+  AlertTriangle,
 } from "lucide-react"
 import Nav from "@/components/layout/nav/nav"
 import Footer from "@/components/layout/footer/footer"
@@ -32,6 +33,8 @@ import { useRouter } from "next/navigation";
 import { Student, PlacementDrive, DriveRegistration, Memory } from "@/types";
 import { uploadFileToR2 } from "@/lib/upload-r2";
 import { toast } from "sonner";
+import useSWR from "swr";
+import { fetchWithRetry } from "@/lib/fetch-utils";
 
 // Lazy load heavy modal components — only loaded when user interacts
 const JobDetailsModal = dynamic(
@@ -43,17 +46,55 @@ const FeedbackComp = dynamic(
   { ssr: false }
 );
 
+/* SWR fetcher with auth */
+const dashboardFetcher = async <T = any,>(url: string): Promise<T> => {
+  const token = getToken("student");
+  const res = await fetchWithRetry(url, {
+    headers: { Authorization: `Bearer ${token}` },
+    retries: 3,
+    retryDelay: 1500,
+  });
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error((errData as any)?.message || `HTTP ${res.status}`);
+  }
+  return res.json() as Promise<T>;
+};
+
 export default function StudentDashboard() {
   const { loading: authLoading, authenticated, user } = useAuth("student", "/students/login");
-  const [data, setData] = useState<{
-    student: Student;
-    drives: PlacementDrive[];
-    archivedDrives?: PlacementDrive[];
-    registrations: DriveRegistration[];
-    memories: Memory[];
-  } | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [fetchError, setFetchError] = useState<string | null>(null)
+
+  /* ── SWR: Main dashboard data with caching + retry ── */
+  const {
+    data: dashboardData,
+    error: fetchErrorObj,
+    isLoading: loading,
+    mutate: mutateDashboard,
+  } = useSWR<{ success: boolean; student?: any; drives?: any[]; archivedDrives?: any[]; registrations?: any[]; memories?: any[]; message?: string }>(
+    authenticated ? "/api/student/dashboard" : null,
+    dashboardFetcher,
+    {
+      revalidateOnFocus: true,
+      errorRetryCount: 3,
+      errorRetryInterval: 2000,
+      dedupingInterval: 10000,
+      onSuccess: (d: any) => {
+        if (d?.student) {
+          setProfileForm({
+            tenthPercentage: d.student.tenthPercentage?.toString() || "",
+            twelfthPercentage: d.student.twelfthPercentage?.toString() || "",
+            activeBacklog: d.student.activeBacklog?.toString() || "0",
+            linkedinUrl: d.student.linkedinUrl || "",
+            githubUrl: d.student.githubUrl || "",
+          });
+        }
+      },
+    },
+  );
+
+  const data = dashboardData?.success ? dashboardData : null;
+  const fetchError = fetchErrorObj?.message || (!dashboardData?.success && dashboardData?.message) || null;
+
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedDrive, setSelectedDrive] = useState<PlacementDrive | null>(null)
   const [memUploading, setMemUploading] = useState(false);
@@ -87,9 +128,10 @@ export default function StudentDashboard() {
     const updateSemester = async () => {
       try {
         const token = getToken("student");
-        const res = await fetch("/api/student/update-semester", {
+        const res = await fetchWithRetry("/api/student/update-semester", {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
+          retries: 2,
         });
         const data = await res.json() as any;
         if(data.success && data.updated) {
@@ -97,16 +139,10 @@ export default function StudentDashboard() {
         }
       } catch (error: any) {
         console.error("Error updating semester:", error);
-        toast.error("Failed to update semester. Please try again.");
       }
     }
-    updateSemester(); 
-  }, [])
-
-  useEffect(() => {
-    if (!authenticated) return;
-    fetchDashboard();
-  }, [authenticated]);
+    if (authenticated) updateSemester(); 
+  }, [authenticated])
 
   const handleLogout = () => {
     if (!window.confirm("Are you sure you want to logout?")) return;
@@ -114,34 +150,8 @@ export default function StudentDashboard() {
     router.push("/");
   };
 
-  const fetchDashboard = async () => {
-    try {
-      setFetchError(null);
-      const token = getToken("student");
-      const res = await fetch("/api/student/dashboard", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const d = (await res.json()) as any;
-      if (d.success) {
-        setData(d);
-        if (d.student) {
-          setProfileForm({
-            tenthPercentage: d.student.tenthPercentage?.toString() || "",
-            twelfthPercentage: d.student.twelfthPercentage?.toString() || "",
-            activeBacklog: d.student.activeBacklog?.toString() || "0",
-            linkedinUrl: d.student.linkedinUrl || "",
-            githubUrl: d.student.githubUrl || "",
-          });
-        }
-      }
-      else setFetchError(d.message || "Failed to load dashboard");
-    } catch (err) {
-      console.error(err);
-      setFetchError("Network error. Please check your connection and try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Convenience: re-fetch dashboard via SWR mutate
+  const fetchDashboard = () => mutateDashboard();
 
   const handleSubmitProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -368,6 +378,39 @@ export default function StudentDashboard() {
   return (
     <>
       <Nav />
+      {/* Complete Profile Prompt */}
+      {isProfileIncomplete && !showProfileForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-sm p-4">
+          <div className="w-full max-w-xl rounded-3xl border border-border bg-card/95 shadow-2xl overflow-hidden animate-in zoom-in-95 fade-in duration-300">
+            <div className="p-6 md:p-7">
+              <div className="flex items-start gap-4">
+                <div className="shrink-0 rounded-2xl bg-brand/10 text-brand p-3">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
+                <div className="space-y-2">
+                  <h2 className="text-xl md:text-2xl font-black tracking-tight text-foreground">
+                    Complete Your Profile
+                  </h2>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Please add your 10th, 12th, and resume details to unlock drive applications and improve your recruiter visibility. GitHub and LinkedIn is optional
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowProfileForm(true)}
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-brand text-primary-foreground px-5 py-2.5 text-sm font-bold hover:bg-brand/90 transition-colors"
+                >
+                  Complete Profile
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {selectedDrive && (
         <JobDetailsModal
           drive={selectedDrive}
@@ -452,9 +495,6 @@ export default function StudentDashboard() {
         <main className="p-6 md:p-10 max-w-7xl mx-auto space-y-10">
           {/* Header */}
           <section className="pt-4 md:pt-8 flex flex-col md:flex-row justify-between md:items-end gap-4">
-            <h1 className="text-2xl md:text-4xl lg:text-5xl font-black tracking-tight text-foreground leading-tight">
-              Welcome, <span className="text-brand">{student?.name || "Student"}</span>
-            </h1>
             <div className="flex flex-wrap items-center gap-3">
               <button
                 onClick={() => setShowFeedbackModal(true)}
@@ -467,7 +507,7 @@ export default function StudentDashboard() {
                 onClick={() => setShowProfileForm(!showProfileForm)}
                 className="relative inline-flex items-center gap-2 text-sm font-bold text-brand hover:text-brand/80 transition-colors border border-brand/20 px-4 py-2.5 rounded-2xl bg-brand/5 hover:bg-brand/10"
               >
-                {showProfileForm ? "Cancel Edit" : "Complete Profile"}
+                {showProfileForm ? "Cancel Edit" : "Update Profile"}
                 <ChevronRight className={`w-4 h-4 transition-transform ${showProfileForm ? "rotate-90" : ""}`} />
                 {!showProfileForm && isProfileIncomplete && (
                   <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shadow-sm" />
@@ -494,12 +534,13 @@ export default function StudentDashboard() {
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">10th Percentage</label>
                     <input type="number" step="0.01" min="0" max="100"
+                    required
                       value={profileForm.tenthPercentage} onChange={(e) => setProfileForm({ ...profileForm, tenthPercentage: e.target.value })}
                       className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
                       placeholder="e.g. 85.50" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">12th/Diploma Percentage</label>
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">12th Percentage(Optional for Diploma)</label>
                     <input type="number" step="0.01" min="0" max="100"
                       value={profileForm.twelfthPercentage} onChange={(e) => setProfileForm({ ...profileForm, twelfthPercentage: e.target.value })}
                       className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
@@ -513,7 +554,7 @@ export default function StudentDashboard() {
                       placeholder="0" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">LinkedIn URL</label>
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">LinkedIn URL(Optional)</label>
                     <div className="relative">
                       <Linkedin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <input value={profileForm.linkedinUrl} onChange={(e) => setProfileForm({ ...profileForm, linkedinUrl: e.target.value })}
@@ -522,7 +563,7 @@ export default function StudentDashboard() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">GitHub URL</label>
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">GitHub URL(Optional)</label>
                     <div className="relative">
                       <Github className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <input value={profileForm.githubUrl} onChange={(e) => setProfileForm({ ...profileForm, githubUrl: e.target.value })}
@@ -557,7 +598,7 @@ export default function StudentDashboard() {
             <div className="flex flex-col items-center justify-center py-20 gap-4">
               <p className="text-destructive font-bold text-lg">{fetchError}</p>
               <button
-                onClick={() => { setLoading(true); fetchDashboard(); }}
+                onClick={() => { mutateDashboard(); }}
                 className="flex items-center gap-2 px-6 py-3 bg-brand text-primary-foreground rounded-xl font-bold text-sm hover:bg-brand/90 transition-all"
               >
                 <RefreshCw className="w-4 h-4" /> Retry
@@ -739,7 +780,7 @@ export default function StudentDashboard() {
                       <p className="text-sm text-muted-foreground">Come back soon for new placement opportunities</p>
                     </div>
                     <button
-                      onClick={() => { setLoading(true); fetchDashboard(); }}
+                      onClick={() => { mutateDashboard(); }}
                       className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-brand/10 text-brand rounded-xl font-bold text-sm hover:bg-brand/20 transition-colors"
                     >
                       <RefreshCw className="w-4 h-4" /> Check Again

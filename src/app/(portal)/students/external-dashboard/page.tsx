@@ -88,18 +88,18 @@ export default function ExternalStudentDashboard() {
 
     const hasRegistered = drive.isRegistered || registrations.some((r: any) => r.driveId === drive.id);
 
-  if (hasRegistered) {
-    return {
-      actionElement: (
-        <button 
-          onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
-          className="inline-flex items-center gap-1.5 text-green-600 bg-green-500/10 hover:bg-green-500/20 px-4 py-2.5 rounded-xl text-xs font-bold transition-all"
-        >
-          <CheckCircle className="w-4 h-4" /> View Details
-        </button>
-      )
-    };
-  }
+    if (hasRegistered) {
+      return {
+        actionElement: (
+          <button
+            onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
+            className="inline-flex items-center gap-1.5 text-green-600 bg-green-500/10 hover:bg-green-500/20 px-4 py-2.5 rounded-xl text-xs font-bold transition-all"
+          >
+            <CheckCircle className="w-4 h-4" /> View Details
+          </button>
+        )
+      };
+    }
 
     if (reason) {
       return {
@@ -226,6 +226,39 @@ export default function ExternalStudentDashboard() {
   return (
     <>
       <Nav />
+      {/* Complete Profile Prompt */}
+      {isProfileIncomplete && !showProfileForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-sm p-4">
+          <div className="w-full max-w-xl rounded-3xl border border-border bg-card/95 shadow-2xl overflow-hidden animate-in zoom-in-95 fade-in duration-300">
+            <div className="p-6 md:p-7">
+              <div className="flex items-start gap-4">
+                <div className="shrink-0 rounded-2xl bg-brand/10 text-brand p-3">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
+                <div className="space-y-2">
+                  <h2 className="text-xl md:text-2xl font-black tracking-tight text-foreground">
+                    Complete Your Profile
+                  </h2>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Please add your 10th, 12th, and resume details to unlock drive applications and improve your recruiter visibility. GitHub and LinkedIn is optional
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowProfileForm(true)}
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-brand text-primary-foreground px-5 py-2.5 text-sm font-bold hover:bg-brand/90 transition-colors"
+                >
+                  Complete Profile
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {selectedDrive && (
         <JobDetailsModal
           role="external_student"
@@ -249,9 +282,6 @@ export default function ExternalStudentDashboard() {
 
           {/* Main Welcome Header */}
           <section className="pt-4 md:pt-8 flex flex-col md:flex-row justify-between md:items-end gap-4">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight text-foreground leading-tight">
-              Welcome, <span className="text-brand">{student?.name || "Student"}</span>
-            </h1>
             <div className="flex flex-wrap items-center gap-3">
               <button
                 onClick={() => setShowFeedbackModal(true)}
@@ -264,7 +294,7 @@ export default function ExternalStudentDashboard() {
                 onClick={() => setShowProfileForm(!showProfileForm)}
                 className="relative inline-flex items-center gap-2 text-sm font-bold text-brand hover:text-brand/80 transition-colors border border-brand/20 px-4 py-2.5 rounded-2xl bg-brand/5 hover:bg-brand/10"
               >
-                {showProfileForm ? "Cancel Edit" : "Complete Profile"}
+                {showProfileForm ? "Cancel Edit" : "Update Profile"}
                 <ChevronRight className={`w-4 h-4 transition-transform ${showProfileForm ? "rotate-90" : ""}`} />
                 {!showProfileForm && isProfileIncomplete && (
                   <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shadow-sm" />
@@ -291,12 +321,13 @@ export default function ExternalStudentDashboard() {
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">10th Percentage</label>
                     <input type="number" step="0.01" min="0" max="100"
+                    required
                       value={profileForm.tenthPercentage} onChange={(e) => setProfileForm({ ...profileForm, tenthPercentage: e.target.value })}
                       className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
                       placeholder="e.g. 85.50" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">12th/Diploma Percentage</label>
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">12th Percentage(Opt)</label>
                     <input type="number" step="0.01" min="0" max="100"
                       value={profileForm.twelfthPercentage} onChange={(e) => setProfileForm({ ...profileForm, twelfthPercentage: e.target.value })}
                       className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
@@ -310,7 +341,7 @@ export default function ExternalStudentDashboard() {
                       placeholder="0" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">LinkedIn URL</label>
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">LinkedIn URL(Optional)</label>
                     <div className="relative">
                       <Linkedin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <input value={profileForm.linkedinUrl} onChange={(e) => setProfileForm({ ...profileForm, linkedinUrl: e.target.value })}
@@ -319,7 +350,7 @@ export default function ExternalStudentDashboard() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">GitHub URL</label>
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">GitHub URL(Optional)</label>
                     <div className="relative">
                       <Github className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <input value={profileForm.githubUrl} onChange={(e) => setProfileForm({ ...profileForm, githubUrl: e.target.value })}
@@ -554,7 +585,7 @@ export default function ExternalStudentDashboard() {
                                 </td>
                                 <td className="px-5 py-3.5 flex justify-end">
                                   {actionElement}
-                                  </td>
+                                </td>
                               </tr>
                             );
                           })}

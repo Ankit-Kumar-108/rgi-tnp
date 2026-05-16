@@ -24,7 +24,14 @@ export async function GET(req: NextRequest) {
             }),
             db.memory.count({ where })
         ])
-        return NextResponse.json({ success: true, memories, totalCount });
+        return NextResponse.json(
+            { success: true, memories, totalCount },
+            {
+                headers: {
+                    "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+                },
+            },
+        );
     } catch (error: any) {
         console.error("Error fetching memories:", error);
         return NextResponse.json({ success: false, message: "Failed to fetch memories" }, { status: 500 });

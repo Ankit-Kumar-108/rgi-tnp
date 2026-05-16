@@ -2,6 +2,7 @@ export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import * as jose from "jose";
+import { select } from "motion/react-client";
 
 async function getRecruiterFromToken(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
@@ -73,7 +74,6 @@ export async function GET(req: NextRequest) {
     const targetDriveId = driveParams || drives[0]?.id
 
     if (drives.length > 0) {
-      const firstDriveId = drives[0].id;
       [applicants, applicantsCount] = await Promise.all([
         db.driveRegistration.findMany({
           where: { driveId: targetDriveId },
@@ -84,6 +84,22 @@ export async function GET(req: NextRequest) {
             status: true,
             studentId: true,
             externalStudentId: true,
+            drive: {
+              select :{
+                roleName: true,
+                companyName: true
+              }
+            },
+            student: {
+              select: {
+                    profileImageUrl: true
+              }
+            },
+            externalStudent: {
+              select : {
+                profileImageUrl: true
+              }
+            }
           },
           take: applicantsLimit,
           skip: (applicantsPage - 1) * applicantsLimit,
@@ -102,13 +118,13 @@ export async function GET(req: NextRequest) {
         studentIds.length > 0
           ? db.student.findMany({
               where: { id: { in: studentIds } },
-              select: { id: true, name: true, enrollmentNumber: true, branch: true, cgpa: true, email: true }
+              select: { id: true, name: true, enrollmentNumber: true, branch: true, cgpa: true, email: true, profileImageUrl: true }
             })
           : Promise.resolve([]),
         externalIds.length > 0
           ? db.externalStudent.findMany({
               where: { id: { in: externalIds } },
-              select: { id: true, name: true, collegeName: true, branch: true, cgpa: true, email: true }
+              select: { id: true, name: true, collegeName: true, branch: true, cgpa: true, email: true, profileImageUrl: true }
             })
           : Promise.resolve([]),
       ]);
@@ -132,6 +148,7 @@ export async function GET(req: NextRequest) {
           cgpa: data?.cgpa || 0,
           email: data?.email || "",
           type: student ? "internal" : "external",
+          profileImageUrl: data?.profileImageUrl || a.student?.profileImageUrl || a.externalStudent?.profileImageUrl || null,
         };
       });
     }

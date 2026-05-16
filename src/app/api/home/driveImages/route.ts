@@ -35,10 +35,14 @@ export async function GET(req: NextRequest) {
       take: limit,
     });
 
-    return NextResponse.json({
-      success: true,
-      drives,
-    });
+    return NextResponse.json(
+      { success: true, drives },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+        },
+      },
+    );
   } catch (error) {
     console.error("Home drive images error:", error);
     return NextResponse.json(

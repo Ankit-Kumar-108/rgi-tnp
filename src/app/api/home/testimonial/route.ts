@@ -1,4 +1,5 @@
 export const runtime = "edge";
+import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 
 export async function GET() {
@@ -20,5 +21,9 @@ export async function GET() {
     LIMIT 3
   `;
 
-  return new Response(JSON.stringify(testimonials));
+  return NextResponse.json(testimonials, {
+    headers: {
+      "Cache-Control": "public, s-maxage=120, stale-while-revalidate=300",
+    },
+  });
 }

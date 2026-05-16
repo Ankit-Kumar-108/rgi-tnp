@@ -15,6 +15,7 @@ import Image from "next/image"
 import { useEffect, useState } from "react";
 import { Camera } from "lucide-react";
 import { toast } from "sonner";
+import useSWR from "swr";
 
 /* Types */
 
@@ -55,98 +56,88 @@ interface TestimonialData {
   profileImageUrl?: string;
 }
 
+/* SWR fetcher with error handling */
+const fetcher = async <T = any,>(url: string): Promise<T> => {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json() as Promise<T>;
+};
+
 /*Component*/
 
 export default function Home() {
-  const [testimonials, setTestimonials] = useState<TestimonialData[]>([]);
-  const [memories, setMemories] = useState<MemoryData[]>([]);
-  const [driveGroups, setDriveGroups] = useState<DriveGroup[]>([]);
   const [currentGroupIndex, setCurrentGroupIndex] = useState(0);
-  const [loadingDrives, setLoadingDrives] = useState(true);
-  const [loadingTestimonials, setLoadingTestimonials] = useState(true);
-  const [loadingMemories, setLoadingMemories] = useState(true);
-  const [volunteers, setVolunteers] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
   const [showAllVolunteers, setShowAllVolunteers] = useState(false);
 
-  /* ── Fetch all initial data in parallel (drives + testimonials + memories) ── */
-  useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
+  /* ── SWR: Fetch drive images with caching + retry ── */
+  const { data: drivesData, isLoading: loadingDrives } = useSWR<{
+    success: boolean;
+    drives: HomeDrive[];
+  }>("/api/home/driveImages?limit=10", fetcher, {
+    revalidateOnFocus: false,
+    errorRetryCount: 3,
+    errorRetryInterval: 2000,
+    dedupingInterval: 60000,
+  });
 
-    const fetchAll = async () => {
-      const [drivesResult, testimonialsResult, memoriesResult] = await Promise.allSettled([
-        fetch("/api/home/driveImages?limit=10", { signal }).then(r => r.json()),
-        fetch("/api/home/testimonial", { signal }).then(r => r.json()),
-        fetch("/api/memories?limit=6", { signal }).then(r => r.json()),
-      ]);
+  /* ── SWR: Fetch testimonials with caching + retry ── */
+  const { data: testimonials, isLoading: loadingTestimonials } = useSWR<TestimonialData[]>(
+    "/api/home/testimonial",
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      errorRetryCount: 3,
+      errorRetryInterval: 2000,
+      dedupingInterval: 120000,
+    },
+  );
 
-      // Process drive images
-      if (drivesResult.status === "fulfilled") {
-        const drivesData = drivesResult.value as { success: boolean; drives: HomeDrive[] };
-        if (drivesData.success && drivesData.drives) {
-          setDriveGroups(
-            drivesData.drives
-              .filter((d) => d.driveImages.length > 0)
-              .map((d) => ({ driveId: d.id, title: d.title, images: d.driveImages }))
-          );
-        }
-      } else if (drivesResult.reason?.name !== "AbortError") {
-        console.error("Error fetching drive images:", drivesResult.reason);
-      }
-      setLoadingDrives(false);
+  /* ── SWR: Fetch memories with caching + retry ── */
+  const { data: memoriesData, isLoading: loadingMemories } = useSWR<{
+    success: boolean;
+    memories: MemoryData[];
+  }>("/api/memories?limit=6", fetcher, {
+    revalidateOnFocus: false,
+    errorRetryCount: 3,
+    errorRetryInterval: 2000,
+    dedupingInterval: 60000,
+  });
 
-      // Process testimonials
-      if (testimonialsResult.status === "fulfilled") {
-        setTestimonials(testimonialsResult.value as TestimonialData[]);
-      } else if (testimonialsResult.reason?.name !== "AbortError") {
-        console.error("Error fetching testimonials:", testimonialsResult.reason);
-      }
-      setLoadingTestimonials(false);
-
-      // Process memories
-      if (memoriesResult.status === "fulfilled") {
-        const memData = memoriesResult.value as { success: boolean; memories: MemoryData[] };
-        if (memData.success && memData.memories) {
-          setMemories(memData.memories);
-        }
-      } else if (memoriesResult.reason?.name !== "AbortError") {
-        console.error("Error fetching memories:", memoriesResult.reason);
-      }
-      setLoadingMemories(false);
-    };
-
-    fetchAll();
-    return () => controller.abort();
-  }, []);
-
-  /* ── Fetch volunteers (separate — depends on showAllVolunteers toggle) ── */
-  useEffect(() => {
-    const controller = new AbortController();
-    setLoading(true);
-
-    const fetchVolunteers = async () => {
-      try {
-        const limit = showAllVolunteers ? "all" : "4";
-        const res = await fetch(`/api/home/volunteerCards?limit=${limit}`, {
-          signal: controller.signal,
-        });
-        const data = (await res.json()) as { success: boolean; volunteers: any[] };
-        if (data.success && data.volunteers) {
-          setVolunteers(data.volunteers);
-        }
-      } catch (error: any) {
-        if (error?.name !== "AbortError") {
-          console.error("Error fetching volunteers:", error);
+  /* ── SWR: Fetch volunteers (key changes with toggle) ── */
+  const volunteerLimit = showAllVolunteers ? "all" : "4";
+  const {
+    data: volunteersData,
+    isLoading: loading,
+    error: volunteersError,
+  } = useSWR<{ success: boolean; volunteers: any[] }>(
+    `/api/home/volunteerCards?limit=${volunteerLimit}`,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      errorRetryCount: 3,
+      errorRetryInterval: 2000,
+      dedupingInterval: 30000,
+      onError: (err) => {
+        if (err?.name !== "AbortError") {
           toast.error("Failed to load volunteer data. Please try again later.");
         }
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchVolunteers();
-    return () => controller.abort();
-  }, [showAllVolunteers]);
+      },
+    },
+  );
+
+  /* ── Derived state from SWR data ── */
+  const driveGroups: DriveGroup[] =
+    drivesData?.success && drivesData?.drives
+      ? drivesData.drives
+          .filter((d) => d.driveImages.length > 0)
+          .map((d) => ({ driveId: d.id, title: d.title, images: d.driveImages }))
+      : [];
+
+  const memories: MemoryData[] =
+    memoriesData?.success && memoriesData?.memories ? memoriesData.memories : [];
+
+  const volunteers: any[] =
+    volunteersData?.success && volunteersData?.volunteers ? volunteersData.volunteers : [];
 
   /* ── Auto-scroll carousel ── */
   useEffect(() => {
@@ -592,7 +583,7 @@ export default function Home() {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-                {testimonials.map((testimonial) => (
+                {(testimonials || []).map((testimonial) => (
                   <div key={testimonial.id} className="bg-card p-6 md:p-10 rounded-2xl md:rounded-3xl shadow-[var(--shadow-sm)] border border-border hover:shadow-[var(--shadow-md)] transition-shadow duration-300 flex flex-col items-center text-center group">
                     <div className="w-20 h-20 md:w-32 md:h-32 rounded-full mb-4 md:mb-6 ring-4 ring-brand/10 group-hover:ring-brand/20 transition-all relative overflow-hidden">
                       <Image src={testimonial.profileImageUrl || "https://lh3.googleusercontent.com/aida-public/AB6AXuD-4qpQG9rSHLujKoHhrbgWRAg81sFBu41MDA54QQ14Y6yYxoww19N7Hs6lybLRgvZCg5yNw-06wJ8p2GwAuZrN9ytupLwK1aRZSm47WIYXx5ld9vONPYIsuhD5KGlStRJhFuJTFHl_Hc-t-2CxveYwpsep0lUKrYPz6ghsEv9_r2NE8H2tzkba6XLY91OoOHMGHGA4iF6n7TtSxX_Dr3zeJ206-8b6lxuPWVgO5R0mihIiXboKj1OEPXe_2qH9vxxFdK4gE9e5YQ"} alt="Alumni testimonial" fill className="object-cover" sizes="128px" />

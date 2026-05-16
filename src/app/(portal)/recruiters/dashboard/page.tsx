@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import useSWR from "swr";
+import { fetchWithRetry } from "@/lib/fetch-utils";
 import {
   Plus,
   Search,
@@ -23,7 +25,8 @@ import Footer from "@/components/layout/footer/footer";
 import { useAuth } from "@/hooks/useAuth";
 import { getToken, logout } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { toast, Toaster } from "sonner";
+import Image from "next/image";
 
 // Lazy load heavy modal components — only loaded when user interacts
 const JobDetailsModal = dynamic(
@@ -39,9 +42,42 @@ const BRANCHES = ["Computer Science", "Civil", "Mechanical", "Electronics", "Ele
 
 export default function RecruiterDashboard() {
   const { loading: authLoading, authenticated, user } = useAuth("recruiter", "/recruiters/login");
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [fetchError, setFetchError] = useState<string | null>(null);
+
+  /* SWR fetcher with auth */
+  const recruiterFetcher = async <T = any,>(url: string): Promise<T> => {
+    const token = getToken("recruiter");
+    const res = await fetchWithRetry(url, {
+      headers: { Authorization: `Bearer ${token}` },
+      retries: 3,
+      retryDelay: 1500,
+    });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error((errData as any)?.message || `HTTP ${res.status}`);
+    }
+    return res.json() as Promise<T>;
+  };
+
+  /* ── SWR: Main dashboard data ── */
+  const {
+    data: dashResult,
+    error: dashError,
+    isLoading: loading,
+    mutate: mutateDash,
+  } = useSWR<{ success: boolean; drives?: any[]; stats?: any; message?: string }>(
+    authenticated ? "/api/recruiter/dashboard" : null,
+    recruiterFetcher,
+    {
+      revalidateOnFocus: true,
+      errorRetryCount: 3,
+      errorRetryInterval: 2000,
+      dedupingInterval: 10000,
+    },
+  );
+
+  const data = dashResult?.success ? dashResult : null;
+  const fetchError: string | null = dashError?.message || (!dashResult?.success && dashResult?.message) || null;
+
   const [showForm, setShowForm] = useState(false);
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
@@ -49,6 +85,7 @@ export default function RecruiterDashboard() {
   const [selectedDrive, setSelectedDrive] = useState<any>(null);
   const [search, setSearch] = useState("");
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false)
 
   const [form, setForm] = useState({
     companyName: "",
@@ -71,52 +108,33 @@ export default function RecruiterDashboard() {
   const [viewDrive, setViewDrive] = useState<any | null>(null);
 
   useEffect(() => {
-    if (!authenticated) return;
-    fetchDashboard();
-  }, [authenticated]);
-
-  useEffect(() => {
     if (user?.company) setForm((f) => ({ ...f, companyName: user.company }));
   }, [user]);
-
-  const fetchDashboard = async () => {
-    try {
-      setFetchError(null);
-      const token = getToken("recruiter");
-      const res = await fetch("/api/recruiter/dashboard", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const d = (await res.json()) as any;
-      if (d.success) setData(d);
-      else setFetchError("Failed to load dashboard data.");
-    } catch (err) {
-      console.error(err);
-      setFetchError("Network error. Please check your connection.");
-      toast.error("Failed to load dashboard data");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const fetchApplicants = async (driveId: string) => {
     try {
+      setIsLoading(true)
       const token = getToken("recruiter")
-      const response = await fetch(`/api/recruiter/dashboard?driveId=${driveId}`, {
-        headers: {Authorization: `Bearer ${token}`}
+      const response = await fetchWithRetry(`/api/recruiter/dashboard?driveId=${driveId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        retries: 2,
       })
       const data = (await response.json()) as any
-      if(data.success){
-        setSelectedDrive({...selectedDrive, applicants: data.firstDriveApplicants})
+      if (data.success) {
+        setSelectedDrive((prev: any) =>
+          prev ? { ...prev, applicants: data.firstDriveApplicants ?? [] } : prev
+        )
       }
+      setIsLoading(false)
     } catch (error: any) {
       console.error("Error fetching applicants")
+      toast.error("Error fetching Applicants")
     }
   }
 
   const handleLogout = () => {
     if (!window.confirm("Are you sure you want to logout?")) return;
     logout("recruiter");
-    toast.success("Logged out successfully"); 
+    toast.success("Logged out successfully");
     router.push("/recruiters/login");
   };
 
@@ -129,23 +147,25 @@ export default function RecruiterDashboard() {
       const method = editDriveId ? "PUT" : "POST";
       const bodyData = editDriveId ? { ...form, id: editDriveId, minCGPA: parseFloat(String(form.minCGPA)) } : { ...form, minCGPA: parseFloat(String(form.minCGPA)) }
 
-      if(!form.eligibleBranches){
+      if (!form.eligibleBranches) {
         setFormMsg({ msg: "Please select eligible branches", ok: false });
         toast.error("Please select eligible branches");
         setSubmitting(false);
         return;
       }
-      if(!form.course){
+      if (!form.course) {
         setFormMsg({ msg: "Please select at least one course", ok: false });
         toast.error("Please select at least one course");
         setSubmitting(false);
         return;
       }
 
-      const res = await fetch("/api/recruiter/drives", {
+      const res = await fetchWithRetry("/api/recruiter/drives", {
         method,
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(bodyData),
+        retries: 2,
+        retryDelay: 1500,
       });
       const d = (await res.json()) as any;
       setFormMsg({ msg: d.message, ok: d.success });
@@ -153,7 +173,7 @@ export default function RecruiterDashboard() {
         setTimeout(() => setShowForm(false), 1000);
         setForm({ companyName: user?.company || "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full-Time", genderPreference: "Both", duration: "", interviewProcess: "" });
         setEditDriveId(null);
-        fetchDashboard();
+        mutateDash();
       }
     } catch {
       setFormMsg({ msg: "Submission failed", ok: false });
@@ -204,7 +224,7 @@ export default function RecruiterDashboard() {
             <div className="flex flex-col items-center justify-center py-16 gap-4">
               <p className="text-destructive font-bold text-lg">{fetchError}</p>
               <button
-                onClick={() => { setLoading(true); fetchDashboard(); }}
+                onClick={() => mutateDash()}
                 className="flex items-center gap-2 px-6 py-3 bg-brand text-primary-foreground rounded-xl font-bold text-sm hover:bg-brand/90 transition-all"
               >
                 <RefreshCw className="w-4 h-4" /> Retry
@@ -225,7 +245,7 @@ export default function RecruiterDashboard() {
             <div className="flex flex-wrap items-center gap-3">
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-bold border border-border text-muted-foreground hover:text-red-500 hover:border-red-500/30 transition-all"
+                className="flex items-center gap-2 px-4 py-2.5 text-destructive rounded-full text-sm font-bold border border-border bg-destructive/20 hover:text-red-500 hover:border-red-500/30 transition-all"
               >
                 <LogOut className="w-4 h-4" /> Logout
               </button>
@@ -236,17 +256,17 @@ export default function RecruiterDashboard() {
                 <MessageSquareShare className="w-4 h-4" />
                 Share Feedback
               </button>
-            <button
-              onClick={() => {
-                setEditDriveId(null);
-                setForm({ companyName: user?.company || "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full-Time", genderPreference: "Both", duration: "", interviewProcess: "" });
-                setFormMsg(null);
-                setShowForm(true);
-              }}
-              className="bg-brand text-white font-bold px-6 py-2.5 rounded-full flex items-center gap-2 hover:opacity-90 transition-opacity shadow-[var(--shadow-brand)] text-sm"
-            >
-              <Plus className="w-4 h-4" /> Submit Drive Request
-            </button>
+              <button
+                onClick={() => {
+                  setEditDriveId(null);
+                  setForm({ companyName: user?.company || "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full-Time", genderPreference: "Both", duration: "", interviewProcess: "" });
+                  setFormMsg(null);
+                  setShowForm(true);
+                }}
+                className="bg-brand text-white font-bold px-6 py-2.5 rounded-full flex items-center gap-2 hover:opacity-90 transition-opacity shadow-[var(--shadow-brand)] text-sm"
+              >
+                <Plus className="w-4 h-4" /> Submit Drive Request
+              </button>
             </div>
           </section>
 
@@ -399,7 +419,7 @@ export default function RecruiterDashboard() {
                               return;
                             }
                             let arr = form.course ? form.course.split(",") : [];
-                            if (arr.includes("All")) arr = []; 
+                            if (arr.includes("All")) arr = [];
                             const updated = arr.includes(c) ? arr.filter((x) => x !== c) : [...arr, c];
                             setForm({ ...form, course: updated.join(",") });
                           }}
@@ -579,102 +599,144 @@ export default function RecruiterDashboard() {
 
           {/* Applicants Modal */}
           {selectedDrive && (
-            <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setSelectedDrive(null)}>
-              <div className="bg-card rounded-2xl border border-border shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
-                {/* Header */}
-                <div className="px-6 py-4 bg-muted/30 border-b border-border flex items-center justify-between sticky top-0 z-10">
-                  <div>
-                    <h2 className="text-xl font-bold text-foreground">{selectedDrive.companyName} — {selectedDrive.roleName}</h2>
-                    <p className="text-xs text-muted-foreground mt-1">{(selectedDrive.applicants ?? []).length} applicant{(selectedDrive.applicants ?? []).length !== 1 ? 's' : ''}</p>
+            <div
+              className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300"
+              onClick={() => setSelectedDrive(null)}
+            >
+              <div
+                className="bg-card rounded-2xl border border-border shadow-2xl w-full max-w-[95vw] xl:max-w-7xl max-h-[92vh] overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Top Fixed Control Area (Header + Search combined to prevent scroll layout bugs) */}
+                <div className="bg-background border-b border-border">
+                  {/* Header */}
+                  <div className="px-6 py-4 flex items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <h2 className="text-xl font-bold tracking-tight text-foreground">
+                          {selectedDrive.companyName}
+                        </h2>
+                        <span className="text-sm px-2.5 py-0.5 rounded-md bg-muted text-muted-foreground font-medium border border-border">
+                          {selectedDrive.roleName}
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {(selectedDrive.applicants ?? []).length} Total Applicant{(selectedDrive.applicants ?? []).length !== 1 ? 's' : ''}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setSelectedDrive(null)}
+                      className="text-muted-foreground hover:text-foreground hover:bg-muted p-2 rounded-xl transition-all"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
                   </div>
-                  <button onClick={() => setSelectedDrive(null)} className="text-muted-foreground hover:text-foreground transition-colors">
-                    <X className="w-5 h-5" />
-                  </button>
+
+                  {/* Search Bar Container */}
+                  <div className="px-6 pb-4">
+                    <div className="relative">
+                      <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <input
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        placeholder="Search by name, college, branch..."
+                        className="w-full pl-10 pr-4 py-2 bg-muted/40 hover:bg-muted/60 focus:bg-background border border-border rounded-xl text-sm text-foreground outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition-all placeholder:text-muted-foreground/70"
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                {/* Search Bar */}
-                <div className="px-6 py-3 bg-background border-b border-border sticky top-16 z-10">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <input 
-                      value={search} 
-                      onChange={(e) => setSearch(e.target.value)} 
-                      placeholder="Search by name, college, or branch..." 
-                      className="w-full pl-10 pr-4 py-2.5 bg-muted/50 border border-border rounded-xl text-sm text-foreground outline-none focus:ring-2 focus:ring-brand transition-all"
-                    />
-                  </div>
-                </div>
+                {/* Scrollable Applicants List */}
+                <div className="overflow-y-auto flex-1 p-6 bg-muted/10 flex justify-center items-center">
+                  {isLoading ?
+                  <div className="size-8 border-brand border-4 border-t-transparent animate-spin rounded-full"></div>
+                    : (
+                      (selectedDrive.applicants ?? []).length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-16 text-muted-foreground gap-2">
+                          <p className="text-sm font-medium">No applicants found</p>
+                          <p className="text-xs text-muted-foreground/70">Try adjusting your search criteria</p>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col gap-3">
+                          {(selectedDrive.applicants ?? [])
+                            .filter((a: any) => !search || a.name.toLowerCase().includes(search.toLowerCase()) || a.college.toLowerCase().includes(search.toLowerCase()) || a.branch.toLowerCase().includes(search.toLowerCase()))
+                            .map((a: any) => (
+                              <div
+                                key={a.id}
+                                className="bg-card flex flex-col md:flex-row md:items-center justify-between gap-4 rounded-xl border border-border p-4 hover:border-brand/40 hover:bg-muted/5 shadow-sm transition-all hover:shadow-md"
+                              >
+                                {/* 1. Profile / Identity Column */}
+                                <div className="flex items-center gap-3.5 min-w-50">
+                                  <div className="relative w-11 h-11 shrink-0 rounded-full bg-brand/10 text-brand flex items-center justify-center text-base font-bold ring-2 ring-brand/5 border border-brand/10 overflow-hidden">
+                                    {typeof a.profileImageUrl === "string" && a.profileImageUrl.trim().length > 0 ? (
+                                      <Image
+                                        src={a.profileImageUrl}
+                                        alt={a.name || "Applicant"}
+                                        fill
+                                        sizes="44px"
+                                        className="object-cover"
+                                      />
+                                    ) : (
+                                      <span>{a.name?.charAt(0) ?? "?"}</span>
+                                    )}
+                                  </div>
+                                  <div className="flex flex-col min-w-0">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 mb-0.5">Name</span>
+                                    <h3 className="font-semibold text-foreground text-sm truncate" title={a.name}>
+                                      {a.name}
+                                    </h3>
+                                  </div>
+                                </div>
 
-                {/* Applicants Grid */}
-                <div className="overflow-y-auto flex-1 p-6">
-                  {(selectedDrive.applicants ?? []).length === 0 ? (
-                    <div className="flex items-center justify-center py-12 text-muted-foreground">
-                      <p>No applicants found</p>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {(selectedDrive.applicants ?? [])
-                        .filter((a: any) => !search || a.name.toLowerCase().includes(search.toLowerCase()) || a.college.toLowerCase().includes(search.toLowerCase()) || a.branch.toLowerCase().includes(search.toLowerCase()))
-                        .map((a: any) => (
-                          <div key={a.id} className="bg-muted/30 rounded-xl border border-border p-4 hover:border-brand/50 transition-all hover:shadow-md">
-                            {/* Avatar */}
-                            <div className="flex justify-center mb-3">
-                              <div className="w-20 h-20 rounded-full bg-brand/10 flex items-center justify-center text-2xl font-bold text-brand border-2 border-brand/20">
-                                {a.name?.charAt(0) ?? '?'}
-                              </div>
-                            </div>
+                                {/* 2. Professional Details Layout (Dashboard Style: Label stacked over data) */}
+                                <div className="flex-1 grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-2 text-xs my-1 md:my-0">
+                                  <div className="flex flex-col min-w-0">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 mb-0.5">College</span>
+                                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase ${a.type === "internal" ? "text-brand" : "text-amber-600 dark:text-amber-500"}`}>
+                                        {a.type === "internal" ? "RGI Student" : `${a.college}`}
+                                      </span>
+                                  </div>
+                                  <div className="flex flex-col min-w-0">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 mb-0.5">Branch</span>
+                                    <span className="text-foreground font-medium truncate" title={a.branch}>{a.branch}</span>
+                                  </div>
+                                  <div className="flex flex-col">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 mb-0.5">CGPA</span>
+                                    <span className="text-foreground font-bold text-sm text-brand">{a.cgpa}</span>
+                                  </div>
+                                  <div className="flex flex-col min-w-0">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 mb-0.5">Email Contact</span>
+                                    <a href={`mailto:${a.email}`} className="text-muted-foreground hover:text-brand transition-colors truncate font-medium" title={a.email}>
+                                      {a.email}
+                                    </a>
+                                  </div>
+                                </div>
 
-                            {/* Name and Type */}
-                            <h3 className="font-bold text-foreground text-center text-sm mb-1">{a.name}</h3>
-                            <div className="flex justify-center mb-3">
-                              <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${a.type === "internal" ? "bg-brand/10 text-brand" : "bg-yellow-500/10 text-yellow-600"}`}>
-                                {a.type === "internal" ? "RGI Student" : "External"}
-                              </span>
-                            </div>
+                                {/* 3. Status & Timestamp Section */}
+                                <div className="flex items-center md:flex-col md:items-end justify-between md:justify-center gap-1.5 pt-3 md:pt-0 border-t md:border-t-0 md:border-l border-border md:pl-5 min-w-[110px]">
+                                  <div className="flex items-center gap-1.5">
+                                    {a.attended ? (
+                                      <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                                        <CheckCircle className="w-3.5 h-3.5" />
+                                        <span className="text-xs font-semibold">Attended</span>
+                                      </div>
+                                    ) : (
+                                      <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted text-muted-foreground">
+                                        <Clock className="w-3.5 h-3.5" />
+                                        <span className="text-xs font-semibold">Pending</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <span className="text-[11px] text-muted-foreground/70 font-medium">
+                                    {new Date(a.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                  </span>
+                                </div>
 
-                            {/* Details */}
-                            <div className="space-y-2 text-xs mb-3">
-                              <div className="flex items-start gap-2">
-                                <span className="text-muted-foreground min-w-fit font-semibold">College:</span>
-                                <span className="text-foreground">{a.college}</span>
                               </div>
-                              <div className="flex items-start gap-2">
-                                <span className="text-muted-foreground min-w-fit font-semibold">Branch:</span>
-                                <span className="text-foreground">{a.branch}</span>
-                              </div>
-                              <div className="flex items-start gap-2">
-                                <span className="text-muted-foreground min-w-fit font-semibold">CGPA:</span>
-                                <span className="text-foreground font-bold">{a.cgpa}</span>
-                              </div>
-                              <div className="flex items-start gap-2">
-                                <span className="text-muted-foreground min-w-fit font-semibold">Email:</span>
-                                <a href={`mailto:${a.email}`} className="text-brand hover:underline break-all">{a.email}</a>
-                              </div>
-                            </div>
-
-                            {/* Status */}
-                            <div className="flex items-center justify-between pt-3 border-t border-border">
-                              <div className="flex items-center gap-1">
-                                {a.attended ? (
-                                  <>
-                                    <CheckCircle className="w-4 h-4 text-green-500" />
-                                    <span className="text-xs font-semibold text-green-600">Attended</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <Clock className="w-4 h-4 text-muted-foreground" />
-                                    <span className="text-xs font-semibold text-muted-foreground">Pending</span>
-                                  </>
-                                )}
-                              </div>
-                              <span className="text-xs text-muted-foreground">
-                                {new Date(a.createdAt).toLocaleDateString()}
-                              </span>
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                  )}
+                            ))}
+                        </div>
+                      )
+                    )}
                 </div>
               </div>
             </div>

@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import useSWR from "swr";
+import { fetchWithRetry } from "@/lib/fetch-utils";
 import {
   Loader2,
   Briefcase,
@@ -95,76 +97,71 @@ export default function VolunteerDashboard() {
     "student",
     "/students/login"
   );
-  const [data, setData] = useState<VolunteerData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [fetchError, setFetchError] = useState<string | null>(null);
+
+  /* SWR fetcher with auth */
+  const volFetcher = async <T = any,>(url: string): Promise<T> => {
+    const token = getToken("student");
+    const res = await fetchWithRetry(url, {
+      headers: { Authorization: `Bearer ${token}` },
+      retries: 3,
+      retryDelay: 1500,
+    });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error((errData as any)?.message || `HTTP ${res.status}`);
+    }
+    return res.json() as Promise<T>;
+  };
+
+  /* ── SWR: Main dashboard data ── */
+  const {
+    data: dashResult,
+    error: dashError,
+    isLoading: loading,
+    mutate: mutateDash,
+  } = useSWR<{ success: boolean; data?: VolunteerData; message?: string }>(
+    authenticated ? "/api/volunteer/dashboard" : null,
+    volFetcher,
+    {
+      revalidateOnFocus: true,
+      errorRetryCount: 3,
+      errorRetryInterval: 2000,
+      dedupingInterval: 10000,
+    },
+  );
+
+  const data: VolunteerData | null = dashResult?.success && dashResult?.data ? dashResult.data : null;
+  const fetchError: string | null = dashError?.message || (!dashResult?.success && dashResult?.message) || null;
+
+  /* ── SWR: Students overview (loaded on tab switch) ── */
   const [activeTab, setActiveTab] = useState<"students-overview" | "drive-images" | "overview" | "attendance-qr">("students-overview");
-  const [studentsOverviewData, setStudentsOverviewData] = useState<StudentData[]>([]);
-  const [studentsOverviewLoading, setStudentsOverviewLoading] = useState(false);
+
+  const {
+    data: studentsResult,
+    isLoading: studentsOverviewLoading,
+  } = useSWR<{ success: boolean; students?: StudentData[]; message?: string }>(
+    authenticated && activeTab === "students-overview" ? "/api/volunteer/students-overview" : null,
+    volFetcher,
+    {
+      revalidateOnFocus: false,
+      errorRetryCount: 3,
+      errorRetryInterval: 2000,
+      dedupingInterval: 30000,
+      onError: (err) => {
+        toast.error(err?.message || "Failed to load students overview");
+      },
+    },
+  );
+
+  const studentsOverviewData: StudentData[] = studentsResult?.success ? (studentsResult.students || []) : [];
 
   const router = useRouter();
-
-  useEffect(() => {
-    if (!authenticated) return;
-    fetchVolunteerDashboard();
-  }, [authenticated]);
-
-  useEffect(() => {
-    if (activeTab === "students-overview" && studentsOverviewData.length === 0) {
-      fetchStudentsOverview();
-    }
-  }, [activeTab, studentsOverviewData.length]);
 
   const handleLogout = () => {
     if (!window.confirm("Are you sure you want to logout?")) return;
     logout("student");
     toast.success("Logged out successfully");
     router.push("/");
-  };
-
-  const fetchVolunteerDashboard = async () => {
-    try {
-      setFetchError(null);
-      const token = getToken("student")
-      const res = await fetch("/api/volunteer/dashboard", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const d = (await res.json()) as { success: boolean; data?: VolunteerData; message?: string };
-      if (d.success && d.data) {
-        setData(d.data);
-      } else {
-        setFetchError(d.message || "Failed to load dashboard");
-        toast.error(d.message || "Failed to load dashboard");
-      }
-    } catch (err) {
-      console.error(err);
-      setFetchError("Network error. Please check your connection and try again.");
-      toast.error("Network error. Please check your connection and try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchStudentsOverview = async () => {
-    try {
-      setStudentsOverviewLoading(true);
-      const token = getToken("student");
-      const res = await fetch("/api/volunteer/students-overview", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const d = (await res.json()) as { success: boolean; students?: StudentData[]; message?: string };
-      if (d.success) {
-        setStudentsOverviewData(d.students || []);
-      } else {
-        console.error(d);
-        toast.error(d.message || "Failed to load students overview");
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to load students overview");
-    } finally {
-      setStudentsOverviewLoading(false);
-    }
   };
 
   if (authLoading) {
@@ -431,10 +428,7 @@ export default function VolunteerDashboard() {
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <p className="text-destructive font-bold text-lg">{fetchError}</p>
             <button
-              onClick={() => {
-                setLoading(true);
-                fetchVolunteerDashboard();
-              }}
+              onClick={() => mutateDash()}
               className="flex items-center gap-2 px-6 py-3 bg-brand text-primary-foreground rounded-xl font-bold text-sm hover:bg-brand/90 transition-all"
             >
               <RefreshCw className="w-4 h-4" /> Retry

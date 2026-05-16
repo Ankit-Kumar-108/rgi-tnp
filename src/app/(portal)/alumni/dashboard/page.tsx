@@ -32,7 +32,8 @@ import {
   ExternalLink,
   Camera,
   Trash2,
-  Upload
+  Upload,
+  AlertTriangle
 } from "lucide-react";
 import Nav from "@/components/layout/nav/nav";
 import Footer from "@/components/layout/footer/footer";
@@ -387,6 +388,40 @@ export default function AlumniDashboard() {
   return (
     <>
       <Nav />
+      {/* Complete Profile Prompt */}
+      {isProfileIncomplete && !showProfileForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-sm p-4">
+          <div className="w-full max-w-xl rounded-3xl border border-border bg-card/95 shadow-2xl overflow-hidden animate-in zoom-in-95 fade-in duration-300">
+            <div className="p-6 md:p-7">
+              <div className="flex items-start gap-4">
+                <div className="shrink-0 rounded-2xl bg-brand/10 text-brand p-3">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
+                <div className="space-y-2">
+                  <h2 className="text-xl md:text-2xl font-black tracking-tight text-foreground">
+                    Complete Your Profile
+                  </h2>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Please add your 10th, 12th, and resume details to unlock drive applications and improve your recruiter visibility. GitHub and LinkedIn is optional
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowProfileForm(true)}
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-brand text-primary-foreground px-5 py-2.5 text-sm font-bold hover:bg-brand/90 transition-colors"
+                >
+                  Complete Profile
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* body */}
       <div className="bg-background text-foreground antialiased font-sans min-h-screen mt-15 overflow-hidden">
         <div className="fixed bottom-0 right-0 w-96 h-96 bg-brand/5 rounded-full blur-[120px] -z-10" />
         <div className="fixed top-1/2 left-0 w-64 h-64 bg-brand/5 rounded-full blur-[100px] -z-10" />
@@ -397,10 +432,6 @@ export default function AlumniDashboard() {
             <GraduationCap className="w-4 h-4" /> Alumni
           </div>
           <section className="pt-4 md:pt-8 flex flex-col md:flex-row justify-between md:items-end gap-4">
-
-            <h1 className="text-2xl md:text-4xl lg:text-5xl font-black tracking-tight text-foreground leading-tight">
-              Welcome Back, <span className="text-brand">{alumni?.name || "Student"}</span>
-            </h1>
             <div className="flex flex-wrap items-center gap-3">
               <button
                 onClick={() => setShowReferralModal(true)}
@@ -426,7 +457,7 @@ export default function AlumniDashboard() {
           </section>
 
           {/* Hero Section */}
-          <section className="pt-4 md:pt-8 w-full">
+          <section className="w-full">
             <div className="flex flex-col items-center justify-between gap-6 mt-2">
               {alumni && (
                 <div className="w-full relative group">
@@ -462,6 +493,7 @@ export default function AlumniDashboard() {
                         )}
                       </div>
                     </div>
+                    
 
                     <div className="flex-1 space-y-6 md:space-y-8 w-full text-center md:text-left">
                       <div className="space-y-2 md:space-y-3">

@@ -27,5 +27,12 @@ export async function GET(req: Request) {
         },
         take: limit === 'all' ? undefined : (parseInt(limit) || 4),
     });
-    return Response.json({ success: true, volunteers });
+    return Response.json(
+      { success: true, volunteers },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+        },
+      },
+    );
 }
