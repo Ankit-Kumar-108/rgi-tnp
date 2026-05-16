@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     if (role === "student") {
       const student = await db.student.findUnique({ where: { email } });
       if (!student) {
-        return NextResponse.json({ success: true, message: "If an account exists, a reset link was sent." });
+        return NextResponse.json({ success: true, message: "NO! account linked with this Email" });
       }
       userName = student.name;
       await db.student.update({
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     } else if (role === "external_student") {
       const externalStudent = await db.externalStudent.findUnique({ where: { email } });
       if (!externalStudent) {
-        return NextResponse.json({ success: true, message: "If an account exists, a reset link was sent." });
+        return NextResponse.json({ success: true, message: "NO! account linked with this Email" });
       }
       userName = externalStudent.name;
       await db.externalStudent.update({
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
     } else if (role === "alumni") {
       const alumni = await db.alumni.findUnique({ where: { personalEmail: email } });
       if (!alumni) {
-        return NextResponse.json({ success: true, message: "If an account exists, a reset link was sent." });
+        return NextResponse.json({ success: true, message: "NO! account linked with this Email" });
       }
       userName = alumni.name;
       await db.alumni.update({
@@ -73,6 +73,19 @@ export async function POST(req: NextRequest) {
           resetPasswordTokenExpiry: expiry,
         },
       });
+    }else if(role == "recruiter"){
+      const recruiter  = await db.recruiter.findUnique({where: {email}})
+      if (!recruiter){
+        return NextResponse.json({success: true, message: "NO! account linked with this Email"})
+      }
+      userName = recruiter.name
+      await db.recruiter.update({
+        where: {email},
+        data: {
+          resetPasswordToken: resetTokenHash,
+          resetPasswordTokenExpiry: expiry,
+      }
+      })
     } else {
       return NextResponse.json({ success: false, message: "Invalid role specified." }, { status: 400 });
     }
@@ -87,7 +100,7 @@ export async function POST(req: NextRequest) {
       html: passwordResetEmailTemplate(userName, resetUrl),
     });
 
-    return NextResponse.json({ success: true, message: "If an account exists, a reset link was sent." });
+    return NextResponse.json({ success: true, message: "Email sent successfully" });
   } catch (error) {
     console.error("Forgot Password Error:", error);
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });

@@ -166,7 +166,7 @@ export default function VolunteerLogin() {
                     Password
                   </label>
                   <Link
-                    href="/forgot-password"
+                    href="/forgot-password?role=student"
                     className="text-xs text-brand hover:underline font-medium"
                   >
                     Forgot password?

@@ -1,7 +1,8 @@
-export const runtime = 'edge';
+    export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { hashPassword } from "@/lib/auth-utils";
+import { success } from "zod";
 
 function bufferToHex(buffer: ArrayBuffer): string {
   return Array.from(new Uint8Array(buffer))
@@ -89,6 +90,27 @@ export async function POST(req: NextRequest) {
       const passwordHash = await hashPassword(password);
       await db.alumni.update({
         where: { id: alumni.id },
+        data: {
+          passwordHash,
+          resetPasswordToken: null,
+          resetPasswordTokenExpiry: null,
+        },
+      });
+    }else if (role === "recruiter") {
+      const recruiter = await db.recruiter.findFirst({
+        where: {
+          resetPasswordToken: tokenHash,
+          resetPasswordTokenExpiry: { gt: new Date() },
+        },
+      })
+
+      if (!recruiter) {
+        return NextResponse.json({ success: false, message: "Invalid or expired reset token" }, { status: 400 });
+      }
+
+      const passwordHash = await hashPassword(password);
+      await db.recruiter.update({
+        where: { id: recruiter.id },
         data: {
           passwordHash,
           resetPasswordToken: null,

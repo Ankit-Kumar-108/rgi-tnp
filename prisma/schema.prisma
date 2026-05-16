@@ -9,8 +9,8 @@ datasource db {
 }
 
 model StudentMaster {
-  id               String @id @default(cuid())
-  
+  id String @id @default(cuid())
+
   enrollmentNumber String @unique
   name             String
   branch           String
@@ -35,22 +35,22 @@ model Admin {
 }
 
 model Student {
-  id                           String              @id @default(cuid())
+  id                           String                   @id @default(cuid())
   name                         String
-  enrollmentNumber             String              @unique
-  email                        String              @unique
+  enrollmentNumber             String                   @unique
+  email                        String                   @unique
   branch                       String
   semester                     Int
   gender                       String
   cgpa                         Float
-  isEmailVerified              Boolean             @default(false)
-  isVerified                   Boolean             @default(false)
+  isEmailVerified              Boolean                  @default(false)
+  isVerified                   Boolean                  @default(false)
   emailVerificationToken       String?
   emailVerificationTokenExpiry DateTime?
-  emailVerificationFailed      Boolean             @default(false)
+  emailVerificationFailed      Boolean                  @default(false)
   emailVerificationError       String?
   resetPasswordToken           String?
-  isProfileComplete             Boolean             @default(false)
+  isProfileComplete            Boolean                  @default(false)
   resetPasswordTokenExpiry     DateTime?
   profileImageUrl              String?
   resumeUrl                    String?
@@ -60,74 +60,74 @@ model Student {
   passwordHash                 String
   linkedinUrl                  String?
   githubUrl                    String?
-  tenthPercentage                Float
-  twelfthPercentage             Float
-  activeBacklog                 Int                @default(0)
-  role                         String              @default("student")
+  tenthPercentage              Float
+  twelfthPercentage            Float
+  activeBacklog                Int                      @default(0)
+  role                         String                   @default("student")
   registrations                DriveRegistration[]
   memories                     Memory[]
   studentFeedbacks             StudentFeedback[]
   volunteerStudentStatuses     VolunteerStudentStatus[]
-  createdAt                    DateTime            @default(now())
-  updatedAt                    DateTime            @updatedAt
-  volunteers Volunteer[]
+  createdAt                    DateTime                 @default(now())
+  updatedAt                    DateTime                 @updatedAt
+  volunteers                   Volunteer[]
 }
 
 model Alumni {
-  id                String           @id @default(cuid())
-  name              String
-  enrollmentNumber  String           @unique
-  personalEmail     String           @unique
-  passwordHash      String
-  isVerified        Boolean          @default(false)
+  id                           String           @id @default(cuid())
+  name                         String
+  enrollmentNumber             String           @unique
+  personalEmail                String           @unique
+  passwordHash                 String
+  isVerified                   Boolean          @default(false)
   emailVerificationToken       String?
   emailVerificationTokenExpiry DateTime?
-  emailVerificationFailed      Boolean             @default(false)
+  emailVerificationFailed      Boolean          @default(false)
   emailVerificationError       String?
   resetPasswordToken           String?
   resetPasswordTokenExpiry     DateTime?
-  isProfileComplete Boolean          @default(false)
-  currentCompany    String?
-  profileImageUrl    String
-  jobTitle          String?
-  city              String?
-  country           String?
-  linkedInUrl       String?
-  phoneNumber       String?
-  privacyJson       Json?
-  branch            String
-  about             String?
-  batch             String
-  course            String
-  memories          Memory[]
-  referrals         Referral[]
-  alumniFeedbacks   AlumniFeedback[]
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
+  isProfileComplete            Boolean          @default(false)
+  currentCompany               String?
+  profileImageUrl              String
+  jobTitle                     String?
+  city                         String?
+  country                      String?
+  linkedInUrl                  String?
+  phoneNumber                  String?
+  privacyJson                  Json?
+  branch                       String
+  about                        String?
+  batch                        String
+  course                       String
+  memories                     Memory[]
+  referrals                    Referral[]
+  alumniFeedbacks              AlumniFeedback[]
+  createdAt                    DateTime         @default(now())
+  updatedAt                    DateTime         @updatedAt
 }
 
 model ExternalStudent {
-  id               String              @id @default(cuid())
-  name             String
-  collegeName      String
-  enrollmentNumber String
-  email            String              @unique
-  passwordHash     String
-  profileImageUrl  String
-  semester         Int
-  isProfileComplete Boolean             @default(false)
-  linkedinUrl      String?
-  githubUrl        String?
-  resumeUrl        String
-  gender           String
-  branch           String
-  tenthPercentage    Float
-  twelfthPercentage Float
-  cgpa             Float
-  activeBacklog     Int                 @default(0)
-  course           String
-  batch            String
-  phoneNumber      String
+  id                           String              @id @default(cuid())
+  name                         String
+  collegeName                  String
+  enrollmentNumber             String
+  email                        String              @unique
+  passwordHash                 String
+  profileImageUrl              String
+  semester                     Int
+  isProfileComplete            Boolean             @default(false)
+  linkedinUrl                  String?
+  githubUrl                    String?
+  resumeUrl                    String
+  gender                       String
+  branch                       String
+  tenthPercentage              Float
+  twelfthPercentage            Float
+  cgpa                         Float
+  activeBacklog                Int                 @default(0)
+  course                       String
+  batch                        String
+  phoneNumber                  String
   isVerified                   Boolean             @default(false)
   emailVerificationToken       String?
   emailVerificationTokenExpiry DateTime?
@@ -143,41 +143,41 @@ model ExternalStudent {
 
 // 4. DRIVE & INTERACTION MODELS
 model PlacementDrive {
-  id               String              @id @default(cuid())
-  companyName      String
-  roleName         String
-  jobDescription   String
-  ctc              String
-  minCGPA          Float
-  jobType           String
-  minBatch         String
-  maxBatch         String
-  course           String
-  eligibleBranches String
-  genderPreference String
-  duration         String?
-  interviewProcess String?
-  driveDate        DateTime
-  driveType        String
-  status           String              @default("pending")
-  googleSheetUrl   String?
-  recruiterId      String
-  recruiter        Recruiter           @relation(fields: [recruiterId], references: [id])
-  registrations    DriveRegistration[]
-  driveImages      DriveImage[]
+  id                       String                   @id @default(cuid())
+  companyName              String
+  roleName                 String
+  jobDescription           String
+  ctc                      String
+  minCGPA                  Float
+  jobType                  String
+  minBatch                 String
+  maxBatch                 String
+  course                   String
+  eligibleBranches         String
+  genderPreference         String
+  duration                 String?
+  interviewProcess         String?
+  driveDate                DateTime
+  driveType                String
+  status                   String                   @default("pending")
+  googleSheetUrl           String?
+  recruiterId              String
+  recruiter                Recruiter                @relation(fields: [recruiterId], references: [id])
+  registrations            DriveRegistration[]
+  driveImages              DriveImage[]
   volunteerStudentStatuses VolunteerStudentStatus[]
-  createdAt        DateTime            @default(now())
-  updatedAt        DateTime            @updatedAt
+  createdAt                DateTime                 @default(now())
+  updatedAt                DateTime                 @updatedAt
 }
 
 model DriveImage {
-  id               String         @id @default(cuid())
-  title            String
-  imageUrl         String
-  driveId          String
-  drive            PlacementDrive @relation(fields: [driveId], references: [id], onDelete: Cascade)
-  uploadedBy       String         // admin email for audit
-  createdAt        DateTime       @default(now())
+  id         String         @id @default(cuid())
+  title      String
+  imageUrl   String
+  driveId    String
+  drive      PlacementDrive @relation(fields: [driveId], references: [id], onDelete: Cascade)
+  uploadedBy String // admin email for audit
+  createdAt  DateTime       @default(now())
 }
 
 model DriveRegistration {
@@ -196,117 +196,120 @@ model DriveRegistration {
 }
 
 model Recruiter {
-  id           String @id @default(cuid())
-  name         String
-  email        String @unique
-  phoneNumber  String
-  designation  String
-  company      String
-  passwordHash String
-  role         String @default("recruiter")
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  drives             PlacementDrive[]
-  corporateFeedbacks CorporateFeedback[]
+  id                       String              @id @default(cuid())
+  name                     String
+  email                    String              @unique
+  phoneNumber              String
+  designation              String
+  company                  String
+  resetPasswordToken       String?
+  resetPasswordTokenExpiry DateTime?
+  passwordHash             String
+  role                     String              @default("recruiter")
+  createdAt                DateTime            @default(now())
+  updatedAt                DateTime            @updatedAt
+  drives                   PlacementDrive[]
+  corporateFeedbacks       CorporateFeedback[]
 }
 
 model Referral {
-  id          String   @id @default(cuid())
-  companyName String
-  jobType     String?
-  position    String
-  description String
-  location    String?
-  minCGPA      Float?
-  experience  String?
+  id            String    @id @default(cuid())
+  companyName   String
+  jobType       String?
+  position      String
+  description   String
+  location      String?
+  minCGPA       Float?
+  experience    String?
   batchEligible String?
   refrerralLink String?
-  referralCode String?
-  deadline    DateTime?
-  applyLink   String?
-  status      String   @default("pending")
-  alumniId    String
-  alumni      Alumni   @relation(fields: [alumniId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  referralCode  String?
+  deadline      DateTime?
+  applyLink     String?
+  status        String    @default("pending")
+  alumniId      String
+  alumni        Alumni    @relation(fields: [alumniId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 model Memory {
-  id        String   @id @default(cuid())
-  imageUrl  String
-  status    String   @default("pending_moderation")
-  studentId String?
-  title     String   @default("Untitled Memory")
+  id           String   @id @default(cuid())
+  imageUrl     String
+  status       String   @default("pending_moderation")
+  studentId    String?
+  title        String   @default("Untitled Memory")
   uploaderName String
-  alumniId String?
-  alumni   Alumni?  @relation(fields: [alumniId], references: [id])
-  student   Student?  @relation(fields: [studentId], references: [id])
-  createdAt DateTime @default(now())
+  alumniId     String?
+  alumni       Alumni?  @relation(fields: [alumniId], references: [id])
+  student      Student? @relation(fields: [studentId], references: [id])
+  createdAt    DateTime @default(now())
 }
 
 model AlumniFeedback {
-  id         String   @id @default(cuid())
+  id         String  @id @default(cuid())
   content    String
-  rating     Int    
-  isApproved Boolean  @default(false)
-  
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  rating     Int
+  isApproved Boolean @default(false)
 
-  alumniId   String
-  alumni     Alumni   @relation(fields: [alumniId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  alumniId String
+  alumni   Alumni @relation(fields: [alumniId], references: [id])
 }
 
 model StudentFeedback {
-  id         String   @id @default(cuid())
+  id         String  @id @default(cuid())
   content    String
   rating     Int
-  isApproved Boolean  @default(false)
-  
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  isApproved Boolean @default(false)
 
-  studentId  String
-  student    Student  @relation(fields: [studentId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id])
 }
 
 model CorporateFeedback {
-  id          String    @id @default(cuid())
-  content     String
-  rating      Int
-  isApproved  Boolean   @default(false)
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id         String  @id @default(cuid())
+  content    String
+  rating     Int
+  isApproved Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   recruiterId String
   recruiter   Recruiter @relation(fields: [recruiterId], references: [id])
 }
+
 model Volunteer {
-  id                  String    @id @default(cuid())
-  studentId           String?   @unique
-  student             Student?  @relation(fields: [studentId], references: [id])
-  designation         String    @default("Volunteer")
-  isVerified          Boolean   @default(false)
-  assignedBy          String?   // Admin email who assigned this volunteer
-  assignedAt          DateTime?
-  verificationNotes   String?   // Notes from admin about why/when approved
-  isActive            Boolean   @default(true)
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  id                String    @id @default(cuid())
+  studentId         String?   @unique
+  student           Student?  @relation(fields: [studentId], references: [id])
+  designation       String    @default("Volunteer")
+  isVerified        Boolean   @default(false)
+  assignedBy        String? // Admin email who assigned this volunteer
+  assignedAt        DateTime?
+  verificationNotes String? // Notes from admin about why/when approved
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 }
 
 model VolunteerStudentStatus {
-  id        String         @id @default(cuid())
-  driveId   String
-  drive     PlacementDrive @relation(fields: [driveId], references: [id], onDelete: Cascade)
-  
+  id      String         @id @default(cuid())
+  driveId String
+  drive   PlacementDrive @relation(fields: [driveId], references: [id], onDelete: Cascade)
+
   studentId String
-  student   Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  
-  status    String         @default("Applied") // Applied, Selected, Rejected, Shortlisted
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
-  
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  status    String   @default("Applied") // Applied, Selected, Rejected, Shortlisted
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([driveId, studentId])
 }

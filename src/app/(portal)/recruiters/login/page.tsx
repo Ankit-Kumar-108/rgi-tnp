@@ -96,7 +96,7 @@ export default function RecruiterLogin() {
                             <div className="space-y-2">
                                 <div className="flex justify-between items-center">
                                     <label className="text-sm font-semibold text-foreground">Password</label>
-                                    <Link className="text-sm font-medium text-brand hover:text-brand/80 transition-colors" href="#">Forgot Password?</Link>
+                                    <Link className="text-sm font-medium text-brand hover:text-brand/80 transition-colors" href="/forgot-password?role=recruiter">Forgot Password?</Link>
                                 </div>
                                 <div className="relative">
                                     <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"><LockKeyhole className="w-5 h-5"/></div>

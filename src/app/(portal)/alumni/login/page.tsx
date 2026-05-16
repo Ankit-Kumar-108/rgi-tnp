@@ -137,7 +137,7 @@ export default function AlumniLogin() {
                                     </label>
                                     <Link
                                         className="text-sm font-medium text-brand hover:text-brand/80 transition-colors"
-                                        href="/forgot-password"
+                                        href="/forgot-password?role=alumni"
                                     >
                                         Forgot Password?
                                     </Link>

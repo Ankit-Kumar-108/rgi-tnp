@@ -2,7 +2,7 @@
 
 import React, { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { CheckCircle, XCircle, Loader2, KeyRound, Eye, EyeOff } from "lucide-react";
+import { CheckCircle, Loader2, KeyRound, Eye, EyeOff, LockKeyhole, ShieldCheck, ArrowRight, Sparkles, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 
@@ -19,6 +19,7 @@ function ResetPasswordContent() {
 
   const token = searchParams?.get("token");
   const role = searchParams?.get("role") || "student";
+  const tokenMissing = !token;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,105 +78,157 @@ function ResetPasswordContent() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-6">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 sm:p-6 overflow-hidden">
       <div className="fixed inset-0 overflow-hidden -z-10">
-        <div className="absolute top-0 right-0 w-125 h-125 bg-brand/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-125 h-125 bg-brand/5 rounded-full blur-[120px] translate-y-1/2 -translate-x-1/2" />
+        <div className="absolute top-0 right-0 h-80 w-80 rounded-full bg-brand/10 blur-[120px] -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 h-96 w-96 rounded-full bg-foreground/5 blur-[120px] translate-y-1/2 -translate-x-1/2" />
       </div>
 
-      <div className="max-w-md w-full bg-card/50 backdrop-blur-xl border border-border p-8 rounded-3xl shadow-2xl text-center">
-        <div className="w-20 h-20 bg-brand/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
-          {status === "loading" && <Loader2 className="w-10 h-10 text-brand animate-spin" />}
-          {status === "success" && <CheckCircle className="w-10 h-10 text-green-500" />}
-          {(status === "form" || status === "error") && <KeyRound className="w-10 h-10 text-brand" />}
-        </div>
-
-        <h1 className="text-2xl font-black text-foreground mb-3 tracking-tight">
-          {status === "loading" && "Resetting Password..."}
-          {status === "success" && "Password Reset!"}
-          {(status === "form" || status === "error") && "Set New Password"}
-        </h1>
-
-        {status === "success" ? (
-          <div className="space-y-4">
-            <p className="text-muted-foreground text-sm leading-relaxed">{message}</p>
-            <Link
-              href={getLoginHref()}
-              className="flex items-center justify-center gap-2 w-full py-3 bg-brand text-primary-foreground rounded-xl font-bold hover:bg-brand/90 transition-all shadow-[var(--shadow-brand)]"
-            >
-              Go to Login
+      <div className="relative w-full max-w-xl max-h-[calc(100dvh-7rem)] overflow-y-auto overflow-hidden rounded-[2rem] border border-border bg-card/85 shadow-[0_30px_120px_rgba(16,16,32,0.18)] backdrop-blur-xl">
+        <div className="p-4 sm:p-6 md:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+            <div className="inline-flex items-center gap-2 rounded-full bg-brand/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-brand">
+              <KeyRound className="h-4 w-4" /> Reset Password
+            </div>
+            <Link href={getLoginHref()} className="text-sm font-medium text-muted-foreground hover:text-brand transition-colors">
+              Back to Login
             </Link>
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4 text-left">
-            {status === "error" && message && (
-              <div className="p-3 rounded-xl bg-destructive/10 text-destructive text-sm font-medium text-center">
-                {message}
-              </div>
-            )}
 
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-foreground">New Password</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  className="w-full px-4 py-3 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all text-sm pr-12"
-                  placeholder="Enter new password (min 8 characters)"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={8}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
+          <div className="mb-5 sm:mb-6 space-y-3">
+            <div className="inline-flex items-center gap-2 rounded-2xl border border-brand/15 bg-brand/5 px-3 py-2 text-xs font-semibold text-brand">
+              <LockKeyhole className="h-4 w-4" /> Secure recovery
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
+              Create a new password.
+            </h1>
+            <p className="max-w-xl text-sm sm:text-base text-muted-foreground leading-relaxed">
+              Choose a strong password you haven’t used before. This will update the account tied to your reset link.
+            </p>
+          </div>
+
+          {tokenMissing && status !== "success" ? (
+              <div className="rounded-3xl border border-amber-500/20 bg-amber-500/5 p-5 sm:p-6 text-left">
+              <div className="flex items-start gap-3">
+                <div className="rounded-2xl bg-amber-500/10 p-3 text-amber-500">
+                  <AlertTriangle className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-foreground">Missing reset token</h3>
+                  <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
+                    Open this page from the reset link sent to your email. If the link is missing, request a fresh one.
+                  </p>
+                </div>
+              </div>
+              <div className="mt-5">
+                <Link href="/forgot-password" className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl bg-brand px-5 py-3 text-sm font-bold text-primary-foreground transition-all hover:bg-brand/90">
+                  Request a new link <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
             </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-foreground">Confirm Password</label>
-              <div className="relative">
-                <input
-                  type={showConfirm ? "text" : "password"}
-                  className="w-full px-4 py-3 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all text-sm pr-12"
-                  placeholder="Confirm new password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirm(!showConfirm)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
+          ) : status === "success" ? (
+            <div className="rounded-3xl border border-green-500/20 bg-green-500/5 p-5 sm:p-8 text-left">
+              <div className="flex items-start gap-4">
+                <div className="rounded-2xl bg-green-500/10 p-3 text-green-500">
+                  <CheckCircle className="h-6 w-6" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-black tracking-tight text-foreground">Password updated</h3>
+                  <p className="text-sm sm:text-base leading-relaxed text-muted-foreground">{message}</p>
+                </div>
+              </div>
+              <div className="mt-6">
+                <Link href={getLoginHref()} className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl bg-brand px-5 py-3 text-sm font-bold text-primary-foreground shadow-(--shadow-brand) transition-all hover:-translate-y-0.5 hover:bg-brand/90 sm:py-3.5">
+                  Go to Login <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
             </div>
-
-            <button
-              type="submit"
-              disabled={status === "loading"}
-              className="w-full py-3 bg-brand text-primary-foreground rounded-xl font-bold hover:bg-brand/90 transition-all shadow-[var(--shadow-brand)] disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {status === "loading" ? (
-                <><Loader2 className="w-4 h-4 animate-spin" /> Resetting...</>
-              ) : (
-                "Reset Password"
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {status === "error" && message && (
+                <div className="rounded-2xl border border-destructive/20 bg-destructive/10 p-4 text-sm font-medium text-destructive">
+                  {message}
+                </div>
               )}
-            </button>
 
-            <div className="text-center pt-2">
-              <Link href={getLoginHref()} className="text-xs text-muted-foreground hover:text-brand transition-colors font-medium">
-                Back to Login
-              </Link>
-            </div>
-          </form>
-        )}
+              <div className="space-y-2.5">
+                <label className="text-sm font-semibold text-foreground">Account Type</label>
+                <div className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-muted/50 px-4 py-3 text-sm font-semibold text-foreground">
+                  <span>
+                    {role === "student" && "Internal Student (RGI)"}
+                    {role === "external_student" && "External Student"}
+                    {role === "alumni" && "Alumni"}
+                    {role === "recruiter" && "Recruiter"}
+                  </span>
+                  <span className="rounded-full bg-brand/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-brand">
+                    From email
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid gap-5 sm:grid-cols-2">
+                <div className="space-y-2.5 sm:col-span-2">
+                  <label className="text-sm font-semibold text-foreground">New Password</label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      className="w-full rounded-2xl border border-input bg-background px-4 py-3 pr-12 text-sm outline-none transition-all placeholder:text-muted-foreground/60 focus:border-brand focus:ring-2 focus:ring-brand/15"
+                      placeholder="Enter new password (min 8 characters)"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      minLength={8}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5 sm:col-span-2">
+                  <label className="text-sm font-semibold text-foreground">Confirm Password</label>
+                  <div className="relative">
+                    <input
+                      type={showConfirm ? "text" : "password"}
+                      className="w-full rounded-2xl border border-input bg-background px-4 py-3 pr-12 text-sm outline-none transition-all placeholder:text-muted-foreground/60 focus:border-brand focus:ring-2 focus:ring-brand/15"
+                      placeholder="Confirm new password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirm(!showConfirm)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={status === "loading"}
+                className="group inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-brand px-5 py-3 text-sm font-bold text-primary-foreground shadow-(--shadow-brand) transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand/90 disabled:translate-y-0 disabled:opacity-50 sm:py-3.5"
+              >
+                {status === "loading" ? (
+                  <><Loader2 className="h-5 w-5 animate-spin" /> Resetting...</>
+                ) : (
+                  <><span>Reset Password</span><ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>
+                )}
+              </button>
+
+              <div className="rounded-2xl border border-border bg-muted/30 p-4 text-sm text-muted-foreground leading-relaxed">
+                Tip: use a unique password with letters, numbers, and symbols for better account security.
+              </div>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   );
