@@ -127,6 +127,8 @@ export async function PUT(req: NextRequest) {
       data: {
         companyName: body.companyName,
         roleName: body.roleName,
+        genderPreference: body.genderPreference,
+        interviewProcess: body.interviewProcess,
         jobDescription: body.jobDescription,
         ctc: body.ctc,
         eligibleBranches: body.eligibleBranches,
@@ -138,11 +140,12 @@ export async function PUT(req: NextRequest) {
         driveDate: new Date(body.driveDate),
         driveType: body.driveType || existingDrive.driveType,
         jobType: body.jobType || existingDrive.jobType,
+        
       },
     });
 
     return NextResponse.json({ success: true, message: "Drive updated successfully", drive: updatedDrive });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Update Drive Error:", error);
     return NextResponse.json({ success: false, message: "Failed to update drive" }, { status: 500 });
   }

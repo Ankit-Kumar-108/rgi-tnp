@@ -5,6 +5,7 @@ import { getDb } from "@/lib/db";
 import { sendEmail } from "@/lib/send-email";
 import { placementOpportunityTemplate } from "@/lib/email-templates";
 import { runInBackground } from "@/lib/background";
+import { success } from "zod";
 
 type ApprovedDrive = {
   id: string;
@@ -625,5 +626,69 @@ export async function POST(req: NextRequest) {
       { success: false, message: "Action failed" },
       { status: 500 },
     );
+  }
+}
+
+export async function PUT(req :NextRequest) {
+  try {
+    const body = (await req.json()) as {
+      id: string;
+      companyName: string;
+      roleName: string;
+      genderPreference: string
+      jobDescription: string;
+      ctc: string;
+      eligibleBranches: string;
+      minCGPA: number;
+      duration: string
+      interviewProcess: string
+      minBatch: string;
+      maxBatch: string;
+      course: string;
+      driveDate: string;
+      driveType: string;
+      jobType: string;
+    };
+
+    const db = getDb()
+
+    const existingDrive = await db.placementDrive.findUnique({
+      where: {id: body.id},
+    })
+    if (!existingDrive) {
+      return NextResponse.json({ success: false, message: "Drive not found" }, { status: 404 });
+    }
+
+    const updatedDrive = await db.placementDrive.update({
+      where: { id: body.id },
+      data: {
+        companyName: body.companyName,
+        roleName: body.roleName,
+        genderPreference: body.genderPreference,
+        interviewProcess: body.interviewProcess,
+        jobDescription: body.jobDescription,
+        ctc: body.ctc,
+        eligibleBranches: body.eligibleBranches,
+        minCGPA: body.minCGPA,
+        minBatch: body.minBatch,
+        maxBatch: body.maxBatch,
+        duration: body.duration,
+        course: body.course,
+        driveDate: new Date(body.driveDate),
+        driveType: body.driveType || existingDrive.driveType,
+        jobType: body.jobType || existingDrive.jobType,
+        
+      },
+    });
+
+    return NextResponse.json({ success: true, message: "Drive updated successfully", drive: updatedDrive });
+  } catch (error: any) {
+    console.error("Error Upadting Drive", error)
+    return NextResponse.json({
+      success: false,
+      message: "error updating drive",
+    }, {
+      status: 500
+    })
   }
 }

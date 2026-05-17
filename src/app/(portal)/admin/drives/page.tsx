@@ -205,33 +205,33 @@ export default function AdminDrivesPage() {
                   </select>
                 </div>
                 <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Eligible Gender</label>
-                      <select required value={form.genderPreference} onChange={(e) => setForm({ ...form, genderPreference: e.target.value })}
-                        className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none">
-                        <option value="Both">Both Gender</option>
-                        <option value="Male">Male Only</option>
-                        <option value="Female">Female Only</option>
-                      </select>
-                    </div>
-                    {(form.jobType === "Internship" || form.jobType === "Full Time with Bond" || form.jobType === "Internship with PPO") && (
-                      <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">
-                          {form.jobType === "Internship" ? "Internship Duration": form.jobType === "Full Time with Bond" ? "Bond Duration" : form.jobType === "Internship with PPO"? "Internship Duration" : "Bond/Contract Duration"}
-                        </label>
-                        <input required value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })}
-                          placeholder={form.jobType === "Internship" || form.jobType === "Internship with PPO" ? "e.g., 6 months" : "e.g., 2 years"}
-                          className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
-                      </div>
-                    )}
-                  </div>
-                  {/* Interview Process */}
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Eligible Gender</label>
+                  <select required value={form.genderPreference} onChange={(e) => setForm({ ...form, genderPreference: e.target.value })}
+                    className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none">
+                    <option value="Both">Both Gender</option>
+                    <option value="Male">Male Only</option>
+                    <option value="Female">Female Only</option>
+                  </select>
+                </div>
+                {(form.jobType === "Internship" || form.jobType === "Full Time with Bond" || form.jobType === "Internship with PPO") && (
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Interview Process</label>
-                    <textarea value={form.interviewProcess} onChange={(e) => setForm({ ...form, interviewProcess: e.target.value })}
-                      placeholder="e.g., Online Test (1 hour) → Technical Round → HR Round"
-                      rows={5}
+                    <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">
+                      {form.jobType === "Internship" ? "Internship Duration" : form.jobType === "Full Time with Bond" ? "Bond Duration" : form.jobType === "Internship with PPO" ? "Internship Duration" : "Bond/Contract Duration"}
+                    </label>
+                    <input required value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })}
+                      placeholder={form.jobType === "Internship" || form.jobType === "Internship with PPO" ? "e.g., 6 months" : "e.g., 2 years"}
                       className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
                   </div>
+                )}
+              </div>
+              {/* Interview Process */}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Interview Process</label>
+                <textarea value={form.interviewProcess} onChange={(e) => setForm({ ...form, interviewProcess: e.target.value })}
+                  placeholder="e.g., Online Test (1 hour) → Technical Round → HR Round"
+                  rows={5}
+                  className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
+              </div>
               {/* Course */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Course</label>

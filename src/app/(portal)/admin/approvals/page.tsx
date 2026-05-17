@@ -68,6 +68,47 @@ const SUBTABS: { key: SubTabKey; label: string; icon: React.ElementType }[] = [
   { key: "approved", label: "Approved", icon: Check },
 ];
 
+const BRANCHES = ["Computer Science", "Civil", "Mechanical", "Electronics", "Electrical", "Power Systems", "Digital Communication", "Thermal Engineering", "Marketing", "Finance", "Human Resource"];
+
+const emptyDriveForm = {
+  companyName: "",
+  roleName: "",
+  jobDescription: "",
+  ctc: "",
+  eligibleBranches: "",
+  minCGPA: 0,
+  minBatch: "",
+  maxBatch: "",
+  course: "B.Tech",
+  driveDate: "",
+  driveType: "Closed",
+  jobType: "Full Time",
+  genderPreference: "Both",
+  interviewProcess: "",
+  duration: "",
+};
+
+type DriveEditForm = typeof emptyDriveForm;
+type DriveApprovalItem = Omit<Partial<DriveEditForm>, "driveDate" | "minCGPA"> & {
+  id: string;
+  driveDate?: string | Date | null;
+  minCGPA?: number | string | null;
+  recruiter?: {
+    name?: string | null;
+    company?: string | null;
+    email?: string | null;
+  } | null;
+};
+
+const formatDateForInput = (value: string | Date | null | undefined) => {
+  if (!value) return "";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+
+  return date.toISOString().split("T")[0];
+};
+
 export default function AdminApprovalsPage() {
   const { loading: authLoading, authenticated } = useAuth("admin", "/admin/login");
   const [activeTab, setActiveTab] = useState<TabKey>("drives");
@@ -81,7 +122,11 @@ export default function AdminApprovalsPage() {
   const [bulkActionLoading, setBulkActionLoading] = useState<"approve" | "reject" | null>(null);
   const [viewItem, setViewItem] = useState<any>(null);
   const [viewDrive, setViewDrive] = useState<any>(null);
-//   const [editDriveId, setEditDriveId] = useState<string | null>(null)
+  const [editDriveId, setEditDriveId] = useState<string | null>(null);
+  const [showDriveEditForm, setShowDriveEditForm] = useState(false);
+  const [submittingDriveEdit, setSubmittingDriveEdit] = useState(false);
+  const [driveFormMsg, setDriveFormMsg] = useState<{ msg: string; ok: boolean } | null>(null);
+  const [driveForm, setDriveForm] = useState({ ...emptyDriveForm });
 
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -156,10 +201,41 @@ export default function AdminApprovalsPage() {
     setItems([])
     setHasMore(true);
     setViewItem(null);
+    setViewDrive(null);
+    setShowDriveEditForm(false);
+    setEditDriveId(null);
     if (tab !== "feedback") setActiveFeedbackSubTab("student");
     if (tab !== "unverified") setActiveUnverifiedSubTab("students");
   };
 
+  const openDriveEdit = (drive: DriveApprovalItem) => {
+    setEditDriveId(drive.id);
+    setDriveForm({
+      companyName: drive.companyName || "",
+      roleName: drive.roleName || "",
+      jobDescription: drive.jobDescription || "",
+      ctc: drive.ctc || "",
+      eligibleBranches: drive.eligibleBranches || "",
+      minCGPA: Number(drive.minCGPA) || 0,
+      minBatch: drive.minBatch || "",
+      maxBatch: drive.maxBatch || "",
+      course: drive.course || "B.Tech",
+      driveDate: formatDateForInput(drive.driveDate),
+      driveType: drive.driveType || "Closed",
+      jobType: drive.jobType || "Full Time",
+      genderPreference: drive.genderPreference || "Both",
+      interviewProcess: drive.interviewProcess || "",
+      duration: drive.duration || "",
+    });
+    setDriveFormMsg(null);
+    setShowDriveEditForm(true);
+  };
+
+  const closeDriveEdit = () => {
+    setShowDriveEditForm(false);
+    setEditDriveId(null);
+    setDriveFormMsg(null);
+  };
 
   const handleAction = async (id: string, action: "approve" | "reject") => {
     setActionLoading(id);
@@ -201,6 +277,47 @@ export default function AdminApprovalsPage() {
       setActionLoading(null);
     }
   };
+
+  const handleSubmitDrive = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editDriveId) return;
+
+    const updatedDrive = {
+      ...driveForm,
+      id: editDriveId,
+      minCGPA: parseFloat(String(driveForm.minCGPA)),
+    };
+
+    setSubmittingDriveEdit(true);
+    setDriveFormMsg(null);
+    try {
+      const res = await fetch("/api/admin/drives", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedDrive),
+      });
+      const data = (await res.json()) as { success: boolean; message?: string; drive?: DriveApprovalItem };
+      if (data.success) {
+        const message = data.message || "Drive updated successfully";
+        toast.success(message);
+        setDriveFormMsg({ msg: message, ok: true });
+        setItems((prev) =>
+          prev.map((item) => (item.id === updatedDrive.id ? { ...item, ...(data.drive || {}), ...updatedDrive } : item))
+        );
+        setTimeout(closeDriveEdit, 800);
+      } else {
+        const message = data.message || "Failed to update drive";
+        toast.error(message);
+        setDriveFormMsg({ msg: message, ok: false });
+      }
+    } catch (error) {
+      console.error("Error Updating Drive:", error);
+      toast.error("Error updating drive");
+      setDriveFormMsg({ msg: "Error updating drive", ok: false });
+    } finally {
+      setSubmittingDriveEdit(false);
+    }
+  }
 
   const handleBulkAction = async (action: "approve" | "reject") => {
     const targetItems = activeTab === "memories" 
@@ -284,6 +401,256 @@ export default function AdminApprovalsPage() {
           role="admin"
           readonly={true}
         />
+      )}
+
+      {/* Drive Edit Modal */}
+      {showDriveEditForm && (
+        <div className="fixed inset-0 z-60 backdrop-blur-xs bg-black/50 flex flex-col items-center justify-center p-4" onClick={closeDriveEdit}>
+          <div className="bg-card rounded-2xl border border-border shadow-2xl max-w-lg w-full p-6 max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-bold text-foreground">Edit Drive Details</h3>
+              <button onClick={closeDriveEdit} className="text-muted-foreground hover:text-foreground">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleSubmitDrive} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Company Name</label>
+                  <input
+                    required
+                    value={driveForm.companyName}
+                    onChange={(e) => setDriveForm({ ...driveForm, companyName: e.target.value })}
+                    className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Role</label>
+                  <input
+                    required
+                    value={driveForm.roleName}
+                    onChange={(e) => setDriveForm({ ...driveForm, roleName: e.target.value })}
+                    className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Job Description</label>
+                <textarea
+                  required
+                  value={driveForm.jobDescription}
+                  onChange={(e) => setDriveForm({ ...driveForm, jobDescription: e.target.value })}
+                  rows={10}
+                  className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">CTC / Stipend</label>
+                  <input
+                    required
+                    value={driveForm.ctc}
+                    onChange={(e) => setDriveForm({ ...driveForm, ctc: e.target.value })}
+                    className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none"
+                    placeholder="e.g. 7 LPA"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Min CGPA</label>
+                  <input
+                    required
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="10"
+                    value={driveForm.minCGPA}
+                    onChange={(e) => setDriveForm({ ...driveForm, minCGPA: parseFloat(e.target.value) || 0 })}
+                    className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Job Type</label>
+                  <select
+                    required
+                    value={driveForm.jobType}
+                    onChange={(e) => setDriveForm({ ...driveForm, jobType: e.target.value })}
+                    className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none"
+                  >
+                    {driveForm.jobType === "Full-Time" && <option value="Full-Time">Full Time</option>}
+                    <option value="Full Time">Full Time</option>
+                    <option value="Internship with PPO">Internship with PPO</option>
+                    <option value="Internship">Internship</option>
+                    <option value="Full Time with Bond">Full Time with Bond</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Eligible Gender</label>
+                  <select
+                    required
+                    value={driveForm.genderPreference}
+                    onChange={(e) => setDriveForm({ ...driveForm, genderPreference: e.target.value })}
+                    className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none"
+                  >
+                    <option value="Both">Both Gender</option>
+                    <option value="Male">Male Only</option>
+                    <option value="Female">Female Only</option>
+                  </select>
+                </div>
+                {(driveForm.jobType === "Internship" || driveForm.jobType === "Full Time with Bond" || driveForm.jobType === "Internship with PPO") && (
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">
+                      {driveForm.jobType === "Full Time with Bond" ? "Bond Duration" : "Internship Duration"}
+                    </label>
+                    <input
+                      required
+                      value={driveForm.duration}
+                      onChange={(e) => setDriveForm({ ...driveForm, duration: e.target.value })}
+                      placeholder={driveForm.jobType === "Full Time with Bond" ? "e.g. 2 years" : "e.g. 6 months"}
+                      className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Interview Process</label>
+                <textarea
+                  value={driveForm.interviewProcess}
+                  onChange={(e) => setDriveForm({ ...driveForm, interviewProcess: e.target.value })}
+                  placeholder="e.g. Online Test -> Technical Round -> HR Round"
+                  rows={5}
+                  className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Course</label>
+                <div className="flex flex-wrap gap-2">
+                  {["B.Tech", "M.Tech", "MBA", "Diploma", "All"].map((course) => (
+                    <button
+                      key={course}
+                      type="button"
+                      onClick={() => {
+                        if (course === "All") {
+                          setDriveForm({ ...driveForm, course: "All" });
+                          return;
+                        }
+
+                        let selectedCourses = driveForm.course ? driveForm.course.split(",") : [];
+                        if (selectedCourses.includes("All")) selectedCourses = [];
+                        const updatedCourses = selectedCourses.includes(course)
+                          ? selectedCourses.filter((item) => item !== course)
+                          : [...selectedCourses, course];
+                        setDriveForm({ ...driveForm, course: updatedCourses.join(",") });
+                      }}
+                      className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${(driveForm.course === "All" && course === "All") || (driveForm.course && driveForm.course.includes(course) && driveForm.course !== "All") ? "bg-brand text-white" : "bg-muted border border-border text-muted-foreground"}`}
+                    >
+                      {course === "All" ? "All Courses" : course}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Eligible Branches</label>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const allSelected = BRANCHES.every((branch) => driveForm.eligibleBranches.includes(branch));
+                      setDriveForm({ ...driveForm, eligibleBranches: allSelected ? "" : BRANCHES.join(",") });
+                    }}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${BRANCHES.every((branch) => driveForm.eligibleBranches.includes(branch)) ? "bg-brand text-white" : "bg-muted border border-border text-muted-foreground"}`}
+                  >
+                    All Branches
+                  </button>
+                  {BRANCHES.map((branch) => (
+                    <button
+                      key={branch}
+                      type="button"
+                      onClick={() => {
+                        const selectedBranches = driveForm.eligibleBranches ? driveForm.eligibleBranches.split(",") : [];
+                        const updatedBranches = selectedBranches.includes(branch)
+                          ? selectedBranches.filter((item) => item !== branch)
+                          : [...selectedBranches, branch];
+                        setDriveForm({ ...driveForm, eligibleBranches: updatedBranches.join(",") });
+                      }}
+                      className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${driveForm.eligibleBranches.includes(branch) ? "bg-brand text-white" : "bg-muted border border-border text-muted-foreground"}`}
+                    >
+                      {branch}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Min Batch (From)</label>
+                  <input
+                    required
+                    value={driveForm.minBatch}
+                    onChange={(e) => setDriveForm({ ...driveForm, minBatch: e.target.value })}
+                    placeholder="e.g. 2021"
+                    className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Max Batch (To)</label>
+                  <input
+                    required
+                    value={driveForm.maxBatch}
+                    onChange={(e) => setDriveForm({ ...driveForm, maxBatch: e.target.value })}
+                    placeholder="e.g. 2025"
+                    className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Drive Date</label>
+                  <input
+                    required
+                    type="date"
+                    value={driveForm.driveDate}
+                    onChange={(e) => setDriveForm({ ...driveForm, driveDate: e.target.value })}
+                    className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Drive Type</label>
+                  <div className="flex gap-2">
+                    {["Closed", "Open", "Pool"].map((driveType) => (
+                      <button
+                        key={driveType}
+                        type="button"
+                        onClick={() => setDriveForm({ ...driveForm, driveType })}
+                        className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all ${driveForm.driveType === driveType ? "bg-brand text-white" : "bg-muted border border-border text-muted-foreground"}`}
+                      >
+                        {driveType} Campus
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {driveFormMsg && (
+                <p className={`text-sm font-medium ${driveFormMsg.ok ? "text-green-600" : "text-red-500"}`}>{driveFormMsg.msg}</p>
+              )}
+
+              <button
+                type="submit"
+                disabled={submittingDriveEdit}
+                className="w-full bg-brand text-white py-3 rounded-xl font-bold hover:bg-brand/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {submittingDriveEdit ? <Loader2 className="w-4 h-4 animate-spin" /> : <Edit className="w-4 h-4" />}
+                {submittingDriveEdit ? "Updating..." : "Update Drive Details"}
+              </button>
+            </form>
+          </div>
+        </div>
       )}
 
       {/* Header */}
@@ -452,7 +819,7 @@ export default function AdminApprovalsPage() {
                 <div key={item.id}
                 ref={isLastElement ? lastItemRef : null}
                 className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-                    {activeTab === "drives" && <DriveRequestCard item={item} onAction={handleAction} loading={actionLoading} onPreview={(driveItem: any) => setViewDrive(driveItem)} />}
+                    {activeTab === "drives" && <DriveRequestCard item={item} onAction={handleAction} loading={actionLoading} onPreview={(driveItem: DriveApprovalItem) => setViewDrive(driveItem)} onEdit={openDriveEdit} />}
                     {activeTab === "referrals" && <ReferralCard item={item} onAction={handleAction} loading={actionLoading} />}
                     {activeTab === "external" && <ExternalScreeningCard item={item} onAction={handleAction} loading={actionLoading} />}
                     {activeTab === "feedback" && <FeedbackCard item={item} onAction={handleAction} loading={actionLoading} feedbackType={activeFeedbackSubTab} />}
@@ -615,7 +982,19 @@ export default function AdminApprovalsPage() {
 
 /* Sub-Components for Cards */
 
-function DriveRequestCard({ item, onAction, loading, onPreview }: { item: any, onAction: any, loading: string | null, onPreview?: any }) {
+function DriveRequestCard({
+    item,
+    onAction,
+    loading,
+    onPreview,
+    onEdit,
+}: {
+    item: DriveApprovalItem;
+    onAction: (id: string, action: "approve" | "reject") => void;
+    loading: string | null;
+    onPreview?: (item: DriveApprovalItem) => void;
+    onEdit: (item: DriveApprovalItem) => void;
+}) {
     const getDriveTypeColor = (type: string) => {
         switch(type) {
             case "Open": return "bg-green-500/10 text-green-600 border-green-200";
@@ -634,6 +1013,12 @@ function DriveRequestCard({ item, onAction, loading, onPreview }: { item: any, o
             default: return "bg-gray-500/10 text-gray-600";
         }
     };
+
+    const driveType = item.driveType || "Closed";
+    const jobType = item.jobType || "Full Time";
+    const eligibleBranches = item.eligibleBranches
+      ? item.eligibleBranches.split(",").map((branch) => branch.trim()).filter(Boolean)
+      : [];
 
     return (
         <div className="bg-card rounded-xl sm:rounded-2xl border border-border shadow-sm hover:shadow-md transition-all duration-300">
@@ -661,16 +1046,16 @@ function DriveRequestCard({ item, onAction, loading, onPreview }: { item: any, o
                     <span className="truncate">{item.recruiter?.name || "Unknown"}</span>
                     <span className="mx-1">•</span>
                     <Calendar className="w-3.5 h-3.5 text-brand shrink-0" />
-                    <span>{new Date(item.driveDate).toLocaleDateString()}</span>
+                    <span>{item.driveDate ? new Date(item.driveDate).toLocaleDateString() : "N/A"}</span>
                 </div>
 
                 {/* Badges */}
                 <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-bold border ${getDriveTypeColor(item.driveType)}`}>
-                        {item.driveType}
+                    <span className={`px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-bold border ${getDriveTypeColor(driveType)}`}>
+                        {driveType}
                     </span>
-                    <span className={`px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-bold ${getJobTypeColor(item.jobType)}`}>
-                        {item.jobType}
+                    <span className={`px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-bold ${getJobTypeColor(jobType)}`}>
+                        {jobType}
                     </span>
                     <span className="px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-bold bg-slate-500/10 text-slate-600">
                         CGPA {item.minCGPA}+
@@ -679,8 +1064,8 @@ function DriveRequestCard({ item, onAction, loading, onPreview }: { item: any, o
 
                 {/* Requirements Summary */}
                 <div className="text-xs sm:text-sm text-muted-foreground space-y-1 px-2 py-2 bg-muted/30 rounded-lg">
-                    <p><span className="font-semibold text-foreground">Batch:</span> {item.minBatch}-{item.maxBatch}</p>
-                    <p><span className="font-semibold text-foreground">Branches:</span> {item.eligibleBranches?.split(",").slice(0, 2).join(", ")}{item.eligibleBranches?.split(",").length > 2 ? ` +${item.eligibleBranches?.split(",").length - 2}` : ""}</p>
+                    <p><span className="font-semibold text-foreground">Batch:</span> {item.minBatch || "N/A"}-{item.maxBatch || "N/A"}</p>
+                    <p><span className="font-semibold text-foreground">Branches:</span> {eligibleBranches.slice(0, 2).join(", ") || "N/A"}{eligibleBranches.length > 2 ? ` +${eligibleBranches.length - 2}` : ""}</p>
                 </div>
 
                 {/* Action Buttons */}
@@ -694,7 +1079,6 @@ function DriveRequestCard({ item, onAction, loading, onPreview }: { item: any, o
                             Preview
                         </button>
                     )}
-                    {/* {onEdit && (
                         <button 
                             onClick={() => onEdit(item)}
                             className="flex-1 py-2 sm:py-2.5 bg-slate-100 hover:bg-slate-200 text-foreground rounded-lg text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2"
@@ -702,7 +1086,6 @@ function DriveRequestCard({ item, onAction, loading, onPreview }: { item: any, o
                             <Edit className="w-4 h-4" />
                             Edit
                         </button>
-                    )} */}
                     <button 
                         onClick={() => onAction(item.id, "approve")}
                         disabled={loading === item.id}
@@ -1208,5 +1591,3 @@ function UnverifiedEmailCard({ item, onAction, loading, userType }: { item: any,
         </div>
     )
 }
-
-
