@@ -97,10 +97,13 @@ export async function PUT(req: NextRequest) {
       id: string;
       companyName: string;
       roleName: string;
+      genderPreference: string
       jobDescription: string;
       ctc: string;
       eligibleBranches: string;
       minCGPA: number;
+      duration: string
+      interviewProcess: string
       minBatch: string;
       maxBatch: string;
       course: string;
@@ -130,6 +133,7 @@ export async function PUT(req: NextRequest) {
         minCGPA: body.minCGPA,
         minBatch: body.minBatch,
         maxBatch: body.maxBatch,
+        duration: body.duration,
         course: body.course,
         driveDate: new Date(body.driveDate),
         driveType: body.driveType || existingDrive.driveType,

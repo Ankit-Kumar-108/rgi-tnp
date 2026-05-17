@@ -39,7 +39,7 @@ export default function AdminDrivesPage() {
   const [submitting, setSubmitting] = useState(false);
   const [formMsg, setFormMsg] = useState<{ msg: string; ok: boolean } | null>(null);
   const [form, setForm] = useState({
-    companyName: "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full-Time"
+    companyName: "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full-Time", genderPreference: "Both", interviewProcess: "", duration: ""  // Add this line
   });
   const observer = useRef<IntersectionObserver | null>(null);
 
@@ -82,7 +82,6 @@ export default function AdminDrivesPage() {
     };
     loadDrives();
   }, [authenticated, page]);
-
 
   const handleSubmitDrive = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,7 +159,7 @@ export default function AdminDrivesPage() {
 
       {/* Drive Edit Modal */}
       {showForm && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex flex-col items-center justify-center p-4" onClick={() => setShowForm(false)}>
+        <div className="fixed inset-0 z-60 backdrop-blur-xs bg-black/50 flex flex-col items-center justify-center p-4" onClick={() => setShowForm(false)}>
           <div className="bg-card rounded-2xl border border-border shadow-2xl max-w-lg w-full p-6 max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-bold text-foreground">Edit Drive Details</h3>
@@ -181,7 +180,7 @@ export default function AdminDrivesPage() {
               </div>
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Job Description</label>
-                <textarea required value={form.jobDescription} onChange={(e) => setForm({ ...form, jobDescription: e.target.value })} rows={3}
+                <textarea required value={form.jobDescription} onChange={(e) => setForm({ ...form, jobDescription: e.target.value })} rows={10}
                   className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -199,12 +198,40 @@ export default function AdminDrivesPage() {
                   <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Job Type</label>
                   <select required value={form.jobType} onChange={(e) => setForm({ ...form, jobType: e.target.value })}
                     className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none">
-                    <option value="Full-Time">Full-Time</option>
+                    <option value="Full Time">Full Time</option>
+                    <option value="Internship with PPO">Internship with PPO</option>
                     <option value="Internship">Internship</option>
-                    <option value="Contract">Contract</option>
+                    <option value="Full Time with Bond">Full Time with Bond</option>
                   </select>
                 </div>
-              </div>
+                <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Eligible Gender</label>
+                      <select required value={form.genderPreference} onChange={(e) => setForm({ ...form, genderPreference: e.target.value })}
+                        className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none">
+                        <option value="Both">Both Gender</option>
+                        <option value="Male">Male Only</option>
+                        <option value="Female">Female Only</option>
+                      </select>
+                    </div>
+                    {(form.jobType === "Internship" || form.jobType === "Full Time with Bond" || form.jobType === "Internship with PPO") && (
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">
+                          {form.jobType === "Internship" ? "Internship Duration": form.jobType === "Full Time with Bond" ? "Bond Duration" : form.jobType === "Internship with PPO"? "Internship Duration" : "Bond/Contract Duration"}
+                        </label>
+                        <input required value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })}
+                          placeholder={form.jobType === "Internship" || form.jobType === "Internship with PPO" ? "e.g., 6 months" : "e.g., 2 years"}
+                          className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
+                      </div>
+                    )}
+                  </div>
+                  {/* Interview Process */}
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Interview Process</label>
+                    <textarea value={form.interviewProcess} onChange={(e) => setForm({ ...form, interviewProcess: e.target.value })}
+                      placeholder="e.g., Online Test (1 hour) → Technical Round → HR Round"
+                      rows={5}
+                      className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
+                  </div>
               {/* Course */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Course</label>
@@ -453,12 +480,15 @@ export default function AdminDrivesPage() {
                                   ctc: drive.ctc,
                                   eligibleBranches: drive.eligibleBranches,
                                   minCGPA: drive.minCGPA,
+                                  genderPreference: drive.genderPreference,
+                                  interviewProcess: drive.interviewProcess,
                                   minBatch: drive.minBatch,
                                   maxBatch: drive.maxBatch,
                                   course: drive.course || "B.Tech",
                                   driveDate: new Date(drive.driveDate).toISOString().split('T')[0],
                                   driveType: drive.driveType,
-                                  jobType: drive.jobType || "Full-Time"
+                                  jobType: drive.jobType || "Full-Time",
+                                  duration: drive.duration || ""  // Add this line
                                 });
                                 setFormMsg(null);
                                 setShowForm(true);

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useMemo, useCallback } from "react";
+import dynamic from "next/dynamic";
 import {
   FileText,
   Briefcase,
@@ -21,10 +22,19 @@ import {
   CheckCircle2,
   XCircle,
   AlertCircle,
+  Clock,
+  Eye,
+  Edit,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
 import { toast } from "sonner";
+
+// Lazy load JobDetailsModal
+const JobDetailsModal = dynamic(
+  () => import("@/components/forms/studentApplyModal/modal"),
+  { ssr: false }
+);
 
 type TabKey = "drives"| "feedback" | "referrals" | "external" | "memories" | "unverified" | "volunteers";
 type SubTabKey = "approve" | "approved";
@@ -70,6 +80,8 @@ export default function AdminApprovalsPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [bulkActionLoading, setBulkActionLoading] = useState<"approve" | "reject" | null>(null);
   const [viewItem, setViewItem] = useState<any>(null);
+  const [viewDrive, setViewDrive] = useState<any>(null);
+//   const [editDriveId, setEditDriveId] = useState<string | null>(null)
 
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -262,6 +274,18 @@ export default function AdminApprovalsPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Drive Preview Modal */}
+      {viewDrive && (
+        <JobDetailsModal
+          drive={viewDrive}
+          isOpen={true}
+          onClose={() => setViewDrive(null)}
+          onSuccess={() => {}}
+          role="admin"
+          readonly={true}
+        />
+      )}
+
       {/* Header */}
       <header className="sticky top-0 z-50 bg-card/90 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3">
@@ -428,7 +452,7 @@ export default function AdminApprovalsPage() {
                 <div key={item.id}
                 ref={isLastElement ? lastItemRef : null}
                 className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-                    {activeTab === "drives" && <DriveRequestCard item={item} onAction={handleAction} loading={actionLoading} />}
+                    {activeTab === "drives" && <DriveRequestCard item={item} onAction={handleAction} loading={actionLoading} onPreview={(driveItem: any) => setViewDrive(driveItem)} />}
                     {activeTab === "referrals" && <ReferralCard item={item} onAction={handleAction} loading={actionLoading} />}
                     {activeTab === "external" && <ExternalScreeningCard item={item} onAction={handleAction} loading={actionLoading} />}
                     {activeTab === "feedback" && <FeedbackCard item={item} onAction={handleAction} loading={actionLoading} feedbackType={activeFeedbackSubTab} />}
@@ -591,60 +615,111 @@ export default function AdminApprovalsPage() {
 
 /* Sub-Components for Cards */
 
-function DriveRequestCard({ item, onAction, loading }: { item: any, onAction: any, loading: string | null }) {
+function DriveRequestCard({ item, onAction, loading, onPreview }: { item: any, onAction: any, loading: string | null, onPreview?: any }) {
+    const getDriveTypeColor = (type: string) => {
+        switch(type) {
+            case "Open": return "bg-green-500/10 text-green-600 border-green-200";
+            case "Pool": return "bg-amber-500/10 text-amber-600 border-amber-200";
+            case "Closed": return "bg-blue-500/10 text-blue-600 border-blue-200";
+            default: return "bg-gray-500/10 text-gray-600 border-gray-200";
+        }
+    };
+
+    const getJobTypeColor = (type: string) => {
+        switch(type) {
+            case "Internship": return "bg-purple-500/10 text-purple-600";
+            case "Full Time": return "bg-green-500/10 text-green-600";
+            case "Internship with PPO": return "bg-blue-500/10 text-blue-600";
+            case "Full Time with Bond": return "bg-orange-500/10 text-orange-600";
+            default: return "bg-gray-500/10 text-gray-600";
+        }
+    };
+
     return (
-        <div className="bg-card p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-border shadow-sm hover:shadow-md transition-all group">
-            <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3 sm:gap-4">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-muted rounded-lg sm:rounded-2xl flex items-center justify-center text-brand border border-slate-100">
-                        <Briefcase className="w-5 h-5 sm:w-6 sm:h-6" />
+        <div className="bg-card rounded-xl sm:rounded-2xl border border-border shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="p-4 sm:p-5 space-y-3 sm:space-y-4">
+                {/* Header with Company and Role */}
+                <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-brand/10 rounded-lg sm:rounded-xl flex items-center justify-center text-brand border border-brand/20 shrink-0">
+                            <Briefcase className="w-5 h-5 sm:w-6 sm:h-6" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <h3 className="text-sm sm:text-base font-bold text-foreground truncate">{item.companyName}</h3>
+                            <p className="text-xs text-muted-foreground truncate mt-0.5">{item.roleName}</p>
+                        </div>
                     </div>
-                    <div>
-                        <h3 className="text-base sm:text-lg font-bold text-foreground tracking-tight leading-tight">{item.companyName}</h3>
-                        <p className="text-xs sm:text-xs font-medium text-muted-foreground">Recruiter: {item.recruiter?.name}</p>
+                    <div className="text-right shrink-0">
+                        <p className="text-xs sm:text-sm font-bold text-brand">{item.ctc}</p>
+                        <p className="text-[11px] sm:text-xs text-muted-foreground">CTC</p>
                     </div>
                 </div>
-            </div>
 
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                    <GraduationCap className="w-3.5 h-3.5 text-brand" />
-                    <span className="text-xs sm:text-xs font-bold">{item.roleName}</span>
+                {/* Recruiter & Date Info */}
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+                    <MapPin className="w-3.5 h-3.5 text-brand shrink-0" />
+                    <span className="truncate">{item.recruiter?.name || "Unknown"}</span>
+                    <span className="mx-1">•</span>
+                    <Calendar className="w-3.5 h-3.5 text-brand shrink-0" />
+                    <span>{new Date(item.driveDate).toLocaleDateString()}</span>
                 </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-brand" />
-                    <span className="text-xs sm:text-xs font-bold">{item.ctc} LPA</span>
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                    <Calendar className="w-3.5 h-3.5 text-brand" />
-                    <span className="text-xs sm:text-xs font-bold">{new Date(item.driveDate).toLocaleDateString()}</span>
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                    <MapPin className="w-3.5 h-3.5 text-brand" />
-                    <span className="text-xs sm:text-xs font-bold font-mono tracking-tight">{item.driveType}</span>
-                </div>
-            </div>
 
-            <div className="p-3 sm:p-4 bg-muted rounded-xl sm:rounded-2xl mb-4 sm:mb-6 border border-slate-100">
-                <p className="text-xs sm:text-xs text-muted-foreground font-medium line-clamp-2 leading-relaxed">
-                    {item.jobDescription}
-                </p>
-            </div>
+                {/* Badges */}
+                <div className="flex items-center gap-2 flex-wrap">
+                    <span className={`px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-bold border ${getDriveTypeColor(item.driveType)}`}>
+                        {item.driveType}
+                    </span>
+                    <span className={`px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-bold ${getJobTypeColor(item.jobType)}`}>
+                        {item.jobType}
+                    </span>
+                    <span className="px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-bold bg-slate-500/10 text-slate-600">
+                        CGPA {item.minCGPA}+
+                    </span>
+                </div>
 
-            <div className="flex gap-2 sm:gap-3">
-                <button 
-                onClick={() => onAction(item.id, "approve")}
-                disabled={loading === item.id}
-                className="flex-1 py-2 sm:py-3 bg-brand text-white rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-brand/90 transition-all flex items-center justify-center gap-2 shadow-md shadow-brand/10 disabled:opacity-50">
-                     {loading === item.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
-                     Approve
-                </button>
-                <button 
-                onClick={() => onAction(item.id, "reject")}
-                disabled={loading === item.id}
-                className="flex-1 py-2 sm:py-3 bg-white border border-border text-muted-foreground rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-red-50 hover:text-red-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50">
-                    Reject
-                </button>
+                {/* Requirements Summary */}
+                <div className="text-xs sm:text-sm text-muted-foreground space-y-1 px-2 py-2 bg-muted/30 rounded-lg">
+                    <p><span className="font-semibold text-foreground">Batch:</span> {item.minBatch}-{item.maxBatch}</p>
+                    <p><span className="font-semibold text-foreground">Branches:</span> {item.eligibleBranches?.split(",").slice(0, 2).join(", ")}{item.eligibleBranches?.split(",").length > 2 ? ` +${item.eligibleBranches?.split(",").length - 2}` : ""}</p>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-2 pt-2 border-t border-border">
+                    {onPreview && (
+                        <button 
+                            onClick={() => onPreview(item)}
+                            className="flex-1 py-2 sm:py-2.5 bg-slate-100 hover:bg-slate-200 text-foreground rounded-lg text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2"
+                        >
+                            <Eye className="w-4 h-4" />
+                            Preview
+                        </button>
+                    )}
+                    {/* {onEdit && (
+                        <button 
+                            onClick={() => onEdit(item)}
+                            className="flex-1 py-2 sm:py-2.5 bg-slate-100 hover:bg-slate-200 text-foreground rounded-lg text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2"
+                        >
+                            <Edit className="w-4 h-4" />
+                            Edit
+                        </button>
+                    )} */}
+                    <button 
+                        onClick={() => onAction(item.id, "approve")}
+                        disabled={loading === item.id}
+                        className="flex-1 py-2 sm:py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-lg text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                        {loading === item.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                        Approve
+                    </button>
+                    <button 
+                        onClick={() => onAction(item.id, "reject")}
+                        disabled={loading === item.id}
+                        className="flex-1 py-2 sm:py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2 disabled:opacity-50 border border-red-200"
+                    >
+                        <X className="w-4 h-4" />
+                        Reject
+                    </button>
+                </div>
             </div>
         </div>
     )

@@ -392,7 +392,7 @@ export default function RecruiterDashboard() {
                     {(form.jobType === "Internship" || form.jobType === "Full Time with Bond" || form.jobType === "Internship with PPO") && (
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">
-                          {form.jobType === "Internship" ? "Internship Duration": form.jobType === "Full Time with Bond" ? "Bond Duration" : form.jobType === "Internship with PPO"? "Internship Duration" : "Bond/Contract Duration"}
+                          {form.jobType === "Internship" ? "Internship Duration" : form.jobType === "Full Time with Bond" ? "Bond Duration" : form.jobType === "Internship with PPO" ? "Internship Duration" : "Bond/Contract Duration"}
                         </label>
                         <input required value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })}
                           placeholder={form.jobType === "Internship" || form.jobType === "Internship with PPO" ? "e.g., 6 months" : "e.g., 2 years"}
@@ -650,7 +650,7 @@ export default function RecruiterDashboard() {
                 {/* Scrollable Applicants List */}
                 <div className="overflow-y-auto flex-1 p-6 bg-muted/10 flex justify-center items-center">
                   {isLoading ?
-                  <div className="size-8 border-brand border-4 border-t-transparent animate-spin rounded-full"></div>
+                    <div className="size-8 border-brand border-4 border-t-transparent animate-spin rounded-full"></div>
                     : (
                       (selectedDrive.applicants ?? []).length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-16 text-muted-foreground gap-2">
@@ -694,8 +694,8 @@ export default function RecruiterDashboard() {
                                   <div className="flex flex-col min-w-0">
                                     <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 mb-0.5">College</span>
                                     <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase ${a.type === "internal" ? "text-brand" : "text-amber-600 dark:text-amber-500"}`}>
-                                        {a.type === "internal" ? "RGI Student" : `${a.college}`}
-                                      </span>
+                                      {a.type === "internal" ? "RGI Student" : `${a.college}`}
+                                    </span>
                                   </div>
                                   <div className="flex flex-col min-w-0">
                                     <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80 mb-0.5">Branch</span>
