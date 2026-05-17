@@ -99,7 +99,7 @@ export default function RecruiterDashboard() {
     course: "B.Tech",
     driveDate: "",
     driveType: "Closed",
-    jobType: "Full-Time",
+    jobType: "Full Time",
     genderPreference: "Both",
     duration: "",
     interviewProcess: ""
@@ -171,7 +171,7 @@ export default function RecruiterDashboard() {
       setFormMsg({ msg: d.message, ok: d.success });
       if (d.success) {
         setTimeout(() => setShowForm(false), 1000);
-        setForm({ companyName: user?.company || "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full-Time", genderPreference: "Both", duration: "", interviewProcess: "" });
+        setForm({ companyName: user?.company || "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full Time", genderPreference: "Both", duration: "", interviewProcess: "" });
         setEditDriveId(null);
         mutateDash();
       }
@@ -342,7 +342,7 @@ export default function RecruiterDashboard() {
                   </div>
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Job Description</label>
-                    <textarea required value={form.jobDescription} onChange={(e) => setForm({ ...form, jobDescription: e.target.value })} rows={3}
+                    <textarea required value={form.jobDescription} onChange={(e) => setForm({ ...form, jobDescription: e.target.value })} rows={10}
                       className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
@@ -374,9 +374,10 @@ export default function RecruiterDashboard() {
                       <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Job Type</label>
                       <select required value={form.jobType} onChange={(e) => setForm({ ...form, jobType: e.target.value })}
                         className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none">
-                        <option value="Full-Time">Full-Time</option>
+                        <option value="Full Time">Full Time</option>
+                        <option value="Internship with PPO">Internship with PPO</option>
                         <option value="Internship">Internship</option>
-                        <option value="Contract/ Bond">Contract/ Bond</option>
+                        <option value="Full Time with Bond">Full Time with Bond</option>
                       </select>
                     </div>
                     <div>
@@ -388,13 +389,13 @@ export default function RecruiterDashboard() {
                         <option value="Female">Female Only</option>
                       </select>
                     </div>
-                    {(form.jobType === "Internship" || form.jobType === "Contract/ Bond") && (
+                    {(form.jobType === "Internship" || form.jobType === "Full Time with Bond" || form.jobType === "Internship with PPO") && (
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">
-                          {form.jobType === "Internship" ? "Internship Duration" : "Bond/Contract Duration"}
+                          {form.jobType === "Internship" ? "Internship Duration": form.jobType === "Full Time with Bond" ? "Bond Duration" : form.jobType === "Internship with PPO"? "Internship Duration" : "Bond/Contract Duration"}
                         </label>
                         <input required value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })}
-                          placeholder={form.jobType === "Internship" ? "e.g., 6 months" : "e.g., 2 years"}
+                          placeholder={form.jobType === "Internship" || form.jobType === "Internship with PPO" ? "e.g., 6 months" : "e.g., 2 years"}
                           className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
                       </div>
                     )}
@@ -404,8 +405,8 @@ export default function RecruiterDashboard() {
                     <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Interview Process</label>
                     <textarea value={form.interviewProcess} onChange={(e) => setForm({ ...form, interviewProcess: e.target.value })}
                       placeholder="e.g., Online Test (1 hour) → Technical Round → HR Round"
-                      rows={3}
-                      className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none resize-none" />
+                      rows={5}
+                      className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
                   </div>
                   {/* Course */}
                   <div>
