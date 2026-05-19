@@ -570,6 +570,9 @@ POST   /api/upload/presigned-url (get R2 upload URL)
  - [ ] **Site (improve site content)  (to change on 25/05/2026 [to be Done])** 
   - improve content of site and add more content in home page and about us page for better visibility and understanding of site
 
+- [ ] **Links (bug in opening external link)  (to change on 29/05/2026 [to be Done])** 
+- fix but where when opening external link it open with sub link of our site instead of opening in new tab
+
 - [ ] **Take Suggestion from sir about final selection and mail notification**
 
 ### Phase 2 (Next Quarter)

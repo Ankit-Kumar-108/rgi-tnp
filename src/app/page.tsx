@@ -129,8 +129,8 @@ export default function Home() {
   const driveGroups: DriveGroup[] =
     drivesData?.success && drivesData?.drives
       ? drivesData.drives
-          .filter((d) => d.driveImages.length > 0)
-          .map((d) => ({ driveId: d.id, title: d.title, images: d.driveImages }))
+        .filter((d) => d.driveImages.length > 0)
+        .map((d) => ({ driveId: d.id, title: d.title, images: d.driveImages }))
       : [];
 
   const memories: MemoryData[] =
@@ -369,7 +369,7 @@ export default function Home() {
               <div className="lg:w-2/3 p-8 lg:p-16 flex flex-col justify-center">
                 <div className="mb-8">
                   <h2 className="text-2xl md:text-3xl font-bold mb-2">Director&apos;s Message</h2>
-                  <p className="text-brand font-semibold text-lg">James Kuttappan, Director (T&P)</p>
+                  <p className="text-brand font-semibold text-lg">James Kuttappan, Director (Training and Placement)</p>
                 </div>
                 <Quote className="text-brand text-5xl mb-4" />
                 <p className="text-muted-foreground text-sm md:text-lg leading-relaxed mb-8 italic">
@@ -384,12 +384,12 @@ export default function Home() {
         <section className="pb-16 md:pb-24 px-4 md:px-8 lg:px-20 max-w-7xl mx-auto">
           <div
             className="bg-card rounded-2xl md:rounded-3xl shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] overflow-hidden border border-border transition-shadow duration-300">
-            <div className="flex flex-col lg:flex-row-reverse">
+            <div className="flex flex-col lg:flex-row">
               <div className="lg:w-1/3 aspect-square lg:aspect-auto relative">
                 <Image
                   alt="Deputy Director T&amp;P"
                   className="object-cover"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIBYviOOWoEn1D6xTyYMluquzqttL4SCoQ8YTdPoSTTNYQLCqya8DiCAs66JmTJiHyRmHxUpVjA4GCYy4fhForyUeFzidpP8yNMIkHu_oaQRp9Krmp-Gz1K9nwFA-4vEgEubQQch8uCbxjl-ImtNgvWcFKvMoDY-gPzvpkp5HvSUSDe_vCwfaHUk_I7xlMHmS6Z4yoMHaYo8erwwh2Y4C_p5eHMCF4UEtWfpnKSjQrYRwDmJRAQhUxaICeli4FyMR5td48o8_nWg"
+                  src="/images/Robin.P.Samuel.png"
                   fill
                   sizes="(max-width: 1024px) 100vw, 33vw"
                   referrerPolicy="no-referrer"
@@ -398,7 +398,7 @@ export default function Home() {
               <div className="lg:w-2/3 p-8 lg:p-16 flex flex-col justify-center">
                 <div className="mb-8">
                   <h2 className="text-2xl md:text-3xl font-bold mb-2">Dy Director&apos;s Message</h2>
-                  <p className="text-brand font-semibold text-lg">Robin P. Samuel, Dy Director (T&amp;P)</p>
+                  <p className="text-brand font-semibold text-lg">Robin P. Samuel, Dy Director (Training and Placement)</p>
                 </div>
                 <Quote className="text-brand text-5xl mb-4" />
                 <p className="text-muted-foreground text-sm md:text-lg leading-relaxed mb-8 italic">
@@ -479,20 +479,22 @@ export default function Home() {
                     id={volunteer.id}
                     className="bg-card relative rounded-xl hover:shadow-[var(--shadow-lg)] border overflow-hidden border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 group">
                     <div className="aspect-2.5/3 relative">
-                      <Image src={volunteer.student.profileImageUrl || "https://lh3.googleusercontent.com/aida-public/AB6AXuD-4qpQG9rSHLujKoHhrbgWRAg81sFBu41MDA54QQ14Y6yYxoww19N7Hs6lybLRgvZCg5yNw-06wJ8p2GwAuZrN9ytupLwK1aRZSm47WIYXx5ld9vONPYIsuhD5KGlStRJhFuJTFHl_Hc-t-2CxveYwpsep0lUKrYPz6ghsEv9_r2NE8H2tzkba6XLY91OoOHMGHGA4iF6n7TtSxX_Dr3zeJ206-8b6lxuPWVgO5R0mihIiXboKj1OEPXe_2qH9vxxFdK4gE9e5YQ"} alt={volunteer.student.name} className="object-cover object-top transition-transform" fill sizes="(max-width: 768px) 50vw, 25vw" />
+                      <Image src={volunteer.student.profileImageUrl} alt={volunteer.student.name} className="object-cover object-top transition-transform" fill sizes="(max-width: 768px) 50vw, 25vw" />
                     </div>
                     <div className="p-3">
-                      <a
-                        href={volunteer.student.linkedinUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="absolute top-2 right-2 p-2 bg-white/90 backdrop-blur-md rounded-lg shadow-lg text-[#0077b5] translate-x-12 -translate-y-12 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-500 ease-out hover:bg-[#0077b5] hover:text-white z-10"
-                        title="LinkedIn Profile"
-                      >
-                        <svg className="size-7 md:size-7 fill-current" viewBox="0 0 24 24">
-                          <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-                        </svg>
-                      </a>
+                      {volunteer.student.linkedinUrl &&
+                        <a
+                          href={volunteer.student.linkedinUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="absolute top-2 right-2 p-2 bg-white/90 backdrop-blur-md rounded-lg shadow-lg text-[#0077b5] translate-x-12 -translate-y-12 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-500 ease-out hover:bg-[#0077b5] hover:text-white z-10"
+                          title="LinkedIn Profile"
+                        >
+                          <svg className="size-7 md:size-7 fill-current" viewBox="0 0 24 24">
+                            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                          </svg>
+                        </a>
+                      }
                       <div className="flex justify-between items-center">
                         <h3 className="font-bold text-sm md:text-lg" >{volunteer.student.name}</h3>
                       </div>
