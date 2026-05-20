@@ -39,8 +39,22 @@ export const getUser = (role: UserRole): any | null => {
   }
 };
 
+export const isTokenExpired = (token: string): boolean => {
+ const parts = token.split('.')
+ if (parts.length !== 3){
+  return true
+ }
+
+ const payload = JSON.parse(atob(parts[1]))
+ const expiresAt = payload.exp* 1000
+ const bufferTime = 30*1000 // buffer time
+ return (Date.now() + bufferTime) > expiresAt
+}
+
 export const isLoggedIn = (role: UserRole): boolean => {
-  return !!getToken(role);
+  const token = getToken(role)
+  if (!token) return false
+  return !isTokenExpired(token)
 };
 
 export const logout = (role: UserRole) => {

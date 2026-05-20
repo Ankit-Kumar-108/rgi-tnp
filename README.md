@@ -573,6 +573,9 @@ POST   /api/upload/presigned-url (get R2 upload URL)
 - [ ] **Links (bug in opening external link)  (to change on 29/05/2026 [to be Done])** 
 - fix but where when opening external link it open with sub link of our site instead of opening in new tab
 
+- [ ] **Alumin-Network (fix)  (to change on 29/05/2026 [to be Done])** 
+- add more courses and branches with open and close option to select in alumni network section and also add filter in alumni network section for better visibility
+
 - [ ] **Take Suggestion from sir about final selection and mail notification**
 
 ### Phase 2 (Next Quarter)

@@ -1,4 +1,4 @@
-import type { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import * as jose from "jose";
 
 export type UserRole =
@@ -141,5 +141,28 @@ export function clearAuthCookie(response: NextResponse, role: UserRole) {
     maxAge: 0,
   });
 
+  return response;
+}
+
+export async function signRefreshToken(payload: Record<string, unknown>){
+  return new jose.SignJWT(payload)
+  .setProtectedHeader({alg: "HS256"})
+  .setExpirationTime("30d")  // 30 days for refresh token
+  .sign(getJwtSecret())
+}
+
+// API endpoint to refresh tokens
+// api/auth/refresh
+export async function POST(req: NextRequest) {
+  const payload = await getVerifiedAuthPayloadFromRequest(req);
+  
+  if (!payload?.role) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const newAccessToken = await signAuthToken(payload, "7d");
+  const response = NextResponse.json({ success: true });
+  
+  attachAuthCookie(response, payload.role as UserRole, newAccessToken);
   return response;
 }

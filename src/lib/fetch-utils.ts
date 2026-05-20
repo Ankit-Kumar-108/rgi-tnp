@@ -3,6 +3,9 @@
  * Wraps the native fetch API to handle transient network failures gracefully.
  */
 
+import { url } from "inspector";
+import { logout, UserRole } from "./auth-client";
+
 interface FetchWithRetryOptions extends RequestInit {
   retries?: number;
   retryDelay?: number;
@@ -93,4 +96,22 @@ export async function fetchAuthJSON<T = any>(
   }
 
   return fetchJSON<T>(url, { ...options, headers });
+}
+
+export const fetchWithAuth = async (
+  url: string,
+  role?: UserRole,
+  options: RequestInit = {},
+) => {
+const response = await fetch(url, options)
+if(response.status === 401){
+  if(role){ // token expired on server
+    logout(role)
+  }
+
+  if(typeof window !== 'undefined'){ //redirect to login
+    window.location.href = '/login'
+  }
+}
+return response
 }
