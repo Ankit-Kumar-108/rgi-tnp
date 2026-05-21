@@ -561,20 +561,35 @@ POST   /api/upload/presigned-url (get R2 upload URL)
 - [ ] **Drive Page (improve drive register page and add interview process)  (to change on 11/05/2026 [Done])**
  - add interview process tab and improve tab of placement ctc..for better visibility
 
-- [ ] **Home Page (improve email content)  (to change on 11/05/2026 [to be Done])**
- - improve email contnet of shortlist, select etc.
+- [ ] **Home Page (improve email content)  (to change on 11/05/2026 [Done])**
+ - improve email content of shortlist, select etc.
 
-- [ ] **Admin Panel Improvement (improve approval of drive and add preview, edit button)  (to change on 20/05/2026 [to be Done])**
+- [ ] **Admin Panel Improvement (improve approval of drive and add preview, edit button)  (to change on 20/05/2026 [Done])**
   - add preview and edit button in drive approval section of admin panel for better visibility and easy approval
+
+- [ ] **Mail template (add verification succes for student, external student and alumni)  (to change on 22/05/2026 [to be Done])**
+ - add email template for verification success for student, external student and alumni for better visibility and understanding of user about verification
 
  - [ ] **Site (improve site content)  (to change on 25/05/2026 [to be Done])** 
   - improve content of site and add more content in home page and about us page for better visibility and understanding of site
+
+  - [ ] **Alumni Register (make sure alumin with no current employment can semlessly register and show up in admin panel)  (to change on 29/05/2026 [to be Done])** 
+  - fix but where alumni with no current employment can not register and show up in admin panel for better visibility and understanding of profile of alumni
 
 - [ ] **Links (bug in opening external link)  (to change on 29/05/2026 [to be Done])** 
 - fix but where when opening external link it open with sub link of our site instead of opening in new tab
 
 - [ ] **Alumin-Network (fix)  (to change on 29/05/2026 [to be Done])** 
 - add more courses and branches with open and close option to select in alumni network section and also add filter in alumni network section for better visibility
+
+- [ ] **Image (optimise)  (to change on 30/05/2026 [to be Done])** 
+- optimise images before uploading in r2 for better performance and also add image optimization in memory section for better performance
+
+- [ ] **Profile and CGPA(give ability to update profile img and cgpa)  (to change on 31/05/2026 [to be Done])**
+- give ability to update profile image and cgpa in profile section of student, external-students and alumni for better visibility and understanding of profile 
+
+- [ ] **Auto transfer student to alumni (add feature)  (to change on 5/06/2026 [to be Done])**
+- add feature to auto transfer student to alumni after completion of course for better visibility and understanding of profile and also add notification for that 
 
 - [ ] **Take Suggestion from sir about final selection and mail notification**
 

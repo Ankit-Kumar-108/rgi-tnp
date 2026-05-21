@@ -47,13 +47,13 @@ const premiumLayout = (heroIcon: string, heroTitle: string, content: string): st
                         <td bgcolor="#1a1022" style="padding: 40px; color: #7f7387; text-align: center;">
                             <p style="margin: 0; font-size: 14px; font-weight: 700; color: #ffffff;">Radharaman Group</p>
                             <p style="margin: 5px 0 20px 0; font-size: 12px; line-height: 1.5;">
-                                Fatehpur Biabani, Ratibad,<br>
+                                Fatehpur, Ratibad,<br>
                                 Bhopal, Madhya Pradesh 462044
                             </p>
                             <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-top: 1px solid #4d4355; padding-top: 20px;">
                                 <tr>
                                     <td align="center" style="font-size: 11px;">
-                                        &copy; 2026 Radharaman Group of Institutes. All rights reserved.
+                                        &copy; ${new Date().getFullYear()} Radharaman Group of Institutes. All rights reserved.
                                     </td>
                                 </tr>
                             </table>
@@ -100,6 +100,16 @@ export const verificationEmailTemplate = (name: string, verificationLink: string
             <p style="font-size: 11px; color: #7f7387; margin-top: 30px; margin-bottom: 5px;">Button not working? Copy and paste this URL:</p>
             <div style="padding: 10px; background-color: #f7f6f8; border: 1px solid #ebdeee; border-radius: 8px; font-family: monospace; font-size: 11px; word-break: break-all; color: #9213ec;">
                 ${verificationLink}
+            </div>
+            
+            <div style="margin-top: 40px; padding: 20px; background-color: #f1daff; border-radius: 16px; text-align: center;">
+                <p style="margin: 0; font-size: 14px; color: #2d004f; font-weight: 600;">
+                    For any Queries, Please contact 
+                </p>
+                <p style="margin: 5px 0 0 0; font-size: 12px; color: #5b2688;">
+                    +91-9425609712
+                    tpo@radharamanbhopal.com
+                </p>
             </div>`;
     return premiumLayout("&#10003;", "Verify Your Identity", content);
 };
@@ -138,6 +148,16 @@ export const passwordResetEmailTemplate = (name: string, resetLink: string): str
             <p style="font-size: 11px; color: #7f7387; margin-top: 30px; margin-bottom: 5px;">Button not working? Copy and paste this URL:</p>
             <div style="padding: 10px; background-color: #f7f6f8; border: 1px solid #ebdeee; border-radius: 8px; font-family: monospace; font-size: 11px; word-break: break-all; color: #9213ec;">
                 ${resetLink}
+            </div>
+            
+            <div style="margin-top: 40px; padding: 20px; background-color: #f1daff; border-radius: 16px; text-align: center;">
+                <p style="margin: 0; font-size: 14px; color: #2d004f; font-weight: 600;">
+                    For any Queries, Please contact 
+                </p>
+                <p style="margin: 5px 0 0 0; font-size: 12px; color: #5b2688;">
+                    +91-9425609712
+                    tpo@radharamanbhopal.com
+                </p>
             </div>`;
     return premiumLayout("&#128274;", "Password Reset", content);
 };
@@ -202,15 +222,25 @@ export const driveRegistrationTemplate = (name: string, companyName: string, dat
                 <tr>
                     <td style="padding: 20px;">
                         <p style="margin: 0 0 5px 0; font-size: 14px; font-weight: 700; color: #4d4355;">Important Reminders</p>
-                        <p style="margin: 0; font-size: 13px; color: #4d4355; font-weight: 300;">Please arrive in formal attire and carry 3 copies of your resume. Late arrivals may not be permitted.</p>
+                        <p style="margin: 0; font-size: 13px; color: #4d4355; font-weight: 300;">Please arrive in formal attire and carry 3 copies of your resume and related documents. Late arrivals may not be permitted.</p>
                     </td>
                 </tr>
-            </table>`;
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background-color: #f1daff; border-radius: 16px; text-align: center;">
+                <p style="margin: 0; font-size: 14px; color: #2d004f; font-weight: 600;">
+                    For any Queries, Please contact 
+                </p>
+                <p style="margin: 5px 0 0 0; font-size: 12px; color: #5b2688;">
+                    +91-9425609712
+                    tpo@radharamanbhopal.com
+                </p>
+            </div>`;
     return premiumLayout("&#128188;", "Drive Registration", content);
 };
 
 // 5. ADMIN NOTIFICATION — NEW USER VERIFIED
-// Sent to admin when a user successfully verifies their account
+// Sent to admin when a user successfully verifies their account (Currently Un-used)
 export const adminVerificationNotifyTemplate = (userName: string, userEmail: string, userRole: string): string => {
     const roleLabel = userRole === "external_student" ? "External Student" : userRole === "alumni" ? "Alumni" : "Internal Student";
     const content = `
@@ -243,7 +273,7 @@ export const shortlistedEmailTemplate = (
     interviewDate: string,
     location: string,
     coordinatorName: string,
-    confirmUrl: string = "https://ankit-dev.me/students/dashboard"
+    confirmUrl: string = `https://${process.env.DOMAIN_NAME}/students/dashboard`
 ): string => {
     const content = `
             <p style="color: #9213ec; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; margin-bottom: 10px;">Status Update</p>
@@ -291,7 +321,7 @@ export const shortlistedEmailTemplate = (
                 <tr>
                     <td align="center" style="padding: 10px 0 30px 0;">
                         <a href="${confirmUrl}" style="background-color: #9213ec; color: #ffffff; padding: 16px 35px; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 16px; display: inline-block; box-shadow: 0 4px 14px rgba(146, 19, 236, 0.3);">
-                            Confirm Attendance &nbsp; &rarr;
+                            For more Details &nbsp; &rarr;
                         </a>
                     </td>
                 </tr>
@@ -304,7 +334,17 @@ export const shortlistedEmailTemplate = (
                         <p style="margin: 0; font-size: 13px; color: #4d4355; font-weight: 300;">Review the job description and keep a digital copy of your resume ready. We wish you the very best!</p>
                     </td>
                 </tr>
-            </table>`;
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background-color: #f1daff; border-radius: 16px; text-align: center;">
+                <p style="margin: 0; font-size: 14px; color: #2d004f; font-weight: 600;">
+                    For any Queries, Please contact 
+                </p>
+                <p style="margin: 5px 0 0 0; font-size: 12px; color: #5b2688;">
+                    +91-9425609712
+                    tpo@radharamanbhopal.com
+                </p>
+            </div>`;
 
     return premiumLayout("&#127882;", "You're Shortlisted!", content);
 };
@@ -314,7 +354,7 @@ export const offerSelectionEmailTemplate = (
     jobRole: string,
     companyName: string,
     packageAmount: string,
-    joiningDate: string,
+    roleName: string,
 ): string => {
     const content = `
             <div style="text-align: center; margin-bottom: 30px;">
@@ -323,32 +363,32 @@ export const offerSelectionEmailTemplate = (
             </div>
             
             <p style="font-size: 16px; line-height: 1.6; color: #4d4355; font-weight: 300; text-align: center;">
-                We are absolutely thrilled to announce that you have been selected for the <strong style="color: #9213ec;">${jobRole}</strong> position at <strong style="color: #9213ec;">${companyName}</strong>. 
-                Your hard work and excellence have truly paid off.
+                We are happy to announce that you have been selected for the next round for <strong style="color: #9213ec;">${jobRole}</strong> position at <strong style="color: #9213ec;">${companyName}</strong>. 
+                Please reach RITS seminar hall in 10 minutes.
             </p>
 
             <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 30px 0; border: 1px solid #ebdeee; border-radius: 20px; overflow: hidden; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
                 <tr>
                     <td style="padding: 30px;">
-                        <h3 style="margin: 0 0 20px 0; font-size: 18px; color: #1f1924; font-weight: 700; border-bottom: 2px solid #f1daff; display: inline-block; padding-bottom: 5px;">Offer Breakdown</h3>
+                        <h3 style="margin: 0 0 20px 0; font-size: 18px; color: #1f1924; font-weight: 700; border-bottom: 2px solid #f1daff; display: inline-block; padding-bottom: 5px;">Details</h3>
                         
                         <table border="0" cellpadding="0" cellspacing="0" width="100%">
                             <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #f7f6f8;">
                                     <span style="font-size: 11px; font-weight: 700; color: #7f7387; text-transform: uppercase; tracking-widest;">Company</span><br>
-                                    <span style="font-size: 16px; font-weight: 600; color: #1f1924;">${companyName}</span>
+                                    <span style="font-size: 12px; font-weight: 600; color: #9213ec;">${companyName}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 12px 0;">
+                                    <span style="font-size: 11px; font-weight: 700; color: #7f7387; text-transform: uppercase; tracking-widest;">Position</span><br>
+                                    <span style="font-size: 12px; font-weight: 600; color: #9213ec;">${roleName}</span>
                                 </td>
                             </tr>
                             <tr>
                                 <td style="padding: 12px 0; border-bottom: 1px solid #f7f6f8;">
                                     <span style="font-size: 11px; font-weight: 700; color: #7f7387; text-transform: uppercase; tracking-widest;">Annual Package (CTC)</span><br>
-                                    <span style="font-size: 18px; font-weight: 800; color: #9213ec;">${packageAmount}</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 12px 0;">
-                                    <span style="font-size: 11px; font-weight: 700; color: #7f7387; text-transform: uppercase; tracking-widest;">Joining Date</span><br>
-                                    <span style="font-size: 16px; font-weight: 600; color: #1f1924;">${joiningDate}</span>
+                                    <span style="font-size: 12px; font-weight: 800; color: #9213ec;">${packageAmount}</span>
                                 </td>
                             </tr>
                         </table>
@@ -358,10 +398,11 @@ export const offerSelectionEmailTemplate = (
 
             <div style="margin-top: 40px; padding: 20px; background-color: #f1daff; border-radius: 16px; text-align: center;">
                 <p style="margin: 0; font-size: 14px; color: #2d004f; font-weight: 600;">
-                    Welcome to the professional world! 
+                    For any Queries, Please contact 
                 </p>
                 <p style="margin: 5px 0 0 0; font-size: 12px; color: #5b2688;">
-                    The T&P Cell is proud of your achievement. Please complete the formal acceptance on the portal.
+                    +91-9425609712
+                    tpo@radharamanbhopal.com
                 </p>
             </div>`;
 
@@ -391,7 +432,7 @@ export const rejectionEmailTemplate = (
                     <td style="padding: 25px;">
                         <h3 style="margin: 0 0 10px 0; font-size: 17px; color: #1f1924; font-weight: 700;">Career Growth Hub</h3>
                         <p style="margin: 0 0 20px 0; font-size: 14px; color: #4d4355; line-height: 1.5;">
-                            The T&amp;P Cell remains committed to your success. We encourage you to check out our upcoming workshops to sharpen your skills for future opportunities.
+                            The Training and Placement Cell remains committed to your success. We encourage you to check out our upcoming workshops to sharpen your skills for future opportunities.
                         </p>
                     </td>
                 </tr>
@@ -399,7 +440,17 @@ export const rejectionEmailTemplate = (
 
             <p style="font-size: 12px; color: #7f7387; text-align: center; margin-top: 30px;">
                 Every experience is a step forward. Keep pushing your boundaries!
-            </p>`;
+            </p>
+
+            <div style="margin-top: 40px; padding: 20px; background-color: #f1daff; border-radius: 16px; text-align: center;">
+                <p style="margin: 0; font-size: 14px; color: #2d004f; font-weight: 600;">
+                    For any Queries, Please contact 
+                </p>
+                <p style="margin: 5px 0 0 0; font-size: 12px; color: #5b2688;">
+                    +91-9425609712
+                    tpo@radharamanbhopal.com
+                </p>
+            </div> `;
 
     return premiumLayout("&#9888;", "Application Update", content);
 };
@@ -413,7 +464,7 @@ export const placementOpportunityTemplate = (
     course: string,
     branch: string,
     deadlineDate: string,
-    applyUrl: string = "https://ankit-dev.me/students/dashboard"
+    applyUrl: string | "https://ankit-dev.me/students/dashboard"
 ): string => {
     const content = `
             <p style="color: #9213ec; font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; margin-bottom: 10px;">Immediate Opening</p>
@@ -449,22 +500,18 @@ export const placementOpportunityTemplate = (
 
                             <tr>
                                 <td style="padding: 15px 0; border-bottom: 1px solid #f7f6f8;">
-                                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                                        <tr>
-                                            <td width="50%" valign="top" style="padding-right: 10px;">
-                                                <span style="font-size: 11px; font-weight: 700; color: #7f7387; text-transform: uppercase;">Package (CTC)</span><br>
-                                                <span style="font-size: 15px; font-weight: 700; color: #9213ec;">${packageRange}</span>
-                                            </td>
-                                            <td width="50%" valign="top" style="border-left: 1px solid #f7f6f8; padding-left: 15px;">
-                                                <span style="font-size: 11px; font-weight: 700; color: #7f7387; text-transform: uppercase;">Eligibility</span>
-                                                <div style="margin-top: 5px; font-size: 13px; color: #4d4355; line-height: 1.5;">
-                                                    <strong>Batch:</strong> ${batch}<br>
-                                                    <strong>Course:</strong> ${course}<br>
-                                                    <strong>Branch:</strong> ${branch}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </table>
+                                 <span style="font-size: 11px; font-weight: 700; color: #7f7387; text-transform: uppercase;">Package (CTC)</span><br>
+                                 <span style="font-size: 15px; font-weight: 700; color: #9213ec;">${packageRange}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 15px 0; border-bottom: 1px solid #f7f6f8;">
+                                   <span style="font-size: 11px; font-weight: 700; color: #7f7387; text-transform: uppercase;">Eligibility</span>
+                                    <div style="margin-top: 5px; font-size: 13px; color: #4d4355; line-height: 1.5;">
+                                      <strong>Batch:</strong> ${batch}<br>
+                                      <strong>Course:</strong> ${course}<br>
+                                      <strong>Branch:</strong> ${branch}
+                                    </div>
                                 </td>
                             </tr>
 
@@ -483,11 +530,21 @@ export const placementOpportunityTemplate = (
                 <tr>
                     <td align="center" style="padding: 10px 0 30px 0;">
                         <a href="${applyUrl}" style="background-color: #9213ec; color: #ffffff; padding: 18px 45px; text-decoration: none; border-radius: 14px; font-weight: 900; font-size: 16px; display: inline-block; box-shadow: 0 10px 20px rgba(146, 19, 236, 0.2);">
-                            View Details & Apply Now &nbsp; &rarr;
+                            Details & Apply Link &nbsp; &rarr;
                         </a>
                     </td>
                 </tr>
-            </table>`;
+            </table>
+            
+            <div style="margin-top: 40px; padding: 20px; background-color: #f1daff; border-radius: 16px; text-align: center;">
+                <p style="margin: 0; font-size: 14px; color: #2d004f; font-weight: 600;">
+                    For any Queries, Please contact 
+                </p>
+                <p style="margin: 5px 0 0 0; font-size: 12px; color: #5b2688;">
+                    +91-9425609712
+                    tpo@radharamanbhopal.com
+                </p>
+            </div>`;
 
     return premiumLayout("&#128188;", "New Placement Drive", content);
 };

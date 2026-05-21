@@ -106,7 +106,7 @@ async function notifyEligibleStudentsForDrive(drive: ApprovedDrive) {
             drive.course,
             eligibleBranches.join(", "),
             driveDate,
-            "https://ankit-dev.me/portal/students/dashboard",
+            `https://${process.env.DOMAIN_NAME}/students/dashboard`,
           ),
         }),
       ),

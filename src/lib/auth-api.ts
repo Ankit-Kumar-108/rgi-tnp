@@ -9,9 +9,9 @@ export interface JWTPayload {
   [key: string]: unknown;
 }
 
-/**
- * Verifies the JWT token from the Authorization header and returns the payload.
- * Shared utility to avoid duplicating token verification logic across API routes.
+/*
+Verifies the JWT token from the Authorization header and returns the payload.
+Shared utility to avoid duplicating token verification logic across API routes.
  */
 export async function verifyAuthToken(req: NextRequest): Promise<JWTPayload | null> {
   const authHeader = req.headers.get("authorization");

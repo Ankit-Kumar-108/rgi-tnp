@@ -167,13 +167,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
             const studentData = reg.student || reg.externalStudent;
             return sendEmail({
               to: studentData!.email,
-              subject: `Selected for ${reg.drive!.companyName} Campus Drive`,
+              subject: `Selected for next round for ${reg.drive!.companyName} Campus Drive`,
               html: offerSelectionEmailTemplate(
                 studentData!.name,
                 reg.drive!.roleName,
                 reg.drive!.companyName,
                 reg.drive!.ctc,
-                "Sent Later",
+                reg.drive!.roleName,
               )
             }).catch(emailError => {
               console.error(`Failed to send email to ${studentData!.email}:`, {
@@ -304,7 +304,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
                 studentData!.name,
                 reg.drive!.roleName,
                 reg.drive!.companyName,
-                "Today in 10 Minutes",
+                `${new Date().toLocaleDateString()} in 10 Minutes`,
                 "RGI Seminar Hall",
                 "Robin Samul (TPO)",
               )
