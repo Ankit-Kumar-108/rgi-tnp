@@ -165,6 +165,7 @@ export const passwordResetEmailTemplate = (name: string, resetLink: string): str
 // 3. VERIFICATION SUCCESS / WELCOME EMAIL
 // Used by: verify-email (sent to user after successful verification)
 export const verificationSuccessTemplate = (name: string): string => {
+    const dashboardLink = `https://${process.env.DOMAIN_NAME}/portal/dashboard`
     const content = `
             <p style="color: #9213ec; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; margin-bottom: 10px;">Account Activated</p>
             <h2 style="font-size: 22px; margin: 0 0 20px 0; color: #1f1924;">Welcome aboard, ${name}!</h2>
@@ -188,7 +189,7 @@ export const verificationSuccessTemplate = (name: string): string => {
             <table border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
                     <td align="center" style="padding: 20px 0;">
-                        <a href="https://ankit-dev.me/portal/dashboard" style="background-color: #9213ec; color: #ffffff; padding: 16px 35px; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 16px; display: inline-block;">
+                        <a href=${dashboardLink} style="background-color: #9213ec; color: #ffffff; padding: 16px 35px; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 16px; display: inline-block;">
                             Go to Dashboard &nbsp; &rarr;
                         </a>
                     </td>
@@ -464,7 +465,7 @@ export const placementOpportunityTemplate = (
     course: string,
     branch: string,
     deadlineDate: string,
-    applyUrl: string | "https://ankit-dev.me/students/dashboard"
+    applyUrl: string,
 ): string => {
     const content = `
             <p style="color: #9213ec; font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; margin-bottom: 10px;">Immediate Opening</p>
