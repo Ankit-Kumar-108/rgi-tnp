@@ -610,7 +610,6 @@ export default function AlumniDashboard() {
                           <Briefcase className="w-3.5 h-3.5 text-muted-foreground" />
                         </div>
                         <input
-                          required
                           value={profileForm.currentCompany}
                           onChange={(e) => setProfileForm({ ...profileForm, currentCompany: e.target.value })}
                           className="w-full bg-muted/50 pl-14 pr-5 py-4 rounded-2xl border border-transparent focus:border-brand/30 focus:bg-background transition-all text-sm outline-none text-foreground font-bold"
@@ -626,7 +625,6 @@ export default function AlumniDashboard() {
                           <TrendingUp className="w-3.5 h-3.5 text-muted-foreground" />
                         </div>
                         <input
-                          required
                           value={profileForm.jobTitle}
                           onChange={(e) => setProfileForm({ ...profileForm, jobTitle: e.target.value })}
                           className="w-full bg-muted/50 pl-14 pr-5 py-4 rounded-2xl border border-transparent focus:border-brand/30 focus:bg-background transition-all text-sm outline-none text-foreground font-bold"
@@ -669,6 +667,7 @@ export default function AlumniDashboard() {
                     <div className="space-y-2">
                       <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Country</label>
                       <input
+                        required
                         value={profileForm.country}
                         onChange={(e) => setProfileForm({ ...profileForm, country: e.target.value })}
                         className="w-full bg-muted/50 px-6 py-4 rounded-2xl border border-transparent focus:border-brand/30 focus:bg-background transition-all text-sm outline-none text-foreground font-bold"

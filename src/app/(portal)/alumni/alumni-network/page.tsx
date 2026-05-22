@@ -107,22 +107,23 @@ export default function AlumniDiscovery() {
   const courses = ["All Courses", "B.Tech", "M.Tech", "MBA", "Diploma"]
 
   const getCollegeName = (enroll: string | undefined) => {
-    if (!enroll) return "Radharaman Group of Institutions";
-    const clgCode = enroll.substring(0, 4);
+  if (!enroll) return "Radharaman Group of Institutions";
 
-    if (clgCode === "0132") return "Radharaman Institute of Technology & Science";
-    if (clgCode === "0158") return "Radharaman Engineering College";
+  const clgCode = enroll.substring(0, 4);
 
-    return "Radharaman Group of Institutions";
-  };
+  if (clgCode === "0132") return "Radharaman Institute of Technology & Science";
+  if (clgCode === "0158") return "Radharaman Engineering College";
 
-  const collegeName = getCollegeName(selectedAlumni?.enrollmentNumber);
+  return "Radharaman Group of Institutions";
+};
 
   const rout = () => {
     const url = selectedAlumni?.linkedInUrl; // Double check your field name (linkedInUrl vs linkedinUrl)
 
     if (url && url.startsWith('http')) {
       window.open(url, "_blank", "noopener,noreferrer");
+    }else if(url && !url.startsWith('http')){
+      window.open(`https://${url}`, "_blank", "noopener,noreferrer");
     } else {
       // Optional: Show a toast or alert if the link is missing
       alert("This alum hasn't linked their profile yet.");
@@ -413,6 +414,7 @@ export default function AlumniDiscovery() {
                         </p>
                       </div>
 
+                      {alumni.jobTitle && alumni.currentCompany &&
                       <div className="flex items-center gap-3 bg-muted/50 p-3 rounded-2xl border border-border/50">
                         <div className="w-10 h-10 rounded-xl bg-background border border-border flex items-center justify-center shadow-sm shrink-0">
                           {alumni.icon}
@@ -421,6 +423,7 @@ export default function AlumniDiscovery() {
                           {alumni.displayRole}
                         </p>
                       </div>
+                      }
                     </div>
                   </div>
                 ))}

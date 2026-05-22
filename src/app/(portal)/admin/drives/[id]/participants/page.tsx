@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
 import { toast } from "sonner";
 import QRCode from "qrcode";
+import { userAgent } from "next/server";
 
 // Types
 type Participant = {
@@ -719,13 +720,14 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
                             </a>
                           )}
                           {user.githubUrl && (
-                            <a href={user.githubUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
+                            <a href={user.githubUrl.startsWith('http') ? user.githubUrl : `https://${user.linkedinUrl}`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
                               className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-[11px] font-bold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-200 transition-colors">
                               <Github className="w-3 h-3" /> GitHub
                             </a>
                           )}
                           {user.linkedinUrl && (
-                            <a href={user.linkedinUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
+                            <a href={user.linkedinUrl.startsWith('http') ? user.linkedinUrl : `https://${user.linkedinUrl}`} 
+                              target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
                               className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-[11px] font-bold bg-blue-700/10 text-blue-700 dark:text-blue-400 hover:bg-blue-700/20 transition-colors">
                               <Linkedin className="w-3 h-3" /> LinkedIn
                             </a>

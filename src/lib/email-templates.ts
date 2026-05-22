@@ -162,40 +162,330 @@ export const passwordResetEmailTemplate = (name: string, resetLink: string): str
     return premiumLayout("&#128274;", "Password Reset", content);
 };
 
-// 3. VERIFICATION SUCCESS / WELCOME EMAIL
-// Used by: verify-email (sent to user after successful verification)
-export const verificationSuccessTemplate = (name: string): string => {
-    const dashboardLink = `https://${process.env.DOMAIN_NAME}/portal/dashboard`
+// ROLE-SPECIFIC VERIFICATION SUCCESS TEMPLATES
+
+// 3A. VERIFICATION SUCCESS - STUDENT
+export const verificationSuccessStudentTemplate = (name: string): string => {
+    const dashboardLink = `https://${process.env.DOMAIN_NAME}/students/dashboard`;
     const content = `
             <p style="color: #9213ec; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; margin-bottom: 10px;">Account Activated</p>
-            <h2 style="font-size: 22px; margin: 0 0 20px 0; color: #1f1924;">Welcome aboard, ${name}!</h2>
+            <h2 style="font-size: 22px; margin: 0 0 20px 0; color: #1f1924;">Welcome to your placement journey, ${name}!</h2>
             
             <p style="font-size: 16px; line-height: 1.6; color: #4d4355; font-weight: 300;">
-                Your email has been verified and your account is now fully active on the RGI Training &amp; Placement Portal. You now have access to:
+                Your email has been verified and your account is now fully active on the RGI Training &amp; Placement Portal. As an internal student, you have full access to our comprehensive placement ecosystem.
             </p>
+
+            <h3 style="font-size: 16px; margin: 25px 0 15px 0; color: #1f1924; font-weight: 700;">Your Available Features:</h3>
 
             <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 20px 0;">
                 <tr>
-                    <td style="padding: 12px 16px; background-color: #f7f6f8; border-radius: 12px; margin-bottom: 8px;">
+                    <td style="padding: 16px; background-color: #f7f6f8; border-radius: 12px;">
                         <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                            <tr><td style="padding: 8px 0; font-size: 14px; color: #4d4355; border-bottom: 1px solid #ebdeee;">&#128188; &nbsp; Placement drive registrations</td></tr>
-                            <tr><td style="padding: 8px 0; font-size: 14px; color: #4d4355; border-bottom: 1px solid #ebdeee;">&#128203; &nbsp; Application tracking</td></tr>
-                            <tr><td style="padding: 8px 0; font-size: 14px; color: #4d4355;">&#128247; &nbsp; Campus memory gallery</td></tr>
+                            <tr>
+                                <td style="padding: 10px 0; font-size: 14px; color: #4d4355; border-bottom: 1px solid #ebdeee;">
+                                    <span style="font-weight: 700; color: #9213ec;">📋 Browse Placement Drives</span><br>
+                                    <span style="font-size: 13px; color: #7f7387;">Explore all active placement drives tailored for your branch and CGPA</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 0; font-size: 14px; color: #4d4355; border-bottom: 1px solid #ebdeee;">
+                                    <span style="font-weight: 700; color: #9213ec;">💼 Apply for Drives</span><br>
+                                    <span style="font-size: 13px; color: #7f7387;">One-click registration for placement opportunities</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 0; font-size: 14px; color: #4d4355; border-bottom: 1px solid #ebdeee;">
+                                    <span style="font-weight: 700; color: #9213ec;">📄 Resume Management</span><br>
+                                    <span style="font-size: 13px; color: #7f7387;">Upload and maintain your resume for all applications</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 0; font-size: 14px; color: #4d4355; border-bottom: 1px solid #ebdeee;">
+                                    <span style="font-weight: 700; color: #9213ec;">👤 Complete Your Profile</span><br>
+                                    <span style="font-size: 13px; color: #7f7387;">Add academic records, LinkedIn, GitHub, and social profiles</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 0; font-size: 14px; color: #4d4355; border-bottom: 1px solid #ebdeee;">
+                                    <span style="font-weight: 700; color: #9213ec;">📸 Memory Gallery</span><br>
+                                    <span style="font-size: 13px; color: #7f7387;">Share and preserve your college memories with batches</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 0; font-size: 14px; color: #4d4355;">
+                                    <span style="font-weight: 700; color: #9213ec;">⭐ Feedback & Ratings</span><br>
+                                    <span style="font-size: 13px; color: #7f7387;">Share your placement experience and help future batches</span>
+                                </td>
+                            </tr>
                         </table>
+                    </td>
+                </tr>
+            </table>
+
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ebdeee; border-radius: 16px; border-left: 4px solid #9213ec; margin: 20px 0;">
+                <tr>
+                    <td style="padding: 20px;">
+                        <p style="margin: 0 0 5px 0; font-size: 14px; font-weight: 700; color: #4d4355;">📌 Quick Start Tips</p>
+                        <p style="margin: 5px 0; font-size: 13px; color: #4d4355; font-weight: 300;">1. Upload your resume to stand out to recruiters</p>
+                        <p style="margin: 5px 0; font-size: 13px; color: #4d4355; font-weight: 300;">2. Complete all profile fields for better eligibility matching</p>
+                        <p style="margin: 5px 0; font-size: 13px; color: #4d4355; font-weight: 300;">3. Register early for drives to secure your spot</p>
                     </td>
                 </tr>
             </table>
 
             <table border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
-                    <td align="center" style="padding: 20px 0;">
-                        <a href=${dashboardLink} style="background-color: #9213ec; color: #ffffff; padding: 16px 35px; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 16px; display: inline-block;">
-                            Go to Dashboard &nbsp; &rarr;
+                    <td align="center" style="padding: 30px 0;">
+                        <a href="${dashboardLink}" style="background-color: #9213ec; color: #ffffff; padding: 16px 40px; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 16px; display: inline-block; box-shadow: 0 4px 14px rgba(146, 19, 236, 0.3);">
+                            Launch Your Dashboard &nbsp; →
                         </a>
                     </td>
                 </tr>
             </table>`;
-    return premiumLayout("&#127881;", "Welcome to RGI TnP", content);
+    return premiumLayout("🎓", "Welcome to RGI TnP - Student Portal", content);
+};
+
+// 3B. VERIFICATION SUCCESS - EXTERNAL STUDENT
+export const verificationSuccessExternalStudentTemplate = (name: string): string => {
+    const dashboardLink = `https://${process.env.DOMAIN_NAME}/students/external-dashboard`;
+    const content = `
+            <p style="color: #9213ec; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; margin-bottom: 10px;">Account Activated</p>
+            <h2 style="font-size: 22px; margin: 0 0 20px 0; color: #1f1924;">Welcome, ${name}! Your placement opportunities await.</h2>
+            
+            <p style="font-size: 16px; line-height: 1.6; color: #4d4355; font-weight: 300;">
+                Congratulations! Your email has been verified and your account is now fully active. As an external student, you now have access to our exclusive placement opportunities and resources designed for aspiring professionals from partner institutions.
+            </p>
+
+            <h3 style="font-size: 16px; margin: 25px 0 15px 0; color: #1f1924; font-weight: 700;">What You Can Access:</h3>
+
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 20px 0;">
+                <tr>
+                    <td style="padding: 16px; background-color: #f7f6f8; border-radius: 12px;">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <td style="padding: 10px 0; font-size: 14px; color: #4d4355; border-bottom: 1px solid #ebdeee;">
+                                    <span style="font-weight: 700; color: #9213ec;">📋 External Placement Drives</span><br>
+                                    <span style="font-size: 13px; color: #7f7387;">Exclusive job opportunities specifically open for external students</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 0; font-size: 14px; color: #4d4355; border-bottom: 1px solid #ebdeee;">
+                                    <span style="font-weight: 700; color: #9213ec;">💼 Apply for Placements</span><br>
+                                    <span style="font-size: 13px; color: #7f7387;">Register for drives with transparent eligibility criteria</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 0; font-size: 14px; color: #4d4355; border-bottom: 1px solid #ebdeee;">
+                                    <span style="font-weight: 700; color: #9213ec;">📄 Resume Management</span><br>
+                                    <span style="font-size: 13px; color: #7f7387;">Your resume is already on file from registration; update anytime</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 0; font-size: 14px; color: #4d4355; border-bottom: 1px solid #ebdeee;">
+                                    <span style="font-weight: 700; color: #9213ec;">👤 Professional Profile</span><br>
+                                    <span style="font-size: 13px; color: #7f7387;">Update your academic records and add LinkedIn/GitHub profiles</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 0; font-size: 14px; color: #4d4355;">
+                                    <span style="font-weight: 700; color: #9213ec;">⭐ Share Your Feedback</span><br>
+                                    <span style="font-size: 13px; color: #7f7387;">Help us improve by sharing your placement experience</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ebdeee; border-radius: 16px; border-left: 4px solid #9213ec; margin: 20px 0;">
+                <tr>
+                    <td style="padding: 20px;">
+                        <p style="margin: 0 0 5px 0; font-size: 14px; font-weight: 700; color: #4d4355;">🚀 Get Started</p>
+                        <p style="margin: 5px 0; font-size: 13px; color: #4d4355; font-weight: 300;">✓ Complete your profile information for better job matches</p>
+                        <p style="margin: 5px 0; font-size: 13px; color: #4d4355; font-weight: 300;">✓ Add professional social media links (LinkedIn, GitHub, etc.)</p>
+                        <p style="margin: 5px 0; font-size: 13px; color: #4d4355; font-weight: 300;">✓ Browse available drives and apply for positions that interest you</p>
+                    </td>
+                </tr>
+            </table>
+
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                    <td align="center" style="padding: 30px 0;">
+                        <a href="${dashboardLink}" style="background-color: #9213ec; color: #ffffff; padding: 16px 40px; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 16px; display: inline-block; box-shadow: 0 4px 14px rgba(146, 19, 236, 0.3);">
+                            Access Your Dashboard &nbsp; →
+                        </a>
+                    </td>
+                </tr>
+            </table>`;
+    return premiumLayout("🎯", "Welcome to RGI TnP - External Student Portal", content);
+};
+
+// 3C. VERIFICATION SUCCESS - ALUMNI
+export const verificationSuccessAlumniTemplate = (name: string): string => {
+    const dashboardLink = `https://${process.env.DOMAIN_NAME}/alumni/dashboard`;
+    const content = `
+            <p style="color: #9213ec; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; margin-bottom: 10px;">Welcome Back</p>
+            <h2 style="font-size: 22px; margin: 0 0 20px 0; color: #1f1924;">Welcome to the RGI Alumni Network, ${name}!</h2>
+            
+            <p style="font-size: 16px; line-height: 1.6; color: #4d4355; font-weight: 300;">
+                Your email has been verified and your alumni account is now fully activated. Join a thriving community of RGI alumni and contribute to shaping the future of our institution. As a valued alumni member, you unlock exclusive opportunities to mentor, refer, and stay connected.
+            </p>
+
+            <h3 style="font-size: 16px; margin: 25px 0 15px 0; color: #1f1924; font-weight: 700;">Alumni Privileges & Features:</h3>
+
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 20px 0;">
+                <tr>
+                    <td style="padding: 16px; background-color: #f7f6f8; border-radius: 12px;">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <td style="padding: 10px 0; font-size: 14px; color: #4d4355; border-bottom: 1px solid #ebdeee;">
+                                    <span style="font-weight: 700; color: #9213ec;">🤝 Referral Program</span><br>
+                                    <span style="font-size: 13px; color: #7f7387;">Submit job referrals to connect outstanding candidates with your company (subject to admin approval)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 0; font-size: 14px; color: #4d4355; border-bottom: 1px solid #ebdeee;">
+                                    <span style="font-weight: 700; color: #9213ec;">👔 Professional Profile</span><br>
+                                    <span style="font-size: 13px; color: #7f7387;">Showcase your current company, role, location, and career achievements</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 0; font-size: 14px; color: #4d4355; border-bottom: 1px solid #ebdeee;">
+                                    <span style="font-weight: 700; color: #9213ec;">📸 Memory Gallery</span><br>
+                                    <span style="font-size: 13px; color: #7f7387;">Upload and share memorable moments from your time at RGI</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 0; font-size: 14px; color: #4d4355; border-bottom: 1px solid #ebdeee;">
+                                    <span style="font-weight: 700; color: #9213ec;">🌐 Alumni Network</span><br>
+                                    <span style="font-size: 13px; color: #7f7387;">Connect with fellow alumni and build meaningful professional relationships</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 0; font-size: 14px; color: #4d4355;">
+                                    <span style="font-weight: 700; color: #9213ec;">⭐ Mentorship & Feedback</span><br>
+                                    <span style="font-size: 13px; color: #7f7387;">Share insights and provide feedback to help current students and recent graduates</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ebdeee; border-radius: 16px; border-left: 4px solid #9213ec; margin: 20px 0;">
+                <tr>
+                    <td style="padding: 20px;">
+                        <p style="margin: 0 0 5px 0; font-size: 14px; font-weight: 700; color: #4d4355;">💡 Make an Impact</p>
+                        <p style="margin: 5px 0; font-size: 13px; color: #4d4355; font-weight: 300;">1. Complete your professional profile to stand out in the alumni community</p>
+                        <p style="margin: 5px 0; font-size: 13px; color: #4d4355; font-weight: 300;">2. Submit your first referral to help talented candidates get placed</p>
+                        <p style="margin: 5px 0; font-size: 13px; color: #4d4355; font-weight: 300;">3. Share memories and stay connected with your alma mater</p>
+                        <p style="margin: 5px 0; font-size: 13px; color: #4d4355; font-weight: 300;">4. Provide feedback based on your professional experiences</p>
+                    </td>
+                </tr>
+            </table>
+
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                    <td align="center" style="padding: 30px 0;">
+                        <a href="${dashboardLink}" style="background-color: #9213ec; color: #ffffff; padding: 16px 40px; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 16px; display: inline-block; box-shadow: 0 4px 14px rgba(146, 19, 236, 0.3);">
+                            Enter Alumni Portal &nbsp; →
+                        </a>
+                    </td>
+                </tr>
+            </table>`;
+    return premiumLayout("🎓", "Welcome to RGI Alumni Network", content);
+};
+
+// 3D. VERIFICATION SUCCESS - RECRUITER
+export const verificationSuccessRecruiterTemplate = (name: string, companyName: string): string => {
+    const dashboardLink = `https://${process.env.DOMAIN_NAME}/recruiters/dashboard`;
+    const content = `
+            <p style="color: #9213ec; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; margin-bottom: 10px;">Partnership Activated</p>
+            <h2 style="font-size: 22px; margin: 0 0 20px 0; color: #1f1924;">Welcome, ${name}! Partnership confirmed for ${companyName}.</h2>
+            
+            <p style="font-size: 16px; line-height: 1.6; color: #4d4355; font-weight: 300;">
+                Your recruiter account has been verified and is now fully operational. You are now part of an elite network of 500+ leading companies recruiting top talent from Radharaman Group of Institutes. Your organization is ready to access our pool of skilled, motivated, and industry-ready professionals.
+            </p>
+
+            <h3 style="font-size: 16px; margin: 25px 0 15px 0; color: #1f1924; font-weight: 700;">Your Recruiting Capabilities:</h3>
+
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 20px 0;">
+                <tr>
+                    <td style="padding: 16px; background-color: #f7f6f8; border-radius: 12px;">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <td style="padding: 10px 0; font-size: 14px; color: #4d4355; border-bottom: 1px solid #ebdeee;">
+                                    <span style="font-weight: 700; color: #9213ec;">🎯 Create Placement Drives</span><br>
+                                    <span style="font-size: 13px; color: #7f7387;">Post job openings with detailed criteria (CGPA, branch, batch eligibility)</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 0; font-size: 14px; color: #4d4355; border-bottom: 1px solid #ebdeee;">
+                                    <span style="font-weight: 700; color: #9213ec;">📊 Manage Multiple Drives</span><br>
+                                    <span style="font-size: 13px; color: #7f7387;">Create, edit, and track all your active placement drives in one dashboard</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 0; font-size: 14px; color: #4d4355; border-bottom: 1px solid #ebdeee;">
+                                    <span style="font-weight: 700; color: #9213ec;">👥 Applicant Management</span><br>
+                                    <span style="font-size: 13px; color: #7f7387;">View, filter, and manage all applicants for each of your drives</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 0; font-size: 14px; color: #4d4355; border-bottom: 1px solid #ebdeee;">
+                                    <span style="font-weight: 700; color: #9213ec;">📈 Recruitment Analytics</span><br>
+                                    <span style="font-size: 13px; color: #7f7387;">Track placement statistics and hiring metrics in dedicated section</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 0; font-size: 14px; color: #4d4355; border-bottom: 1px solid #ebdeee;">
+                                    <span style="font-weight: 700; color: #9213ec;">💬 Corporate Feedback</span><br>
+                                    <span style="font-size: 13px; color: #7f7387;">Provide performance feedback on students to help their development</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px 0; font-size: 14px; color: #4d4355;">
+                                    <span style="font-weight: 700; color: #9213ec;">🔍 Advanced Search & Filter</span><br>
+                                    <span style="font-size: 13px; color: #7f7387;">Easily find drives, applicants, and candidates matching your requirements</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ebdeee; border-radius: 16px; border-left: 4px solid #9213ec; margin: 20px 0;">
+                <tr>
+                    <td style="padding: 20px;">
+                        <p style="margin: 0 0 5px 0; font-size: 14px; font-weight: 700; color: #4d4355;">🚀 Next Steps</p>
+                        <p style="margin: 5px 0; font-size: 13px; color: #4d4355; font-weight: 300;">1. Log in to your recruiter dashboard</p>
+                        <p style="margin: 5px 0; font-size: 13px; color: #4d4355; font-weight: 300;">2. Create your first placement drive with detailed job specifications</p>
+                        <p style="margin: 5px 0; font-size: 13px; color: #4d4355; font-weight: 300;">3. Set eligibility criteria and interview process details</p>
+                        <p style="margin: 5px 0; font-size: 13px; color: #4d4355; font-weight: 300;">4. Start receiving applications from pre-screened candidates</p>
+                    </td>
+                </tr>
+            </table>
+
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f1daff; border-radius: 16px; margin: 20px 0;">
+                <tr>
+                    <td style="padding: 20px;">
+                        <p style="margin: 0 0 8px 0; font-size: 14px; font-weight: 700; color: #2d004f;">📞 Dedicated Support</p>
+                        <p style="margin: 5px 0; font-size: 13px; color: #5b2688; font-weight: 300;">Our TPO (Training & Placement Officer) team is here to assist you:</p>
+                        <p style="margin: 8px 0 0 0; font-size: 12px; color: #5b2688;">📧 tpo@radharamanbhopal.com | ☎️ +91-9425609712</p>
+                    </td>
+                </tr>
+            </table>
+
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                    <td align="center" style="padding: 30px 0;">
+                        <a href="${dashboardLink}" style="background-color: #9213ec; color: #ffffff; padding: 16px 40px; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 16px; display: inline-block; box-shadow: 0 4px 14px rgba(146, 19, 236, 0.3);">
+                            Launch Recruiter Dashboard &nbsp; →
+                        </a>
+                    </td>
+                </tr>
+            </table>`;
+    return premiumLayout("💼", `Welcome to RGI Recruiter Portal - ${companyName}`, content);
 };
 
 export const driveRegistrationTemplate = (name: string, companyName: string, date: string, role: string): string => {

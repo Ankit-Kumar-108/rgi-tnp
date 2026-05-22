@@ -567,16 +567,13 @@ POST   /api/upload/presigned-url (get R2 upload URL)
 - [ ] **Admin Panel Improvement (improve approval of drive and add preview, edit button)  (to change on 20/05/2026 [Done])**
   - add preview and edit button in drive approval section of admin panel for better visibility and easy approval
 
-- [ ] **Mail template (add verification succes for student, external student and alumni)  (to change on 22/05/2026 [to be Done])**
+- [ ] **Mail template (add verification succes for student, external student and alumni)  (to change on 22/05/2026 [Done])**
  - add email template for verification success for student, external student and alumni for better visibility and understanding of user about verification
 
- - [ ] **Site (improve site content)  (to change on 25/05/2026 [to be Done])** 
-  - improve content of site and add more content in home page and about us page for better visibility and understanding of site
-
-  - [ ] **Alumni Register (make sure alumin with no current employment can semlessly register and show up in admin panel)  (to change on 29/05/2026 [to be Done])** 
+  - [ ] **Alumni Register (make sure alumin with no current employment can semlessly register and show up in admin panel)  (to change on 29/05/2026 [Done])** 
   - fix but where alumni with no current employment can not register and show up in admin panel for better visibility and understanding of profile of alumni
 
-- [ ] **Links (bug in opening external link)  (to change on 29/05/2026 [to be Done])** 
+- [ ] **Links (bug in opening external link)  (to change on 29/05/2026 [Done])** 
 - fix but where when opening external link it open with sub link of our site instead of opening in new tab
 
 - [ ] **Alumin-Network (fix)  (to change on 29/05/2026 [to be Done])** 
@@ -590,6 +587,9 @@ POST   /api/upload/presigned-url (get R2 upload URL)
 
 - [ ] **Auto transfer student to alumni (add feature)  (to change on 5/06/2026 [to be Done])**
 - add feature to auto transfer student to alumni after completion of course for better visibility and understanding of profile and also add notification for that 
+
+ - [ ] **Site (improve site content)  (to change on 25/05/2026 [to be Done])** 
+  - improve content of site and add more content in home page and about us page for better visibility and understanding of site
 
 - [ ] **Take Suggestion from sir about final selection and mail notification**
 
