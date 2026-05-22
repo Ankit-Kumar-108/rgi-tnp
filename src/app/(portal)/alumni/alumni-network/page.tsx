@@ -144,13 +144,13 @@ export default function AlumniDiscovery() {
 
         {isModalOpen ?
           (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-md">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-background/80 backdrop-blur-md overflow-y-auto">
 
               {/* Alumni Profile Modal Container */}
-              <main className="relative w-full max-w-4xl bg-card rounded-[2rem] shadow-2xl overflow-hidden flex flex-col md:flex-row border border-border">
+              <main className="relative w-full max-w-4xl bg-card rounded-xl sm:rounded-2xl md:rounded-[2rem] shadow-2xl overflow-hidden flex flex-col border border-border my-4">
 
                 {/* Main Content Area */}
-                <div className="flex-1 flex flex-col max-h-[90vh] overflow-y-auto custom-scrollbar">
+                <div className="flex-1 flex flex-col max-h-[95vh] sm:max-h-[90vh] overflow-y-auto custom-scrollbar">
 
                   <style dangerouslySetInnerHTML={{
                     __html: `
@@ -166,90 +166,90 @@ export default function AlumniDiscovery() {
                       setIsModalOpen(!isModalOpen)
                       setSelectedAlumni(null)
                     }}
-                    className="absolute top-6 right-6 z-20 p-2 rounded-full bg-background/50 hover:bg-muted transition-colors text-muted-foreground">
-                    <X className="w-5 h-5" />
+                    className="absolute top-3 right-3 sm:top-6 sm:right-6 z-20 p-1.5 sm:p-2 rounded-full bg-background/50 hover:bg-muted transition-colors text-muted-foreground">
+                    <X className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
 
                   {/* Top Header Section */}
-                  <header className="p-8 md:p-12 bg-gradient-to-br from-brand/10 via-brand/5 to-transparent flex flex-col md:flex-row items-center md:items-start gap-8 relative">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-brand/5 rounded-full blur-3xl"></div>
+                  <header className="p-4 sm:p-6 md:p-8 lg:p-12 bg-linear-to-br from-brand/10 via-brand/5 to-transparent flex flex-col items-center gap-4 sm:gap-6 relative">
+                    <div className="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-brand/5 rounded-full blur-3xl"></div>
 
                     {/* Circular Profile Picture */}
                     <div className="relative group shrink-0">
                       <div className="absolute inset-0 bg-brand/20 rounded-full blur-xl group-hover:blur-2xl transition-all"></div>
-                      <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-full p-1 bg-gradient-to-tr from-brand to-brand/30">
+                      <div className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full p-1 bg-linear-to-tr from-brand to-brand/30">
                         <img
                           alt="Alumni Profile"
-                          className="w-full h-full rounded-full object-cover border-4 border-card shadow-lg"
+                          className="w-full h-full rounded-full object-cover border-3 sm:border-4 border-card shadow-lg"
                           src={selectedAlumni?.image}
                         />
                       </div>
-                      <div className="absolute bottom-1 md:bottom-2 right-1 md:right-4 bg-background rounded-full shadow-md">
+                      <div className="absolute bottom-0 right-0 bg-background rounded-full shadow-md">
                         {selectedAlumni?.isVerified ? (
-                          <BadgeCheck className="size-5 md:size-7 text-green-500" />
+                          <BadgeCheck className="size-4 sm:size-5 md:size-7 text-green-500" />
                         ) : (
-                          <BadgeAlert className="size-5 md:size-7 text-destructive/80" />
+                          <BadgeAlert className="size-4 sm:size-5 md:size-7 text-destructive/80" />
                         )}
                       </div>
                     </div>
 
                     {/* Primary Professional Info */}
-                    <div className="flex-1 text-center md:text-left pt-2">
-                      <h1 className="text-3xl md:text-4xl font-black text-foreground tracking-tight leading-none mb-3">
+                    <div className="flex-1 text-center pt-0 sm:pt-2">
+                      <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-foreground tracking-tight leading-tight mb-2 sm:mb-3">
                         {selectedAlumni?.name}
                       </h1>
-                      <p className="text-xl font-bold text-brand mb-5">{selectedAlumni?.displayRole}</p>
+                      <p className="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-brand mb-3 sm:mb-5 line-clamp-2">{selectedAlumni?.displayRole}</p>
 
-                      <div className="flex flex-wrap justify-center md:justify-start gap-3">
-                        <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-full border border-border shadow-sm">
-                          <Briefcase className="text-brand w-4 h-4" />
-                          <span className="text-sm font-semibold">{selectedAlumni?.currentCompany}</span>
+                      <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
+                        <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-card rounded-full border border-border shadow-sm text-xs sm:text-sm">
+                          <Briefcase className="text-brand w-3 h-3 sm:w-4 sm:h-4" />
+                          <span className="font-semibold line-clamp-1">{selectedAlumni?.currentCompany}</span>
                         </div>
-                        <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-full border border-border shadow-sm">
-                          <MapPin className="text-brand w-4 h-4" />
-                          <span className="text-sm font-semibold">{selectedAlumni?.city}</span>
+                        <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-card rounded-full border border-border shadow-sm text-xs sm:text-sm">
+                          <MapPin className="text-brand w-3 h-3 sm:w-4 sm:h-4" />
+                          <span className="font-semibold line-clamp-1">{selectedAlumni?.city}</span>
                         </div>
                       </div>
                     </div>
                   </header>
 
                   {/* Central Body Area */}
-                  <div className="p-8 md:p-12 space-y-12">
+                  <div className="p-4 sm:p-6 md:p-8 lg:p-12 space-y-6 sm:space-y-8 md:space-y-12">
 
                     {/* Bio Section */}
                     <section>
-                      <h2 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground mb-4">Professional Bio</h2>
-                      <p className="text-lg text-foreground/80 leading-relaxed font-light">
+                      <h2 className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-muted-foreground mb-2 sm:mb-4">Professional Bio</h2>
+                      <p className="text-sm sm:text-base md:text-lg text-foreground/80 leading-relaxed font-light">
                         {selectedAlumni?.about || "This alum has not added a bio yet."}
                       </p>
                     </section>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-10">
                       {/* Academic Background */}
-                      <section className="space-y-6">
-                        <h2 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground">Academic Background</h2>
-                        <div className="bg-muted/30 rounded-2xl p-6 flex gap-4 items-center border border-border/50 group hover:border-brand/30 transition-colors">
-                          <div className="w-12 h-12 rounded-xl bg-brand/10 text-brand flex items-center justify-center shrink-0">
-                            <BookOpen className="w-6 h-6" />
+                      <section className="space-y-4 sm:space-y-6">
+                        <h2 className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-muted-foreground">Academic Background</h2>
+                        <div className="bg-muted/30 rounded-xl sm:rounded-2xl p-4 sm:p-6 flex gap-3 sm:gap-4 items-start sm:items-center border border-border/50 group hover:border-brand/30 transition-colors">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-brand/10 text-brand flex items-center justify-center shrink-0">
+                            <BookOpen className="w-5 h-5 sm:w-6 sm:h-6" />
                           </div>
                           <div>
-                            <h3 className="font-bold text-foreground">{getCollegeName(selectedAlumni?.enrollmentNumber)}</h3>
-                            <p className="text-sm text-muted-foreground">{selectedAlumni?.course} {selectedAlumni?.branch}</p>
-                            <p className="text-xs font-black text-brand mt-1 uppercase tracking-wider">Class of {selectedAlumni?.batch}</p>
+                            <h3 className="font-bold text-sm sm:text-base text-foreground">{getCollegeName(selectedAlumni?.enrollmentNumber)}</h3>
+                            <p className="text-xs sm:text-sm text-muted-foreground">{selectedAlumni?.course} {selectedAlumni?.branch}</p>
+                            <p className="text-[10px] sm:text-xs font-black text-brand mt-1 uppercase tracking-wider">Class of {selectedAlumni?.batch}</p>
                           </div>
                         </div>
                       </section>
 
                       {/* Career Highlights */}
-                      <section className="space-y-6">
-                        <h2 className="text-xs font-black uppercase tracking-[0.3em] text-muted-foreground">Career Highlights</h2>
-                        <div className="space-y-5">
-                          <div className="flex items-start gap-4 group">
-                            <span className="w-2 h-2 rounded-full bg-brand mt-2 ring-4 ring-brand/10"></span>
-                            <div>
-                              <p className="font-bold text-foreground group-hover:text-brand transition-colors">{selectedAlumni?.jobTitle}</p>
-                              <p className="text-xs text-muted-foreground mt-0.5">{selectedAlumni?.currentCompany}</p>
-                              <p className="text-xs text-muted-foreground mt-0.5">{selectedAlumni?.city}, {selectedAlumni?.country}</p>
+                      <section className="space-y-4 sm:space-y-6">
+                        <h2 className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-muted-foreground">Career Highlights</h2>
+                        <div className="space-y-4 sm:space-y-5">
+                          <div className="flex items-start gap-3 sm:gap-4 group">
+                            <span className="w-2 h-2 rounded-full bg-brand mt-1.5 sm:mt-2 ring-4 ring-brand/10"></span>
+                            <div className="min-w-0">
+                              <p className="font-bold text-sm sm:text-base text-foreground group-hover:text-brand transition-colors line-clamp-2">{selectedAlumni?.jobTitle}</p>
+                              <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">{selectedAlumni?.currentCompany}</p>
+                              <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">{selectedAlumni?.city}, {selectedAlumni?.country}</p>
                             </div>
                           </div>
                         </div>
@@ -257,15 +257,15 @@ export default function AlumniDiscovery() {
                     </div>
 
                     {/* Footer Action Area */}
-                    <footer className="pt-10 border-t border-border flex flex-col md:flex-row items-center justify-end gap-8">
+                    <footer className="pt-6 sm:pt-8 md:pt-10 border-t border-border flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-8">
 
                       {/* Connect Button */}
                       <button
                         onClick={rout}
-                        className="flex-1 md:flex-none px-10 py-4 bg-[#0077b5] text-white rounded-2xl font-bold text-sm shadow-xl shadow-blue-500/20 transition-all flex items-center justify-center gap-3 group"
+                        className="w-full sm:w-auto px-6 sm:px-10 py-3 sm:py-4 bg-[#0077b5] text-white rounded-lg sm:rounded-2xl font-bold text-xs sm:text-sm shadow-xl shadow-blue-500/20 transition-all flex items-center justify-center gap-2 sm:gap-3 group hover:shadow-2xl"
                       >
                         Connect on LinkedIn
-                        <Send className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                        <Send className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                       </button>
                     </footer>
                   </div>
@@ -276,15 +276,15 @@ export default function AlumniDiscovery() {
             ``
           )}
 
-        <main className="max-w-7xl mx-auto px-6 py-12 md:py-20">
+        <main className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-8 sm:py-12 md:py-20">
 
           {/* Header Console */}
-          <div className="mb-16 text-center space-y-8">
-            <div className="max-w-3xl mx-auto space-y-4">
-              <h1 className="text-4xl md:text-6xl font-black tracking-tight text-foreground">
+          <div className="mb-8 sm:mb-12 md:mb-16 text-center space-y-4 sm:space-y-6 md:space-y-8">
+            <div className="max-w-3xl mx-auto space-y-2 sm:space-y-3 md:space-y-4">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black tracking-tight text-foreground">
                 Discovery Console
               </h1>
-              <p className="text-lg text-muted-foreground font-light leading-relaxed">
+              <p className="text-sm sm:text-base md:text-lg text-muted-foreground font-light leading-relaxed">
                 Instantly explore the global Radharaman Group of Institutes (RGI) network.
                 Start typing to find alumni by role, company, or interests.
               </p>
@@ -292,8 +292,8 @@ export default function AlumniDiscovery() {
 
             {/* Search Input - Now Functional! */}
             <div className="relative max-w-2xl mx-auto group">
-              <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
-                <Search className="text-brand w-6 h-6" />
+              <div className="absolute inset-y-0 left-3 sm:left-4 md:left-6 flex items-center pointer-events-none">
+                <Search className="text-brand size-4 sm:size-5 md:size-6" />
               </div>
               <input
                 value={filters.search}
@@ -301,7 +301,7 @@ export default function AlumniDiscovery() {
                   setPage(1); // Reset page on search
                   setFilters({ ...filters, search: e.target.value });
                 }}
-                className="w-full bg-card border border-border h-20 pl-16 pr-8 rounded-[2rem] text-xl shadow-2xl shadow-brand/5 focus:outline-none focus:ring-4 focus:ring-brand/10 transition-all placeholder:text-muted-foreground/50 text-foreground"
+                className="w-full bg-card border border-border h-9 sm:h-11 md:h-12 lg:h-14 pl-10 sm:pl-12 md:pl-16 pr-4 sm:pr-6 md:pr-8 rounded-full text-xs sm:text-sm md:text-base lg:text-lg shadow-lg shadow-brand/5 focus:outline-none focus:ring-2 sm:focus:ring-4 focus:ring-brand/10 transition-all placeholder:text-muted-foreground/50 text-foreground"
                 placeholder="Search by name, role, or company..."
                 type="text"
               />
@@ -309,62 +309,62 @@ export default function AlumniDiscovery() {
           </div>
 
           {/* Filters Row */}
-          <div className="flex flex-col items-center gap-4 mt-8">
+          <div className="flex flex-col items-center gap-3 sm:gap-4 md:gap-6 mt-8 sm:mt-10 md:mt-12">
             {/* Branch Filters */}
-            <div className="flex flex-wrap justify-center gap-3 overflow-x-auto pb-2 px-4 custom-scrollbar max-w-5xl">
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 overflow-x-auto pb-2 px-2 sm:px-4 custom-scrollbar w-full md:max-w-5xl">
               {branches.map((branch) => (
                 <button
                   key={branch}
                   onClick={() => { setPage(1); setFilters({ ...filters, branch: branch }); }}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm transition-all shadow-sm ${filters.branch === branch
+                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 md:py-2.5 rounded-full font-semibold text-xs sm:text-sm md:text-base transition-all shadow-sm whitespace-nowrap ${filters.branch === branch
                     ? "bg-brand text-primary-foreground"
                     : "bg-card border border-border text-foreground hover:border-brand"
                     }`}
                 >
-                  <BookOpen className="w-4 h-4" /> {branch}
+                  <BookOpen className="w-3 h-3 sm:w-4 sm:h-4" /> <span className="hidden sm:inline">{branch}</span><span className="sm:hidden">{branch.slice(0, 3)}</span>
                 </button>
               ))}
             </div>
             {/* Batch Filters */}
-            <div className="flex flex-wrap justify-center gap-3 overflow-x-auto pb-2 px-4 custom-scrollbar max-w-5xl">
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 overflow-x-auto pb-2 px-2 sm:px-4 custom-scrollbar w-full md:max-w-5xl">
               {batches.map((batch) => (
                 <button
                   key={batch}
                   onClick={() => { setPage(1); setFilters({ ...filters, batch: batch }); }}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm transition-all shadow-sm ${filters.batch === batch
+                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 md:py-2.5 rounded-full font-semibold text-xs sm:text-sm md:text-base transition-all shadow-sm whitespace-nowrap ${filters.batch === batch
                     ? "bg-brand text-primary-foreground"
                     : "bg-card border border-border text-foreground hover:border-brand"
                     }`}
                 >
-                  <Calendar className="w-4 h-4" /> {batch}
+                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4" /> {batch}
                 </button>
               ))}
             </div>
             {/* Courses Filters */}
-            <div className="flex flex-wrap justify-center gap-3 overflow-x-auto pb-2 px-4 custom-scrollbar max-w-5xl">
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 overflow-x-auto pb-2 px-2 sm:px-4 custom-scrollbar w-full md:max-w-5xl">
               {courses.map((course) => (
                 <button
                   key={course}
                   onClick={() => { setPage(1); setFilters({ ...filters, course: course }); }}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-medium text-sm transition-all ${filters.course === course
+                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 md:py-2.5 rounded-full font-medium text-xs sm:text-sm md:text-base transition-all whitespace-nowrap ${filters.course === course
                     ? "bg-brand text-primary-foreground border-brand"
                     : "bg-card border border-border text-foreground hover:border-brand hover:text-brand"
                     }`}
                 >
-                  <BookOpen className="w-4 h-4" /> {course}
+                  <BookOpen className="w-3 h-3 sm:w-4 sm:h-4" /> <span className="hidden sm:inline">{course}</span><span className="sm:hidden">{course.slice(0, 3)}</span>
                 </button>
               ))}
             </div>
           </div>
 
           {/* Results Section */}
-          <div className="space-y-12 mt-12">
-            <div className="flex items-center justify-between border-b border-border pb-6">
-              <div className="flex items-center gap-3">
-                <TrendingUp className="text-brand w-6 h-6" />
-                <h2 className="text-xl font-bold text-foreground">Network Members</h2>
+          <div className="space-y-8 sm:space-y-10 md:space-y-12 mt-10 sm:mt-12 md:mt-16">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-border pb-4 sm:pb-6 gap-3 sm:gap-0">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <TrendingUp className="text-brand w-5 h-5 sm:w-6 sm:h-6" />
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">Network Members</h2>
               </div>
-              <p className="text-sm text-muted-foreground font-medium">Showing {finalAlumniData.length} Alumni</p>
+              <p className="text-xs sm:text-sm text-muted-foreground font-medium">Showing {finalAlumniData.length} Alumni</p>
             </div>
 
             {loading ? (
@@ -377,10 +377,14 @@ export default function AlumniDiscovery() {
                 <p className="text-lg font-medium">No alumni found matching your criteria.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
                 {finalAlumniData.map((alumni) => (
                   <div
                     key={alumni.id}
+                    onClick={() => {
+                      setIsModalOpen(!isModalOpen)
+                      setSelectedAlumni(alumni)
+                    }}
                     className="group relative bg-card rounded-[2rem] p-5 shadow-sm hover:shadow-2xl transition-all duration-300 border border-border hover:border-brand/30 overflow-hidden flex flex-col justify-between"
                   >
                     {/* Profile Image with Hover Overlay */}
@@ -431,7 +435,7 @@ export default function AlumniDiscovery() {
             )}
 
             {/* The Infinite Scroll Trigger */}
-            <div ref={lastElementRef} className="flex flex-col items-center justify-center py-12 h-32 w-full">
+            <div ref={lastElementRef} className="flex flex-col items-center justify-center py-8 sm:py-10 md:py-12 h-24 sm:h-28 md:h-32 w-full">
               {loadingMore && (
                 <div className="flex flex-col items-center gap-3 text-brand">
                   <Loader2 className="w-8 h-8 animate-spin" />
