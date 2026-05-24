@@ -15,10 +15,7 @@ A comprehensive **Full-Stack Training & Placement Management System** built with
 - [🚀 Getting Started](#-getting-started)
 - [📁 Project Structure](#-project-structure)
 - [🔐 Authentication & Authorization](#-authentication--authorization)
-- [📦 Key Modules](#-key-modules)
-- [🗄️ Database Schema](#️-database-schema)
-- [📡 API Endpoints](#-api-endpoints)
-- [🔮 Future Features & Roadmap](#-future-features--roadmap)
+- [ Future Features & Roadmap](#-future-features--roadmap)
 - [🚢 Deployment](#-deployment)
 - [📝 Contributing](#-contributing)
 - [📄 License](#-license)
@@ -161,54 +158,7 @@ The platform combines **security, usability, and scalability** with a profession
 2. **Install dependencies**
    ```bash
    npm install
-   ```
-
-3. **Set up environment variables**
-   ```bash
-   cp .env.example .env.local
-   ```
-
-   Update `.env.local` with:
-   ```env
-   # Database
-   DATABASE_URL=file:./dev.db
-
-   # Cloudflare Configuration
-   R2_BUCKET_NAME=your-bucket-name
-   R2_ACCOUNT_ID=your-account-id
-   R2_PUBLIC_URL=https://your-public-url.r2.dev
-   R2_END_POINT=https://your-account-id.r2.cloudflarestorage.com
-   R2_ACCESS_KEY_ID=your-access-key
-   R2_SECRET_ACCESS_KEY=your-secret-key
-
-   # JWT & Security
-   JWT_SECRET=your-super-secret-jwt-key
-
-   # Email (Gmail OAuth2)
-   GMAIL_USER=your-gmail@gmail.com
-   GMAIL_CLIENT_ID=your-client-id.apps.googleusercontent.com
-   GMAIL_CLIENT_SECRET=your-client-secret
-   GMAIL_REFRESH_TOKEN=your-refresh-token
-
-   # Email From
-   EMAIL_FROM=noreply@yourdomain.com
-   ```
-
-4. **Run database migrations**
-   ```bash
-   npm run db:generate
-   npm run db:migrate:local  # For local dev
-   ```
-
-5. **Start development server**
-   ```bash
-   npm run dev
-   ```
-
-6. **Open in browser**
-   ```
-   http://localhost:3000
-   ```
+  ```
 
 ### Development Commands
 
@@ -477,57 +427,6 @@ Verify Token + Role Authorization
 - **Memory** - Photo gallery
 - **Referral** - Alumni referrals
 - **EmailFailureTracking** - Failed email logs
-
----
-
-## 📡 API Endpoints
-
-### Authentication
-```
-POST   /api/auth/register/student
-POST   /api/auth/register/alumni
-POST   /api/auth/register/external-student
-POST   /api/auth/login/student
-POST   /api/auth/login/alumni
-POST   /api/auth/reset-password
-GET    /api/auth/verify-email
-```
-
-### Student APIs
-```
-GET    /api/student/dashboard
-GET    /api/student/applications
-POST   /api/student/feedback
-GET    /api/student/profile
-```
-
-### Alumni APIs
-```
-GET    /api/alumni/dashboard
-POST   /api/alumni/referral
-POST   /api/alumni/feedback
-GET    /api/alumni/profile
-```
-
-### Admin APIs
-```
-GET    /api/admin/approvals
-POST   /api/admin/approvals (approve/reject)
-GET    /api/admin/stats
-POST   /api/admin/master-data
-```
-
-### Recruiter APIs
-```
-POST   /api/recruiter/drive (create)
-GET    /api/recruiter/applications
-POST   /api/recruiter/feedback
-```
-
-### File Upload
-```
-POST   /api/upload/presigned-url (get R2 upload URL)
-```
 
 ---
 

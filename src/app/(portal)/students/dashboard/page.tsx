@@ -99,6 +99,8 @@ export default function StudentDashboard() {
   const [selectedDrive, setSelectedDrive] = useState<PlacementDrive | null>(null)
   const [memUploading, setMemUploading] = useState(false);
   const [resumeUploading, setResumeUploading] = useState(false);
+  const [profileUploading, setProfileUploading] = useState(false);
+  const profileImageRef = React.useRef<HTMLInputElement>(null);
 
   // Memory Modal State
   const [isMemModalOpen, setIsMemModalOpen] = useState(false);
@@ -121,6 +123,8 @@ export default function StudentDashboard() {
     githubUrl: "",
   });
 
+  const [deleteLoading, setDeleteLoading] = useState<string | null>()
+
   const router = useRouter();
 
   // it auto updates semester
@@ -134,14 +138,14 @@ export default function StudentDashboard() {
           retries: 2,
         });
         const data = await res.json() as any;
-        if(data.success && data.updated) {
+        if (data.success && data.updated) {
           toast.success(`Semester updated to ${data.semester}`);
         }
       } catch (error: any) {
         console.error("Error updating semester:", error);
       }
     }
-    if (authenticated) updateSemester(); 
+    if (authenticated) updateSemester();
   }, [authenticated])
 
   const handleLogout = () => {
@@ -191,19 +195,19 @@ export default function StudentDashboard() {
 
     const hasRegistered = drive.isRegistered || registrations.some(r => r.driveId === drive.id);
 
-  if (hasRegistered) {
-    return {
-      actionElement: (
-        // 2. Make this a clickable button so they can still read the job details
-        <button 
-          onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
-          className="inline-flex items-center gap-1.5 text-green-600 bg-green-500/10 hover:bg-green-500/20 px-4 py-2.5 rounded-xl text-xs font-bold transition-all"
-        >
-          <CheckCircle className="w-4 h-4" /> View Details
-        </button>
-      )
-    };
-  }
+    if (hasRegistered) {
+      return {
+        actionElement: (
+          // 2. Make this a clickable button so they can still read the job details
+          <button
+            onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
+            className="inline-flex items-center gap-1.5 text-green-600 bg-green-500/10 hover:bg-green-500/20 px-4 py-2.5 rounded-xl text-xs font-bold transition-all"
+          >
+            <CheckCircle className="w-4 h-4" /> View Details
+          </button>
+        )
+      };
+    }
 
     if (reason) {
       return {
@@ -254,6 +258,34 @@ export default function StudentDashboard() {
       toast.error("Resume upload failed: " + err.message);
     } finally {
       setResumeUploading(false);
+    }
+  };
+
+  const handleProfileImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setProfileUploading(true);
+      const url = await uploadFileToR2(file, "profiles", { role: "student" });
+      const token = getToken("student");
+      const res = await fetch("/api/student/update-profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ profileImageUrl: url }),
+      });
+      const d = await res.json() as any;
+      if (d.success) {
+        toast.success("Profile image updated successfully!");
+        fetchDashboard();
+      } else {
+        throw new Error(d.message);
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Profile image upload failed: " + err.message);
+    } finally {
+      setProfileUploading(false);
     }
   };
 
@@ -337,6 +369,7 @@ export default function StudentDashboard() {
 
   const handleDeleteMemory = async (id: string) => {
     try {
+      setDeleteLoading(id)
       const token = getToken("student");
       const res = await fetch("/api/student/memories", {
         method: "DELETE",
@@ -353,7 +386,7 @@ export default function StudentDashboard() {
       } else {
         throw new Error(d.message);
       }
-
+      setDeleteLoading(null)
     } catch (error: any) {
       console.error("Error deleting memory:", error);
       toast.error("Failed to delete memory. Please try again.");
@@ -392,7 +425,7 @@ export default function StudentDashboard() {
                     Complete Your Profile
                   </h2>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Please add your 10th, 12th, and resume details to unlock drive applications and improve your recruiter visibility. GitHub and LinkedIn is optional
+                    Please add your 10th, 12th/ Diploma, and resume details to unlock drive applications and improve your recruiter visibility. GitHub and LinkedIn are optional
                   </p>
                 </div>
               </div>
@@ -448,7 +481,7 @@ export default function StudentDashboard() {
             <div className="space-y-4">
               <div className="space-y-2">
                 <label className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Batch Title (Optional)</label>
-                <input 
+                <input
                   type="text"
                   value={memBatchTitle}
                   onChange={(e) => setMemBatchTitle(e.target.value)}
@@ -459,13 +492,13 @@ export default function StudentDashboard() {
               </div>
 
               <div className="flex gap-3">
-                <button 
+                <button
                   onClick={() => { setIsMemModalOpen(false); setSelectedMemFiles([]); setMemPreviews([]); }}
                   className="flex-1 bg-muted text-foreground px-6 py-4 rounded-xl font-bold hover:bg-muted/80 transition-all text-sm"
                 >
                   Cancel
                 </button>
-                <button 
+                <button
                   onClick={startMemoryUpload}
                   disabled={memUploading}
                   className="flex-2 bg-brand text-white px-6 py-4 rounded-xl font-bold hover:bg-brand/90 transition-all text-sm disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2 shadow-[var(--shadow-brand)]"
@@ -534,7 +567,7 @@ export default function StudentDashboard() {
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">10th Percentage</label>
                     <input type="number" step="0.01" min="0" max="100"
-                    required
+                      required
                       value={profileForm.tenthPercentage} onChange={(e) => setProfileForm({ ...profileForm, tenthPercentage: e.target.value })}
                       className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
                       placeholder="e.g. 85.50" />
@@ -620,9 +653,12 @@ export default function StudentDashboard() {
                       <div className="absolute top-0 right-0 size-32 bg-linear-to-bl from-brand/10 to-transparent rounded-bl-[5rem]"></div>
 
                       {/* Avatar Section */}
-                      <div className="relative shrink-0 mx-auto md:mx-0">
-                        <div className="w-32 h-32 md:size-48 rounded-full p-1 md:p-2 bg-linear-to-tr from-brand to-brand/40 transition-transform duration-500 group-hover:rotate-6">
-                          <div className="w-full h-full rounded-full border-2 md:border-4 border-background overflow-hidden bg-muted">
+                      <div
+                        onClick={() => !profileUploading && profileImageRef.current?.click()}
+                        className="relative shrink-0 mx-auto md:mx-0 cursor-pointer group/avatar"
+                      >
+                        <div className="w-32 h-32 md:size-48 rounded-full p-1 md:p-2 bg-linear-to-tr from-brand to-brand/40 transition-transform duration-500 group-hover/avatar:scale-105">
+                          <div className="w-full h-full rounded-full border-2 md:border-4 border-background overflow-hidden bg-muted relative">
                             {student?.profileImageUrl ? (
                               <img
                                 alt="Student Portrait"
@@ -635,18 +671,40 @@ export default function StudentDashboard() {
                                 {student?.name?.charAt(0)}
                               </div>
                             )}
+
+                            {/* Camera Hover Overlay */}
+                            <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300">
+                              <Camera className="w-6 h-6 mb-1 text-white animate-pulse" />
+                              <span className="text-[10px] uppercase font-bold tracking-wider">Change Image</span>
+                            </div>
+
+                            {/* Loading Overlay */}
+                            {profileUploading && (
+                              <div className="absolute inset-0 bg-black/75 flex items-center justify-center">
+                                <Loader2 className="w-6 h-6 text-brand animate-spin" />
+                              </div>
+                            )}
                           </div>
                         </div>
 
+                        {/* Hidden Input */}
+                        <input
+                          type="file"
+                          ref={profileImageRef}
+                          onChange={handleProfileImageUpload}
+                          accept="image/*"
+                          className="hidden"
+                          disabled={profileUploading}
+                        />
+
                         {/* Verified Badge */}
-                        <div className="absolute bottom-4 bg-background right-0 md:right-4 size-7 md:size-10 rounded-full flex shrink-0 items-center justify-center">
+                        <div className="absolute bottom-4 bg-background right-0 md:right-4 size-7 md:size-10 rounded-full flex shrink-0 items-center justify-center shadow-lg">
                           {student?.isVerified || student?.isEmailVerified ? (
                             <BadgeCheck className={`size-7 md:size-10 text-center text-green-500`} />
                           ) : (
                             <BadgeAlert className={`size-7 md:size-10 text-center text-red-500`} />
                           )}
                         </div>
-
                       </div>
 
                       {/* Info Section */}
@@ -704,7 +762,7 @@ export default function StudentDashboard() {
                     </div>
                   </section>
                 </div>
-              </section> 
+              </section>
 
               {/* Stats */}
               {!loading && data && (
@@ -816,7 +874,7 @@ export default function StudentDashboard() {
                               </div>
                               <div>
                                 <p className="text-xs uppercase font-black text-muted-foreground tracking-wider mb-1">Date</p>
-                                <p className="text-sm font-bold text-foreground">{new Date(drive.driveDate).toLocaleDateString('en-IN', {month: 'short', day: 'numeric'})}</p>
+                                <p className="text-sm font-bold text-foreground">{new Date(drive.driveDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}</p>
                               </div>
                             </div>
 
@@ -1126,14 +1184,19 @@ export default function StudentDashboard() {
                       <div key={m.id} className="bg-card rounded-2xl border border-border overflow-hidden">
                         <div className="aspect-square bg-muted flex items-center justify-center object-top">
                           <img src={m.imageUrl} alt="Memory" loading="lazy" className="w-full h-full object-cover" />
-                          
+
                         </div>
+
                         <div className="p-3 flex items-center justify-between">
                           <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${m.status === "approved" ? "bg-green-500/10 text-green-600"
                             : m.status === "rejected" ? "bg-red-500/10 text-red-500"
                               : "bg-yellow-500/10 text-yellow-600"
                             }`}>{m.status === "pending_moderation" ? "Pending" : m.status}</span>
+                          {deleteLoading ==m.id ? (
+                            <div className="size-5 border-3 border-red-500 rounded-full border-t-transparent animate-spin"></div>
+                          ) : (
                             <Trash2 className="text-red-500 cursor-pointer size-6" onClick={() => handleDeleteMemory(m.id)} />
+                          )}
                         </div>
                       </div>
                     ))}

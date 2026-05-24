@@ -21,6 +21,7 @@ import {
   Linkedin,
   Github,
   MessageSquareShare,
+  Camera,
 } from "lucide-react";
 import Nav from "@/components/layout/nav/nav";
 import Footer from "@/components/layout/footer/footer";
@@ -180,6 +181,8 @@ export default function ExternalStudentDashboard() {
   const [selectedDrive, setSelectedDrive] = useState<PlacementDrive | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [resumeUploading, setResumeUploading] = useState(false);
+  const [profileUploading, setProfileUploading] = useState(false);
+  const profileImageRef = React.useRef<HTMLInputElement>(null);
 
   const handleResumeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.[0]) return;
@@ -206,6 +209,34 @@ export default function ExternalStudentDashboard() {
       toast.error("Resume upload failed: " + err.message);
     } finally {
       setResumeUploading(false);
+    }
+  };
+
+  const handleProfileImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setProfileUploading(true);
+      const url = await uploadFileToR2(file, "profiles", { role: "external_student" });
+      const token = getToken("external_student");
+      const res = await fetch("/api/external/update-profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ profileImageUrl: url }),
+      });
+      const d = await res.json() as any;
+      if (d.success) {
+        toast.success("Profile image updated successfully!");
+        fetchDashboard();
+      } else {
+        throw new Error(d.message);
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Profile image upload failed: " + err.message);
+    } finally {
+      setProfileUploading(false);
     }
   };
 
@@ -240,7 +271,7 @@ export default function ExternalStudentDashboard() {
                     Complete Your Profile
                   </h2>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Please add your 10th, 12th, and resume details to unlock drive applications and improve your recruiter visibility. GitHub and LinkedIn is optional
+                    Please add your 10th, 12th/Diploma, and resume details to unlock drive applications and improve your recruiter visibility. GitHub and LinkedIn are optional
                   </p>
                 </div>
               </div>
@@ -404,13 +435,16 @@ export default function ExternalStudentDashboard() {
                   <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-bl from-brand/10 to-transparent rounded-bl-[5rem]"></div>
 
                   {/* Avatar Section */}
-                  <div className="relative shrink-0 mx-auto md:mx-0">
-                    <div className="w-32 h-32 md:w-48 md:h-48 rounded-full p-1 md:p-2 bg-linear-to-tr from-brand to-brand/40 transition-transform duration-500 group-hover:rotate-6">
-                      <div className="w-full h-full rounded-full border-2 md:border-4 border-background overflow-hidden bg-muted object-top">
+                  <div 
+                    onClick={() => !profileUploading && profileImageRef.current?.click()}
+                    className="relative shrink-0 mx-auto md:mx-0 cursor-pointer group/avatar"
+                  >
+                    <div className="w-32 h-32 md:w-48 md:h-48 rounded-full p-1 md:p-2 bg-linear-to-tr from-brand to-brand/40 transition-transform duration-500 group-hover/avatar:scale-105">
+                      <div className="w-full h-full rounded-full border-2 md:border-4 border-background overflow-hidden bg-muted relative">
                         {student?.profileImageUrl ? (
                           <img
                             alt="Student Portrait"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover object-top"
                             src={student.profileImageUrl}
                           />
                         ) : (
@@ -418,8 +452,31 @@ export default function ExternalStudentDashboard() {
                             {student?.name?.charAt(0)}
                           </div>
                         )}
+
+                        {/* Camera Hover Overlay */}
+                        <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300">
+                          <Camera className="w-6 h-6 mb-1 text-white animate-pulse" />
+                          <span className="text-[10px] uppercase font-bold tracking-wider">Change Image</span>
+                        </div>
+
+                        {/* Loading Overlay */}
+                        {profileUploading && (
+                          <div className="absolute inset-0 bg-black/75 flex items-center justify-center">
+                            <Loader2 className="w-6 h-6 text-brand animate-spin" />
+                          </div>
+                        )}
                       </div>
                     </div>
+
+                    {/* Hidden Input */}
+                    <input 
+                      type="file" 
+                      ref={profileImageRef} 
+                      onChange={handleProfileImageUpload} 
+                      accept="image/*" 
+                      className="hidden" 
+                      disabled={profileUploading}
+                    />
 
                     {/* Verified Badge */}
                     <div className="absolute bottom-4 bg-background right-0 md:right-4 size-10 rounded-full flex shrink-0 items-center justify-center shadow-lg">

@@ -83,6 +83,8 @@ export default function AlumniDashboard() {
     const [memPreviews, setMemPreviews] = useState<string[]>([]);
   const [data, setData] = useState<any>(null);
   const [memUploading, setMemUploading] = useState(false);
+  const [profileUploading, setProfileUploading] = useState(false);
+  const profileImageRef = React.useRef<HTMLInputElement>(null);
   
 
   // Profile Form
@@ -98,6 +100,7 @@ export default function AlumniDashboard() {
   const [submittingProfile, setSubmittingProfile] = useState(false);
   const [profileMsg, setProfileMsg] = useState<{ msg: string; ok: boolean } | null>(null);
   const [showProfileForm, setShowProfileForm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<string | null>()
 
   useEffect(() => {
     if (!authenticated) return;
@@ -259,6 +262,34 @@ export default function AlumniDashboard() {
     }
   };
 
+  const handleProfileImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setProfileUploading(true);
+      const url = await uploadFileToR2(file, "profiles", { role: "alumni" });
+      const token = getToken("alumni");
+      const res = await fetch("/api/alumni/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ profileImageUrl: url }),
+      });
+      const d = await res.json() as any;
+      if (d.success) {
+        toast.success("Profile image updated successfully!");
+        fetchDashboard();
+      } else {
+        throw new Error(d.message);
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Profile image upload failed: " + err.message);
+    } finally {
+      setProfileUploading(false);
+    }
+  };
+
   const [showReferralModal, setShowReferralModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
@@ -338,7 +369,7 @@ export default function AlumniDashboard() {
 
   const handleDeleteMemory = async (id: string) => {
     try {
-      if (!window.confirm("Are you sure you want to delete this memory?")) return;
+      setIsDeleting(id)
       const token = getToken("alumni");
       const res = await fetch("/api/alumni/memories", {
         method: "DELETE",
@@ -355,7 +386,7 @@ export default function AlumniDashboard() {
       } else {
         throw new Error(d.message);
       }
-
+      setIsDeleting(null)
     } catch (error: any) {
       console.error("Error deleting memory:", error);
       toast.error("Failed to delete memory. Please try again.");
@@ -380,7 +411,7 @@ export default function AlumniDashboard() {
   }
 
   const alumni = data?.alumni;
-  const isProfileIncomplete = alumni && (!alumni.jobTitle || !alumni.currentCompany || !alumni.city || !alumni.linkedInUrl);
+  const isProfileIncomplete = alumni && (!alumni.city || !alumni.linkedInUrl);
   const referrals = data?.referrals || [];
   const stats = data?.stats || {};
   const memories = data?.memories || [];
@@ -402,7 +433,7 @@ export default function AlumniDashboard() {
                     Complete Your Profile
                   </h2>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Please add your 10th, 12th, and resume details to unlock drive applications and improve your recruiter visibility. GitHub and LinkedIn is optional
+                    Please add your current city and Linkedin details to unlock full functionality and improve your visibility. Other details are optional
                   </p>
                 </div>
               </div>
@@ -468,9 +499,12 @@ export default function AlumniDashboard() {
 
                     <div className="absolute top-0 right-0 w-24 h-24 md:w-40 md:h-40 bg-gradient-to-bl from-brand/10 via-transparent to-transparent rounded-bl-[3rem] md:rounded-bl-[6rem]"></div>
 
-                    <div className="relative shrink-0">
-                      <div className="w-32 h-32 md:w-44 lg:w-52 md:h-44 lg:h-52 rounded-full p-1 md:p-2 bg-gradient-to-tr from-brand to-brand/50">
-                        <div className="w-full h-full rounded-full border-[3px] md:border-[5px] border-background overflow-hidden bg-muted flex items-center justify-center">
+                    <div 
+                      onClick={() => !profileUploading && profileImageRef.current?.click()}
+                      className="relative shrink-0 cursor-pointer group/avatar"
+                    >
+                      <div className="w-32 h-32 md:w-44 lg:w-52 md:h-44 lg:h-52 rounded-full p-1 md:p-2 bg-gradient-to-tr from-brand to-brand/50 transition-transform duration-500 group-hover/avatar:scale-105">
+                        <div className="w-full h-full rounded-full border-[3px] md:border-[5px] border-background overflow-hidden bg-muted flex items-center justify-center relative">
                           {alumni?.profileImageUrl ? (
                             <img
                               alt="Alumni Portrait"
@@ -482,8 +516,31 @@ export default function AlumniDashboard() {
                               {alumni?.name?.charAt(0)}
                             </span>
                           )}
+
+                          {/* Camera Hover Overlay */}
+                          <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300">
+                            <Camera className="w-6 h-6 mb-1 text-white animate-pulse" />
+                            <span className="text-[10px] uppercase font-bold tracking-wider">Change Image</span>
+                          </div>
+
+                          {/* Loading Overlay */}
+                          {profileUploading && (
+                            <div className="absolute inset-0 bg-black/75 flex items-center justify-center">
+                              <Loader2 className="w-6 h-6 text-brand animate-spin" />
+                            </div>
+                          )}
                         </div>
                       </div>
+
+                      {/* Hidden Input */}
+                      <input 
+                        type="file" 
+                        ref={profileImageRef} 
+                        onChange={handleProfileImageUpload} 
+                        accept="image/*" 
+                        className="hidden" 
+                        disabled={profileUploading}
+                      />
 
                       <div className="absolute bottom-1 md:bottom-2 right-1 md:right-4 bg-background rounded-full shadow-md">
                         {alumni?.isVerified ? (
@@ -525,7 +582,7 @@ export default function AlumniDashboard() {
                       </div>
 
                       <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-                        {alumni.linkedInUrl && (
+                        {alumni?.linkedInUrl && (
                           <a
                             href={alumni.linkedInUrl}
                             target="_blank"
@@ -1292,7 +1349,9 @@ export default function AlumniDashboard() {
                         : m.status === "rejected" ? "bg-red-500/10 text-red-500"
                           : "bg-yellow-500/10 text-yellow-600"
                         }`}>{m.status === "pending_moderation" ? "Pending" : m.status}</span>
-                      <Trash2 className="text-red-500 cursor-pointer size-6" onClick={() => handleDeleteMemory(m.id)} />
+                        {isDeleting ==m.id ?(<div className="size-5 border-3 border-red-500 rounded-full border-t-transparent animate-spin"></div>):(
+                          <Trash2 className="text-red-500 cursor-pointer size-6" onClick={() => handleDeleteMemory(m.id)} />
+                        )}
                     </div>
                   </div>
                 ))}
