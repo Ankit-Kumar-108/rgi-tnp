@@ -2,6 +2,7 @@ export const runtime = 'edge';
 
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { deleteMultipleFromR2 } from "@/lib/r2-delete";
 
 export async function GET(req: NextRequest) {
   try {
@@ -242,20 +243,42 @@ export async function DELETE(req: NextRequest) {
 
     const db = getDb();
     switch (role) {
-      case "student":
+      case "student": {
+        const students = await db.student.findMany({
+          where: { id: { in: ids } },
+          select: { profileImageUrl: true, resumeUrl: true },
+        });
+        const studentUrls = students
+          .flatMap((s) => [s.profileImageUrl, s.resumeUrl])
+          .filter((url): url is string => Boolean(url));
+
         await db.driveRegistration.deleteMany({
           where: { studentId: { in: ids } },
         });
         await db.student.deleteMany({
           where: { id: { in: ids } },
         });
-        break;
 
-      case "alumni":
+        if (studentUrls.length > 0) deleteMultipleFromR2(studentUrls);
+        break;
+      }
+
+      case "alumni": {
+        const alumniRecords = await db.alumni.findMany({
+          where: { id: { in: ids } },
+          select: { profileImageUrl: true },
+        });
+        const alumniUrls = alumniRecords
+          .map((a) => a.profileImageUrl)
+          .filter(Boolean);
+
         await db.alumni.deleteMany({
           where: { id: { in: ids } },
         });
+
+        if (alumniUrls.length > 0) deleteMultipleFromR2(alumniUrls);
         break;
+      }
 
       case "recruiter":
         await db.recruiter.deleteMany({
@@ -263,14 +286,25 @@ export async function DELETE(req: NextRequest) {
         });
         break;
 
-      case "external":
+      case "external": {
+        const externals = await db.externalStudent.findMany({
+          where: { id: { in: ids } },
+          select: { profileImageUrl: true, resumeUrl: true },
+        });
+        const externalUrls = externals
+          .flatMap((s) => [s.profileImageUrl, s.resumeUrl])
+          .filter((url): url is string => Boolean(url));
+
         await db.driveRegistration.deleteMany({
           where: { externalStudentId: { in: ids } },
         });
         await db.externalStudent.deleteMany({
           where: { id: { in: ids } },
         });
+
+        if (externalUrls.length > 0) deleteMultipleFromR2(externalUrls);
         break;
+      }
 
       default:
         return NextResponse.json({ success: false, message: "Invalid role specified" }, { status: 400 });

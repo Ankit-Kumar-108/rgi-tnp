@@ -3,6 +3,7 @@ export const runtime = "edge";
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
+import { deleteFromR2 } from "@/lib/r2-delete";
 
 function hasValue(value: unknown) {
   return value !== undefined && value !== null && value !== "";
@@ -123,6 +124,16 @@ export async function PATCH(req: NextRequest) {
         isProfileComplete,
       },
     });
+
+    // Clean up old R2 files if replaced
+    if (profileImageUrl && existingStudent.profileImageUrl &&
+        profileImageUrl !== existingStudent.profileImageUrl) {
+      deleteFromR2(existingStudent.profileImageUrl);
+    }
+    if (resumeUrl && existingStudent.resumeUrl &&
+        resumeUrl !== existingStudent.resumeUrl) {
+      deleteFromR2(existingStudent.resumeUrl);
+    }
 
     return NextResponse.json({
       success: true,

@@ -2,6 +2,7 @@ export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import * as jose from "jose";
+import {deleteFromR2} from "@/lib/r2-delete"
 
 async function getStudentFromToken(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
@@ -87,6 +88,20 @@ export async function DELETE(req: NextRequest) {
     if (!student) {
       return NextResponse.json({ success: false, message: "Student not found" }, { status: 404 });
     }
+
+    const imgUrl = await db.memory.findFirst({
+      where: {
+        id: id,
+        studentId: student.id,
+      },
+      select: {imageUrl: true}
+    })
+
+    if(!imgUrl){
+      return NextResponse.json({success: false, message: "Memory not found or you don't have permission to delete it"})
+    }
+
+    deleteFromR2(imgUrl.imageUrl)
 
     const deletedMemory = await db.memory.deleteMany({
       where: { 

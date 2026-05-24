@@ -576,10 +576,10 @@ POST   /api/upload/presigned-url (get R2 upload URL)
 - [ ] **Links (bug in opening external link)  (to change on 29/05/2026 [Done])** 
 - fix but where when opening external link it open with sub link of our site instead of opening in new tab
 
-- [ ] **Alumin-Network (fix)  (to change on 29/05/2026 [to be Done])** 
+- [ ] **Alumin-Network (fix)  (to change on 29/05/2026 [Done])** 
 - add more courses and branches with open and close option to select in alumni network section and also add filter in alumni network section for better visibility
 
-- [ ] **Image (optimise)  (to change on 30/05/2026 [to be Done])** 
+- [ ] **Image (optimise)  (to change on 30/05/2026 [Done])** 
 - optimise images before uploading in r2 for better performance and also add image optimization in memory section for better performance
 
 - [ ] **Profile and CGPA(give ability to update profile img and cgpa)  (to change on 31/05/2026 [to be Done])**

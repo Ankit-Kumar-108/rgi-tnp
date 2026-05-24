@@ -1,4 +1,5 @@
 import { getToken, type UserRole } from "@/lib/auth-client";
+import {compressImage} from "./image-compression"
 
 export type UploadFolder =
   | "profiles"
@@ -46,6 +47,7 @@ export async function uploadFileToR2(
   folder: UploadFolder,
   options: UploadOptions = {},
 ): Promise<string> {
+  const processedFile = await compressImage(file, folder)
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
@@ -63,10 +65,10 @@ export async function uploadFileToR2(
     headers,
     credentials: "same-origin",
     body: JSON.stringify({
-      filename: file.name,
-      contentType: file.type,
+      filename: processedFile.name,
+      contentType: processedFile.type,
       folder,
-      fileSize: file.size,
+      fileSize: processedFile.size,
       uploadToken: options.uploadToken,
     }),
   });
@@ -85,12 +87,12 @@ export async function uploadFileToR2(
   const { presignedUrl, publicUrl } = data as { presignedUrl: string; publicUrl: string };
 
   // 2. Direct Upload to Cloudflare R2 using the signed URL
-  // We use direct binary upload (PUT)
+  // We use direct upload (PUT)
   const uploadRes = await fetch(presignedUrl, {
     method: "PUT",
-    body: file,
+    body: processedFile,
     headers: { 
-      "Content-Type": file.type 
+      "Content-Type": processedFile.type 
     },
   });
 

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import {
-  Search, Calendar, TrendingUp,
+  Search, Calendar, TrendingUp, ChevronDown, SlidersHorizontal,
   Briefcase, Mail, Network, Database, Loader2, BookOpen, X,
   School, MapPin, Link as LinkIcon,
   Share2, Send, BadgeCheck,
@@ -102,9 +102,29 @@ export default function AlumniDiscovery() {
     displayRole: `${alumni.jobTitle} at ${alumni.currentCompany}`,
   }));
 
-  const branches = ["All Branches", "Computer Science", "Mechanical", "Civil", "Electronics", "Electrical"]
-  const batches = ["All Batches", "2022", "2023", "2024", "2025", "2026", "2027", "2028"]
+  const branch = () => {
+    switch (filters.course) {
+      case 'All Courses':
+        return ["Computer Science", "Mechanical", "Civil", "Electronics", "Electrical", "Digital Communication", "Power Systems", "Thermal Engineering", "Marketing", "Finance", "Human Resource"]
+
+      case 'B.Tech':
+        return ["Computer Science", "AIML", "Mechanical", "Civil", "Electronics", "Electrical"]
+
+      case 'M.Tech':
+        return ["Digital Communication", "Power Systems", "Thermal Engineering"]
+      
+      case 'MBA':
+        return ["Marketing", "Finance", "Human Resource"]
+
+      case 'Diploma':
+        return ["Civil","Mechanical", "Electrical", "Electronics", "Computer Science"]
+      default:
+        return ["All Branches"]
+    }
+  }
+  const branches = branch()
   const courses = ["All Courses", "B.Tech", "M.Tech", "MBA", "Diploma"]
+  const batches = ["All Batches", "2022", "2023", "2024", "2025", "2026", "2027", "2028"]
 
   const getCollegeName = (enroll: string | undefined) => {
   if (!enroll) return "Radharaman Group of Institutions";
@@ -308,52 +328,102 @@ export default function AlumniDiscovery() {
             </div>
           </div>
 
-          {/* Filters Row */}
-          <div className="flex flex-col items-center gap-3 sm:gap-4 md:gap-6 mt-8 sm:mt-10 md:mt-12">
-            {/* Branch Filters */}
-            <div className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 overflow-x-auto pb-2 px-2 sm:px-4 custom-scrollbar w-full md:max-w-5xl">
-              {branches.map((branch) => (
-                <button
-                  key={branch}
-                  onClick={() => { setPage(1); setFilters({ ...filters, branch: branch }); }}
-                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 md:py-2.5 rounded-full font-semibold text-xs sm:text-sm md:text-base transition-all shadow-sm whitespace-nowrap ${filters.branch === branch
-                    ? "bg-brand text-primary-foreground"
-                    : "bg-card border border-border text-foreground hover:border-brand"
-                    }`}
+          {/* ═══ MOBILE: Compact Dropdown Selects (single row) ═══ */}
+          <div className="flex sm:hidden items-center gap-2 mt-6 px-1">
+            <SlidersHorizontal className="w-4 h-4 text-muted-foreground shrink-0" />
+            <div className="flex-1 grid grid-cols-3 gap-2">
+              <div className="relative">
+                <select
+                  value={filters.course}
+                  onChange={(e) => { setPage(1); setFilters({ ...filters, course: e.target.value }); }}
+                  className="w-full appearance-none bg-card border border-border rounded-xl px-3 py-2.5 pr-7 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition-all truncate"
                 >
-                  <BookOpen className="w-3 h-3 sm:w-4 sm:h-4" /> <span className="hidden sm:inline">{branch}</span><span className="sm:hidden">{branch.slice(0, 3)}</span>
-                </button>
-              ))}
+                  {courses.map((c) => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+              </div>
+              <div className="relative">
+                <select
+                  value={filters.branch}
+                  onChange={(e) => { setPage(1); setFilters({ ...filters, branch: e.target.value }); }}
+                  className="w-full appearance-none bg-card border border-border rounded-xl px-3 py-2.5 pr-7 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition-all truncate"
+                >
+                  <option value="All Branches">All Branches</option>
+                  {branches.map((b) => <option key={b} value={b}>{b}</option>)}
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+              </div>
+              <div className="relative">
+                <select
+                  value={filters.batch}
+                  onChange={(e) => { setPage(1); setFilters({ ...filters, batch: e.target.value }); }}
+                  className="w-full appearance-none bg-card border border-border rounded-xl px-3 py-2.5 pr-7 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition-all truncate"
+                >
+                  {batches.map((b) => <option key={b} value={b}>{b}</option>)}
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+              </div>
             </div>
-            {/* Batch Filters */}
-            <div className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 overflow-x-auto pb-2 px-2 sm:px-4 custom-scrollbar w-full md:max-w-5xl">
-              {batches.map((batch) => (
-                <button
-                  key={batch}
-                  onClick={() => { setPage(1); setFilters({ ...filters, batch: batch }); }}
-                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 md:py-2.5 rounded-full font-semibold text-xs sm:text-sm md:text-base transition-all shadow-sm whitespace-nowrap ${filters.batch === batch
-                    ? "bg-brand text-primary-foreground"
-                    : "bg-card border border-border text-foreground hover:border-brand"
-                    }`}
-                >
-                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4" /> {batch}
-                </button>
-              ))}
+          </div>
+
+          {/* ═══ DESKTOP: Chip Pills (hidden on mobile) ═══ */}
+          <div className="hidden sm:flex flex-col gap-4 md:gap-5 mt-10 md:mt-12 w-full max-w-5xl mx-auto">
+            {/* Course chips */}
+            <div className="space-y-1.5">
+              <p className="text-xs font-black uppercase tracking-[0.15em] text-muted-foreground text-center">Course</p>
+              <div className="flex flex-wrap justify-center gap-2 md:gap-3">
+                {courses.map((course) => (
+                  <button
+                    key={course}
+                    onClick={() => { setPage(1); setFilters({ ...filters, course: course }); }}
+                    className={`flex items-center gap-1.5 px-4 py-2 rounded-full font-semibold text-xs md:text-sm transition-all whitespace-nowrap ${filters.course === course
+                      ? "bg-brand text-primary-foreground shadow-sm"
+                      : "bg-card border border-border text-foreground hover:border-brand hover:text-brand"
+                      }`}
+                  >
+                    <BookOpen className="w-3.5 h-3.5" />
+                    {course}
+                  </button>
+                ))}
+              </div>
             </div>
-            {/* Courses Filters */}
-            <div className="flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4 overflow-x-auto pb-2 px-2 sm:px-4 custom-scrollbar w-full md:max-w-5xl">
-              {courses.map((course) => (
-                <button
-                  key={course}
-                  onClick={() => { setPage(1); setFilters({ ...filters, course: course }); }}
-                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 md:py-2.5 rounded-full font-medium text-xs sm:text-sm md:text-base transition-all whitespace-nowrap ${filters.course === course
-                    ? "bg-brand text-primary-foreground border-brand"
-                    : "bg-card border border-border text-foreground hover:border-brand hover:text-brand"
-                    }`}
-                >
-                  <BookOpen className="w-3 h-3 sm:w-4 sm:h-4" /> <span className="hidden sm:inline">{course}</span><span className="sm:hidden">{course.slice(0, 3)}</span>
-                </button>
-              ))}
+            {/* Branch chips */}
+            <div className="space-y-1.5">
+              <p className="text-xs font-black uppercase tracking-[0.15em] text-muted-foreground text-center">Branch</p>
+              <div className="flex flex-wrap justify-center gap-2 md:gap-3">
+                {branches.map((branch) => (
+                  <button
+                    key={branch}
+                    onClick={() => { setPage(1); setFilters({ ...filters, branch: branch }); }}
+                    className={`flex items-center gap-1.5 px-4 py-2 rounded-full font-semibold text-xs md:text-sm transition-all whitespace-nowrap ${filters.branch === branch
+                      ? "bg-brand text-primary-foreground shadow-sm"
+                      : "bg-card border border-border text-foreground hover:border-brand"
+                      }`}
+                  >
+                    <BookOpen className="w-3.5 h-3.5" />
+                    {branch}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {/* Batch chips */}
+            <div className="space-y-1.5">
+              <p className="text-xs font-black uppercase tracking-[0.15em] text-muted-foreground text-center">Batch</p>
+              <div className="flex flex-wrap justify-center gap-2 md:gap-3">
+                {batches.map((batch) => (
+                  <button
+                    key={batch}
+                    onClick={() => { setPage(1); setFilters({ ...filters, batch: batch }); }}
+                    className={`flex items-center gap-1.5 px-4 py-2 rounded-full font-semibold text-xs md:text-sm transition-all whitespace-nowrap ${filters.batch === batch
+                      ? "bg-brand text-primary-foreground shadow-sm"
+                      : "bg-card border border-border text-foreground hover:border-brand"
+                      }`}
+                  >
+                    <Calendar className="w-3.5 h-3.5" />
+                    {batch}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -377,7 +447,7 @@ export default function AlumniDiscovery() {
                 <p className="text-lg font-medium">No alumni found matching your criteria.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 md:gap-6">
                 {finalAlumniData.map((alumni) => (
                   <div
                     key={alumni.id}
@@ -385,13 +455,13 @@ export default function AlumniDiscovery() {
                       setIsModalOpen(!isModalOpen)
                       setSelectedAlumni(alumni)
                     }}
-                    className="group relative bg-card rounded-[2rem] p-5 shadow-sm hover:shadow-2xl transition-all duration-300 border border-border hover:border-brand/30 overflow-hidden flex flex-col justify-between"
+                    className="group relative bg-card rounded-xl p-2 sm:p-3 md:p-5 shadow-sm hover:shadow-2xl transition-all duration-300 border border-border hover:border-brand/30 overflow-hidden flex flex-col justify-between"
                   >
                     {/* Profile Image with Hover Overlay */}
-                    <div className="relative h-64 mb-6 rounded-2xl overflow-hidden bg-muted">
+                    <div className="relative mb-6 rounded-xl overflow-hidden bg-muted">
                       <img
                         alt={`${alumni.name} profile portrait`}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                        className="w-full md:h-full object-cover group-hover:scale-110 transition-transform duration-700"
                         src={alumni.image}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
@@ -408,22 +478,22 @@ export default function AlumniDiscovery() {
                     </div>
 
                     {/* Details */}
-                    <div className="space-y-4 flex-1 flex flex-col justify-end">
+                    <div className="space-y-2 md:space-y-4 flex-1 flex flex-col justify-end">
                       <div>
-                        <h3 className="text-xl font-bold text-foreground group-hover:text-brand transition-colors">
+                        <h3 className="text-md md:text-xl font-bold text-foreground group-hover:text-brand transition-colors">
                           {alumni.name}
                         </h3>
-                        <p className="text-xs font-bold text-brand uppercase tracking-wider mt-1">
+                        <p className="text-[10px] md:text-xs font-bold text-brand uppercase tracking-wider mt-1">
                           Batch of {alumni.displayBatch}
                         </p>
                       </div>
 
                       {alumni.jobTitle && alumni.currentCompany &&
-                      <div className="flex items-center gap-3 bg-muted/50 p-3 rounded-2xl border border-border/50">
-                        <div className="w-10 h-10 rounded-xl bg-background border border-border flex items-center justify-center shadow-sm shrink-0">
+                      <div className="flex items-center gap-2 md:gap-3 bg-muted/50 p-1 md:p-3 rounded-2xl border border-border/50">
+                        <div className="size-7 md:size-10 rounded-xl bg-background border border-border flex items-center justify-center shadow-sm shrink-0">
                           {alumni.icon}
                         </div>
-                        <p className="text-xs font-semibold leading-snug text-foreground">
+                        <p className="text-[11px] md:text-xs font-semibold leading-snug text-foreground">
                           {alumni.displayRole}
                         </p>
                       </div>

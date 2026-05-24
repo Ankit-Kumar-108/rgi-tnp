@@ -2,6 +2,7 @@ export const runtime = "edge";
 import { NextResponse, NextRequest } from "next/server";
 import { getDb } from "@/lib/db";
 import * as jose from "jose";
+import { deleteMultipleFromR2 } from "@/lib/r2-delete";
 
 
 async function getAlumniFromToken(req: NextRequest) {
@@ -71,10 +72,28 @@ export async function DELETE(req: NextRequest) {
         // Find alumni ID first
         const alumni = await db.alumni.findUnique({
             where: { enrollmentNumber: alumniTokenData.enrollmentNumber },
+            select: {id: true}
         });
         if (!alumni) {
             return NextResponse.json({ success: false, message: "Alumni not found" }, { status: 404 });
         }
+
+        // Fetch ALL memories to get their imageUrls (not just the first one)
+        const memoriesToDelete = await db.memory.findMany({
+            where: { id: { in: memoryIds }, alumniId: alumni.id },
+            select: { imageUrl: true },
+        });
+
+        if (memoriesToDelete.length === 0) {
+            return NextResponse.json({ success: false, message: "No matching memories found" }, { status: 404 });
+        }
+
+        // Batch-delete from R2 (fire-and-forget)
+        const urls = memoriesToDelete.map((m) => m.imageUrl).filter(Boolean);
+        if (urls.length > 0) {
+            deleteMultipleFromR2(urls);
+        }
+
         // Delete memories that belong to the alumni and match the provided IDs
         const deleteResult = await db.memory.deleteMany({
             where: {
@@ -90,4 +109,4 @@ export async function DELETE(req: NextRequest) {
         console.error("Error in DELETE /api/alumni/memories:", error);
         return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });
     }
-}
+}

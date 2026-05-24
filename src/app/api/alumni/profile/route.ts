@@ -2,6 +2,7 @@ export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import * as jose from "jose";
+import { deleteFromR2 } from "@/lib/r2-delete";
 
 async function getAlumniFromToken(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
@@ -31,9 +32,16 @@ export async function POST(req: NextRequest) {
       linkedInUrl?: string;
       phoneNumber?: string;
       about?: string;
+      profileImageUrl?: string;
     };
 
     const db = getDb();
+
+    // Fetch existing alumni to check for old profileImageUrl
+    const existingAlumni = await db.alumni.findUnique({
+      where: { id: alumni.id },
+      select: { profileImageUrl: true }
+    });
 
     const updatedAlumni = await db.alumni.update({
       where: { id: alumni.id },
@@ -45,9 +53,16 @@ export async function POST(req: NextRequest) {
         linkedInUrl: body.linkedInUrl,
         phoneNumber: body.phoneNumber,
         about: body.about,
+        ...(body.profileImageUrl !== undefined && { profileImageUrl: body.profileImageUrl }),
         isProfileComplete: true,
       },
     });
+
+    // Clean up old R2 files if replaced
+    if (body.profileImageUrl && existingAlumni?.profileImageUrl &&
+        body.profileImageUrl !== existingAlumni.profileImageUrl) {
+      deleteFromR2(existingAlumni.profileImageUrl);
+    }
 
     return NextResponse.json({ 
         success: true, 
@@ -59,3 +74,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, message: "Failed to update profile" }, { status: 500 });
   }
 }
+

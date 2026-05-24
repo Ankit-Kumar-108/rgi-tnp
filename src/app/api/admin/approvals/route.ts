@@ -5,7 +5,7 @@ import { getDb } from "@/lib/db";
 import { sendEmail } from "@/lib/send-email";
 import { placementOpportunityTemplate } from "@/lib/email-templates";
 import { runInBackground } from "@/lib/background";
-import { success } from "zod";
+import { deleteMultipleFromR2 } from "@/lib/r2-delete";
 
 type ApprovedDrive = {
   id: string;
@@ -471,9 +471,20 @@ export async function POST(req: NextRequest) {
           data: { isVerified: true },
         });
       } else {
+        // Fetch R2 URLs before deleting
+        const extStudents = await db.externalStudent.findMany({
+          where: { id: { in: targetIds } },
+          select: { profileImageUrl: true, resumeUrl: true },
+        });
+        const extUrls = extStudents
+          .flatMap((s) => [s.profileImageUrl, s.resumeUrl])
+          .filter((url): url is string => Boolean(url));
+
         await db.externalStudent.deleteMany({
           where: { id: { in: targetIds } },
         });
+
+        if (extUrls.length > 0) deleteMultipleFromR2(extUrls);
       }
     } else if (type === "memories") {
       if (action === "approve") {
@@ -482,9 +493,18 @@ export async function POST(req: NextRequest) {
           data: { status: "approved" },
         });
       } else {
+        // Fetch imageUrls before deleting
+        const memories = await db.memory.findMany({
+          where: { id: { in: targetIds } },
+          select: { imageUrl: true },
+        });
+        const imageUrls = memories.map((m) => m.imageUrl).filter(Boolean);
+
         await db.memory.deleteMany({
           where: { id: { in: targetIds } },
         });
+
+        if (imageUrls.length > 0) deleteMultipleFromR2(imageUrls);
       }
     } else if (type === "studentFeedback") {
       if (action === "approve") {
@@ -531,9 +551,19 @@ export async function POST(req: NextRequest) {
           },
         });
       } else {
+        const students = await db.student.findMany({
+          where: { id: { in: targetIds } },
+          select: { profileImageUrl: true, resumeUrl: true },
+        });
+        const studentUrls = students
+          .flatMap((s) => [s.profileImageUrl, s.resumeUrl])
+          .filter((url): url is string => Boolean(url));
+
         await db.student.deleteMany({
           where: { id: { in: targetIds } },
         });
+
+        if (studentUrls.length > 0) deleteMultipleFromR2(studentUrls);
       }
     } else if (type === "unverifiedAlumni") {
       if (action === "approve") {
@@ -546,9 +576,19 @@ export async function POST(req: NextRequest) {
           },
         });
       } else {
+        const alumniRecords = await db.alumni.findMany({
+          where: { id: { in: targetIds } },
+          select: { profileImageUrl: true },
+        });
+        const alumniUrls = alumniRecords
+          .map((a) => a.profileImageUrl)
+          .filter(Boolean);
+
         await db.alumni.deleteMany({
           where: { id: { in: targetIds } },
         });
+
+        if (alumniUrls.length > 0) deleteMultipleFromR2(alumniUrls);
       }
     } else if (type === "unverifiedExternal") {
       if (action === "approve") {
@@ -561,9 +601,19 @@ export async function POST(req: NextRequest) {
           },
         });
       } else {
+        const extRecords = await db.externalStudent.findMany({
+          where: { id: { in: targetIds } },
+          select: { profileImageUrl: true, resumeUrl: true },
+        });
+        const extUrls = extRecords
+          .flatMap((s) => [s.profileImageUrl, s.resumeUrl])
+          .filter((url): url is string => Boolean(url));
+
         await db.externalStudent.deleteMany({
           where: { id: { in: targetIds } },
         });
+
+        if (extUrls.length > 0) deleteMultipleFromR2(extUrls);
       }
     } else if (type === "volunteers") {
       if (action === "approve") {
