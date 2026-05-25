@@ -673,7 +673,7 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
                           <div className="flex flex-wrap items-center gap-3 divide-x divide-border">
                             {user.cgpa && (
                               <div className="pr-3">
-                                <StatChip value={user.cgpa} label="CGPA" />
+                                <span className="flex"><StatChip value={user.cgpa} label="CGPA" /><p className="text-sm font-bold">%</p></span>
                               </div>
                             )}
                             {user.enrollmentNumber && (
