@@ -113,21 +113,21 @@ model ExternalStudent {
   enrollmentNumber             String
   email                        String              @unique
   passwordHash                 String
-  profileImageUrl              String
+  profileImageUrl              String?
   semester                     Int
   isProfileComplete            Boolean             @default(false)
   linkedinUrl                  String?
   githubUrl                    String?
-  resumeUrl                    String
+  resumeUrl                    String?
   gender                       String
   branch                       String
-  tenthPercentage              Float
-  twelfthPercentage            Float
-  cgpa                         Float
+  tenthPercentage              Float?
+  twelfthPercentage            Float?
+  cgpa                         Float?
   activeBacklog                Int                 @default(0)
   course                       String
   batch                        String
-  phoneNumber                  String
+  phoneNumber                  String?
   isVerified                   Boolean             @default(false)
   emailVerificationToken       String?
   emailVerificationTokenExpiry DateTime?

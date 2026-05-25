@@ -484,7 +484,7 @@ export async function POST(req: NextRequest) {
           where: { id: { in: targetIds } },
         });
 
-        if (extUrls.length > 0) deleteMultipleFromR2(extUrls);
+        if (extUrls.length > 0) await deleteMultipleFromR2(extUrls);
       }
     } else if (type === "memories") {
       if (action === "approve") {
@@ -504,7 +504,7 @@ export async function POST(req: NextRequest) {
           where: { id: { in: targetIds } },
         });
 
-        if (imageUrls.length > 0) deleteMultipleFromR2(imageUrls);
+        if (imageUrls.length > 0) await deleteMultipleFromR2(imageUrls);
       }
     } else if (type === "studentFeedback") {
       if (action === "approve") {
@@ -563,7 +563,7 @@ export async function POST(req: NextRequest) {
           where: { id: { in: targetIds } },
         });
 
-        if (studentUrls.length > 0) deleteMultipleFromR2(studentUrls);
+        if (studentUrls.length > 0) await deleteMultipleFromR2(studentUrls);
       }
     } else if (type === "unverifiedAlumni") {
       if (action === "approve") {
@@ -588,7 +588,7 @@ export async function POST(req: NextRequest) {
           where: { id: { in: targetIds } },
         });
 
-        if (alumniUrls.length > 0) deleteMultipleFromR2(alumniUrls);
+        if (alumniUrls.length > 0) await deleteMultipleFromR2(alumniUrls);
       }
     } else if (type === "unverifiedExternal") {
       if (action === "approve") {
@@ -613,7 +613,7 @@ export async function POST(req: NextRequest) {
           where: { id: { in: targetIds } },
         });
 
-        if (extUrls.length > 0) deleteMultipleFromR2(extUrls);
+        if (extUrls.length > 0) await deleteMultipleFromR2(extUrls);
       }
     } else if (type === "volunteers") {
       if (action === "approve") {

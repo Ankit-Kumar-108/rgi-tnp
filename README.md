@@ -481,8 +481,11 @@ Verify Token + Role Authorization
 - [ ] **Image (optimise)  (to change on 30/05/2026 [Done])** 
 - optimise images before uploading in r2 for better performance and also add image optimization in memory section for better performance
 
-- [ ] **Profile and CGPA(give ability to update profile img and cgpa)  (to change on 31/05/2026 [to be Done])**
-- give ability to update profile image and cgpa in profile section of student, external-students and alumni for better visibility and understanding of profile 
+- [ ] **Profile and CGPA(give ability to update profile img and cgpa)  (to change on 31/05/2026 [Done])**
+- give ability to update profile image and cgpa in profile section of student, external-students and alumni for better visibility and understanding of profile also check why cgpa 12th, 10th and back is default 0
+
+- [] **Delete R2 (fix bug when deleting a user their profile image and resume is not deleting from r2)  (to change on 31/05/2026 [to be Done])**
+- fix bug where when deleting a user their profile image and resume is not deleting from r2 for better performance and also add delete file from r2 when deleting a memory for better performance
 
 - [ ] **Auto transfer student to alumni (add feature)  (to change on 5/06/2026 [to be Done])**
 - add feature to auto transfer student to alumni after completion of course for better visibility and understanding of profile and also add notification for that 

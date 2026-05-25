@@ -101,7 +101,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({success: false, message: "Memory not found or you don't have permission to delete it"})
     }
 
-    deleteFromR2(imgUrl.imageUrl)
+    await deleteFromR2(imgUrl.imageUrl)
 
     const deletedMemory = await db.memory.deleteMany({
       where: { 

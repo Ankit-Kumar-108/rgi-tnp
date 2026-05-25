@@ -211,6 +211,8 @@ export default function ExternalStudentDashboard() {
       toast.error("Resume upload failed: " + err.message);
     } finally {
       setResumeUploading(false);
+      // Reset input to allow same file to be selected again
+      e.target.value = "";
     }
   };
 
@@ -239,6 +241,8 @@ export default function ExternalStudentDashboard() {
       toast.error("Profile image upload failed: " + err.message);
     } finally {
       setProfileUploading(false);
+      // Reset input to allow same file to be selected again
+      e.target.value = "";
     }
   };
 
@@ -251,7 +255,7 @@ export default function ExternalStudentDashboard() {
   }
 
   const student = data?.student;
-  const isProfileIncomplete = student && (!student.tenthPercentage || !student.twelfthPercentage || !student.resumeUrl);
+  const isProfileIncomplete = student && (!student.tenthPercentage || !student.cgpa || !student.resumeUrl);
   const drives = data?.drives || [];
   const archivedDrives = data?.archivedDrives || [];
   const registrations = data?.registrations || [];
@@ -359,13 +363,15 @@ export default function ExternalStudentDashboard() {
                       className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
                       placeholder="e.g. 85.50" />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">12th Percentage(Optional for Diploma)</label>
-                    <input type="number" step="0.01" min="10" max="100"
+                  {student.course === "Diploma" ?(``):(
+                    <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">12th Percentage/ Diploma</label>
+                    <input type="number" step="0.01" min="0" max="100"
                       value={profileForm.twelfthPercentage} onChange={(e) => setProfileForm({ ...profileForm, twelfthPercentage: e.target.value })}
                       className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
                       placeholder="e.g. 78.30" />
                   </div>
+                  )}
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Graduation Percentage</label>
                     <input type="number" step="0.01" min="10" max="100"

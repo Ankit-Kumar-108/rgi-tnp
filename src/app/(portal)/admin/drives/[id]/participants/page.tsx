@@ -687,7 +687,7 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
                               )}
                             </div>
                             <div className="pr-3">
-                              {user.twelfthPercentage && (
+                              {user.twelfthPercentage === 0 ? (``):(
                                 <StatChip value={`${user.twelfthPercentage}%`} label="12th/Diploma" />
                               )}
                             </div>

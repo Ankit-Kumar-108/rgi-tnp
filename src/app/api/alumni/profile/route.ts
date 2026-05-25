@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
     // Clean up old R2 files if replaced
     if (body.profileImageUrl && existingAlumni?.profileImageUrl &&
         body.profileImageUrl !== existingAlumni.profileImageUrl) {
-      deleteFromR2(existingAlumni.profileImageUrl);
+      await deleteFromR2(existingAlumni.profileImageUrl);
     }
 
     return NextResponse.json({ 

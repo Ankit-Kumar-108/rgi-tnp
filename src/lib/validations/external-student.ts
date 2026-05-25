@@ -10,9 +10,9 @@ export const externalStudentRegistrationSchema = z.object({
     course: z.string().trim().min(1, 'Course is required'),
     batch: z.string().trim().min(1, 'Batch is required'),
     semester: z.coerce.number().int().min(1, 'Semester must be at least 1').max(8, 'Semester cannot be more than 8'),
-    cgpa: z.coerce.number().min(0, 'CGPA must be a positive number').max(10, 'CGPA cannot be more than 10'),
+    cgpa: z.coerce.number().min(0, 'CGPA must be a positive number').max(100, 'CGPA cannot be more than 100'),
     resumeUrl: z.string().trim().url('Invalid URL format for resume'),
-    phoneNumber: z.string().trim().min(10, 'Phone number must be at least 10 digits').max(15),
+    phoneNumber: z.string().trim().min(10, 'Phone number must be at least 10 digits').max(15, 'Phone number cannot be greater than 15 digits'),
     password: z.string()
         .min(8, 'Password must be at least 8 characters long')
         .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')

@@ -106,11 +106,11 @@ export async function POST(req: NextRequest) {
     );
   } catch (error: any) {
     if (error.name === "ZodError") {
-      const firstError = error.errors[0];
+      const firstError = error.issues?.[0];
       const errorMessage = firstError?.message || "Validation failed";
       
       return NextResponse.json(
-        { success: false, message: errorMessage, errors: error.errors},
+        { success: false, message: errorMessage, errors: error.issues},
         { status: 400 }
       );
     }

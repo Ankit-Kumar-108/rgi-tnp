@@ -386,10 +386,11 @@ export default function AlumniDashboard() {
       } else {
         throw new Error(d.message);
       }
-      setIsDeleting(null)
     } catch (error: any) {
       console.error("Error deleting memory:", error);
       toast.error("Failed to delete memory. Please try again.");
+    } finally {
+      setIsDeleting(null);
     }
   };
 

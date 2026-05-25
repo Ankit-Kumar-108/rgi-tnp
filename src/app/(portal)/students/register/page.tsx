@@ -520,7 +520,7 @@ export default function StudentRegister() {
                                 <label className="text-xs sm:text-sm font-semibold text-foreground">Phone Number</label>
                                 <div className="relative">
                                     <div className={iconClass}><Phone className="w-4 h-4 sm:w-5 sm:h-5" /></div>
-                                    <input className={inputClass} placeholder="10-digit number" required value={form.phoneNumber} onChange={update("phoneNumber")} />
+                                    <input className={inputClass} maxLength={10} minLength={10} placeholder="10-digit number" required value={form.phoneNumber} onChange={update("phoneNumber")} />
                                 </div>
                             </div>
 

@@ -88,10 +88,10 @@ export async function DELETE(req: NextRequest) {
             return NextResponse.json({ success: false, message: "No matching memories found" }, { status: 404 });
         }
 
-        // Batch-delete from R2 (fire-and-forget)
+        // Batch-delete from R2
         const urls = memoriesToDelete.map((m) => m.imageUrl).filter(Boolean);
         if (urls.length > 0) {
-            deleteMultipleFromR2(urls);
+            await deleteMultipleFromR2(urls);
         }
 
         // Delete memories that belong to the alumni and match the provided IDs
@@ -109,4 +109,4 @@ export async function DELETE(req: NextRequest) {
         console.error("Error in DELETE /api/alumni/memories:", error);
         return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });
     }
-}
+}

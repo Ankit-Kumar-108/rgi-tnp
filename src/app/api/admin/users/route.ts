@@ -259,7 +259,7 @@ export async function DELETE(req: NextRequest) {
           where: { id: { in: ids } },
         });
 
-        if (studentUrls.length > 0) deleteMultipleFromR2(studentUrls);
+        if (studentUrls.length > 0) await deleteMultipleFromR2(studentUrls);
         break;
       }
 
@@ -276,7 +276,7 @@ export async function DELETE(req: NextRequest) {
           where: { id: { in: ids } },
         });
 
-        if (alumniUrls.length > 0) deleteMultipleFromR2(alumniUrls);
+        if (alumniUrls.length > 0) await deleteMultipleFromR2(alumniUrls);
         break;
       }
 
@@ -302,7 +302,7 @@ export async function DELETE(req: NextRequest) {
           where: { id: { in: ids } },
         });
 
-        if (externalUrls.length > 0) deleteMultipleFromR2(externalUrls);
+        if (externalUrls.length > 0) await deleteMultipleFromR2(externalUrls);
         break;
       }
 

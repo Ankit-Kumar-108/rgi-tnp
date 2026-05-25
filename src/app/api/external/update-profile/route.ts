@@ -126,8 +126,8 @@ export async function PATCH(req: NextRequest) {
         ...(profileImageUrl !== undefined && { profileImageUrl }),
         ...(resumeUrl !== undefined && { resumeUrl }),
         ...(tenthPercentage !== undefined && { tenthPercentage: normalizedTenth }),
-        ...(twelfthPercentage !== undefined && {twelfthPercentage: normalizedTwelfth}),
-        ...(cgpa !== undefined && {cgpa: normalizedCGPA }),
+        ...(twelfthPercentage !== undefined && { twelfthPercentage: normalizedTwelfth }),
+        ...(cgpa !== undefined && { cgpa: normalizedCGPA }),
         ...(activeBacklog !== undefined && { activeBacklog: normalizedBacklog }),
         ...(linkedinUrl !== undefined && { linkedinUrl }),
         ...(githubUrl !== undefined && { githubUrl }),
@@ -139,11 +139,11 @@ export async function PATCH(req: NextRequest) {
     // Clean up old R2 files if replaced
     if (profileImageUrl && existingStudent.profileImageUrl &&
         profileImageUrl !== existingStudent.profileImageUrl) {
-      deleteFromR2(existingStudent.profileImageUrl);
+      await deleteFromR2(existingStudent.profileImageUrl);
     }
     if (resumeUrl && existingStudent.resumeUrl &&
         resumeUrl !== existingStudent.resumeUrl) {
-      deleteFromR2(existingStudent.resumeUrl);
+      await deleteFromR2(existingStudent.resumeUrl);
     }
 
     return NextResponse.json({
