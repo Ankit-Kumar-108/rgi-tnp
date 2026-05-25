@@ -59,6 +59,7 @@ export default function ExternalStudentDashboard() {
   const [profileForm, setProfileForm] = useState({
     tenthPercentage: "",
     twelfthPercentage: "",
+    cgpa: "",
     activeBacklog: "0",
     linkedinUrl: "",
     githubUrl: "",
@@ -139,6 +140,7 @@ export default function ExternalStudentDashboard() {
           setProfileForm({
             tenthPercentage: d.student.tenthPercentage?.toString() || "",
             twelfthPercentage: d.student.twelfthPercentage?.toString() || "",
+            cgpa: d.student.cgpa?.toString() || "",
             activeBacklog: d.student.activeBacklog?.toString() || "0",
             linkedinUrl: d.student.linkedinUrl || "",
             githubUrl: d.student.githubUrl || "",
@@ -351,16 +353,23 @@ export default function ExternalStudentDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">10th Percentage</label>
-                    <input type="number" step="0.01" min="0" max="100"
+                    <input type="number" step="0.01" min="10" max="100"
                     required
                       value={profileForm.tenthPercentage} onChange={(e) => setProfileForm({ ...profileForm, tenthPercentage: e.target.value })}
                       className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
                       placeholder="e.g. 85.50" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">12th Percentage(Opt)</label>
-                    <input type="number" step="0.01" min="0" max="100"
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">12th Percentage(Optional for Diploma)</label>
+                    <input type="number" step="0.01" min="10" max="100"
                       value={profileForm.twelfthPercentage} onChange={(e) => setProfileForm({ ...profileForm, twelfthPercentage: e.target.value })}
+                      className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
+                      placeholder="e.g. 78.30" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Graduation Percentage</label>
+                    <input type="number" step="0.01" min="10" max="100"
+                      value={profileForm.cgpa} onChange={(e) => setProfileForm({ ...profileForm, cgpa: e.target.value })}
                       className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
                       placeholder="e.g. 78.30" />
                   </div>
@@ -506,7 +515,7 @@ export default function ExternalStudentDashboard() {
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-0 pt-6 border-t border-border">
                       <div className="md:pr-6 md:border-r border-border">
                         <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Current CGPA</p>
-                        <p className="text-xl md:text-2xl font-bold text-brand">{student?.cgpa || "N/A"}</p>
+                        <p className="text-xl md:text-2xl font-bold text-brand">{student?.cgpa || "N/A"}%</p>
                       </div>
                       <div className="md:px-6 md:border-r border-border">
                         <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Branch</p>

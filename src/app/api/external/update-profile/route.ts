@@ -31,11 +31,13 @@ export async function PATCH(req: NextRequest) {
       linkedinUrl,
       githubUrl,
       semester,
+      cgpa,
     } = (await req.json()) as {
       profileImageUrl?: string;
       resumeUrl?: string;
       tenthPercentage?: string | number;
       twelfthPercentage?: string | number;
+      cgpa?: string | number
       activeBacklog?: string | number;
       linkedinUrl?: string;
       githubUrl?: string;
@@ -50,7 +52,8 @@ export async function PATCH(req: NextRequest) {
       activeBacklog === undefined &&
       linkedinUrl === undefined &&
       githubUrl === undefined &&
-      semester === undefined
+      semester === undefined &&
+      cgpa === undefined
     ) {
       return NextResponse.json(
         { success: false, message: "Missing update data" },
@@ -71,6 +74,7 @@ export async function PATCH(req: NextRequest) {
         linkedinUrl: true,
         githubUrl: true,
         semester: true,
+        cgpa: true,
       },
     });
 
@@ -87,6 +91,10 @@ export async function PATCH(req: NextRequest) {
       twelfthPercentage !== undefined
         ? Number.parseFloat(String(twelfthPercentage))
         : undefined;
+    const normalizedCGPA =
+      cgpa !== undefined
+        ? Number.parseFloat(String(cgpa))
+        : undefined;
     const normalizedBacklog =
       activeBacklog !== undefined ? Number.parseInt(String(activeBacklog), 10) : undefined;
     const normalizedSemester =
@@ -95,14 +103,18 @@ export async function PATCH(req: NextRequest) {
     const nextResumeUrl = resumeUrl ?? existingStudent.resumeUrl;
     const nextTenthPercentage =
       tenthPercentage !== undefined ? normalizedTenth : existingStudent.tenthPercentage;
-    const nextTwelfthPercentage =
-      twelfthPercentage !== undefined
-        ? normalizedTwelfth
-        : existingStudent.twelfthPercentage;
-    const nextActiveBacklog =
+      const nextTwelfthPercentage =
+        twelfthPercentage !== undefined
+          ? normalizedTwelfth
+          : existingStudent.twelfthPercentage;
+      const nextCGPA =
+        cgpa !== undefined
+          ? normalizedCGPA
+          : existingStudent.cgpa;
+      const nextActiveBacklog =
       activeBacklog !== undefined ? normalizedBacklog : existingStudent.activeBacklog;
     const isProfileComplete =
-      [nextProfileImageUrl, nextResumeUrl].every(hasValue) &&
+      [nextProfileImageUrl, nextResumeUrl, nextCGPA].every(hasValue) &&
       hasValue(nextTenthPercentage) &&
       hasValue(nextTwelfthPercentage) &&
       Number.isFinite(nextActiveBacklog) &&
@@ -114,9 +126,8 @@ export async function PATCH(req: NextRequest) {
         ...(profileImageUrl !== undefined && { profileImageUrl }),
         ...(resumeUrl !== undefined && { resumeUrl }),
         ...(tenthPercentage !== undefined && { tenthPercentage: normalizedTenth }),
-        ...(twelfthPercentage !== undefined && {
-          twelfthPercentage: normalizedTwelfth,
-        }),
+        ...(twelfthPercentage !== undefined && {twelfthPercentage: normalizedTwelfth}),
+        ...(cgpa !== undefined && {cgpa: normalizedCGPA }),
         ...(activeBacklog !== undefined && { activeBacklog: normalizedBacklog }),
         ...(linkedinUrl !== undefined && { linkedinUrl }),
         ...(githubUrl !== undefined && { githubUrl }),

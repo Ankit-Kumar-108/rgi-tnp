@@ -86,7 +86,7 @@ export default function StudentRegister() {
                     confirmPassword: "",
                 }));
             }
-        } catch {}
+        } catch { }
     }, []);
 
     // Persist form data to sessionStorage on change (excluding passwords)
@@ -94,7 +94,7 @@ export default function StudentRegister() {
         try {
             const { password, confirmPassword, ...safeFields } = form;
             sessionStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(safeFields));
-        } catch {}
+        } catch { }
     }, [form]);
 
 
@@ -126,7 +126,7 @@ export default function StudentRegister() {
             const file = e.target.files[0];
             if (file.type !== "application/pdf") {
                 setError("Please upload a PDF file for your resume.");
-                toast.error("Please upload a PDF file for your resume.");  
+                toast.error("Please upload a PDF file for your resume.");
                 return;
             }
             if (file.size > 5 * 1024 * 1024) {
@@ -143,24 +143,24 @@ export default function StudentRegister() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError(""); 
+        setError("");
         toast.dismiss(); // Dismiss any existing toasts
         setSuccess("");
-        
-        if (form.password !== form.confirmPassword) { 
-            setError("Passwords do not match"); 
+
+        if (form.password !== form.confirmPassword) {
+            setError("Passwords do not match");
             toast.error("Passwords do not match");
-            return; 
+            return;
         }
-        if (!profileImageFile) { 
-            setError("Please upload a profile image to continue."); 
+        if (!profileImageFile) {
+            setError("Please upload a profile image to continue.");
             toast.error("Please upload a profile image to continue.");
-            return; 
+            return;
         }
-        if (!resumeFile) { 
-            setError("Please upload your resume to continue."); 
+        if (!resumeFile) {
+            setError("Please upload your resume to continue.");
             toast.error("Please upload your resume to continue.");
-            return; 
+            return;
         }
 
         setLoading(true);
@@ -177,30 +177,30 @@ export default function StudentRegister() {
                     semester: Number(form.semester),
                     cgpa: Number(form.cgpa),
                     profileImageUrl,
-                    resumeUrl 
+                    resumeUrl
                 }),
                 retries: 2,
                 retryDelay: 2000,
             });
             const data = (await res.json()) as { success?: boolean; message?: string };
-            
-            if (!res.ok || !data.success) { 
-                setError(data.message || "Registration failed"); 
+
+            if (!res.ok || !data.success) {
+                setError(data.message || "Registration failed");
                 toast.error(data.message || "Registration failed");
-                return; 
+                return;
             }
-            
+
             // Clear saved form data on success
             sessionStorage.removeItem(FORM_STORAGE_KEY);
             setSuccess("Registration successful! Check your email for the verification link.");
             toast.success("Registration successful! Check your email for the verification link.");
             setTimeout(() => router.push(`/students/login`), 1000);
-        } catch (error: any) { 
+        } catch (error: any) {
             console.error("Error during registration", error);
-            setError("Something went wrong."); 
+            setError("Something went wrong.");
             toast.error("Something went wrong.");
-        } finally { 
-            setLoading(false); 
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -225,7 +225,7 @@ export default function StudentRegister() {
                             <button
                                 onClick={() => {
                                     setIsProfileImgModalOpen(false);
-                                    if (!profileImageFile) setImgPreviewURL(null); 
+                                    if (!profileImageFile) setImgPreviewURL(null);
                                 }}
                                 className="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground hover:text-foreground shrink-0"
                             >
@@ -263,9 +263,8 @@ export default function StudentRegister() {
                                         handleFileSelection(e.dataTransfer.files[0]);
                                     }
                                 }}
-                                className={`relative group border-2 border-dashed rounded-2xl sm:rounded-3xl p-6 sm:p-10 flex flex-col items-center justify-center gap-3 sm:gap-4 transition-all cursor-pointer ${
-                                    isDragging ? 'border-brand bg-brand/10 scale-[1.02]' : 'border-border bg-muted/30 hover:border-brand/50 hover:bg-brand/5'
-                                }`}
+                                className={`relative group border-2 border-dashed rounded-2xl sm:rounded-3xl p-6 sm:p-10 flex flex-col items-center justify-center gap-3 sm:gap-4 transition-all cursor-pointer ${isDragging ? 'border-brand bg-brand/10 scale-[1.02]' : 'border-border bg-muted/30 hover:border-brand/50 hover:bg-brand/5'
+                                    }`}
                             >
                                 <input
                                     type="file"
@@ -295,11 +294,10 @@ export default function StudentRegister() {
                             <button
                                 disabled={!profileImageFile}
                                 onClick={() => setIsProfileImgModalOpen(false)}
-                                className={`flex-1 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm transition-all ${
-                                    profileImageFile 
-                                    ? "bg-brand text-primary-foreground shadow-[var(--shadow-brand)]" 
-                                    : "bg-muted text-muted-foreground cursor-not-allowed"
-                                }`}
+                                className={`flex-1 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm transition-all ${profileImageFile
+                                        ? "bg-brand text-primary-foreground shadow-[var(--shadow-brand)]"
+                                        : "bg-muted text-muted-foreground cursor-not-allowed"
+                                    }`}
                             >
                                 Save Image
                             </button>
@@ -321,7 +319,7 @@ export default function StudentRegister() {
             {isResumePreviewOpen && resumePreviewURL && (
                 <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-md">
                     <div className="w-full max-w-5xl bg-card rounded-[1.5rem] sm:rounded-[2rem] shadow-2xl overflow-hidden ring-1 ring-border flex flex-col h-[90vh] relative">
-                        
+
                         <div className="absolute -top-24 -right-24 w-64 h-64 bg-brand/10 rounded-full blur-[80px] pointer-events-none -z-10"></div>
 
                         <div className="px-6 py-5 md:px-8 md:py-6 flex justify-between items-center border-b border-border bg-muted/30 relative z-10">
@@ -339,9 +337,9 @@ export default function StudentRegister() {
                         </div>
 
                         <div className="flex-1 w-full bg-muted/20 p-4 md:p-6 relative z-10">
-                            <iframe 
-                                src={`${resumePreviewURL}#toolbar=0`} 
-                                className="w-full h-full rounded-xl shadow-sm border border-border bg-white" 
+                            <iframe
+                                src={`${resumePreviewURL}#toolbar=0`}
+                                className="w-full h-full rounded-xl shadow-sm border border-border bg-white"
                                 title="Resume Preview"
                             />
                         </div>
@@ -361,10 +359,10 @@ export default function StudentRegister() {
 
             {/* --- Main Registration Content --- */}
             <main className="flex-1 flex w-full items-center justify-center p-4 sm:p-6 sm:mt-15 md:mt-0 pt-24 md:pt-32 lg:mt-10 pb-12 lg:h-screen lg:max-h-screen lg:py-24">
-                
+
                 {/* Fixed Container Height for Desktop */}
                 <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-background/50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-2xl shadow-brand/10 border border-brand/10 lg:h-[85vh] lg:max-h-200 lg:overflow-hidden">
-                    
+
                     {/* Left Decorative Side (Hidden on Mobile) */}
                     <div className="relative hidden lg:flex flex-col justify-end p-10 xl:p-12 bg-brand/5 h-full">
                         <div className="absolute inset-0 bg-cover bg-center z-0 opacity-80" style={{ backgroundImage: "linear-gradient(180deg, rgba(146, 19, 236, 0.2) 0%, rgba(26, 16, 34, 0.9) 100%), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop')" }} />
@@ -387,7 +385,7 @@ export default function StudentRegister() {
 
                     {/* Form Side with Independent Scroll */}
                     <div className="p-5 sm:p-8 md:p-10 lg:p-12 flex flex-col relative h-full lg:overflow-y-auto overflow-x-hidden custom-scrollbar">
-                        
+
                         <style dangerouslySetInnerHTML={{
                             __html: `
                             .custom-scrollbar::-webkit-scrollbar { width: 6px; }
@@ -397,7 +395,7 @@ export default function StudentRegister() {
                         }} />
 
                         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 rounded-full bg-brand/5 blur-2xl z-0 pointer-events-none"></div>
-                        
+
                         <div className="mb-6 relative z-10">
                             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground mb-1 sm:mb-2">Create Account</h2>
                             <p className="text-muted-foreground text-xs sm:text-sm">Register as a Student to access the portal.</p>
@@ -435,7 +433,7 @@ export default function StudentRegister() {
                                     <input className={inputClass} placeholder="Enter your full name" type="text" required value={form.name} onChange={update("name")} />
                                 </div>
                             </div>
-                            
+
                             <div className="space-y-1">
                                 <label className="text-xs sm:text-sm font-semibold text-foreground">Email</label>
                                 <div className="relative">
@@ -443,7 +441,7 @@ export default function StudentRegister() {
                                     <input className={inputClass} placeholder="yourname@gmail.com" type="email" required value={form.email} onChange={update("email")} />
                                 </div>
                             </div>
-                            
+
                             <div className="space-y-1">
                                 <label className="text-xs sm:text-sm font-semibold text-foreground">Enrollment Number</label>
                                 <div className="relative">
@@ -492,8 +490,8 @@ export default function StudentRegister() {
                                     </select>
                                 </div>
                             </div>
-                            
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div className="space-y-1">
                                     <label className="text-xs sm:text-sm font-semibold text-foreground">Select Semester</label>
                                     <select className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} required value={form.semester} onChange={update("semester")}>
@@ -512,12 +510,12 @@ export default function StudentRegister() {
                                         ))}
                                     </select>
                                 </div>
-                                <div className="space-y-1">
-                                    <label className="text-xs sm:text-sm font-semibold text-foreground">CGPA</label>
-                                    <input className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} type="number" step="0.01" min="0" max="10" placeholder="8.5" required value={form.cgpa} onChange={update("cgpa")} />
-                                </div>
                             </div>
-                            
+
+                            <div className="space-y-1">
+                                <label className="text-xs sm:text-sm font-semibold text-foreground">Graduation Percentage</label>
+                                <input className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} type="number" step="0.01" min="10" max="100" placeholder="88.5% cgpa" required value={form.cgpa} onChange={update("cgpa")} />
+                            </div>
                             <div className="space-y-1">
                                 <label className="text-xs sm:text-sm font-semibold text-foreground">Phone Number</label>
                                 <div className="relative">
@@ -561,12 +559,12 @@ export default function StudentRegister() {
                                         </div>
                                     </div>
                                 ) : (
-                                    <input 
-                                        type="file" 
-                                        accept=".pdf" 
-                                        required 
-                                        onChange={handleResumeChange} 
-                                        className="w-full text-xs sm:text-sm text-muted-foreground file:mr-3 sm:file:mr-4 file:py-1.5 sm:file:py-2 file:px-3 sm:file:px-4 file:rounded-xl file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-brand/10 file:text-brand hover:file:bg-brand/20 cursor-pointer border border-dashed border-border p-2 rounded-xl transition-all hover:border-brand/50" 
+                                    <input
+                                        type="file"
+                                        accept=".pdf"
+                                        required
+                                        onChange={handleResumeChange}
+                                        className="w-full text-xs sm:text-sm text-muted-foreground file:mr-3 sm:file:mr-4 file:py-1.5 sm:file:py-2 file:px-3 sm:file:px-4 file:rounded-xl file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-brand/10 file:text-brand hover:file:bg-brand/20 cursor-pointer border border-dashed border-border p-2 rounded-xl transition-all hover:border-brand/50"
                                     />
                                 )}
                             </div>
@@ -614,7 +612,7 @@ export default function StudentRegister() {
                                 )}
                             </button>
                         </form>
-                        
+
                         <div className="mt-5 sm:mt-6 pt-4 border-t border-border relative z-10 shrink-0">
                             <p className="text-center text-muted-foreground mb-2 sm:mb-3 text-xs sm:text-sm">Already have an account?</p>
                             <Link href="/students/login" className="w-full py-2.5 sm:py-3.5 rounded-xl border-2 border-brand/20 text-brand font-bold bg-transparent hover:bg-brand/5 transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base">Login Here</Link>

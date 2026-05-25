@@ -55,10 +55,10 @@ export default function ExternalStudentRegister() {
     // year logic states 
     const [year, setYear] = useState<number[]>([]);
 
-        // smart year dropdown generation based on current year
-        useEffect(() => {
-            setYear(getBatchYears());
-        }, []);
+    // smart year dropdown generation based on current year
+    useEffect(() => {
+        setYear(getBatchYears());
+    }, []);
 
     const update = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
         setForm(prev => ({ ...prev, [field]: e.target.value }));
@@ -258,8 +258,8 @@ export default function ExternalStudentRegister() {
                                 disabled={!profileImageFile}
                                 onClick={() => setIsProfileImgModalOpen(false)}
                                 className={`flex-1 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm transition-all ${profileImageFile
-                                        ? "bg-brand text-primary-foreground shadow-[var(--shadow-brand)]"
-                                        : "bg-muted text-muted-foreground cursor-not-allowed"
+                                    ? "bg-brand text-primary-foreground shadow-[var(--shadow-brand)]"
+                                    : "bg-muted text-muted-foreground cursor-not-allowed"
                                     }`}
                             >
                                 Save Image
@@ -283,7 +283,7 @@ export default function ExternalStudentRegister() {
             {isResumePreviewOpen && resumePreviewURL && (
                 <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-md">
                     <div className="w-full max-w-4xl bg-card rounded-[1.5rem] sm:rounded-[2rem] shadow-2xl overflow-hidden ring-1 ring-border flex flex-col h-[90vh]">
-                        
+
                         {/* Modal Header */}
                         <div className="px-6 py-4 flex justify-between items-center border-b border-border bg-muted/30">
                             <div>
@@ -301,8 +301,8 @@ export default function ExternalStudentRegister() {
 
                         {/* PDF Viewer */}
                         <div className="flex-1 w-full bg-muted/10 p-2 sm:p-4">
-                            <iframe 
-                                src={`${resumePreviewURL}#toolbar=0`} 
+                            <iframe
+                                src={`${resumePreviewURL}#toolbar=0`}
                                 className="w-full h-full rounded-xl border border-border bg-background"
                                 title="Resume Preview"
                             />
@@ -340,7 +340,7 @@ export default function ExternalStudentRegister() {
 
                     {/* Form Side */}
                     <div className="p-5 sm:p-8 md:p-10 lg:p-12 flex flex-col relative h-full lg:overflow-y-auto custom-scrollbar">
-                        
+
                         <style dangerouslySetInnerHTML={{
                             __html: `
                             .custom-scrollbar::-webkit-scrollbar { width: 6px; }
@@ -411,7 +411,7 @@ export default function ExternalStudentRegister() {
                                 </div>
                             </div>
 
-                             <div className="space-y-1">
+                            <div className="space-y-1">
                                 <label className="text-xs sm:text-sm font-semibold text-foreground">Gender</label>
                                 <div className="relative">
                                     <select className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} required value={form.gender} onChange={update("gender")}>
@@ -451,7 +451,7 @@ export default function ExternalStudentRegister() {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div className="space-y-1">
                                     <label className="text-xs sm:text-sm font-semibold text-foreground">Select Batch</label>
                                     <select className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} required value={form.batch} onChange={update("batch")}>
@@ -470,12 +470,12 @@ export default function ExternalStudentRegister() {
                                         ))}
                                     </select>
                                 </div>
-                                <div className="space-y-1">
-                                    <label className="text-xs sm:text-sm font-semibold text-foreground">CGPA</label>
-                                    <input className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} type="number" step="0.01" min="0" max="10" placeholder="8.5" required value={form.cgpa} onChange={update("cgpa")} />
-                                </div>
                             </div>
 
+                            <div className="space-y-1">
+                                <label className="text-xs sm:text-sm font-semibold text-foreground">Graduation Percentage</label>
+                                <input className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} type="number" step="0.01" min="10" max="100" placeholder="88.5% cgpa" required value={form.cgpa} onChange={update("cgpa")} />
+                            </div>
                             <div className="space-y-1">
                                 <label className="text-xs sm:text-sm font-semibold text-foreground">Phone Number</label>
                                 <div className="relative">
@@ -519,12 +519,12 @@ export default function ExternalStudentRegister() {
                                         </div>
                                     </div>
                                 ) : (
-                                    <input 
-                                        type="file" 
-                                        accept=".pdf" 
-                                        required 
-                                        onChange={handleResumeChange} 
-                                        className="w-full text-xs sm:text-sm text-muted-foreground file:mr-3 sm:file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs sm:file:text-sm file:font-bold file:bg-brand/10 file:text-brand hover:file:bg-brand/20 cursor-pointer border border-dashed border-border p-2 rounded-xl transition-all hover:border-brand/50" 
+                                    <input
+                                        type="file"
+                                        accept=".pdf"
+                                        required
+                                        onChange={handleResumeChange}
+                                        className="w-full text-xs sm:text-sm text-muted-foreground file:mr-3 sm:file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs sm:file:text-sm file:font-bold file:bg-brand/10 file:text-brand hover:file:bg-brand/20 cursor-pointer border border-dashed border-border p-2 rounded-xl transition-all hover:border-brand/50"
                                     />
                                 )}
                             </div>
