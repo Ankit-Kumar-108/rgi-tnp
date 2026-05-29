@@ -154,7 +154,7 @@ export async function POST(req: NextRequest) {
     if (!drive.eligibleBranches.includes(student.branch)) {
       return NextResponse.json({ success: false, message: "Branch not eligible" }, { status: 403 });
     }
-    if (student.cgpa < drive.minCGPA) {
+    if (student.cgpa === null || student.cgpa < drive.minCGPA) {
       return NextResponse.json({ success: false, message: "CGPA requirement not met" }, { status: 403 });
     }
 
