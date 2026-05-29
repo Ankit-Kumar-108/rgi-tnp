@@ -27,6 +27,7 @@ import { getToken, logout } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast, Toaster } from "sonner";
 import Image from "next/image";
+import NotificationBell from "@/components/ui/NotificationBell";
 
 // Lazy load heavy modal components — only loaded when user interacts
 const JobDetailsModal = dynamic(
@@ -243,6 +244,7 @@ export default function RecruiterDashboard() {
               {user?.company && <p className="text-sm text-muted-foreground mt-1">{user.company}</p>}
             </div>
             <div className="flex flex-wrap items-center gap-3">
+              <NotificationBell role="recruiter"/>
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-2 px-4 py-2.5 text-destructive rounded-full text-sm font-bold border border-border bg-destructive/20 hover:text-red-500 hover:border-red-500/30 transition-all"

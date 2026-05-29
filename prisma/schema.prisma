@@ -71,6 +71,7 @@ model Student {
   createdAt                    DateTime                 @default(now())
   updatedAt                    DateTime                 @updatedAt
   volunteers                   Volunteer[]
+  notifications                Notification[]
 }
 
 model Alumni {
@@ -104,13 +105,14 @@ model Alumni {
   alumniFeedbacks              AlumniFeedback[]
   createdAt                    DateTime         @default(now())
   updatedAt                    DateTime         @updatedAt
+  notifications                Notification[]
 }
 
 model ExternalStudent {
   id                           String              @id @default(cuid())
   name                         String
   collegeName                  String
-  enrollmentNumber             String
+  enrollmentNumber             String              @unique
   email                        String              @unique
   passwordHash                 String
   profileImageUrl              String?
@@ -139,6 +141,7 @@ model ExternalStudent {
   registrations                DriveRegistration[]
   createdAt                    DateTime            @default(now())
   updatedAt                    DateTime            @updatedAt
+  notifications                Notification[]
 }
 
 // 4. DRIVE & INTERACTION MODELS
@@ -210,6 +213,7 @@ model Recruiter {
   updatedAt                DateTime            @updatedAt
   drives                   PlacementDrive[]
   corporateFeedbacks       CorporateFeedback[]
+  notifications            Notification[]
 }
 
 model Referral {
@@ -312,4 +316,49 @@ model VolunteerStudentStatus {
   updatedAt DateTime @updatedAt
 
   @@unique([driveId, studentId])
+}
+
+model Notification {
+  id            String   @id @default(cuid())
+  type          String   // e.g., "drive_approved", "referral_published", "participant_selected", "broadcast"
+  title         String
+  message       String
+  link          String?  // Deep link to direct users e.g., "/students/drives/clx..."
+  isRead        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  // Polymorphic recipients (mutually exclusive relations)
+  recipientType     String            // "student" | "alumni" | "external_student" | "recruiter" | "admin"
+  studentId         String?
+  student           Student?          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  alumniId          String?
+  alumni            Alumni?           @relation(fields: [alumniId], references: [id], onDelete: Cascade)
+  externalStudentId String?
+  externalStudent   ExternalStudent?  @relation(fields: [externalStudentId], references: [id], onDelete: Cascade)
+  recruiterId       String?
+  recruiter         Recruiter?        @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([alumniId])
+  @@index([externalStudentId])
+  @@index([recruiterId])
+  @@index([isRead])
+}
+
+model EmailLog {
+  id            String   @id @default(cuid())
+  to            String
+  subject       String
+  template      String   // Name of template used (or "custom_broadcast")
+  status        String   // "sent" | "failed"
+  error         String?  // Stack trace or API error message if failed
+  recipientType String?  // "student" | "alumni" | "recruiter" | "external_student"
+  triggeredBy   String   // Admin email or "system"
+  approvalType  String?  // "participants_selection" | "participant_rejection" | "drive"
+  approvalId    String?  // ID of the drive/referral/participant
+  actionType    String?  // "selected" | "rejected" | "shortlisted"
+  createdAt     DateTime @default(now())
+  @@index([status])
+  @@index([createdAt])
+  @@index([approvalId])
 }

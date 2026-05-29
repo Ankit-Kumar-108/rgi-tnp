@@ -247,7 +247,7 @@ export const verificationSuccessStudentTemplate = (name: string): string => {
 
 // 3B. VERIFICATION SUCCESS - EXTERNAL STUDENT
 export const verificationSuccessExternalStudentTemplate = (name: string): string => {
-    const dashboardLink = `https://${process.env.DOMAIN_NAME}/students/external-dashboard`;
+    const dashboardLink = `https://${process.env.DOMAIN_NAME}/external-students/external-dashboard`;
     const content = `
             <p style="color: #9213ec; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; margin-bottom: 10px;">Account Activated</p>
             <h2 style="font-size: 22px; margin: 0 0 20px 0; color: #1f1924;">Welcome, ${name}! Your placement opportunities await.</h2>

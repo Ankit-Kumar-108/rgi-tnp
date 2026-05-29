@@ -35,6 +35,7 @@ import { uploadFileToR2 } from "@/lib/upload-r2";
 import { toast } from "sonner";
 import useSWR from "swr";
 import { fetchWithRetry } from "@/lib/fetch-utils";
+import NotificationBell from "@/components/ui/NotificationBell";
 
 // Lazy load heavy modal components — only loaded when user interacts
 const JobDetailsModal = dynamic(
@@ -559,6 +560,7 @@ export default function StudentDashboard() {
               >
                 <LogOut className="size-4" /> Logout
               </button>
+              <NotificationBell role="student"/>
             </div>
           </section>
 

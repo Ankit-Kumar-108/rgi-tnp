@@ -42,7 +42,7 @@ function ExternalLoginContent() {
             toast.success("Logged in successfully!");
             
             const redirect = searchParams.get("redirect");
-            const safeRedirect = redirect?.startsWith("/") ? redirect : "/students/external-dashboard";
+            const safeRedirect = redirect?.startsWith("/") ? redirect : "/external-students/external-dashboard";
             router.push(safeRedirect);
         } catch (error: any) {
             setError("Something went wrong. Please try again.");

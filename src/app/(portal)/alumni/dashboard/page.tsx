@@ -43,6 +43,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { DriveRegistration, Memory, PlacementDrive, Student } from "@/types";
 import { uploadFileToR2 } from "@/lib/upload-r2";
+import NotificationBell from "@/components/ui/NotificationBell";
 
 export default function AlumniDashboard() {
   const { loading: authLoading, authenticated, user } = useAuth("alumni", "/alumni/login");
@@ -485,6 +486,7 @@ export default function AlumniDashboard() {
               >
                 <LogOut className="size-4" /> Logout
               </button>
+              <NotificationBell role="alumni" />
             </div>
           </section>
 

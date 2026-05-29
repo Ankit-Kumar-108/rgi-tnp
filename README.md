@@ -430,7 +430,7 @@ Verify Token + Role Authorization
 
 ---
 
-## 🔮 Future Features & Roadmap
+## 🔮 Issue And Fix
 
 ### Phase 1
 - [ ] **Feedback UI card change  (to change on 15/04/2026 [Done])**
@@ -484,13 +484,31 @@ Verify Token + Role Authorization
 - [ ] **Profile and CGPA(give ability to update profile img and cgpa)  (to change on 31/05/2026 [Done])**
 - give ability to update profile image and cgpa in profile section of student, external-students and alumni for better visibility and understanding of profile also check why cgpa 12th, 10th and back is default 0
 
-- [] **Delete R2 (fix bug when deleting a user their profile image and resume is not deleting from r2)  (to change on 31/05/2026 [to be Done])**
+- [ ] **Delete R2 (fix bug when deleting a user, their profile image and resume is not deleting from r2)  (to change on 31/05/2026 [Done])**
 - fix bug where when deleting a user their profile image and resume is not deleting from r2 for better performance and also add delete file from r2 when deleting a memory for better performance
+
+- [ ] **Notification (add notification for drive registration, user registration, email sent)  (to change on 1/06/2026 [to be Done])**
+- add notification for drive registration for better visibility and understanding of status of drive registration
+
+- [ ] **Broadcast (add broadcast email for all students, alumni and recruiters)  (to change on 5/06/2026 [to be Done])**
+- add broadcast email for all students, alumni and recruiters for better communication and understanding of status of
 
 - [ ] **Auto transfer student to alumni (add feature)  (to change on 5/06/2026 [to be Done])**
 - add feature to auto transfer student to alumni after completion of course for better visibility and understanding of profile and also add notification for that 
 
- - [ ] **Site (improve site content)  (to change on 25/05/2026 [to be Done])** 
+- [ ] **Admin Panel (in drive management section add custom email function so admin can send custom email to all applicants of drive or selected applicants of drive)  (to change on 10/06/2026 [to be Done])**
+- add custom email function in drive management section of admin panel so admin can send custom email to all applicants of drive or selected applicants of drive for better communication and understanding of status of drive and also add template for that email
+
+- [ ] **Backend (add linkedin api and googleSheet api integration)  (to change on 15/06/2026 [to be Done])**
+- add linkedin api to post drive in linkedin and google sheet api to maintain record of drives, applicants, students batch wise, alumni, referrals etc. for better visibility and understanding of data and also add automation for that
+
+- [ ] **Referral (add a page where referral are posted by alumni and also appears in the students dashboard)  (to change on 20/06/2026 [to be Done])**
+ - add a page where referral are posted by alumni for better visibility and understanding of referral and also add filter in that page for better visibility only logged in student and alumni can see that page
+
+- [ ] **Notification Center (add send mail to all students, alumni, recruiters and course specific students)  (to change on 25/06/2026 [to be Done])**
+ - add notification center in admin panel where admin can send mail to all students, alumni, recruiters and course specific students for better communication and understanding of status of drive and also add template for that email
+
+- [ ] **Site (improve site content)  (to change on 25/06/2026 [to be Done])** 
   - improve content of site and add more content in home page and about us page for better visibility and understanding of site
 
 - [ ] **Take Suggestion from sir about final selection and mail notification**

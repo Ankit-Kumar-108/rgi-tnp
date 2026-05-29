@@ -31,6 +31,7 @@ import { useRouter } from "next/navigation";
 import { uploadFileToR2 } from "@/lib/upload-r2";
 import { PlacementDrive } from "@/types";
 import { toast } from "sonner";
+import NotificationBell from "@/components/ui/NotificationBell";
 
 // Lazy load heavy modal components — only loaded when user interacts
 const JobDetailsModal = dynamic(
@@ -38,7 +39,7 @@ const JobDetailsModal = dynamic(
   { ssr: false }
 );
 const FeedbackComp = dynamic(
-  () => import("../feedback/feedbakComp"),
+  () => import("@/app/(portal)/students/feedback/feedbakComp"), 
   { ssr: false }
 );
 
@@ -343,6 +344,7 @@ export default function ExternalStudentDashboard() {
               >
                 <LogOut className="size-4" /> Logout
               </button>
+              <NotificationBell role="external_student" />
             </div>
           </section>
 

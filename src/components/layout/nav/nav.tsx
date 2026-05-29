@@ -22,7 +22,6 @@ import {
   Network,
   ClipboardList,
   Earth,
-  Heart
 } from "lucide-react"
 import { useState } from 'react'
 
@@ -76,7 +75,7 @@ export default function Nav() {
         { name: "Open Drives", icon: Building2, link: "open-drives" },
         { name: "Login", icon: UserCheck, link: "external-students/login" },
         { name: "Register", icon: UserPlus, link: "external-students/register" },
-        { name: "Dashboard", icon: TrendingUp, link: "students/external-dashboard" }
+        { name: "Dashboard", icon: TrendingUp, link: "external-students/external-dashboard" }
       ]
     },
     {

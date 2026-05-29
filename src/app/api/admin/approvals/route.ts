@@ -2,10 +2,10 @@ export const runtime = "edge";
 
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { sendEmail } from "@/lib/send-email";
 import { placementOpportunityTemplate } from "@/lib/email-templates";
 import { runInBackground } from "@/lib/background";
 import { deleteMultipleFromR2 } from "@/lib/r2-delete";
+import { NotificationService } from "@/lib/notification-service";
 
 type ApprovedDrive = {
   id: string;
@@ -58,7 +58,7 @@ function chunkArray<T>(items: T[], size: number) {
   return chunks;
 }
 
-async function notifyEligibleStudentsForDrive(drive: ApprovedDrive) {
+async function notifyEligibleStudentsForDrive(drive: ApprovedDrive, triggeredBy: string) {
   const db = getDb();
   const eligibleBranches = parseEligibleValues(drive.eligibleBranches);
   const eligibleCourses =
@@ -77,6 +77,7 @@ async function notifyEligibleStudentsForDrive(drive: ApprovedDrive) {
         : {}),
     },
     select: {
+      id: true,
       name: true,
       email: true,
     },
@@ -93,28 +94,42 @@ async function notifyEligibleStudentsForDrive(drive: ApprovedDrive) {
     DRIVE_NOTIFICATION_BATCH_SIZE,
   )) {
     await Promise.allSettled(
-      studentsBatch.map((student) =>
-        sendEmail({
-          to: student.email,
-          subject: `New Opportunity: ${drive.companyName} is hiring!`,
-          html: placementOpportunityTemplate(
-            student.name,
-            drive.companyName,
-            drive.driveType,
-            drive.ctc,
-            `${drive.minBatch} - ${drive.maxBatch}`,
-            drive.course,
-            eligibleBranches.join(", "),
-            driveDate,
-            `https://${process.env.DOMAIN_NAME}/students/dashboard`,
-          ),
-        }),
-      ),
+      studentsBatch.map(async (student) => {
+        await NotificationService.notifyUser({
+          email: {
+            to: student.email,
+            subject: `New Opportunity: ${drive.companyName} is hiring!`,
+            html: placementOpportunityTemplate(
+              student.name,
+              drive.companyName,
+              drive.driveType,
+              drive.ctc,
+              `${drive.minBatch} - ${drive.maxBatch}`,
+              drive.course,
+              eligibleBranches.join(", "),
+              driveDate,
+              `https://${process.env.DOMAIN_NAME}/students/dashboard`,
+            ),
+            template: "placementOpportunityTemplate",
+          },
+          inApp: {
+            type: "drive_approved",
+            title: `New Placement Opportunity: ${drive.companyName}`,
+            message: `${drive.roleName} role with CTC of ${drive.ctc}. Date: ${driveDate}.`,
+            link: "/students/dashboard",
+          },
+          triggeredBy,
+          recipient: {
+            id: student.id,
+            type: "student",
+          },
+        });
+      })
     );
   }
 }
 
-async function sendApprovedDriveNotifications(driveIds: string[]) {
+async function sendApprovedDriveNotifications(driveIds: string[], triggeredBy: string) {
   const db = getDb();
   const approvedDrives = await db.placementDrive.findMany({
     where: { id: { in: driveIds }, status: "active" },
@@ -135,7 +150,7 @@ async function sendApprovedDriveNotifications(driveIds: string[]) {
   await Promise.allSettled(
     approvedDrives.map(async (drive) => {
       try {
-        await notifyEligibleStudentsForDrive(drive);
+        await notifyEligibleStudentsForDrive(drive, triggeredBy);
       } catch (error) {
         console.error(
           `[DRIVE NOTIFICATION ERROR] Failed for drive ${drive.id}:`,
@@ -143,6 +158,170 @@ async function sendApprovedDriveNotifications(driveIds: string[]) {
         );
       }
     }),
+  );
+}
+
+async function notifyRecruitersForRejectedDrives(driveIds: string[], triggeredBy: string) {
+  const db = getDb();
+  const rejectedDrives = await db.placementDrive.findMany({
+    where: { id: { in: driveIds }, status: "rejected" },
+    include: {
+      recruiter: { select: { id: true, name: true, email: true } },
+    },
+  });
+
+  await Promise.allSettled(
+    rejectedDrives.map(async (drive) => {
+      if (!drive.recruiter) return;
+      await NotificationService.notifyUser({
+        email: {
+          to: drive.recruiter.email,
+          subject: `Placement Drive Rejected: ${drive.companyName}`,
+          html: `
+            <div style="font-family: sans-serif; padding: 20px; color: #333;">
+              <h2 style="color: #D32F2F; margin-bottom: 20px;">Placement Drive Rejected</h2>
+              <p>Hello <strong>${drive.recruiter.name}</strong>,</p>
+              <p style="line-height: 1.6; font-size: 15px;">Your submitted placement drive for <strong>${drive.companyName}</strong> (${drive.roleName} role) has been reviewed and was <strong>not approved</strong> at this time.</p>
+              <p style="line-height: 1.6; font-size: 15px;">Please review the job details or contact the placement coordinator for more information.</p>
+              <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
+              <p style="font-size: 12px; color: #999;">Radharaman Group of Institutes (RGI) Training & Placement Cell.</p>
+            </div>
+          `,
+          template: "driveRejectionTemplate",
+        },
+        inApp: {
+          type: "drive_rejected",
+          title: `Drive Rejected: ${drive.companyName}`,
+          message: `Your drive for ${drive.companyName} (${drive.roleName}) was not approved.`,
+        },
+        triggeredBy,
+        recipient: {
+          id: drive.recruiter.id,
+          type: "recruiter",
+        },
+      });
+    })
+  );
+}
+
+async function notifyAlumniForReferrals(referralIds: string[], action: "approve" | "reject", triggeredBy: string) {
+  const db = getDb();
+  const referrals = await db.referral.findMany({
+    where: { id: { in: referralIds } },
+    include: {
+      alumni: { select: { id: true, name: true, personalEmail: true } },
+    },
+  });
+
+  await Promise.allSettled(
+    referrals.map(async (ref) => {
+      await NotificationService.notifyUser({
+        email: {
+          to: ref.alumni.personalEmail,
+          subject: `Referral Submission ${action === "approve" ? "Approved" : "Rejected"}: ${ref.position}`,
+          html: `
+            <div style="font-family: sans-serif; padding: 20px; color: #333;">
+              <h2 style="color: ${action === "approve" ? "#388E3C" : "#D32F2F"}; margin-bottom: 20px;">Referral Status Update</h2>
+              <p>Hello <strong>${ref.alumni.name}</strong>,</p>
+              <p style="line-height: 1.6; font-size: 15px;">Your submitted referral for <strong>${ref.position}</strong> at <strong>${ref.companyName}</strong> has been <strong>${action === "approve" ? "approved and published" : "rejected"}</strong> by the administration.</p>
+              <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
+              <p style="font-size: 12px; color: #999;">Radharaman Group of Institutes (RGI) Training & Placement Cell.</p>
+            </div>
+          `,
+          template: "referralStatusUpdateTemplate",
+        },
+        inApp: {
+          type: action === "approve" ? "referral_approved" : "referral_rejected",
+          title: `Referral ${action === "approve" ? "Approved" : "Rejected"}`,
+          message: `Your referral for ${ref.position} at ${ref.companyName} was ${action === "approve" ? "published" : "not approved"}.`,
+        },
+        triggeredBy,
+        recipient: {
+          id: ref.alumni.id,
+          type: "alumni",
+        },
+      });
+    })
+  );
+}
+
+async function notifyUploaderForMemoryApproval(memoryIds: string[], triggeredBy: string) {
+  const db = getDb();
+  const memories = await db.memory.findMany({
+    where: { id: { in: memoryIds } },
+    select: {
+      id: true,
+      title: true,
+      studentId: true,
+      alumniId: true,
+      student: { select: { email: true, name: true } },
+      alumni: { select: { personalEmail: true, name: true } },
+    },
+  });
+
+  await Promise.allSettled(
+    memories.map(async (memory) => {
+      const isStudent = Boolean(memory.studentId);
+      const recipientId = isStudent ? memory.studentId : memory.alumniId;
+      const recipientType = isStudent ? ("student" as const) : ("alumni" as const);
+
+      if (!recipientId) return;
+
+      await NotificationService.notifyUser({
+        inApp: {
+          type: "memory_approved",
+          title: `Memory Approved`,
+          message: `Your memory "${memory.title}" has been approved and published.`,
+        },
+        triggeredBy,
+        recipient: {
+          id: recipientId,
+          type: recipientType,
+        },
+      });
+    })
+  );
+}
+
+async function notifyVolunteersApproval(volunteerIds: string[], triggeredBy: string) {
+  const db = getDb();
+  const volunteers = await db.volunteer.findMany({
+    where: { id: { in: volunteerIds } },
+    include: {
+      student: { select: { id: true, name: true, email: true } },
+    },
+  });
+
+  await Promise.allSettled(
+    volunteers.map(async (v) => {
+      if (!v.student) return;
+      await NotificationService.notifyUser({
+        email: {
+          to: v.student.email,
+          subject: `Volunteer Status Approved!`,
+          html: `
+            <div style="font-family: sans-serif; padding: 20px; color: #333;">
+              <h2 style="color: #388E3C; margin-bottom: 20px;">Volunteer Approved!</h2>
+              <p>Hello <strong>${v.student.name}</strong>,</p>
+              <p style="line-height: 1.6; font-size: 15px;">Congratulations! You have been approved as a student volunteer for Training & Placement cell events.</p>
+              <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
+              <p style="font-size: 12px; color: #999;">Radharaman Group of Institutes (RGI) Training & Placement Cell.</p>
+            </div>
+          `,
+          template: "volunteerApprovedTemplate",
+        },
+        inApp: {
+          type: "volunteer_approved",
+          title: `Volunteer Registration Approved`,
+          message: `You are now verified as a student volunteer!`,
+        },
+        triggeredBy,
+        recipient: {
+          id: v.student.id,
+          type: "student",
+        },
+      });
+    })
   );
 }
 
@@ -427,6 +606,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const adminEmail = req.headers.get("x-admin-email") || "system";
     const body = (await req.json()) as {
       type: string;
       id?: string;
@@ -455,8 +635,13 @@ export async function POST(req: NextRequest) {
 
       if (action === "approve") {
         runInBackground(
-          sendApprovedDriveNotifications(targetIds),
+          sendApprovedDriveNotifications(targetIds, adminEmail),
           "drive approval notifications",
+        );
+      } else {
+        runInBackground(
+          notifyRecruitersForRejectedDrives(targetIds, adminEmail),
+          "drive rejection notifications",
         );
       }
     } else if (type === "referrals") {
@@ -464,12 +649,47 @@ export async function POST(req: NextRequest) {
         where: { id: { in: targetIds } },
         data: { status: action === "approve" ? "published" : "rejected" },
       });
+
+      runInBackground(
+        notifyAlumniForReferrals(targetIds, action, adminEmail),
+        "referral status notifications",
+      );
     } else if (type === "external") {
       if (action === "approve") {
         await db.externalStudent.updateMany({
           where: { id: { in: targetIds } },
           data: { isVerified: true },
         });
+
+        // Notify External Student
+        runInBackground(
+          (async () => {
+            const list = await db.externalStudent.findMany({
+              where: { id: { in: targetIds } },
+              select: { id: true, name: true, email: true },
+            });
+            await Promise.allSettled(
+              list.map((student) =>
+                NotificationService.notifyUser({
+                  email: {
+                    to: student.email,
+                    subject: "Account Verified Successfully",
+                    html: `<p>Hello ${student.name}, your external student registration is verified!</p>`,
+                    template: "externalVerificationSuccess",
+                  },
+                  inApp: {
+                    type: "account_verified",
+                    title: "Account Verified",
+                    message: "Your external student profile is verified.",
+                  },
+                  triggeredBy: adminEmail,
+                  recipient: { id: student.id, type: "external_student" },
+                })
+              )
+            );
+          })(),
+          "external student approval notifications"
+        );
       } else {
         // Fetch R2 URLs before deleting
         const extStudents = await db.externalStudent.findMany({
@@ -492,6 +712,11 @@ export async function POST(req: NextRequest) {
           where: { id: { in: targetIds } },
           data: { status: "approved" },
         });
+
+        runInBackground(
+          notifyUploaderForMemoryApproval(targetIds, adminEmail),
+          "memory approval notifications",
+        );
       } else {
         // Fetch imageUrls before deleting
         const memories = await db.memory.findMany({
@@ -550,6 +775,35 @@ export async function POST(req: NextRequest) {
             isVerified: true,
           },
         });
+
+        runInBackground(
+          (async () => {
+            const list = await db.student.findMany({
+              where: { id: { in: targetIds } },
+              select: { id: true, name: true, email: true },
+            });
+            await Promise.allSettled(
+              list.map((student) =>
+                NotificationService.notifyUser({
+                  email: {
+                    to: student.email,
+                    subject: "Account Verified Successfully",
+                    html: `<p>Hello ${student.name}, your student account has been verified by the administrator.</p>`,
+                    template: "studentVerificationSuccess",
+                  },
+                  inApp: {
+                    type: "account_verified",
+                    title: "Account Verified",
+                    message: "Your profile has been manually verified by the administrator.",
+                  },
+                  triggeredBy: adminEmail,
+                  recipient: { id: student.id, type: "student" },
+                })
+              )
+            );
+          })(),
+          "student verification notifications"
+        );
       } else {
         const students = await db.student.findMany({
           where: { id: { in: targetIds } },
@@ -575,6 +829,35 @@ export async function POST(req: NextRequest) {
             isVerified: true,
           },
         });
+
+        runInBackground(
+          (async () => {
+            const list = await db.alumni.findMany({
+              where: { id: { in: targetIds } },
+              select: { id: true, name: true, personalEmail: true },
+            });
+            await Promise.allSettled(
+              list.map((alumni) =>
+                NotificationService.notifyUser({
+                  email: {
+                    to: alumni.personalEmail,
+                    subject: "Account Verified Successfully",
+                    html: `<p>Hello ${alumni.name}, your alumni account has been verified by the administrator.</p>`,
+                    template: "alumniVerificationSuccess",
+                  },
+                  inApp: {
+                    type: "account_verified",
+                    title: "Account Verified",
+                    message: "Your alumni profile has been manually verified by the administrator.",
+                  },
+                  triggeredBy: adminEmail,
+                  recipient: { id: alumni.id, type: "alumni" },
+                })
+              )
+            );
+          })(),
+          "alumni verification notifications"
+        );
       } else {
         const alumniRecords = await db.alumni.findMany({
           where: { id: { in: targetIds } },
@@ -600,6 +883,35 @@ export async function POST(req: NextRequest) {
             isVerified: true,
           },
         });
+
+        runInBackground(
+          (async () => {
+            const list = await db.externalStudent.findMany({
+              where: { id: { in: targetIds } },
+              select: { id: true, name: true, email: true },
+            });
+            await Promise.allSettled(
+              list.map((student) =>
+                NotificationService.notifyUser({
+                  email: {
+                    to: student.email,
+                    subject: "Account Verified Successfully",
+                    html: `<p>Hello ${student.name}, your external student account has been verified by the administrator.</p>`,
+                    template: "externalVerificationSuccess",
+                  },
+                  inApp: {
+                    type: "account_verified",
+                    title: "Account Verified",
+                    message: "Your profile has been manually verified by the administrator.",
+                  },
+                  triggeredBy: adminEmail,
+                  recipient: { id: student.id, type: "external_student" },
+                })
+              )
+            );
+          })(),
+          "external verification notifications"
+        );
       } else {
         const extRecords = await db.externalStudent.findMany({
           where: { id: { in: targetIds } },
@@ -621,6 +933,11 @@ export async function POST(req: NextRequest) {
           where: { id: { in: targetIds } },
           data: { isVerified: true, assignedAt: new Date() },
         });
+
+        runInBackground(
+          notifyVolunteersApproval(targetIds, adminEmail),
+          "volunteer approval notifications",
+        );
       } else {
         await db.volunteer.deleteMany({
           where: { id: { in: targetIds } },
