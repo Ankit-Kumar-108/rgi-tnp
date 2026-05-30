@@ -6,13 +6,12 @@ import {
   ArrowRightCircle, XCircle, FileText, Download, ExternalLink,
   Github, Linkedin,
   ChevronDown, SlidersHorizontal, BarChart3, Clock,
-  Mail, Phone, UserCheck, QrCode, AlertCircle
+  Mail, Phone, UserCheck, QrCode, AlertCircle, Send
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
 import { toast } from "sonner";
 import QRCode from "qrcode";
-import { userAgent } from "next/server";
 
 // Types
 type Participant = {
@@ -351,25 +350,6 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
           </div>
 
           {/* Right: actions */}
-          {/* 3. Changed: Added order-2 on mobile so it stays on the top row with the title */}
-          <div className="flex items-center gap-2 shrink-0 order-2 sm:order-0">
-            {drive?.googleSheetUrl && (
-              <a href={drive.googleSheetUrl} target="_blank" rel="noopener noreferrer"
-                className="hidden sm:flex items-center gap-1.5 h-8 px-3 rounded-lg bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20 text-xs font-bold transition-colors">
-                <ExternalLink className="w-3.5 h-3.5" /> Sheet
-              </a>
-            )}
-            <button onClick={generateQr} disabled={qrLoading}
-              className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-purple-500/10 text-purple-700 dark:text-purple-400 hover:bg-purple-500/20 text-xs font-bold transition-colors disabled:opacity-50">
-              {qrLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <QrCode className="w-3.5 h-3.5" />}
-              <span className="hidden sm:inline">Attendance QR</span>
-            </button>
-            <button onClick={exportToCSV} disabled={!filteredParticipants.length}
-              className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-brand text-white hover:bg-brand/90 text-xs font-bold transition-colors disabled:opacity-40">
-              <Download className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Export CSV</span>
-            </button>
-          </div>
 
           {/* Bulk action bar */}
           {selectedIds.size > 0 && (
@@ -396,6 +376,31 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
             </div>
           )}
 
+          {/* 3. Changed: Added order-2 on mobile so it stays on the top row with the title */}
+          <div className="flex items-center gap-2 shrink-0 order-2 sm:order-0">
+            {drive?.googleSheetUrl && (
+              <a href={drive.googleSheetUrl} target="_blank" rel="noopener noreferrer"
+                className="hidden sm:flex items-center gap-1.5 h-8 px-3 rounded-lg bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20 text-xs font-bold transition-colors">
+                <ExternalLink className="w-3.5 h-3.5" /> Sheet
+              </a>
+            )}
+            <button onClick={generateQr} disabled={qrLoading}
+              className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-purple-500/10 text-purple-700 dark:text-purple-400 hover:bg-purple-500/20 text-xs font-bold transition-colors disabled:opacity-50">
+              {qrLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <QrCode className="w-3.5 h-3.5" />}
+              <span className="hidden sm:inline">Attendance QR</span>
+            </button>
+            <button onClick={exportToCSV} disabled={!filteredParticipants.length}
+              className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-brand text-white hover:bg-brand/90 text-xs font-bold transition-colors disabled:opacity-40">
+              <Download className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Export CSV</span>
+            </button>
+            <button
+            className="group bg-brand text-white p-2.5 rounded-lg text-xs font-bold shadow-lg shadow-brand/25 transition-all duration-300 flex items-center gap-2 cursor-pointer"
+          >
+            <Send className="group-hover:translate-x-2 group-hover:-translate-y-2 transition-all duration-300 size-3.5" />
+            <span className="hidden md:flex">Compose Broadcast</span>
+          </button>
+          </div>
         </div>
       </header>
 

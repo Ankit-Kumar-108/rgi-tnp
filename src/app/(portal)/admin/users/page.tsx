@@ -5,7 +5,8 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import {
   Users, GraduationCap, Building2, UserCheck, Search, Loader2,
   Shield, ArrowLeft, ChevronDown, Trash2, Mail, Phone, MapPin,
-  Briefcase, FileText, Github, Linkedin, CheckCircle2, Clock, XCircle
+  Briefcase, FileText, Github, Linkedin, CheckCircle2, Clock, XCircle,
+  Send
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
@@ -56,7 +57,7 @@ function StatChip({ value, label }: { value?: string | number; label: string }) 
 export default function AdminUsersPage() {
   const { loading: authLoading, authenticated } = useAuth("admin", "/admin/login");
   const [activeTab, setActiveTab] = useState<TabKey>("student");
-  
+
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -64,9 +65,9 @@ export default function AdminUsersPage() {
   const [totalCount, setTotalCount] = useState(0);
 
   const [search, setSearch] = useState("");
-  const [submittedSearch, setSubmittedSearch] = useState(""); 
+  const [submittedSearch, setSubmittedSearch] = useState("");
   const [branch, setBranch] = useState("");
-  
+
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [actionLoading, setActionLoading] = useState(false);
 
@@ -86,23 +87,23 @@ export default function AdminUsersPage() {
   // Fetch users 
   useEffect(() => {
     if (!authenticated) return;
-    
+
     const loadUsers = async () => {
-      if (page === 1) setLoading(true); 
-      
+      if (page === 1) setLoading(true);
+
       try {
-        const params = new URLSearchParams({ 
-          role: activeTab, 
-          limit: "50", 
-          page: page.toString() 
+        const params = new URLSearchParams({
+          role: activeTab,
+          limit: "50",
+          page: page.toString()
         });
-        
+
         if (branch && branch !== "All Branches") params.set("branch", branch);
         if (submittedSearch) params.set("search", submittedSearch);
-        
+
         const res = await fetch(`/api/admin/users?${params}`);
         const data = (await res.json()) as { success: boolean; users: any[], totalCount: number };
-        
+
         if (data.success) {
           setTotalCount(data.totalCount || 0);
           setUsers(prev => {
@@ -135,7 +136,7 @@ export default function AdminUsersPage() {
   const handleBranchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setBranch(e.target.value);
     setPage(1);
-    setUsers([]); 
+    setUsers([]);
   };
 
   const handleTabChange = (tabKey: TabKey) => {
@@ -161,17 +162,17 @@ export default function AdminUsersPage() {
         body: JSON.stringify({ ids: Array.from(selectedIds), action, role: activeTab }),
       });
       const data = await res.json() as any;
-      
+
       if (data.success) {
         toast.success(`Successfully ${action === 'delete' ? 'deleted' : 'approved'} ${selectedIds.size} users`);
-        
+
         if (action === "delete") {
           setUsers(prev => prev.filter(u => !selectedIds.has(u.id)));
           setTotalCount(prev => prev - selectedIds.size);
         } else {
           setUsers(prev => prev.map(u => selectedIds.has(u.id) ? { ...u, isVerified: true, isEmailVerified: true } : u));
         }
-        
+
         setSelectedIds(new Set());
       } else {
         toast.error(data.message || "Action failed");
@@ -210,11 +211,11 @@ export default function AdminUsersPage() {
   // Render 
   return (
     <div className="min-h-screen bg-background pb-12 overflow-hidden">
-      
+
       {/* Sticky Header */}
       <header className="fixed w-full top-0 z-40 bg-card/80 backdrop-blur-xl border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 min-h-16 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
-          
+
           {/* Left: back + title */}
           <div className="flex items-center gap-3 min-w-0 flex-1 sm:flex-none">
             <Link href="/admin/dashboard" className="w-8 h-8 rounded-lg flex items-center justify-center border border-border hover:bg-muted transition-colors shrink-0">
@@ -232,25 +233,30 @@ export default function AdminUsersPage() {
               </div>
             </div>
           </div>
-
+          <button
+            className="group bg-brand text-white px-4.5 py-2 rounded-lg md:rounded-xl text-xs font-bold shadow-lg shadow-brand/25 transition-all duration-300 flex items-center gap-2 cursor-pointer"
+          >
+            <Send className="group-hover:translate-x-2 group-hover:-translate-y-2 transition-all duration-300 size-5" />
+            <span className="hidden md:flex">Compose Broadcast</span>
+          </button>
           {/* Bulk action bar (Responsive: drops to new line on mobile) */}
           {selectedIds.size > 0 && (
             <div className="flex items-center gap-2 h-11 px-3 bg-brand/5 border border-brand/20 rounded-xl animate-in fade-in slide-in-from-bottom-2 duration-200 w-full sm:w-auto order-3 sm:order-0 overflow-x-auto no-scrollbar">
               <span className="text-xs font-bold text-brand mr-1 shrink-0">{selectedIds.size} selected</span>
               <div className="h-4 w-px bg-border shrink-0" />
-              
+
               <button onClick={() => handleBulkAction("approve")} disabled={actionLoading}
                 className="flex items-center gap-1.5 h-7 px-3 rounded-lg text-xs font-bold transition-colors disabled:opacity-50 shrink-0 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30">
                 {actionLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
                 <span className="whitespace-nowrap">Approve</span>
               </button>
-              
+
               <button onClick={() => handleBulkAction("delete")} disabled={actionLoading}
                 className="flex items-center gap-1.5 h-7 px-3 rounded-lg text-xs font-bold transition-colors disabled:opacity-50 shrink-0 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30">
                 {actionLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                 <span className="whitespace-nowrap">Delete</span>
               </button>
-              
+
               <button onClick={() => setSelectedIds(new Set())}
                 className="ml-auto text-muted-foreground hover:text-foreground transition-colors shrink-0 pl-2">
                 <XCircle className="w-4 h-4" />
@@ -261,16 +267,15 @@ export default function AdminUsersPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 mt-15 sm:px-6 py-6 space-y-6">
-        
+
         {/* Tabs */}
         <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
           {TABS.map((tab) => (
             <button key={tab.key} onClick={() => handleTabChange(tab.key)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${
-                activeTab === tab.key
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${activeTab === tab.key
                   ? "bg-brand text-white shadow-[var(--shadow-brand)]"
                   : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-brand/40"
-              }`}>
+                }`}>
               <tab.icon className="w-4 h-4" />
               {tab.label}
             </button>
@@ -291,7 +296,7 @@ export default function AdminUsersPage() {
               </button>
             )}
           </div>
-          
+
           {(activeTab === "student" || activeTab === "external") && (
             <div className="relative">
               <select value={branch} onChange={handleBranchChange}
@@ -301,7 +306,7 @@ export default function AdminUsersPage() {
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
             </div>
           )}
-          
+
           <button type="submit" className="h-10 px-5 bg-brand text-white rounded-xl text-sm font-bold hover:bg-brand/90 transition-all shrink-0">
             Search
           </button>
@@ -350,7 +355,7 @@ export default function AdminUsersPage() {
               {users.map((user, index) => {
                 const isSelected = selectedIds.has(user.id);
                 const isLast = index === users.length - 1;
-                
+
                 // Normalize data structure across the 4 different tab schemas
                 const email = user.email || user.personalEmail;
                 const isVerified = user.isVerified ?? user.isEmailVerified;
@@ -364,7 +369,7 @@ export default function AdminUsersPage() {
                     onClick={e => { const t = (e.target as HTMLElement).tagName; if (t !== "INPUT" && t !== "A" && t !== "BUTTON") toggleSelection(user.id); }}
                     className={`group bg-card border rounded-xl px-5 py-4 transition-all cursor-pointer select-none
                       ${isSelected ? "border-brand ring-1 ring-brand/20 bg-brand/15" : "border-border hover:border-border/80 hover:shadow-sm"}`}>
-                    
+
                     <div className="flex flex-col md:flex-row items-start gap-4">
                       {/* Checkbox */}
                       <input type="checkbox" onClick={e => e.stopPropagation()}
@@ -373,7 +378,7 @@ export default function AdminUsersPage() {
 
                       {/* Avatar Desktop */}
                       <div className="hidden md:block">
-                      <Avatar url={user.profileImageUrl} name={user.name} isVerified={isVerified} />
+                        <Avatar url={user.profileImageUrl} name={user.name} isVerified={isVerified} />
                       </div>
                       {/* Avatar Mobile */}
                       <div className="md:hidden w-full flex justify-center">
@@ -382,7 +387,7 @@ export default function AdminUsersPage() {
 
                       {/* Content */}
                       <div className="flex-1 min-w-0">
-                        
+
                         {/* Row 1: Name + Role Badge + Verification */}
                         <div className="flex items-start justify-between gap-2 mb-1.5">
                           <div className="flex items-center gap-2 flex-wrap min-w-0">
@@ -390,14 +395,13 @@ export default function AdminUsersPage() {
                             <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-brand/10 text-brand uppercase tracking-wide">
                               {activeTab}
                             </span>
-                            
+
                             {/* Verification Badge (Hidden for recruiters as they lack the DB field) */}
                             {activeTab !== "recruiter" && (
-                              <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full ${
-                                isVerified 
+                              <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full ${isVerified
                                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:border-emerald-800 dark:text-emerald-300"
                                   : "bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-900/30 dark:border-amber-800 dark:text-amber-300"
-                              }`}>
+                                }`}>
                                 {isVerified ? <CheckCircle2 className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
                                 {isVerified ? "Verified" : "Pending"}
                               </span>
@@ -409,7 +413,7 @@ export default function AdminUsersPage() {
                         <div className="flex items-center gap-1.5 flex-wrap text-xs text-muted-foreground mb-1.5">
                           {company && (
                             <>
-                              <span className="inline-flex items-center gap-1 font-semibold text-brand"><Briefcase className="w-3 h-3"/> {company}</span>
+                              <span className="inline-flex items-center gap-1 font-semibold text-brand"><Briefcase className="w-3 h-3" /> {company}</span>
                               <span className="text-border">·</span>
                               <span>{designation || "Employee"}</span>
                               <span className="text-border">·</span>
@@ -436,7 +440,7 @@ export default function AdminUsersPage() {
                           )}
                           {user.city && (
                             <>
-                              <span className="inline-flex items-center gap-1"><MapPin className="w-3 h-3"/> {user.city}{user.country ? `, ${user.country}` : ""}</span>
+                              <span className="inline-flex items-center gap-1"><MapPin className="w-3 h-3" /> {user.city}{user.country ? `, ${user.country}` : ""}</span>
                             </>
                           )}
                         </div>
@@ -466,13 +470,13 @@ export default function AdminUsersPage() {
                         <div className="flex items-center gap-2 flex-wrap">
                           {email && (
                             <a href={`mailto:${email}`} onClick={e => e.stopPropagation()}
-                               className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-xs font-bold bg-muted text-muted-foreground hover:bg-muted/80 transition-colors">
+                              className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-xs font-bold bg-muted text-muted-foreground hover:bg-muted/80 transition-colors">
                               <Mail className="w-3 h-3" /> {email}
                             </a>
                           )}
                           {user.phoneNumber && (
                             <a href={`tel:${user.phoneNumber}`} onClick={e => e.stopPropagation()}
-                               className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-xs font-bold bg-muted text-muted-foreground hover:bg-muted/80 transition-colors">
+                              className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-xs font-bold bg-muted text-muted-foreground hover:bg-muted/80 transition-colors">
                               <Phone className="w-3 h-3" /> {user.phoneNumber}
                             </a>
                           )}
@@ -498,12 +502,12 @@ export default function AdminUsersPage() {
                           {/* Quick Actions Hover */}
                           <div className="ml-auto flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button title="Delete User" onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedIds(new Set([user.id]));
-                                handleBulkAction("delete");
-                              }}
-                              className="h-6 w-6 rounded-md flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 transition-colors">
-                              <Trash2 className="w-3 h-3" />
+                              e.stopPropagation();
+                              setSelectedIds(new Set([user.id]));
+                              handleBulkAction("delete");
+                            }}
+                              className="size-10 rounded-md flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 transition-colors">
+                              <Trash2 className="size-5" />
                             </button>
                           </div>
 
@@ -519,7 +523,7 @@ export default function AdminUsersPage() {
                   <Loader2 className="w-5 h-5 animate-spin text-brand" />
                 </div>
               )}
-              
+
               {!hasMore && users.length > 0 && (
                 <div className="text-center py-8 text-sm text-muted-foreground">
                   All {activeTab}s loaded · {users.length} total
