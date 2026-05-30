@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { generateVerificationToken, getresetTokenExpiry } from "@/lib/auth-utils";
 import { verificationEmailTemplate } from "@/lib/email-templates";
-import { sendEmail } from "@/lib/send-email";
+import { NotificationService } from "@/lib/notification-service";
 
 export async function POST(req: NextRequest) {
     try {
@@ -42,11 +42,25 @@ export async function POST(req: NextRequest) {
             });
 
             const verificationLink = `${protocol}://${host}/verify-email?token=${newToken}&email=${email}&role=student`;
-            await sendEmail({
-                to: email,
-                subject: "Verify Your Email - RGI TnP Portal",
-                html: verificationEmailTemplate(userName, verificationLink),
-            });
+            try {
+                await NotificationService.notifyUser({
+                    email: {
+                        to: email,
+                        subject: "Verify Your Email - RGI Training and Placement Portal",
+                        html: verificationEmailTemplate(userName, verificationLink),
+                        template: "verificationEmailTemplate",
+                        approvalId: student.id,
+                        approvalType: "Student",
+                        actionType: "verification",
+                    },
+                    triggeredBy: "System",
+                    recipient: { id: student.id, type: "student" },
+                });
+                return NextResponse.json({ success: true, message: "Verification link sent successfully" }, { status: 200 });
+            } catch (error) {
+                console.error("Error sending verification email to student:", error);
+                return NextResponse.json({ success: false, message: "Failed to resend verification email" }, { status: 500 });
+            }
 
         } else if (role === "external_student") {
             const extStudent = await db.externalStudent.findUnique({ where: { email } });
@@ -70,11 +84,25 @@ export async function POST(req: NextRequest) {
             });
 
             const verificationLink = `${protocol}://${host}/verify-email?token=${newToken}&email=${email}&role=external_student`;
-            await sendEmail({
-                to: email,
-                subject: "Verify Your Email - RGI TnP Portal",
-                html: verificationEmailTemplate(userName, verificationLink),
-            });
+            try {
+                await NotificationService.notifyUser({
+                    email: {
+                        to: email,
+                        subject: "Verify Your Email - RGI Training and Placement Portal",
+                        html: verificationEmailTemplate(userName, verificationLink),
+                        template: "verificationEmailTemplate",
+                        approvalId: extStudent.id,
+                        approvalType: "external_student",
+                        actionType: "verification",
+                    },
+                    triggeredBy: "System",
+                    recipient: { id: extStudent.id, type: "external_student" },
+                });
+                return NextResponse.json({ success: true, message: "Verification link sent successfully" }, { status: 200 });
+            } catch (error) {
+                console.error("Error sending verification email to external student:", error);
+                return NextResponse.json({ success: false, message: "Failed to resend verification email" }, { status: 500 });
+            }
 
         } else if (role === "alumni") {
             const alumni = await db.alumni.findUnique({ where: { personalEmail: email } });
@@ -98,17 +126,29 @@ export async function POST(req: NextRequest) {
             });
 
             const verificationLink = `${protocol}://${host}/verify-email?token=${newToken}&email=${email}&role=alumni`;
-            await sendEmail({
-                to: email,
-                subject: "Verify Your Email - RGI TnP Portal",
-                html: verificationEmailTemplate(userName, verificationLink),
-            });
+            try {
+                await NotificationService.notifyUser({
+                    email: {
+                        to: email,
+                        subject: "Verify Your Email - RGI TnP Portal",
+                        html: verificationEmailTemplate(userName, verificationLink),
+                        template: "verificationEmailTemplate",
+                        approvalId: alumni.id,
+                        approvalType: "alumni",
+                        actionType: "verification",
+                    },
+                    triggeredBy: "System",
+                    recipient: { id: alumni.id, type: "alumni" },
+                });
+                return NextResponse.json({ success: true, message: "Verification link sent successfully" }, { status: 200 });
+            } catch (error) {
+                console.error("Error sending verification email to alumni:", error);
+                return NextResponse.json({ success: false, message: "Failed to resend verification email" }, { status: 500 });
+            }
 
         } else {
             return NextResponse.json({ success: false, message: "Invalid role" }, { status: 400 });
         }
-
-        return NextResponse.json({ success: true, message: "Verification link sent successfully" }, { status: 200 });
 
     } catch (error: any) {
         console.error("Error resending verification:", error);

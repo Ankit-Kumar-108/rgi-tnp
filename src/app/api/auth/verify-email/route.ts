@@ -2,7 +2,7 @@ export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { isTokenExpired } from "@/lib/auth-utils";
-import { sendEmail } from "@/lib/send-email";
+import { NotificationService } from "@/lib/notification-service";
 import { verificationSuccessStudentTemplate, verificationSuccessExternalStudentTemplate, verificationSuccessAlumniTemplate } from "@/lib/email-templates";
 
 export async function POST(req: NextRequest) {
@@ -50,10 +50,13 @@ export async function POST(req: NextRequest) {
 
     const sendWelcomeEmail = async (toEmail: string, verificationSuccessTemplate: string) => {
       try {
-        await sendEmail({
+        await NotificationService.sendEmailWithLog({
           to: toEmail,
           subject: "Welcome to RGI Training and Placement Portal!",
           html: verificationSuccessTemplate,
+          template: "welcome_email",
+          triggeredBy: "System",
+          actionType: "welcome",
         });
       } catch (e) {
         console.warn("[EMAIL] Welcome email failed (non-critical):", e);
@@ -95,19 +98,19 @@ export async function POST(req: NextRequest) {
 
       if (student) {
         const res = await verifyUser(student, db.student, "email", "isEmailVerified", true);
-        if (res.newlyVerified) await sendWelcomeEmail(email, res.userName || student.name);
+        if (res.newlyVerified) await sendWelcomeEmail(email, verificationSuccessStudentTemplate(res.userName || student.name));
         return NextResponse.json(res, { status: res.success ? 200 : 400 });
       }
 
       if (external) {
         const res = await verifyUser(external, db.externalStudent, "email", "isVerified");
-        if (res.newlyVerified) await sendWelcomeEmail(email, res.userName || external.name);
+        if (res.newlyVerified) await sendWelcomeEmail(email, verificationSuccessExternalStudentTemplate(res.userName || external.name));
         return NextResponse.json(res, { status: res.success ? 200 : 400 });
       }
 
       if (alumni) {
         const res = await verifyUser(alumni, db.alumni, "personalEmail", "isVerified");
-        if (res.newlyVerified) await sendWelcomeEmail(email, res.userName || alumni.name);
+        if (res.newlyVerified) await sendWelcomeEmail(email, verificationSuccessAlumniTemplate(res.userName || alumni.name));
         return NextResponse.json(res, { status: res.success ? 200 : 400 });
       }
     }

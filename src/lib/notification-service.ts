@@ -77,13 +77,30 @@ export class NotificationService {
     approvalType,
     actionType,
   }: SendEmailWithLogOptions) {
+    const db = getDb();
     if (!to) {
-      console.warn(`[NotificationService] Missing email address. Skipping log creation.`);
+      try {
+        await db.emailLog.create({
+          data: {
+            to: "MISSING_ADDRESS",
+            subject,
+            template,
+            status: "failed",
+            error: "Recipient email is empty or undefined",
+            recipientType: recipientType || null,
+            triggeredBy,
+            approvalId: approvalId || null,
+            approvalType: approvalType || null,
+            actionType: actionType || null
+          },
+        })
+      } catch (dbError) {
+        console.error(`[NotificationService] Failed to log empty-mail`, dbError);
+      }
       return { success: false, error: "Recipient email is undefined" };
     }
 
     const result = await sendEmail({ to, subject, html });
-    const db = getDb();
 
     try {
       await db.emailLog.create({
@@ -292,9 +309,9 @@ export class NotificationService {
           await this.notifyUser({
             email: channels.includes("email")
               ? {
-                  to: recipient.email,
-                  subject: subject,
-                  html: `
+                to: recipient.email,
+                subject: subject,
+                html: `
                     <div style="font-family: sans-serif; padding: 20px; color: #333;">
                       <h2 style="color: #0F52BA; margin-bottom: 20px;">${subject}</h2>
                       <p>Hello <strong>${recipient.name}</strong>,</p>
@@ -303,18 +320,18 @@ export class NotificationService {
                       <p style="font-size: 12px; color: #999;">This is an administrative broadcast from Radharaman Group of Institutes (RGI) Training & Placement Cell.</p>
                     </div>
                   `,
-                  template: "custom_broadcast",
-                  approvalId: recipient.id,
-                  approvalType: "Recipeint_Data",
-                  actionType: "message",
-                }
+                template: "custom_broadcast",
+                approvalId: recipient.id,
+                approvalType: "Recipeint_Data",
+                actionType: "message",
+              }
               : undefined,
             inApp: channels.includes("in_app")
               ? {
-                  type: "broadcast",
-                  title: subject,
-                  message: message,
-                }
+                type: "broadcast",
+                title: subject,
+                message: message,
+              }
               : undefined,
             triggeredBy,
             recipient: {

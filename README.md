@@ -487,11 +487,11 @@ Verify Token + Role Authorization
 - [ ] **Delete R2 (fix bug when deleting a user, their profile image and resume is not deleting from r2)  (to change on 31/05/2026 [Done])**
 - fix bug where when deleting a user their profile image and resume is not deleting from r2 for better performance and also add delete file from r2 when deleting a memory for better performance
 
-- [ ] **Notification (add notification for drive registration, user registration, email sent)  (to change on 1/06/2026 [to be Done])**
+- [ ] **Notification (add notification for drive registration, user registration, email sent)  (to change on 1/06/2026 [Done])**
 - add notification for drive registration for better visibility and understanding of status of drive registration
 
-- [ ] **Broadcast (add broadcast email for all students, alumni and recruiters)  (to change on 5/06/2026 [to be Done])**
-- add broadcast email for all students, alumni and recruiters for better communication and understanding of status of
+- [ ] **Broadcast (add broadcast email for all students, alumni and external student in user Management tab)  (to change on 5/06/2026 [to be Done])**
+- add broadcast email for all students, alumni and external student for better communication and understanding of status of broadcast also remove compose from notification management
 
 - [ ] **Auto transfer student to alumni (add feature)  (to change on 5/06/2026 [to be Done])**
 - add feature to auto transfer student to alumni after completion of course for better visibility and understanding of profile and also add notification for that 

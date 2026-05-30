@@ -1,7 +1,7 @@
 export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { sendEmail } from "@/lib/send-email";
+import { NotificationService } from "@/lib/notification-service";
 import { passwordResetEmailTemplate } from "@/lib/email-templates";
 import { generateResetToken, getresetTokenExpiry } from "@/lib/auth-utils";
 
@@ -94,11 +94,19 @@ export async function POST(req: NextRequest) {
     const protocol = host?.includes("localhost") ? "http" : "https";
     const resetUrl = `${protocol}://${host}/reset-password?token=${resetToken}&role=${role}`;
 
-    await sendEmail({
+    const emailResult = await NotificationService.sendEmailWithLog({
       to: email,
       subject: "Password Reset — RGI T&P Portal",
       html: passwordResetEmailTemplate(userName, resetUrl),
+      template: "passwordResetEmailTemplate",
+      triggeredBy: "System",
+      approvalType: "password_reset",
+      actionType: "reset",
     });
+
+    if (!emailResult.success) {
+      return NextResponse.json({ success: false, message: "Failed to send reset email. Please try again." }, { status: 500 });
+    }
 
     return NextResponse.json({ success: true, message: "Email sent successfully" });
   } catch (error) {

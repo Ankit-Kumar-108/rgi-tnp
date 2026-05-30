@@ -2,12 +2,10 @@ export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { getDb } from "@/lib/db";
-import { sendEmail } from "@/lib/send-email";
 import { rejectionEmailTemplate } from "@/lib/email-templates";
 import { shortlistedEmailTemplate } from "@/lib/email-templates";
 import { offerSelectionEmailTemplate } from "@/lib/email-templates";
 import { NotificationService } from "@/lib/notification-service";
-import { tr } from "zod/v4/locales/index.js";
 
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

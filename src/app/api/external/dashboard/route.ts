@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import * as jose from "jose";
 import { driveRegistrationTemplate } from "@/lib/email-templates";
-import { sendEmail } from "@/lib/send-email";
+import { NotificationService } from "@/lib/notification-service";
 
 async function getExternalFromToken(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
@@ -168,23 +168,33 @@ export async function POST(req: NextRequest) {
     });
     // Send Drive Registration Confirmation Email 
     try {
-      const emailResult = await sendEmail({
-        to: student.email,
-        subject: `Registered for ${drive.companyName} Drive`,
-        html: driveRegistrationTemplate(student.name, drive.companyName, drive.driveDate.toDateString(), drive.roleName),
+      await NotificationService.notifyUser({
+        email: {
+          to: student.email,
+          subject: `Registered for ${drive.companyName} Drive`,
+          html: driveRegistrationTemplate(student.name, drive.companyName, drive.driveDate.toDateString(), drive.roleName),
+          template: "drive_registration",
+          approvalId: student.id,
+          approvalType: "external_student",
+          actionType: "drive_registration",
+        },
+        inApp: {
+          type: "external_student",
+          title: "Drive Registration",
+          message: `Registered for ${drive.companyName} Drive`,
+        },
+        triggeredBy: "System",
+        recipient: {
+          id: student.id,
+          type: "external_student",
+        }
       })
+      return NextResponse.json({ success: true, message: "Registered for the drive, confirmation email sent" }, { status: 200 });
 
-      if (!emailResult.success) {
-        console.warn("Drive registration email failed to send:", emailResult.error);
-        return NextResponse.json({ success: true, message: "Registered for the drive, but failed to send confirmation email" }, { status: 200 });
-
-      }
     } catch (emailError) {
       console.error("Failed to send drive registration email:", emailError);
       return NextResponse.json({ success: false, message: "Registered for the drive, but failed to send confirmation email" }, { status: 500 });
     }
-
-    return NextResponse.json({ success: true, message: "Registered successfully" });
   } catch (error) {
     console.error("External Registration Error:", error);
     return NextResponse.json({ success: false, message: "Registration failed" }, { status: 500 });

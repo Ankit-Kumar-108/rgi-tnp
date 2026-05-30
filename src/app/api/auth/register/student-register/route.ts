@@ -4,7 +4,7 @@ import { registrationSchema } from "@/lib/validations/student";
 import { hashPassword, generateVerificationToken, getresetTokenExpiry } from "@/lib/auth-utils";
 import { getDb } from "@/lib/db";
 import { verificationEmailTemplate } from "@/lib/email-templates";
-import { sendEmail } from "@/lib/send-email";
+import { NotificationService } from "@/lib/notification-service";
 
 
 export async function POST(req: NextRequest) {
@@ -107,15 +107,20 @@ export async function POST(req: NextRequest) {
     const protocol = host?.includes("localhost") ? "http" : "https";
     const verificationLink = `${protocol}://${host}/verify-email?token=${verificationToken}&email=${validatedData.email}&role=student`;
 
-    const emailResult = await sendEmail({
+    const emailResult = await NotificationService.sendEmailWithLog({
       to: trimmedData.email,
       subject: "Verify Your Email - RGI TnP Portal",
       html: verificationEmailTemplate(trimmedData.name, verificationLink),
+      template: "verificationEmailTemplate",
+      triggeredBy: "System",
+      recipientType: "student",
+      approvalId: student.id,
+      approvalType: "student_registration",
+      actionType: "verification",
     });
 
     if (!emailResult.success) {
       console.error("[STUDENT-REGISTER] Email verification failed for:", trimmedData.email, emailResult.error);
-      // Mark registration as failed due to email issue
       await db.student.update({
         where: { id: student.id },
         data: {

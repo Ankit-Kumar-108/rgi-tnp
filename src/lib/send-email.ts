@@ -1,12 +1,16 @@
-
+import { validateEmail } from "./mail-validator";
 interface SendEmailOptions {
-  to: string | undefined
+  to: string
   subject: string;
   html: string;
   from?: string;
 }
-
 export async function sendEmail({ to, subject, html, from }: SendEmailOptions): Promise<{ success: boolean; error?: string }> {
+  const validate = validateEmail(to)
+  if(!validate.valid){
+  console.error(`Email validation error: ${validate.error}`);
+  return { success: false, error: validate.error };
+  }
   const GMAIL_USER = process.env.GMAIL_USER;
   const CLIENT_ID = process.env.GMAIL_CLIENT_ID;
   const CLIENT_SECRET = process.env.GMAIL_CLIENT_SECRET;

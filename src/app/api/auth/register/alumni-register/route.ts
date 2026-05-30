@@ -3,8 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { alumniRegistrationSchema } from "@/lib/validations/alumni";
 import { hashPassword, generateVerificationToken, getresetTokenExpiry } from "@/lib/auth-utils";
 import { getDb } from "@/lib/db";
-import { sendEmail } from "@/lib/send-email";
 import { verificationEmailTemplate } from "@/lib/email-templates";
+import { NotificationService } from "@/lib/notification-service";
 
 export async function POST(req: NextRequest) {
   try {
@@ -89,10 +89,16 @@ export async function POST(req: NextRequest) {
     const protocol = host?.includes("localhost") ? "http" : "https";
     const verificationLink = `${protocol}://${host}/verify-email?token=${verificationToken}&email=${trimmedData.personalEmail}&role=alumni`;
 
-    const emailResult = await sendEmail({
+    const emailResult = await NotificationService.sendEmailWithLog({
       to: trimmedData.personalEmail,
       subject: "Verify Your Email - RGI TnP Portal",
       html: verificationEmailTemplate(trimmedData.name, verificationLink),
+      template: "verificationEmailTemplate",
+      triggeredBy: "System",
+      recipientType: "alumni",
+      approvalId: alumni.id,
+      approvalType: "alumni_registration",
+      actionType: "verification",
     });
 
     if (!emailResult.success) {
