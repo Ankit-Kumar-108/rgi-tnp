@@ -87,14 +87,16 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const adminEmail = req.headers.get("x-admin-email") || "system";
-    const body = await req.json() as {
-      audience: string;
-      subject: string;
-      message: string;
-      channels?: ("email" | "in_app")[];
-    };
-
-    const { audience, subject, message, channels = ["email", "in_app"] } = body;
+    const body = await req.json() as any;
+    const audience = body.audience || body.to;
+    const { subject, message, course, branch } = body;
+    
+    let channels = body.channels;
+    if (!channels) {
+      channels = [];
+      if (body.emailChannel !== false) channels.push("email");
+      if (body.inAppChannel !== false) channels.push("in_app");
+    }
 
     if (!audience || !subject || !message) {
       return NextResponse.json(
@@ -104,13 +106,22 @@ export async function POST(req: NextRequest) {
     }
 
     // Trigger asynchronous broadcast distribution utilizing Cloudflare waitUntil
-    NotificationService.triggerBroadcast({
+    const result = await NotificationService.triggerBroadcast({
       audience,
       subject,
       message,
       triggeredBy: adminEmail,
       channels,
+      course,
+      branch,
     });
+
+    if(!result.success) {
+      return NextResponse.json({
+        success: false,
+        message: result.message,
+      }, {status: 400});
+    }
 
     return NextResponse.json({
       success: true,

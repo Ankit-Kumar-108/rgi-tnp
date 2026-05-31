@@ -1,6 +1,7 @@
 import { getDb } from "./db";
 import { sendEmail } from "./send-email";
 import { runInBackground } from "./background";
+import { NextResponse } from "next/server";
 
 interface SendEmailWithLogOptions {
   to: string;
@@ -55,6 +56,8 @@ interface BroadcastOptions {
   message: string;
   triggeredBy: string;
   channels: ("email" | "in_app")[];
+  course?: string;
+  branch?: string;
 }
 
 const BROADCAST_BATCH_SIZE = 50;
@@ -208,11 +211,8 @@ export class NotificationService {
   /**
    * Large-scale targeted broadcast engine execution in the background.
    */
-  static triggerBroadcast(options: BroadcastOptions) {
-    runInBackground(
-      this.executeBroadcast(options),
-      `broadcast to ${options.audience}`
-    );
+  static async triggerBroadcast(options: BroadcastOptions) {
+    return await this.executeBroadcast(options)
   }
 
   /**
@@ -224,6 +224,8 @@ export class NotificationService {
     message,
     triggeredBy,
     channels,
+    course,
+    branch,
   }: BroadcastOptions) {
     const db = getDb();
     let recipients: { id: string; name: string; email: string; type: "student" | "alumni" | "recruiter" | "external_student" }[] = [];
@@ -231,26 +233,31 @@ export class NotificationService {
     console.log(`[NotificationService] Beginning broadcast resolution for: ${audience}`);
 
     // Resolve audience lists
-    if (audience === "all_students") {
+    if (audience === "all_students" || audience === "student") {
+      const where: any = { isEmailVerified: true };
+      if (course) where.course = course;
+      if (branch) where.branch = branch;
+
       const list = await db.student.findMany({
-        where: { isEmailVerified: true },
+        where,
         select: { id: true, name: true, email: true },
       });
       recipients = list.map((r) => ({ ...r, type: "student" as const }));
+    } else if (audience === "all_external_students") {
+      const where: any = { isVerified: true };
+      if (course) where.course = course;
+      if (branch) where.branch = branch;
+
+      const list = await db.externalStudent.findMany({
+        where,
+        select: { id: true, name: true, email: true },
+      });
+      recipients = list.map((r) => ({ ...r, type: "external_student" as const }));
     } else if (audience === "cs_students") {
       const list = await db.student.findMany({
         where: {
           isEmailVerified: true,
-          branch: {
-            in: [
-              "Computer Science & Engineering",
-              "CS",
-              "CSE",
-              "Information Technology",
-              "IT",
-              "Computer Science",
-            ],
-          },
+          branch: { in: ["Computer Science"] },
         },
         select: { id: true, name: true, email: true },
       });
@@ -259,14 +266,12 @@ export class NotificationService {
       const list = await db.student.findMany({
         where: {
           isEmailVerified: true,
-          branch: {
-            in: ["Mechanical Engineering", "ME", "Mechanical"],
-          },
+          branch: { in: ["Mechanical"]},
         },
         select: { id: true, name: true, email: true },
       });
       recipients = list.map((r) => ({ ...r, type: "student" as const }));
-    } else if (audience === "all_alumni") {
+    } else if (audience === "all_alumnis") {
       const list = await db.alumni.findMany({
         where: { isVerified: true },
         select: { id: true, name: true, personalEmail: true },
@@ -288,7 +293,7 @@ export class NotificationService {
 
     if (recipients.length === 0) {
       console.log(`[NotificationService] No recipients found for audience "${audience}". Aborting broadcast.`);
-      return;
+      return {success:false, message:`No recipients found for audience ${audience}, Course: ${course}, Branch: ${branch}`}
     }
 
     console.log(`[NotificationService] Resolved ${recipients.length} targets. Dispatching in chunks...`);
@@ -313,8 +318,6 @@ export class NotificationService {
                 subject: subject,
                 html: `
                     <div style="font-family: sans-serif; padding: 20px; color: #333;">
-                      <h2 style="color: #0F52BA; margin-bottom: 20px;">${subject}</h2>
-                      <p>Hello <strong>${recipient.name}</strong>,</p>
                       <p style="line-height: 1.6; font-size: 15px;">${message}</p>
                       <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
                       <p style="font-size: 12px; color: #999;">This is an administrative broadcast from Radharaman Group of Institutes (RGI) Training & Placement Cell.</p>
@@ -344,6 +347,7 @@ export class NotificationService {
     }
 
     console.log(`[NotificationService] Broadcast to ${recipients.length} recipients completed.`);
+    return {success:true, message:`Broadcast completed`}
   }
 
   private static chunkArray<T>(items: T[], size: number) {

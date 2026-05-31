@@ -6,7 +6,10 @@ import {
   Users, GraduationCap, Building2, UserCheck, Search, Loader2,
   Shield, ArrowLeft, ChevronDown, Trash2, Mail, Phone, MapPin,
   Briefcase, FileText, Github, Linkedin, CheckCircle2, Clock, XCircle,
-  Send
+  Send,
+  AlertTriangle,
+  CheckCircle,
+  Bell
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
@@ -27,6 +30,8 @@ const BRANCHES = [
   "Civil", "Electronics", "Digital Communication", "Power Systems",
   "Thermal Engineering", "Marketing", "Finance", "Human Resource",
 ];
+
+const COURSES = ["B.Tech", "M.Tech", "MBA", "Diploma"];
 
 // Subcomponents 
 
@@ -70,6 +75,22 @@ export default function AdminUsersPage() {
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [actionLoading, setActionLoading] = useState(false);
+
+  // Compose Broadcast
+  const [showCompose, setShowCompose] = useState(false);
+  const [composeData, setComposeData] = useState({
+    to: "all_students",
+    course: "",
+    branch: "",
+    subject: "",
+    message: "",
+    emailChannel: true,
+    inAppChannel: true,
+  });
+  const [sending, setSending] = useState(false);
+  const [sendSuccess, setSendSuccess] = useState(false);
+  const [sendError, setSendError] = useState("");
+
 
   //  Infinite scroll
   const observer = useRef<IntersectionObserver | null>(null);
@@ -200,6 +221,84 @@ export default function AdminUsersPage() {
     }
   };
 
+  // Handle broadcast send
+  const handleSendBroadcast = async () => {
+    if (!composeData.subject || !composeData.message) {
+      setSendError("Subject and message are required");
+      return;
+    }
+
+    if (!composeData.emailChannel && !composeData.inAppChannel) {
+      setSendError("Please select at least one delivery channel");
+      return;
+    }
+
+    setSending(true);
+    setSendError("");
+
+    try {
+      const res = await fetch("/api/admin/notifications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: composeData.to,
+          course: composeData.course || undefined,
+          branch: composeData.branch || undefined,
+          subject: composeData.subject,
+          message: composeData.message,
+          emailChannel: composeData.emailChannel,
+          inAppChannel: composeData.inAppChannel,
+        }),
+      });
+
+      const data = await res.json() as any;
+
+      if (data.success) {
+        setSendSuccess(true);
+        toast.success("Broadcast queued successfully!");
+
+        // Reset form after 2 seconds
+        setTimeout(() => {
+          setShowCompose(false);
+          setSendSuccess(false);
+          setComposeData({
+            to: "all_students",
+            course: "",
+            branch: "",
+            subject: "",
+            message: "",
+            emailChannel: true,
+            inAppChannel: true,
+          });
+        }, 2000);
+      } else {
+        setSendError(data.message || "Failed to send broadcast");
+      }
+    } catch (err) {
+      setSendError("An error occurred while sending the broadcast");
+      toast.error("Error sending broadcast");
+    } finally {
+      setSending(false);
+    }
+  };
+
+  function getTabData(activeTab: string) {
+    if (activeTab === "student") {
+      return [{ tabData: "all_students" }];
+    }
+    if (activeTab === "alumni") {
+      return [{ tabData: "all_alumnis" }];
+    }
+    if (activeTab === "recruiter") {
+      return [{ tabData: "all_recruiters" }];
+    }
+    if (activeTab === "external") {
+      return [{ tabData: "all_external_students" }];
+    }
+
+    return [];
+  }
+
   if (authLoading || !authenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -215,7 +314,6 @@ export default function AdminUsersPage() {
       {/* Sticky Header */}
       <header className="fixed w-full top-0 z-40 bg-card/80 backdrop-blur-xl border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 min-h-16 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
-
           {/* Left: back + title */}
           <div className="flex items-center gap-3 min-w-0 flex-1 sm:flex-none">
             <Link href="/admin/dashboard" className="w-8 h-8 rounded-lg flex items-center justify-center border border-border hover:bg-muted transition-colors shrink-0">
@@ -233,12 +331,6 @@ export default function AdminUsersPage() {
               </div>
             </div>
           </div>
-          <button
-            className="group bg-brand text-white px-4.5 py-2 rounded-lg md:rounded-xl text-xs font-bold shadow-lg shadow-brand/25 transition-all duration-300 flex items-center gap-2 cursor-pointer"
-          >
-            <Send className="group-hover:translate-x-2 group-hover:-translate-y-2 transition-all duration-300 size-5" />
-            <span className="hidden md:flex">Compose Broadcast</span>
-          </button>
           {/* Bulk action bar (Responsive: drops to new line on mobile) */}
           {selectedIds.size > 0 && (
             <div className="flex items-center gap-2 h-11 px-3 bg-brand/5 border border-brand/20 rounded-xl animate-in fade-in slide-in-from-bottom-2 duration-200 w-full sm:w-auto order-3 sm:order-0 overflow-x-auto no-scrollbar">
@@ -263,6 +355,17 @@ export default function AdminUsersPage() {
               </button>
             </div>
           )}
+          {/* compose button */}
+          <button
+            onClick={() => {
+              setShowCompose(true);
+              setComposeData(prev => ({ ...prev, to: getTabData(activeTab)[0]?.tabData ?? activeTab }));
+            }}
+            className="group bg-brand text-white px-4.5 py-2 rounded-lg md:rounded-xl text-xs font-bold shadow-lg shadow-brand/25 transition-all duration-300 flex items-center gap-2 cursor-pointer"
+          >
+            <Send className="group-hover:translate-x-2 group-hover:-translate-y-2 transition-all duration-300 size-5" />
+            <span className="hidden md:flex">Compose Broadcast</span>
+          </button>
         </div>
       </header>
 
@@ -273,8 +376,8 @@ export default function AdminUsersPage() {
           {TABS.map((tab) => (
             <button key={tab.key} onClick={() => handleTabChange(tab.key)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${activeTab === tab.key
-                  ? "bg-brand text-white shadow-[var(--shadow-brand)]"
-                  : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-brand/40"
+                ? "bg-brand text-white shadow-(--shadow-brand)"
+                : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-brand/40"
                 }`}>
               <tab.icon className="w-4 h-4" />
               {tab.label}
@@ -311,7 +414,167 @@ export default function AdminUsersPage() {
             Search
           </button>
         </form>
+        {/* Compose Modal */}
+        {showCompose && (
+          <div className="absolute w-full h-full top-0 left-0 z-60 bg-[#020617]/50 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setShowCompose(false)}>
+            <div className="bg-white dark:bg-[#0D1527] rounded-3xl border border-slate-200 dark:border-slate-800/80 shadow-2xl max-w-xl w-full p-8 animate-in fade-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+              {sendSuccess ? (
+                <div className="text-center py-10">
+                  <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6 text-green-500">
+                    <CheckCircle className="w-10 h-10" />
+                  </div>
+                  <h3 className="text-2xl font-black text-slate-900 dark:text-white">Broadcast Queued!</h3>
+                  <p className="text-sm text-slate-400 mt-2 max-w-sm mx-auto">Your message is being distributed in the background through Cloudflare workers.</p>
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center text-brand">
+                      <Send className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-black text-slate-900 dark:text-white">New Multi-Channel Broadcast</h3>
+                      <p className="text-xs text-slate-400 mt-0.5">Send immediate push alerts or emails to target groups</p>
+                    </div>
+                  </div>
 
+                  {sendError && (
+                    <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs rounded-xl flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 shrink-0" />
+                      <span>{sendError}</span>
+                    </div>
+                  )}
+
+                  <div className="space-y-5">
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-[#64748B]">Target Recipient Audience</label>
+                      <div className="relative">
+                        <select
+                          value={composeData.to}
+                          onChange={(e) => setComposeData({ ...composeData, to: e.target.value, course: "", branch: "" })}
+                          className="w-full appearance-none bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 pr-10 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand transition-all"
+                        >
+                          <option value={getTabData(activeTab)[0]?.tabData ?? activeTab}>
+                            All {TABS.find(t => t.key === activeTab)?.label}
+                          </option>
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                      </div>
+                    </div>
+
+                    {(activeTab === "student" || activeTab === "external") && (
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-[#64748B]">Course</label>
+                          <div className="relative">
+                            <select
+                              value={composeData.course}
+                              onChange={(e) => setComposeData({ ...composeData, course: e.target.value })}
+                              className="w-full appearance-none bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 pr-10 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand transition-all"
+                            >
+                              <option value="">All Courses</option>
+                              {COURSES.map((c) => (
+                                <option key={c} value={c}>{c}</option>
+                              ))}
+                            </select>
+                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-[#64748B]">Branch</label>
+                          <div className="relative">
+                            <select
+                              value={composeData.branch}
+                              onChange={(e) => setComposeData({ ...composeData, branch: e.target.value })}
+                              className="w-full appearance-none bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 pr-10 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand transition-all"
+                            >
+                              <option value="">All Branches</option>
+                              {BRANCHES.filter(b => b !== "All Branches").map((b) => (
+                                <option key={b} value={b}>{b}</option>
+                              ))}
+                            </select>
+                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-[#64748B]">Message Subject</label>
+                      <input
+                        type="text"
+                        value={composeData.subject}
+                        onChange={(e) => setComposeData({ ...composeData, subject: e.target.value })}
+                        className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand transition-all"
+                        placeholder="Opportunity update, urgent notice, event alert..."
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-[#64748B]">Detailed Body Message</label>
+                      <textarea
+                        value={composeData.message}
+                        onChange={(e) => setComposeData({ ...composeData, message: e.target.value })}
+                        className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand transition-all"
+                        rows={5}
+                        placeholder="Write the clear details of your notice here..."
+                      />
+                    </div>
+
+                    {/* Delivery Channels */}
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-[#64748B]">Delivery Channels</label>
+                      <div className="flex gap-6 mt-1">
+                        <label className="flex items-center gap-2 cursor-pointer group">
+                          <input
+                            type="checkbox"
+                            checked={composeData.emailChannel}
+                            onChange={(e) => setComposeData({ ...composeData, emailChannel: e.target.checked })}
+                            className="w-4 h-4 text-brand focus:ring-brand border-slate-300 dark:border-slate-700 rounded"
+                          />
+                          <span className="text-sm font-semibold group-hover:text-slate-900 dark:group-hover:text-white transition-colors flex items-center gap-1.5">
+                            <Mail className="w-4 h-4 text-slate-400" />
+                            Email Channel
+                          </span>
+                        </label>
+
+                        <label className="flex items-center gap-2 cursor-pointer group">
+                          <input
+                            type="checkbox"
+                            checked={composeData.inAppChannel}
+                            onChange={(e) => setComposeData({ ...composeData, inAppChannel: e.target.checked })}
+                            className="w-4 h-4 text-brand focus:ring-brand border-slate-300 dark:border-slate-700 rounded"
+                          />
+                          <span className="text-sm font-semibold group-hover:text-slate-900 dark:group-hover:text-white transition-colors flex items-center gap-1.5">
+                            <Bell className="w-4 h-4 text-slate-400" />
+                            In-App Push
+                          </span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-4 pt-2">
+                      <button
+                        onClick={() => setShowCompose(false)}
+                        className="flex-1 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 py-3 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-all duration-150"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleSendBroadcast}
+                        disabled={sending || !composeData.subject || !composeData.message}
+                        className="flex-1 bg-brand hover:bg-brand/90 text-white py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-brand/25 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-40"
+                      >
+                        {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                        {sending ? "Triggering..." : "Send Broadcast"}
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
         {/* ── Users List (Cards) ─────────────────────────────────────────── */}
         <section>
           <div className="flex items-center justify-between mb-3 px-1">
@@ -399,8 +662,8 @@ export default function AdminUsersPage() {
                             {/* Verification Badge (Hidden for recruiters as they lack the DB field) */}
                             {activeTab !== "recruiter" && (
                               <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full ${isVerified
-                                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:border-emerald-800 dark:text-emerald-300"
-                                  : "bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-900/30 dark:border-amber-800 dark:text-amber-300"
+                                ? "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:border-emerald-800 dark:text-emerald-300"
+                                : "bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-900/30 dark:border-amber-800 dark:text-amber-300"
                                 }`}>
                                 {isVerified ? <CheckCircle2 className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
                                 {isVerified ? "Verified" : "Pending"}
@@ -430,6 +693,7 @@ export default function AdminUsersPage() {
                               <span className="font-semibold text-brand">{college}</span>
                               <span className="text-border">·</span>
                               <span>{user.branch || "No Branch"}</span>
+
                             </>
                           )}
                           {user.batch && (
