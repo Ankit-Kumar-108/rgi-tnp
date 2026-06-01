@@ -48,7 +48,7 @@ export async function sendEmail({ to, subject, html, from }: SendEmailOptions): 
     
     // Cloudflare Workers support Buffer via their 'nodejs_compat' compatibility flag
     const rawMessage = [
-      `From: RGI T&P <${senderEmail}>`,
+      `From: RGI Training and Placement Department <${senderEmail}>`,
       `To: ${to}`,
       `Subject: =?utf-8?B?${base64Subject}?=`,
       `MIME-Version: 1.0`,

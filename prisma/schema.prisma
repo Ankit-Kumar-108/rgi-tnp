@@ -196,6 +196,9 @@ model DriveRegistration {
   attended  Boolean  @default(false)
   status    String   @default("Applied")
   createdAt DateTime @default(now())
+
+  @@unique([driveId, studentId])
+  @@unique([driveId, externalStudentId])
 }
 
 model Recruiter {

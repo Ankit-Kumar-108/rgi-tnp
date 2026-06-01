@@ -2,6 +2,10 @@ import { getDb } from "./db";
 import { sendEmail } from "./send-email";
 import { runInBackground } from "./background";
 import { NextResponse } from "next/server";
+import { infinite } from "swr/infinite";
+import { nullable, set } from "zod";
+import { nonNullable } from "next/dist/lib/non-nullable";
+import { referralSchema } from "./validations/alumni";
 
 interface SendEmailWithLogOptions {
   to: string;
@@ -58,6 +62,7 @@ interface BroadcastOptions {
   channels: ("email" | "in_app")[];
   course?: string;
   branch?: string;
+  driveId?: string;
 }
 
 const BROADCAST_BATCH_SIZE = 50;
@@ -226,6 +231,7 @@ export class NotificationService {
     channels,
     course,
     branch,
+    driveId,
   }: BroadcastOptions) {
     const db = getDb();
     let recipients: { id: string; name: string; email: string; type: "student" | "alumni" | "recruiter" | "external_student" }[] = [];
@@ -233,10 +239,11 @@ export class NotificationService {
     console.log(`[NotificationService] Beginning broadcast resolution for: ${audience}`);
 
     // Resolve audience lists
-    if (audience === "all_students" || audience === "student") {
+    if (audience === "all_students") {
       const where: any = { isEmailVerified: true };
       if (course) where.course = course;
       if (branch) where.branch = branch;
+      if (driveId) where.driveId = driveId
 
       const list = await db.student.findMany({
         where,
@@ -266,7 +273,7 @@ export class NotificationService {
       const list = await db.student.findMany({
         where: {
           isEmailVerified: true,
-          branch: { in: ["Mechanical"]},
+          branch: { in: ["Mechanical"] },
         },
         select: { id: true, name: true, email: true },
       });
@@ -289,11 +296,83 @@ export class NotificationService {
         select: { id: true, name: true, email: true },
       });
       recipients = list.map((r) => ({ ...r, type: "student" as const }));
+    } else if (audience === "all_drive_participants") {
+      const list = await db.driveRegistration.findMany({
+        where: { driveId: driveId },
+        select: {
+          student: { select: { id: true, name: true, email: true } },
+          externalStudent: { select: { id: true, name: true, email: true } }
+        }
+      })
+      const rawRecipients = list.map((reg) => {
+        if (reg.student) return { ...reg.student, type: "student" as const }
+        if (reg.externalStudent) return { ...reg.externalStudent, type: "external_student" as const }
+        return null
+      }).filter((r): r is NonNullable<typeof r> => r !== null)
+      const uniqueMap = new Map()
+      for (const person of rawRecipients) {
+        if (!uniqueMap.has(person.email)) {
+          uniqueMap.set(person.email, person)
+        }
+      }
+      recipients = Array.from(uniqueMap.values())
+
+    } else if (audience === "internal_drive_participants") {
+      const list = await db.driveRegistration.findMany({
+        where: { driveId: driveId },
+        select: {
+          student: {
+            select: {
+              id: true,
+              name: true,
+              email: true
+            }
+          }
+        }
+      })
+      const rawRecipients = list.map((reg) => {
+        if (reg.student) return { ...reg.student, type: "student" as const }
+        return null
+      }).filter((r): r is NonNullable<typeof r> => r !== null)
+
+      const uniqueMap = new Map()
+      for (const person of rawRecipients) {
+        if (!uniqueMap.has(person.email)) {
+          uniqueMap.set(person.email, person)
+        }
+      }
+      recipients = Array.from(uniqueMap.values())
+
+    } else if (audience === "external_drive_participants") {
+      const list = await db.driveRegistration.findMany({
+        where: { driveId },
+        select: {
+          externalStudent: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            }
+          }
+        }
+      })
+      const rawRecipients = list.map((reg) => {
+        if (reg.externalStudent) return { ...reg.externalStudent, type: "external_student" as const }
+        return null
+      }).filter((r): r is NonNullable<typeof r> => r !== null)
+
+      const uniqueMap = new Map()
+      for (const person of rawRecipients) {
+        if (!uniqueMap.has(person.email)) {
+          uniqueMap.set(person.email, person)
+        }
+      }
+      recipients = Array.from(uniqueMap.values())
     }
 
     if (recipients.length === 0) {
       console.log(`[NotificationService] No recipients found for audience "${audience}". Aborting broadcast.`);
-      return {success:false, message:`No recipients found for audience ${audience}, Course: ${course}, Branch: ${branch}`}
+      return { success: false, message: `No recipients found for audience ${audience}, Course: ${course}, Branch: ${branch}` }
     }
 
     console.log(`[NotificationService] Resolved ${recipients.length} targets. Dispatching in chunks...`);
@@ -347,7 +426,7 @@ export class NotificationService {
     }
 
     console.log(`[NotificationService] Broadcast to ${recipients.length} recipients completed.`);
-    return {success:true, message:`Broadcast completed`}
+    return { success: true, message: `Broadcast completed` }
   }
 
   private static chunkArray<T>(items: T[], size: number) {

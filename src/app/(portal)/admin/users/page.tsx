@@ -416,7 +416,7 @@ export default function AdminUsersPage() {
         </form>
         {/* Compose Modal */}
         {showCompose && (
-          <div className="absolute w-full h-full top-0 left-0 z-60 bg-[#020617]/50 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setShowCompose(false)}>
+          <div className="fixed w-full h-full top-0 left-0 z-60 bg-[#020617]/50 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setShowCompose(false)}>
             <div className="bg-white dark:bg-[#0D1527] rounded-3xl border border-slate-200 dark:border-slate-800/80 shadow-2xl max-w-xl w-full p-8 animate-in fade-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
               {sendSuccess ? (
                 <div className="text-center py-10">
