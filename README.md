@@ -490,13 +490,13 @@ Verify Token + Role Authorization
 - [ ] **Notification (add notification for drive registration, user registration, email sent)  (to change on 1/06/2026 [Done])**
 - add notification for drive registration for better visibility and understanding of status of drive registration
 
-- [ ] **Broadcast (add broadcast email for all students, alumni and external student in user Management tab)  (to change on 5/06/2026 [to be Done])**
+- [ ] **Broadcast (add broadcast email for all students, alumni and external student in user Management tab)  (to change on 5/06/2026 [Done])**
 - add broadcast email for all students, alumni and external student for better communication and understanding of status of broadcast also remove compose from notification management
 
 - [ ] **Auto transfer student to alumni (add feature)  (to change on 5/06/2026 [to be Done])**
 - add feature to auto transfer student to alumni after completion of course for better visibility and understanding of profile and also add notification for that 
 
-- [ ] **Admin Panel (in drive management section add custom email function so admin can send custom email to all applicants of drive or selected applicants of drive)  (to change on 10/06/2026 [to be Done])**
+- [ ] **Admin Panel (in drive management section add custom email function so admin can send custom email to all applicants of drive or selected applicants of drive)  (to change on 10/06/2026 [Done])**
 - add custom email function in drive management section of admin panel so admin can send custom email to all applicants of drive or selected applicants of drive for better communication and understanding of status of drive and also add template for that email
 
 - [ ] **Backend (add linkedin api and googleSheet api integration)  (to change on 15/06/2026 [to be Done])**
@@ -505,7 +505,7 @@ Verify Token + Role Authorization
 - [ ] **Referral (add a page where referral are posted by alumni and also appears in the students dashboard)  (to change on 20/06/2026 [to be Done])**
  - add a page where referral are posted by alumni for better visibility and understanding of referral and also add filter in that page for better visibility only logged in student and alumni can see that page
 
-- [ ] **Notification Center (add send mail to all students, alumni, recruiters and course specific students)  (to change on 25/06/2026 [to be Done])**
+- [ ] **Notification Center (add send mail to all students, alumni, recruiters and course specific students)  (to change on 25/06/2026 [Done])**
  - add notification center in admin panel where admin can send mail to all students, alumni, recruiters and course specific students for better communication and understanding of status of drive and also add template for that email
 
 - [ ] **Site (improve site content)  (to change on 25/06/2026 [to be Done])** 

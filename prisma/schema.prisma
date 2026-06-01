@@ -106,6 +106,9 @@ model Alumni {
   createdAt                    DateTime         @default(now())
   updatedAt                    DateTime         @updatedAt
   notifications                Notification[]
+  placementSnapsJson           Json?            @default("[]")
+  isTransferred                Boolean?         @default(false)
+  registrations                DriveRegistration[]
 }
 
 model ExternalStudent {
@@ -171,6 +174,7 @@ model PlacementDrive {
   volunteerStudentStatuses VolunteerStudentStatus[]
   createdAt                DateTime                 @default(now())
   updatedAt                DateTime                 @updatedAt
+  allowAlumni              Boolean                  @default(false)
 }
 
 model DriveImage {
@@ -197,8 +201,12 @@ model DriveRegistration {
   status    String   @default("Applied")
   createdAt DateTime @default(now())
 
+  alumniId  String?
+  alumni    Alumni?  @relation(fields: [alumniId], references: [id])
+
   @@unique([driveId, studentId])
   @@unique([driveId, externalStudentId])
+  @@unique([driveId, alumniId])
 }
 
 model Recruiter {

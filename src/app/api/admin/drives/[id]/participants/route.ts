@@ -68,6 +68,21 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
             tenthPercentage: true,
             twelfthPercentage: true,
           }
+        },
+        alumni: {
+          select: {
+            name: true,
+            enrollmentNumber: true,
+            branch: true,
+            profileImageUrl: true,
+            personalEmail: true,
+            phoneNumber: true,
+            linkedInUrl: true,
+            course: true,
+            batch: true,
+            currentCompany: true,
+            jobTitle: true,
+          }
         }
       },
       orderBy: { createdAt: "desc" }
@@ -156,6 +171,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
                 email: true,
                 id: true
               }
+            },
+            alumni: {
+              select: {
+                name: true,
+                personalEmail: true,
+                id: true
+              }
             }
           }
 
@@ -164,11 +186,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         // Send emails to all selected students in PARALLEL (not sequential)
         const emailPromises = updatedRegistrations
           .filter(reg => {
-            const studentData = reg.student || reg.externalStudent;
+            const studentData = reg.student || reg.externalStudent || (reg.alumni ? { ...reg.alumni, email: reg.alumni.personalEmail } : null);
             return studentData?.email && studentData?.name && reg.drive?.companyName && reg.drive?.roleName && reg.drive?.ctc;
           })
           .map(async (reg) => {
-            const studentData = reg.student || reg.externalStudent;
+            const studentData = reg.student || reg.externalStudent || (reg.alumni ? { ...reg.alumni, email: reg.alumni.personalEmail } : null);
             await NotificationService.notifyUser({
               email: {
                 to: studentData!.email,
@@ -193,7 +215,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
               triggeredBy: "system",
               recipient: {
                 id: studentData!.id,
-                type: studentData === reg.student ? "student" : "external_student"
+                type: reg.student ? "student" : reg.externalStudent ? "external_student" : "alumni"
               }
       }).catch(emailError => {
         console.error(`Failed to send email to ${studentData!.email}:`, {
@@ -242,6 +264,13 @@ if (status.toLowerCase() === "rejected") {
             email: true,
             id: true
           }
+        },
+        alumni: {
+          select: {
+            name: true,
+            personalEmail: true,
+            id: true
+          }
         }
       }
 
@@ -250,11 +279,11 @@ if (status.toLowerCase() === "rejected") {
     // Send emails to all rejected students in PARALLEL (not sequential)
     const emailPromises = updatedRegistrations
       .filter(reg => {
-        const studentData = reg.student || reg.externalStudent;
+        const studentData = reg.student || reg.externalStudent || (reg.alumni ? { ...reg.alumni, email: reg.alumni.personalEmail } : null);
         return studentData?.email && studentData?.name && reg.drive?.companyName && reg.drive?.roleName;
       })
       .map(async (reg) => {
-        const studentData = reg.student || reg.externalStudent;
+        const studentData = reg.student || reg.externalStudent || (reg.alumni ? { ...reg.alumni, email: reg.alumni.personalEmail } : null);
         await NotificationService.notifyUser({
           email: {
             to: studentData!.email,
@@ -277,7 +306,7 @@ if (status.toLowerCase() === "rejected") {
           triggeredBy: "system",
           recipient: {
             id: studentData!.id,
-            type: studentData === reg.student ? "student" : "external_student"
+            type: reg.student ? "student" : reg.externalStudent ? "external_student" : "alumni"
           }
         }).catch(emailError => {
           console.error(`Failed to send email to ${studentData!.email}:`, {
@@ -326,6 +355,13 @@ if (status.toLowerCase() === "shortlisted") {
             email: true,
             id: true
           }
+        },
+        alumni: {
+          select: {
+            name: true,
+            personalEmail: true,
+            id: true
+          }
         }
       }
 
@@ -334,11 +370,11 @@ if (status.toLowerCase() === "shortlisted") {
     // Send emails to all shortlisted students in PARALLEL (not sequential)
     const emailPromises = updatedRegistrations
       .filter(reg => {
-        const studentData = reg.student || reg.externalStudent;
+        const studentData = reg.student || reg.externalStudent || (reg.alumni ? { ...reg.alumni, email: reg.alumni.personalEmail } : null);
         return studentData?.email && studentData?.name && reg.drive?.companyName && reg.drive?.roleName;
       })
       .map(reg => {
-        const studentData = reg.student || reg.externalStudent;
+        const studentData = reg.student || reg.externalStudent || (reg.alumni ? { ...reg.alumni, email: reg.alumni.personalEmail } : null);
         return NotificationService.notifyUser({
           email: {
             to: studentData!.email,
@@ -359,7 +395,7 @@ if (status.toLowerCase() === "shortlisted") {
           triggeredBy: "admin",
           recipient: {
             id: studentData!.id,
-            type: "student"
+            type: reg.student ? "student" : reg.externalStudent ? "external_student" : "alumni"
           }
         }).catch(emailError => {
           console.error(`Failed to send email to ${studentData!.email}:`, {

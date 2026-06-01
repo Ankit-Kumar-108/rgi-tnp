@@ -29,3 +29,8 @@ export const getBatchYears = (): number[] => {
 export const COURSE_DURATION_YEARS = 4;
 
 export const COURSE_DURATION_SEMESTERS = COURSE_DURATION_YEARS * 2;
+
+export const isPassout = (course: string, semester: number): boolean => {
+  const maxSems = getMaxSemestersForCourse(course);
+  return semester >= maxSems;
+};

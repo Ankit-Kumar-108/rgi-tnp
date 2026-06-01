@@ -26,6 +26,7 @@ type Participant = {
   starred?: boolean;
   student?: StudentUser;
   externalStudent?: StudentUser;
+  alumni?: StudentUser;
 };
 type StudentUser = {
   name?: string;
@@ -334,21 +335,22 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
 
   const filteredParticipants = useMemo(() => {
     let list = participants.filter(p => {
-      const u = p.student || p.externalStudent;
+      const u = p.student || p.externalStudent || p.alumni;
       const matchesSearch = !searchQuery ||
         u?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         u?.enrollmentNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         u?.branch?.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesStatus = statusFilter === "All" || p.status === statusFilter;
       const isInternal = !!p.student;
-      const matchesType = typeFilter === "All" || (typeFilter === "Internal" ? isInternal : !isInternal);
+      const isAlumni = !!p.alumni;
+      const matchesType = typeFilter === "All" || (typeFilter === "Internal" ? isInternal : typeFilter === "External" ? !!p.externalStudent : isAlumni);
       const matchesAttandance = attandanceFilter === "All" || (attandanceFilter === "Present" ? p.attended === true : p.attended === false);
       return matchesSearch && matchesStatus && matchesType && matchesAttandance;
     });
 
     list.sort((a, b) => {
-      const ua = a.student || a.externalStudent || {};
-      const ub = b.student || b.externalStudent || {};
+      const ua = a.student || a.externalStudent || a.alumni || {};
+      const ub = b.student || b.externalStudent || b.alumni || {};
       if (sortBy === "cgpa") return (Number(ub.cgpa) || 0) - (Number(ua.cgpa) || 0);
       if (sortBy === "name") return (ua.name || "").localeCompare(ub.name || "");
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -374,8 +376,8 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
     if (!filteredParticipants.length) return;
     const headers = ["Name", "Enrollment", "Email", "Phone", "Type", "College", "Branch", "CGPA", "10th Percentage", "12th Percentage/ Diploma", "Status", "Attended", "Applied On", "Resume"];
     const rows = filteredParticipants.map(p => {
-      const u = p.student || p.externalStudent || {};
-      const type = p.student ? "Internal" : "External";
+      const u = p.student || p.externalStudent || p.alumni || {};
+      const type = p.student ? "Internal" : p.externalStudent ? "External" : "Alumni";
       return [
         `"${u.name || ""}"`, `"${u.enrollmentNumber || ""}"`, `"${u.email || ""}"`,
         `"${u.phoneNumber || ""}"`, `"${type}"`, `"${u.collegeName || "RGI"}"`,
@@ -793,9 +795,10 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
           ) : (
             <div className="space-y-2.5">
               {filteredParticipants.map((reg, index) => {
-                const user = reg.student || reg.externalStudent || {} as StudentUser;
+                const user = reg.student || reg.externalStudent || reg.alumni || {} as StudentUser;
                 const isSelected = selectedIds.has(reg.id);
                 const isInternal = !!reg.student;
+                const isAlumni = !!reg.alumni;
                 const isLast = index === filteredParticipants.length - 1;
 
                 return (

@@ -78,15 +78,15 @@ export default function AlumniDashboard() {
   const [fbSubmitted, setFbSubmitted] = useState(false);
 
   // Memory Modal State
-    const [isMemModalOpen, setIsMemModalOpen] = useState(false);
-    const [selectedMemFiles, setSelectedMemFiles] = useState<File[]>([]);
-    const [memBatchTitle, setMemBatchTitle] = useState("");
-    const [memPreviews, setMemPreviews] = useState<string[]>([]);
+  const [isMemModalOpen, setIsMemModalOpen] = useState(false);
+  const [selectedMemFiles, setSelectedMemFiles] = useState<File[]>([]);
+  const [memBatchTitle, setMemBatchTitle] = useState("");
+  const [memPreviews, setMemPreviews] = useState<string[]>([]);
   const [data, setData] = useState<any>(null);
   const [memUploading, setMemUploading] = useState(false);
   const [profileUploading, setProfileUploading] = useState(false);
   const profileImageRef = React.useRef<HTMLInputElement>(null);
-  
+
 
   // Profile Form
   const [profileForm, setProfileForm] = useState({
@@ -502,7 +502,7 @@ export default function AlumniDashboard() {
 
                     <div className="absolute top-0 right-0 w-24 h-24 md:w-40 md:h-40 bg-gradient-to-bl from-brand/10 via-transparent to-transparent rounded-bl-[3rem] md:rounded-bl-[6rem]"></div>
 
-                    <div 
+                    <div
                       onClick={() => !profileUploading && profileImageRef.current?.click()}
                       className="relative shrink-0 cursor-pointer group/avatar"
                     >
@@ -536,12 +536,12 @@ export default function AlumniDashboard() {
                       </div>
 
                       {/* Hidden Input */}
-                      <input 
-                        type="file" 
-                        ref={profileImageRef} 
-                        onChange={handleProfileImageUpload} 
-                        accept="image/*" 
-                        className="hidden" 
+                      <input
+                        type="file"
+                        ref={profileImageRef}
+                        onChange={handleProfileImageUpload}
+                        accept="image/*"
+                        className="hidden"
                         disabled={profileUploading}
                       />
 
@@ -553,7 +553,7 @@ export default function AlumniDashboard() {
                         )}
                       </div>
                     </div>
-                    
+
 
                     <div className="flex-1 space-y-6 md:space-y-8 w-full text-center md:text-left">
                       <div className="space-y-2 md:space-y-3">
@@ -818,6 +818,116 @@ export default function AlumniDashboard() {
             </section>
           )}
 
+          {/* Campus Drives Section */}
+          {!loading && !fetchError && (data?.drives?.length > 0) && (
+            <section className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center">
+                    <Briefcase className="w-5 h-5 text-brand" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg md:text-xl font-black text-foreground tracking-tight">
+                      Campus Drives
+                    </h2>
+                    <p className="text-xs text-muted-foreground">
+                      Drives open for experienced alumni
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {data.drives.map((drive: any) => (
+                  <div
+                    key={drive.id}
+                    className="bg-card rounded-2xl p-6 border border-border
+                     shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)]
+                     transition-all duration-300 group"
+                  >
+                    {/* Company + Role */}
+                    <div className="flex items-start justify-between gap-3 mb-4">
+                      <div>
+                        <h3 className="text-base font-black text-foreground leading-tight">
+                          {drive.companyName}
+                        </h3>
+                        <p className="text-sm text-muted-foreground font-medium mt-0.5">
+                          {drive.roleName}
+                        </p>
+                      </div>
+                      {drive.isRegistered ? (
+                        <span className="shrink-0 inline-flex items-center gap-1.5 text-xs
+                               font-bold px-3 py-1.5 rounded-full bg-green-500/10
+                               text-green-600 border border-green-500/20">
+                          <CheckCircle className="w-3.5 h-3.5" />
+                          Registered
+                        </span>
+                      ) : (
+                        <button
+                          onClick={async () => {
+                            try {
+                              const token = getToken("alumni");
+                              const res = await fetch("/api/alumni/drives", {
+                                method: "POST",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                  Authorization: `Bearer ${token}`,
+                                },
+                                body: JSON.stringify({ driveId: drive.id }),
+                              });
+                              const d = (await res.json()) as any;
+                              if (d.success) {
+                                toast.success(d.message);
+                                fetchDashboard(); // 💡 Refresh to update isRegistered
+                              } else {
+                                toast.error(d.message || "Registration failed");
+                              }
+                            } catch {
+                              toast.error("Failed to register");
+                            }
+                          }}
+                          className="shrink-0 text-xs font-bold px-4 py-1.5 rounded-full
+                           bg-brand text-white hover:bg-brand/90 transition-all
+                           shadow-md shadow-brand/25"
+                        >
+                          Register
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Drive Details */}
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                      <span className="inline-flex items-center gap-1 font-semibold">
+                        <Calendar className="w-3 h-3" />
+                        {new Date(drive.driveDate).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </span>
+                      <span className="text-border">·</span>
+                      <span className="font-medium">{drive.ctc}</span>
+                      <span className="text-border">·</span>
+                      <span>{drive.jobType}</span>
+                      <span className="text-border">·</span>
+                      <span>{drive.driveType}</span>
+                    </div>
+
+                    {/* Recruiter info */}
+                    {drive.recruiter && (
+                      <div className="mt-3 pt-3 border-t border-border/50
+                            text-xs text-muted-foreground">
+                        <span className="font-semibold">{drive.recruiter.company}</span>
+                        {" · "}
+                        <span>{drive.recruiter.name}</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
           {/* Error State */}
           {!loading && fetchError && (
             <div className="flex flex-col items-center justify-center py-16 gap-4">
@@ -1048,8 +1158,8 @@ export default function AlumniDashboard() {
                         {/* Validation Messages */}
                         {refMsg && (
                           <div className={`p-4 rounded-xl flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-300 ${refMsg.ok
-                              ? "bg-green-500/10 border border-green-500/20 text-green-600"
-                              : "bg-destructive/10 border border-destructive/20 text-destructive"
+                            ? "bg-green-500/10 border border-green-500/20 text-green-600"
+                            : "bg-destructive/10 border border-destructive/20 text-destructive"
                             }`}>
                             {refMsg.ok ? <CheckCircle className="w-4 h-4 mt-0.5 shrink-0" /> : <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />}
                             <div className="space-y-1">
@@ -1157,8 +1267,8 @@ export default function AlumniDashboard() {
                                 >
                                   <Star
                                     className={`w-6 h-6 transition-all duration-300 ${s <= (hoverRating || fbRating)
-                                        ? "text-amber-400 fill-amber-400 drop-shadow-[0_2px_8px_rgba(251,191,36,0.4)] scale-110"
-                                        : "text-border hover:text-muted-foreground/50"
+                                      ? "text-amber-400 fill-amber-400 drop-shadow-[0_2px_8px_rgba(251,191,36,0.4)] scale-110"
+                                      : "text-border hover:text-muted-foreground/50"
                                       }`}
                                   />
                                 </button>
@@ -1234,7 +1344,7 @@ export default function AlumniDashboard() {
                   <h3 className="text-2xl font-black text-foreground tracking-tight">Create Memory</h3>
                   <p className="text-sm text-muted-foreground">Share this special moment from your journey</p>
                 </div>
-    
+
                 {memPreviews.length > 0 && (
                   <div className="grid grid-cols-2 gap-3 max-h-75 overflow-y-auto p-1 scrollbar-hide">
                     {memPreviews.map((preview, idx) => (
@@ -1245,11 +1355,11 @@ export default function AlumniDashboard() {
                     ))}
                   </div>
                 )}
-    
+
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <label className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Batch Title (Optional)</label>
-                    <input 
+                    <input
                       type="text"
                       value={memBatchTitle}
                       onChange={(e) => setMemBatchTitle(e.target.value)}
@@ -1258,15 +1368,15 @@ export default function AlumniDashboard() {
                     />
                     <p className="text-xs text-muted-foreground ml-1">This title will be applied to all {selectedMemFiles.length} images.</p>
                   </div>
-    
+
                   <div className="flex gap-3">
-                    <button 
+                    <button
                       onClick={() => { setIsMemModalOpen(false); setSelectedMemFiles([]); setMemPreviews([]); }}
                       className="flex-1 bg-muted text-foreground px-6 py-4 rounded-xl font-bold hover:bg-muted/80 transition-all text-sm"
                     >
                       Cancel
                     </button>
-                    <button 
+                    <button
                       onClick={startMemoryUpload}
                       disabled={memUploading}
                       className="flex-2 bg-brand text-white px-6 py-4 rounded-xl font-bold hover:bg-brand/90 transition-all text-sm disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2 shadow-[var(--shadow-brand)]"
@@ -1352,9 +1462,9 @@ export default function AlumniDashboard() {
                         : m.status === "rejected" ? "bg-red-500/10 text-red-500"
                           : "bg-yellow-500/10 text-yellow-600"
                         }`}>{m.status === "pending_moderation" ? "Pending" : m.status}</span>
-                        {isDeleting ==m.id ?(<div className="size-5 border-3 border-red-500 rounded-full border-t-transparent animate-spin"></div>):(
-                          <Trash2 className="text-red-500 cursor-pointer size-6" onClick={() => handleDeleteMemory(m.id)} />
-                        )}
+                      {isDeleting == m.id ? (<div className="size-5 border-3 border-red-500 rounded-full border-t-transparent animate-spin"></div>) : (
+                        <Trash2 className="text-red-500 cursor-pointer size-6" onClick={() => handleDeleteMemory(m.id)} />
+                      )}
                     </div>
                   </div>
                 ))}

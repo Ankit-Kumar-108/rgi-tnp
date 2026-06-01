@@ -3,12 +3,14 @@ export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { deleteMultipleFromR2 } from "@/lib/r2-delete";
+import { getMaxSemestersForCourse } from "@/lib/constants";
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const role = searchParams.get("role") || "student";
     const branch = searchParams.get("branch");
+    const passoutOnly = searchParams.get("passout_only") === "true";
     const search = searchParams.get("search");
     const parsedLimit = parseInt(searchParams.get("limit") || "100", 10);
     const parsedPage = parseInt(searchParams.get("page") || "1", 10);
@@ -57,7 +59,14 @@ export async function GET(req: NextRequest) {
         }),
         db.student.count({ where })
       ])
-      return NextResponse.json({ success: true, users: students, role, totalCount });
+      let filteredStudents = students;
+      if(passoutOnly){
+        filteredStudents = students.filter(student => {
+          const maxSemesters = getMaxSemestersForCourse(student.course);
+          return student.semester >= maxSemesters;
+        });
+      }
+      return NextResponse.json({ success: true, users: filteredStudents, role, totalCount: passoutOnly? filteredStudents.length : totalCount });
     }
 
     if (role === "alumni") {

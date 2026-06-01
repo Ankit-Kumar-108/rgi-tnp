@@ -41,6 +41,7 @@ export async function POST(req: NextRequest) {
       duration?: string;
       interviewProcess?: string;
       isRegistered?: boolean;
+      allowAlumni?: boolean;
     };
 
     const db = getDb();
@@ -64,6 +65,7 @@ export async function POST(req: NextRequest) {
         interviewProcess: body.interviewProcess || null,
         status: "pending",
         recruiter: { connect: { id: recruiter.id } },
+        allowAlumni: body.allowAlumni || false,
       },
     });
 
@@ -99,6 +101,7 @@ export async function PUT(req: NextRequest) {
       genderPreference: string;
       duration?: string;
       interviewProcess?: string;
+      allowAlumni?: boolean;
     };
 
     const db = getDb();
@@ -130,6 +133,7 @@ export async function PUT(req: NextRequest) {
         genderPreference: body.genderPreference || existingDrive.genderPreference,
         duration: body.duration || existingDrive.duration,
         interviewProcess: body.interviewProcess || existingDrive.interviewProcess,
+        allowAlumni: body.allowAlumni ?? existingDrive.allowAlumni,
       },
     });
 

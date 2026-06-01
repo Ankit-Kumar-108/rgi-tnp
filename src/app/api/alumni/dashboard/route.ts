@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Get referrals with counts at database level (avoid filtering in-memory)
-    const [referrals, feedbacks, memories, referralCounts] = await Promise.all([
+    const [referrals, feedbacks, memories, referralCounts, alumniDrives] = await Promise.all([
       db.referral.findMany({
         where: { alumniId: alumni.id },
         orderBy: { id: "desc" },
@@ -58,8 +58,29 @@ export async function GET(req: NextRequest) {
         db.referral.count({ where: { alumniId: alumni.id } }),
         db.referral.count({ where: { alumniId: alumni.id, status: "published" } }),
         db.referral.count({ where: { alumniId: alumni.id, status: "pending" } }),
-      ])
+      ]),
+      db.placementDrive.findMany({
+        where: {
+          allowAlumni: true,
+          status: "active",
+        },
+        include: {
+          recruiter: { select: { name: true, company: true } },
+          registrations: {
+            where: { alumniId: alumni.id },
+            select: { id: true },
+          },
+        },
+        orderBy: { driveDate: "desc" },
+        take: 10,
+      }),
     ]);
+    // Map drives to add isRegistered flag
+    const formattedDrives = alumniDrives.map((d: any) => ({
+      ...d,
+      isRegistered: d.registrations.length > 0,
+      registrations: undefined,
+    }));
 
     const [totalReferrals, approvedReferrals, pendingReferrals] = referralCounts;
 
@@ -68,6 +89,7 @@ export async function GET(req: NextRequest) {
       alumni: alumniData,
       referrals,
       memories,
+      drives: formattedDrives,
       stats: {
         totalReferrals,
         approvedReferrals,

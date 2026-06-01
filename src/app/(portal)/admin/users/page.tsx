@@ -14,6 +14,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
 import { toast } from "sonner";
+import { isPassout } from "@/lib/constants";
 
 // Types
 type TabKey = "student" | "alumni" | "recruiter" | "external";
@@ -91,6 +92,55 @@ export default function AdminUsersPage() {
   const [sendSuccess, setSendSuccess] = useState(false);
   const [sendError, setSendError] = useState("");
 
+  // Add to state declarations (~line 76):
+  const [showTransferModal, setShowTransferModal] = useState(false);
+  const [transferLoading, setTransferLoading] = useState(false);
+  const [transferCompany, setTransferCompany] = useState("");
+  const [transferJobTitle, setTransferJobTitle] = useState("");
+  const [hasPlacement, setHasPlacement] = useState(false);
+  const [passoutOnly, setPassoutOnly] = useState(false);
+
+  const handleTransfer = async () => {
+    if (selectedIds.size === 0) return;
+    setTransferLoading(true);
+    try {
+      const res = await fetch("/api/admin/users/transfer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          studentIds: Array.from(selectedIds),
+          placementDetails: hasPlacement
+            ? { currentCompany: transferCompany, jobTitle: transferJobTitle }
+            : undefined,
+        }),
+      });
+      const data = (await res.json()) as any;
+      if (data.success) {
+        toast.success(
+          `Transferred ${data.transferred} student(s) to Alumni` +
+          (data.skipped > 0 ? ` (${data.skipped} skipped)` : "")
+        );
+        setUsers((prev) => prev.filter((u) => !selectedIds.has(u.id)));
+        setTotalCount((prev) => prev - (data.transferred || 0));
+        setSelectedIds(new Set());
+        if (data.errors?.length) {
+          data.errors.forEach((err: string) => toast.error(err));
+        }
+      } else {
+        toast.error(data.message || "Transfer failed");
+      }
+    } catch (err) {
+      toast.error("An error occurred during transfer");
+    } finally {
+      setTransferLoading(false);
+      setShowTransferModal(false);
+      setTransferCompany("");
+      setTransferJobTitle("");
+      setHasPlacement(false);
+    }
+  };
+
+
 
   //  Infinite scroll
   const observer = useRef<IntersectionObserver | null>(null);
@@ -121,6 +171,7 @@ export default function AdminUsersPage() {
 
         if (branch && branch !== "All Branches") params.set("branch", branch);
         if (submittedSearch) params.set("search", submittedSearch);
+        if (passoutOnly) params.set("passout_only", "true");
 
         const res = await fetch(`/api/admin/users?${params}`);
         const data = (await res.json()) as { success: boolean; users: any[], totalCount: number };
@@ -349,6 +400,19 @@ export default function AdminUsersPage() {
                 <span className="whitespace-nowrap">Delete</span>
               </button>
 
+              {activeTab === "student" && (
+                <button
+                  onClick={() => setShowTransferModal(true)}
+                  disabled={actionLoading}
+                  className="flex items-center gap-1.5 h-7 px-3 rounded-lg text-xs font-bold
+               transition-colors disabled:opacity-50 shrink-0
+               text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30"
+                >
+                  <GraduationCap className="w-3.5 h-3.5" />
+                  <span className="whitespace-nowrap">Transfer to Alumni</span>
+                </button>
+              )}
+
               <button onClick={() => setSelectedIds(new Set())}
                 className="ml-auto text-muted-foreground hover:text-foreground transition-colors shrink-0 pl-2">
                 <XCircle className="w-4 h-4" />
@@ -408,6 +472,23 @@ export default function AdminUsersPage() {
               </select>
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
             </div>
+          )}
+
+          {activeTab === "student" && (
+            <button
+              type="button"
+              onClick={() => {
+                setPassoutOnly((prev) => !prev);
+                setPage(1);
+                setUsers([]);
+              }}
+              className={`h-10 px-4 rounded-xl text-sm font-bold whitespace-nowrap transition-all border ${passoutOnly
+                ? "bg-amber-500 text-white border-amber-500"
+                : "bg-card border-border text-muted-foreground hover:border-amber-400"
+                }`}
+            >
+              🎓 Pass-outs Only
+            </button>
           )}
 
           <button type="submit" className="h-10 px-5 bg-brand text-white rounded-xl text-sm font-bold hover:bg-brand/90 transition-all shrink-0">
@@ -575,6 +656,136 @@ export default function AdminUsersPage() {
             </div>
           </div>
         )}
+
+        {showTransferModal && (
+          <div
+            className="fixed w-full h-full top-0 left-0 z-60 bg-[#020617]/50
+               backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={() => setShowTransferModal(false)}
+          >
+            <div
+              className="bg-white dark:bg-[#0D1527] rounded-3xl border
+                 border-slate-200 dark:border-slate-800/80 shadow-2xl
+                 max-w-lg w-full p-8 animate-in fade-in zoom-in-95 duration-200"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center
+                        justify-center text-amber-500">
+                  <GraduationCap className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-slate-900 dark:text-white">
+                    Transfer to Alumni
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    {selectedIds.size} student(s) will be converted to alumni
+                  </p>
+                </div>
+              </div>
+
+              {/* Warning */}
+              <div className="mb-5 p-3 bg-amber-500/10 border border-amber-500/20
+                      text-amber-700 dark:text-amber-300 text-xs rounded-xl
+                      flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold">This action cannot be undone.</p>
+                  <p className="mt-1">
+                    Student accounts will be deleted and new alumni accounts created.
+                    They will need to login via the alumni portal with their existing password.
+                  </p>
+                </div>
+              </div>
+
+              {/* Placement checkbox + fields */}
+              <div className="space-y-4">
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={hasPlacement}
+                    onChange={(e) => setHasPlacement(e.target.checked)}
+                    className="w-4 h-4 text-amber-500 focus:ring-amber-500
+                       border-slate-300 dark:border-slate-700 rounded"
+                  />
+                  <span className="text-sm font-semibold group-hover:text-slate-900
+                           dark:group-hover:text-white transition-colors">
+                    These students have been placed
+                  </span>
+                </label>
+
+                {hasPlacement && (
+                  <div className="space-y-3 pl-6 border-l-2 border-amber-200
+                          dark:border-amber-800 ml-2">
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider
+                                mb-1.5 text-[#64748B]">Company Name</label>
+                      <input
+                        type="text"
+                        value={transferCompany}
+                        onChange={(e) => setTransferCompany(e.target.value)}
+                        className="w-full bg-slate-50 dark:bg-slate-800/40 border
+                           border-slate-200 dark:border-slate-800 rounded-xl
+                           px-4 py-2.5 text-sm focus:outline-none focus:ring-2
+                           focus:ring-amber-500 transition-all"
+                        placeholder="e.g., TCS, Infosys, Google..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider
+                                mb-1.5 text-[#64748B]">Job Title / Role</label>
+                      <input
+                        type="text"
+                        value={transferJobTitle}
+                        onChange={(e) => setTransferJobTitle(e.target.value)}
+                        className="w-full bg-slate-50 dark:bg-slate-800/40 border
+                           border-slate-200 dark:border-slate-800 rounded-xl
+                           px-4 py-2.5 text-sm focus:outline-none focus:ring-2
+                           focus:ring-amber-500 transition-all"
+                        placeholder="e.g., Software Engineer, Analyst..."
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Buttons */}
+              <div className="flex gap-4 pt-6">
+                <button
+                  onClick={() => {
+                    setShowTransferModal(false);
+                    setHasPlacement(false);
+                    setTransferCompany("");
+                    setTransferJobTitle("");
+                  }}
+                  className="flex-1 border border-slate-200 dark:border-slate-800
+                     text-slate-700 dark:text-slate-300 py-3 rounded-xl
+                     font-bold hover:bg-slate-50 dark:hover:bg-slate-800/40
+                     transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleTransfer}
+                  disabled={transferLoading || (hasPlacement && !transferCompany)}
+                  className="flex-1 bg-amber-500 hover:bg-amber-600 text-white py-3
+                     rounded-xl font-bold hover:shadow-lg hover:shadow-amber-500/25
+                     transition-all flex items-center justify-center gap-2
+                     disabled:opacity-40"
+                >
+                  {transferLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <GraduationCap className="w-4 h-4" />
+                  )}
+                  {transferLoading ? "Transferring..." : "Confirm Transfer"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ── Users List (Cards) ─────────────────────────────────────────── */}
         <section>
           <div className="flex items-center justify-between mb-3 px-1">
@@ -669,6 +880,14 @@ export default function AdminUsersPage() {
                                 {isVerified ? "Verified" : "Pending"}
                               </span>
                             )}
+                            {/* Add after the existing role badge and verification badge */}
+                            {activeTab === "student" && user.course && user.semester &&
+                              isPassout(user.course, user.semester) && (
+                                <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5rounded-full bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-900/30 dark:border-amber-800 dark:text-amber-300">
+                                  🎓 Pass-out
+                                </span>
+                              )}
+
                           </div>
                         </div>
 

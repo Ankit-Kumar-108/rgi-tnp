@@ -110,6 +110,7 @@ export async function PUT(req: NextRequest) {
       driveDate: string;
       driveType: string;
       jobType: string;
+      allowAlumni: boolean;
     };
 
     const db = getDb();
@@ -140,7 +141,7 @@ export async function PUT(req: NextRequest) {
         driveDate: new Date(body.driveDate),
         driveType: body.driveType || existingDrive.driveType,
         jobType: body.jobType || existingDrive.jobType,
-        
+        allowAlumni: body.allowAlumni ?? existingDrive.allowAlumni,
       },
     });
 

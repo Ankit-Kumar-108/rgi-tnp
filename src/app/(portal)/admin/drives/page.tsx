@@ -39,7 +39,7 @@ export default function AdminDrivesPage() {
   const [submitting, setSubmitting] = useState(false);
   const [formMsg, setFormMsg] = useState<{ msg: string; ok: boolean } | null>(null);
   const [form, setForm] = useState({
-    companyName: "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full-Time", genderPreference: "Both", interviewProcess: "", duration: ""  // Add this line
+    companyName: "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full-Time", genderPreference: "Both", interviewProcess: "", duration: "", allowAlumni: false
   });
   const observer = useRef<IntersectionObserver | null>(null);
 
@@ -223,6 +223,24 @@ export default function AdminDrivesPage() {
                       className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
                   </div>
                 )}
+              </div>
+              <div className="space-y-2">
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={form.allowAlumni || false}
+                    onChange={(e) => setForm({ ...form, allowAlumni: e.target.checked })}
+                    className="w-5 h-5 text-brand focus:ring-brand border-border rounded"
+                  />
+                  <div>
+                    <span className="text-sm font-bold text-foreground group-hover:text-brand transition-colors">
+                      Allow Alumni / Experienced Pass-outs
+                    </span>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Experienced alumni from this college can also apply
+                    </p>
+                  </div>
+                </label>
               </div>
               {/* Interview Process */}
               <div>
@@ -488,7 +506,8 @@ export default function AdminDrivesPage() {
                                   driveDate: new Date(drive.driveDate).toISOString().split('T')[0],
                                   driveType: drive.driveType,
                                   jobType: drive.jobType || "Full-Time",
-                                  duration: drive.duration || ""  // Add this line
+                                  duration: drive.duration || "",
+                                  allowAlumni: drive.allowAlumni || false,
                                 });
                                 setFormMsg(null);
                                 setShowForm(true);

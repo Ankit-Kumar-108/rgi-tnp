@@ -103,7 +103,8 @@ export default function RecruiterDashboard() {
     jobType: "Full Time",
     genderPreference: "Both",
     duration: "",
-    interviewProcess: ""
+    interviewProcess: "",
+    allowAlumni: false,
   });
   const [editDriveId, setEditDriveId] = useState<string | null>(null);
   const [viewDrive, setViewDrive] = useState<any | null>(null);
@@ -172,7 +173,7 @@ export default function RecruiterDashboard() {
       setFormMsg({ msg: d.message, ok: d.success });
       if (d.success) {
         setTimeout(() => setShowForm(false), 1000);
-        setForm({ companyName: user?.company || "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full Time", genderPreference: "Both", duration: "", interviewProcess: "" });
+        setForm({ companyName: user?.company || "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full Time", genderPreference: "Both", duration: "", interviewProcess: "",allowAlumni:false });
         setEditDriveId(null);
         mutateDash();
       }
@@ -244,7 +245,7 @@ export default function RecruiterDashboard() {
               {user?.company && <p className="text-sm text-muted-foreground mt-1">{user.company}</p>}
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <NotificationBell role="recruiter"/>
+              <NotificationBell role="recruiter" />
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-2 px-4 py-2.5 text-destructive rounded-full text-sm font-bold border border-border bg-destructive/20 hover:text-red-500 hover:border-red-500/30 transition-all"
@@ -261,7 +262,7 @@ export default function RecruiterDashboard() {
               <button
                 onClick={() => {
                   setEditDriveId(null);
-                  setForm({ companyName: user?.company || "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full-Time", genderPreference: "Both", duration: "", interviewProcess: "" });
+                  setForm({ companyName: user?.company || "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full-Time", genderPreference: "Both", duration: "", interviewProcess: "", allowAlumni: false });
                   setFormMsg(null);
                   setShowForm(true);
                 }}
@@ -391,6 +392,26 @@ export default function RecruiterDashboard() {
                         <option value="Female">Female Only</option>
                       </select>
                     </div>
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-3 cursor-pointer group">
+                        <input
+                          type="checkbox"
+                          checked={form.allowAlumni || false}
+                          onChange={(e) => setForm({ ...form, allowAlumni: e.target.checked })}
+                          className="w-5 h-5 text-brand focus:ring-brand border-border rounded"
+                        />
+                        <div>
+                          <span className="text-sm font-bold text-foreground
+                       group-hover:text-brand transition-colors">
+                            Allow Alumni / Experienced Pass-outs
+                          </span>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            Experienced alumni from this college can also apply
+                          </p>
+                        </div>
+                      </label>
+                    </div>
+
                     {(form.jobType === "Internship" || form.jobType === "Full Time with Bond" || form.jobType === "Internship with PPO") && (
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">
@@ -564,7 +585,8 @@ export default function RecruiterDashboard() {
                                     jobType: drive.jobType || "Full-Time",
                                     genderPreference: drive.genderPreference || "Both",
                                     duration: drive.duration || "",
-                                    interviewProcess: drive.interviewProcess || ""
+                                    interviewProcess: drive.interviewProcess || "",
+                                    allowAlumni: drive.allowAlumni || false,
                                   });
                                   setFormMsg(null);
                                   setShowForm(true);
