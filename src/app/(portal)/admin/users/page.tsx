@@ -195,7 +195,7 @@ export default function AdminUsersPage() {
     };
 
     loadUsers();
-  }, [authenticated, activeTab, branch, submittedSearch, page]);
+  }, [authenticated, activeTab, branch, submittedSearch, page, passoutOnly]);
 
   //  Handlers 
   const handleSearch = (e: React.FormEvent) => {
@@ -487,7 +487,7 @@ export default function AdminUsersPage() {
                 : "bg-card border-border text-muted-foreground hover:border-amber-400"
                 }`}
             >
-              🎓 Pass-outs Only
+              Pass Outs
             </button>
           )}
 
@@ -786,7 +786,7 @@ export default function AdminUsersPage() {
           </div>
         )}
 
-        {/* ── Users List (Cards) ─────────────────────────────────────────── */}
+        {/*Users List Cards*/}
         <section>
           <div className="flex items-center justify-between mb-3 px-1">
             <h2 className="text-sm font-bold text-foreground flex items-center gap-2">
@@ -884,7 +884,7 @@ export default function AdminUsersPage() {
                             {activeTab === "student" && user.course && user.semester &&
                               isPassout(user.course, user.semester) && (
                                 <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5rounded-full bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-900/30 dark:border-amber-800 dark:text-amber-300">
-                                  🎓 Pass-out
+                                  Pass Outs
                                 </span>
                               )}
 

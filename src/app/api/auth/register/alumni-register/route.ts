@@ -22,17 +22,21 @@ export async function POST(req: NextRequest) {
     };
 
     // Verify Enrollment Number in Master Records
-    // Using select to fetch only ID (more efficient)
-    const masterRecord = await db.alumniMaster.findFirst({
+    // Fetch all master records for this batch and compare with trimmed values
+    // This handles any existing data with extra whitespace
+    const masterRecords = await db.alumniMaster.findMany({
       where: {
-        enrollmentNumber: trimmedData.enrollmentNumber,
-        branch: trimmedData.branch, 
         batch: trimmedData.batch,
-        course: trimmedData.course,
       },
-      select: { id: true }, // Only fetch ID
     });
 
+    const masterRecord = masterRecords.find(
+      (record) =>
+        record.enrollmentNumber?.trim() === trimmedData.enrollmentNumber &&
+        record.branch?.trim() === trimmedData.branch &&
+        record.course?.trim() === trimmedData.course
+    );
+   
     if (!masterRecord) {
       return NextResponse.json(
         { success: false, message: "Information not found in college alumni records" },
@@ -124,11 +128,11 @@ export async function POST(req: NextRequest) {
     }, { status: 201 });
   } catch (error: any) {
     if (error.name === "ZodError") {
-      const firstError = error.errors[0];
+      const firstError = error.issues?.[0];
       const errorMessage = firstError?.message || "Validation failed";
 
       return NextResponse.json(
-        { success: false, message: errorMessage, errors: error.errors },
+        { success: false, message: errorMessage, errors: error.issues },
         { status: 400 }
       );
     }

@@ -94,10 +94,36 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// GET: Fetch master data counts
-export async function GET() {
+// GET: Fetch master data counts or list records
+export async function GET(req: NextRequest) {
   try {
     const db = getDb();
+    const searchParams = req.nextUrl.searchParams;
+    const action = searchParams.get("action");
+
+    if (action === "list") {
+      const type = searchParams.get("type"); // "student" | "alumni"
+      const page = parseInt(searchParams.get("page") || "1", 10);
+      const limit = parseInt(searchParams.get("limit") || "50", 10);
+      const skip = (page - 1) * limit;
+
+      if (type === "student") {
+        const [records, total] = await Promise.all([
+          db.studentMaster.findMany({ skip, take: limit, orderBy: { name: 'asc' } }),
+          db.studentMaster.count()
+        ]);
+        return NextResponse.json({ success: true, records, total });
+      } else if (type === "alumni") {
+        const [records, total] = await Promise.all([
+          db.alumniMaster.findMany({ skip, take: limit, orderBy: { name: 'asc' } }),
+          db.alumniMaster.count()
+        ]);
+        return NextResponse.json({ success: true, records, total });
+      } else {
+         return NextResponse.json({ success: false, message: "Invalid type" }, { status: 400 });
+      }
+    }
+
     const [studentCount, alumniCount] = await Promise.all([
       db.studentMaster.count(),
       db.alumniMaster.count(),
@@ -109,7 +135,7 @@ export async function GET() {
   } catch (error) {
     console.error("Master Data GET Error:", error);
     return NextResponse.json(
-      { success: false, message: "Failed to fetch counts" },
+      { success: false, message: "Failed to fetch data" },
       { status: 500 }
     );
   }

@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { getMaxSemestersForCourse } from "@/lib/constants";
 import { NotificationService } from "@/lib/notification-service";
+import { alumniTransferTemplate } from "@/lib/email-templates";
 
 function generateId() {
   return crypto.randomUUID().replace(/-/g, "").slice(0, 25);
@@ -151,33 +152,8 @@ export async function POST(req: NextRequest) {
 
         await NotificationService.sendEmailWithLog({
           to: student.email,
-          subject: "🎓 Your Account Has Been Upgraded to Alumni — RGI TnP",
-          html: `
-            <div style="font-family: sans-serif; padding: 20px; color: #333;">
-              <h2 style="color: #1a1a2e;">Congratulations, ${student.name}! 🎉</h2>
-              ${placementDetails?.currentCompany
-                ? `<p style="font-size: 16px; line-height: 1.6;">
-                    Your placement at <strong>${placementDetails.currentCompany}</strong>
-                    as <strong>${placementDetails.jobTitle}</strong> has been recorded.
-                  </p>`
-                : `<p style="font-size: 16px; line-height: 1.6;">
-                    Your student account has been upgraded to an alumni account.
-                  </p>`
-              }
-              <p style="font-size: 15px; line-height: 1.6;">
-                Your account has been moved to the <strong>Alumni Portal</strong>.
-                Your existing password still works — just login from the alumni page:
-              </p>
-              <a href="${alumniLoginLink}"
-                style="display: inline-block; padding: 12px 24px; background: #6366f1;
-                       color: white; text-decoration: none; border-radius: 8px;
-                       font-weight: bold; margin: 16px 0;">
-                Login as Alumni →
-              </a>
-              <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
-              <p style="font-size: 12px; color: #999;">RGI Training & Placement Cell</p>
-            </div>
-          `,
+          subject: "Your Account Has Been Upgraded to Alumni — RGI Training & Placement Department",
+          html: alumniTransferTemplate(student.name, placementDetails, alumniLoginLink),
           template: "alumni_transfer",
           triggeredBy: req.headers.get("x-admin-email") || "admin",
           recipientType: "alumni",

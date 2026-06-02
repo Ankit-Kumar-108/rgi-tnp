@@ -33,15 +33,20 @@ export async function POST(req: NextRequest) {
     };
 
     // 4. Verify Enrollment Number in Master Records
-    const masterRecord = await db.studentMaster.findFirst({
+    // Fetch all master records for this batch and compare with trimmed values
+    // This handles any existing data with extra whitespace
+    const masterRecords = await db.studentMaster.findMany({
       where: {
-        enrollmentNumber: trimmedData.enrollmentNumber,
-        branch: trimmedData.branch,
-        course: trimmedData.course,
         batch: trimmedData.batch,
       },
     });
-
+    const masterRecord = masterRecords.find(
+      (record) =>
+        record.enrollmentNumber?.trim() === trimmedData.enrollmentNumber &&
+        record.branch?.trim() === trimmedData.branch &&
+        record.course?.trim() === trimmedData.course
+    );
+     console.log(" master data: ", masterRecord)
     if (!masterRecord) {
       return NextResponse.json(
         { success: false, message: "Information not found in college records" },
@@ -144,11 +149,11 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     if (error.name === "ZodError") {
       // Extract the first error message for display
-      const firstError = error.errors[0];
+      const firstError = error.issues?.[0];
       const errorMessage = firstError?.message || "Validation failed";
       
       return NextResponse.json(
-        { success: false, message: errorMessage, errors: error.errors },
+        { success: false, message: errorMessage, errors: error.issues },
         { status: 400 }
       );
     }

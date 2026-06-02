@@ -839,3 +839,99 @@ export const placementOpportunityTemplate = (
 
     return premiumLayout("&#128188;", "New Placement Drive", content);
 };
+
+export const alumniTransferTemplate = (studentName: string, placementDetails: { currentCompany?: string | null, jobTitle?: string | null } | undefined, alumniLoginLink: string): string => {
+    const content = `
+            <div style="font-family: sans-serif; padding: 20px; color: #333;">
+              <h2 style="color: #1a1a2e;">Congratulations, ${studentName}! 🎉</h2>
+              ${placementDetails?.currentCompany
+                ? `<p style="font-size: 16px; line-height: 1.6;">
+                    Your placement at <strong>${placementDetails.currentCompany}</strong>
+                    as <strong>${placementDetails.jobTitle}</strong> has been recorded.
+                  </p>`
+                : `<p style="font-size: 16px; line-height: 1.6;">
+                    Your student account has been upgraded to an alumni account.
+                  </p>`
+              }
+              <p style="font-size: 15px; line-height: 1.6;">
+                Your account has been moved to the <strong>Alumni Portal</strong>.
+                Your existing password still works — just login from the alumni page:
+              </p>
+              <a href="${alumniLoginLink}"
+                style="display: inline-block; padding: 12px 24px; background: #6366f1;
+                       color: white; text-decoration: none; border-radius: 8px;
+                       font-weight: bold; margin: 16px 0;">
+                Login as Alumni →
+              </a>
+              <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
+              <p style="font-size: 12px; color: #999;">RGI Training & Placement Cell</p>
+            </div>
+          `;
+    return premiumLayout("🎉", "Alumni Account Upgraded", content);
+};
+
+export const driveRejectionTemplate = (recruiterName: string, companyName: string, roleName: string): string => {
+    const content = `
+            <div style="font-family: sans-serif; padding: 20px; color: #333;">
+              <h2 style="color: #D32F2F; margin-bottom: 20px;">Placement Drive Rejected</h2>
+              <p>Hello <strong>${recruiterName}</strong>,</p>
+              <p style="line-height: 1.6; font-size: 15px;">Your submitted placement drive for <strong>${companyName}</strong> (${roleName} role) has been reviewed and was <strong>not approved</strong> at this time.</p>
+              <p style="line-height: 1.6; font-size: 15px;">Please review the job details or contact the placement coordinator for more information.</p>
+              <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
+              <p style="font-size: 12px; color: #999;">Radharaman Group of Institutes (RGI) Training & Placement Cell.</p>
+            </div>
+          `;
+    return premiumLayout("❌", "Placement Drive Rejected", content);
+};
+
+export const referralStatusUpdateTemplate = (alumniName: string, position: string, companyName: string, action: "approve" | "reject"): string => {
+    const content = `
+            <div style="font-family: sans-serif; padding: 20px; color: #333;">
+              <h2 style="color: ${action === "approve" ? "#388E3C" : "#D32F2F"}; margin-bottom: 20px;">Referral Status Update</h2>
+              <p>Hello <strong>${alumniName}</strong>,</p>
+              <p style="line-height: 1.6; font-size: 15px;">Your submitted referral for <strong>${position}</strong> at <strong>${companyName}</strong> has been <strong>${action === "approve" ? "approved and published" : "rejected"}</strong> by the administration.</p>
+              <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
+              <p style="font-size: 12px; color: #999;">Radharaman Group of Institutes (RGI) Training & Placement Cell.</p>
+            </div>
+          `;
+    return premiumLayout(action === "approve" ? "✅" : "❌", "Referral Status Update", content);
+};
+
+export const volunteerApprovedTemplate = (studentName: string): string => {
+    const content = `
+            <div style="font-family: sans-serif; padding: 20px; color: #333;">
+              <h2 style="color: #388E3C; margin-bottom: 20px;">Volunteer Approved!</h2>
+              <p>Hello <strong>${studentName}</strong>,</p>
+              <p style="line-height: 1.6; font-size: 15px;">Congratulations! You have been approved as a student volunteer for Training & Placement cell events.</p>
+              <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
+              <p style="font-size: 12px; color: #999;">Radharaman Group of Institutes (RGI) Training & Placement Cell.</p>
+            </div>
+          `;
+    return premiumLayout("🌟", "Volunteer Approved", content);
+};
+
+export const externalVerificationSuccessTemplate = (studentName: string): string => {
+    const content = `
+            <div style="font-family: sans-serif; padding: 20px; color: #333;">
+              <h2 style="color: #388E3C; margin-bottom: 20px;">Account Verified Successfully</h2>
+              <p>Hello <strong>${studentName}</strong>,</p>
+              <p style="line-height: 1.6; font-size: 15px;">Your external student registration is verified!</p>
+              <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
+              <p style="font-size: 12px; color: #999;">Radharaman Group of Institutes (RGI) Training & Placement Cell.</p>
+            </div>
+          `;
+    return premiumLayout("✅", "Account Verified", content);
+};
+
+export const studentVerificationSuccessTemplate = (studentName: string): string => {
+    const content = `
+            <div style="font-family: sans-serif; padding: 20px; color: #333;">
+              <h2 style="color: #388E3C; margin-bottom: 20px;">Account Verified Successfully</h2>
+              <p>Hello <strong>${studentName}</strong>,</p>
+              <p style="line-height: 1.6; font-size: 15px;">Your student account has been verified by the administrator.</p>
+              <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
+              <p style="font-size: 12px; color: #999;">Radharaman Group of Institutes (RGI) Training & Placement Cell.</p>
+            </div>
+          `;
+    return premiumLayout("✅", "Account Verified", content);
+};

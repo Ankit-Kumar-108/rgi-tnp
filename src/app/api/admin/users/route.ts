@@ -3,7 +3,7 @@ export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { deleteMultipleFromR2 } from "@/lib/r2-delete";
-import { getMaxSemestersForCourse } from "@/lib/constants";
+import { COURSE_SEMESTER_MAP, MAX_SEMESTERS } from "@/lib/constants";
 
 export async function GET(req: NextRequest) {
   try {
@@ -24,12 +24,33 @@ export async function GET(req: NextRequest) {
     if (role === "student") {
       const where: any = {};
       if (branch) where.branch = branch;
-      if (search) {
-        where.OR = [
-          { name: { contains: search } },
-          { enrollmentNumber: { contains: search } },
-          { email: { contains: search } },
+      
+      const searchOr = search ? [
+        { name: { contains: search } },
+        { enrollmentNumber: { contains: search } },
+        { email: { contains: search } },
+      ] : undefined;
+
+      const passoutOr = passoutOnly ? [
+        ...Object.entries(COURSE_SEMESTER_MAP).map(([course, maxSems]) => ({
+          course,
+          semester: { gte: maxSems }
+        })),
+        {
+          course: { notIn: Object.keys(COURSE_SEMESTER_MAP) },
+          semester: { gte: MAX_SEMESTERS }
+        }
+      ] : undefined;
+
+      if (searchOr && passoutOr) {
+        where.AND = [
+          { OR: searchOr },
+          { OR: passoutOr }
         ];
+      } else if (searchOr) {
+        where.OR = searchOr;
+      } else if (passoutOr) {
+        where.OR = passoutOr;
       }
 
       const [students, totalCount] = await Promise.all([
@@ -59,14 +80,8 @@ export async function GET(req: NextRequest) {
         }),
         db.student.count({ where })
       ])
-      let filteredStudents = students;
-      if(passoutOnly){
-        filteredStudents = students.filter(student => {
-          const maxSemesters = getMaxSemestersForCourse(student.course);
-          return student.semester >= maxSemesters;
-        });
-      }
-      return NextResponse.json({ success: true, users: filteredStudents, role, totalCount: passoutOnly? filteredStudents.length : totalCount });
+      
+      return NextResponse.json({ success: true, users: students, role, totalCount });
     }
 
     if (role === "alumni") {

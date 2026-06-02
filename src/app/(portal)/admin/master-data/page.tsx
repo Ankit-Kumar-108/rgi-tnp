@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import {
   Database,
   Shield,
@@ -43,14 +43,47 @@ export default function AdminMasterDataPage() {
   const [preview, setPreview] = useState<Record<string, string>[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const [activeTab, setActiveTab] = useState<UploadType>("student");
+  const [viewData, setViewData] = useState<Record<string, string>[]>([]);
+  const [viewTotal, setViewTotal] = useState(0);
+  const [viewPage, setViewPage] = useState(1);
+  const [viewLoading, setViewLoading] = useState(false);
+  const limit = 50;
+
   useEffect(() => {
     if (!authenticated) return;
     fetchCounts();
   }, [authenticated]);
 
+  const fetchViewData = useCallback(async () => {
+    setViewLoading(true);
+    try {
+      const res = await fetch(`/api/admin/master-data?action=list&type=${activeTab}&page=${viewPage}&limit=${limit}`);
+      if (res.ok) {
+        const data = (await res.json()) as { success: boolean; records: Record<string, string>[]; total: number };
+        if (data.success) {
+          setViewData(data.records);
+          setViewTotal(data.total);
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setViewLoading(false);
+    }
+  }, [activeTab, viewPage]);
+
+  useEffect(() => {
+    if (!authenticated) return;
+    fetchViewData();
+  }, [authenticated, fetchViewData]);
+
   const fetchCounts = async () => {
     try {
       const res = await fetch("/api/admin/master-data");
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: Failed to fetch master data`);
+      }
       const data = (await res.json()) as { success: boolean; counts: { studentMaster: number; alumniMaster: number } };
       if (data.success) setCounts(data.counts);
     } catch (err) {
@@ -86,6 +119,9 @@ export default function AdminMasterDataPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ type: uploadType, records: preview }),
       });
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: Upload failed`);
+      }
       const data = (await res.json()) as { success: boolean; message: string; errors?: string[] };
       const displayMsg = data.errors?.length
         ? `${data.message} | Errors: ${data.errors.join("; ")}`
@@ -94,12 +130,14 @@ export default function AdminMasterDataPage() {
       toast[data.success ? "success" : "error"](displayMsg);
       if (data.success) {
         fetchCounts();
+        fetchViewData();
         setPreview([]);
         if (fileRef.current) fileRef.current.value = "";
       }
-    } catch {
-      setResult({ success: false, message: "Upload failed" });
-      toast.error("Upload failed. Please try again.");
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Upload failed";
+      setResult({ success: false, message: errorMsg });
+      toast.error(errorMsg);
     } finally {
       setUploading(false);
     }
@@ -280,6 +318,101 @@ export default function AdminMasterDataPage() {
               }`}>
               {result.success ? <CheckCircle className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
               <p className="text-sm font-medium">{result.message}</p>
+            </div>
+          )}
+        </div>
+
+        {/* View Section */}
+        <div className="bg-card rounded-2xl border border-border shadow-sm p-6 mt-8">
+          <h2 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+            <Database className="w-5 h-5 text-brand" />
+            Uploaded Data
+          </h2>
+
+          <div className="flex gap-3 mb-6">
+            <button
+              onClick={() => { setActiveTab("student"); setViewPage(1); }}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === "student"
+                  ? "bg-brand text-white shadow-[var(--shadow-brand)]"
+                  : "bg-muted border border-border text-muted-foreground hover:text-foreground"
+                }`}
+            >
+              <GraduationCap className="w-4 h-4" />
+              Student Data
+            </button>
+            <button
+              onClick={() => { setActiveTab("alumni"); setViewPage(1); }}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === "alumni"
+                  ? "bg-brand text-white shadow-[var(--shadow-brand)]"
+                  : "bg-muted border border-border text-muted-foreground hover:text-foreground"
+                }`}
+            >
+              <UserCheck className="w-4 h-4" />
+              Alumni Data
+            </button>
+          </div>
+
+          <div className="overflow-x-auto rounded-xl border border-border mb-4">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-muted/50 border-b border-border">
+                  <th className="text-left px-4 py-3 font-bold uppercase tracking-wider text-muted-foreground">Enrollment No</th>
+                  <th className="text-left px-4 py-3 font-bold uppercase tracking-wider text-muted-foreground">Name</th>
+                  <th className="text-left px-4 py-3 font-bold uppercase tracking-wider text-muted-foreground">Course</th>
+                  <th className="text-left px-4 py-3 font-bold uppercase tracking-wider text-muted-foreground">Branch</th>
+                  <th className="text-left px-4 py-3 font-bold uppercase tracking-wider text-muted-foreground">Batch</th>
+                </tr>
+              </thead>
+              <tbody>
+                {viewLoading ? (
+                  <tr>
+                    <td colSpan={5} className="text-center py-8">
+                      <Loader2 className="w-6 h-6 animate-spin text-brand mx-auto" />
+                    </td>
+                  </tr>
+                ) : viewData.length > 0 ? (
+                  viewData.map((record) => (
+                    <tr key={record.id} className="border-b border-border/50 hover:bg-muted/50 transition-colors">
+                      <td className="px-4 py-3 font-medium">{record.enrollmentNumber}</td>
+                      <td className="px-4 py-3">{record.name}</td>
+                      <td className="px-4 py-3">{record.course}</td>
+                      <td className="px-4 py-3">{record.branch}</td>
+                      <td className="px-4 py-3">{record.batch}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="text-center py-8 text-muted-foreground">
+                      No records found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          {viewTotal > limit && (
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                Showing {(viewPage - 1) * limit + 1} to {Math.min(viewPage * limit, viewTotal)} of {viewTotal} entries
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setViewPage((p) => Math.max(1, p - 1))}
+                  disabled={viewPage === 1}
+                  className="px-3 py-1.5 rounded-lg border border-border text-sm font-medium hover:bg-muted disabled:opacity-50 transition-colors"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => setViewPage((p) => p + 1)}
+                  disabled={viewPage * limit >= viewTotal}
+                  className="px-3 py-1.5 rounded-lg border border-border text-sm font-medium hover:bg-muted disabled:opacity-50 transition-colors"
+                >
+                  Next
+                </button>
+              </div>
             </div>
           )}
         </div>

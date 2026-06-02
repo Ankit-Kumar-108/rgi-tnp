@@ -2,7 +2,14 @@ export const runtime = "edge";
 
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { placementOpportunityTemplate } from "@/lib/email-templates";
+import { 
+  placementOpportunityTemplate, 
+  driveRejectionTemplate, 
+  referralStatusUpdateTemplate, 
+  volunteerApprovedTemplate, 
+  externalVerificationSuccessTemplate, 
+  studentVerificationSuccessTemplate 
+} from "@/lib/email-templates";
 import { runInBackground } from "@/lib/background";
 import { deleteMultipleFromR2 } from "@/lib/r2-delete";
 import { NotificationService } from "@/lib/notification-service";
@@ -177,16 +184,7 @@ async function notifyRecruitersForRejectedDrives(driveIds: string[], triggeredBy
         email: {
           to: drive.recruiter.email,
           subject: `Placement Drive Rejected: ${drive.companyName}`,
-          html: `
-            <div style="font-family: sans-serif; padding: 20px; color: #333;">
-              <h2 style="color: #D32F2F; margin-bottom: 20px;">Placement Drive Rejected</h2>
-              <p>Hello <strong>${drive.recruiter.name}</strong>,</p>
-              <p style="line-height: 1.6; font-size: 15px;">Your submitted placement drive for <strong>${drive.companyName}</strong> (${drive.roleName} role) has been reviewed and was <strong>not approved</strong> at this time.</p>
-              <p style="line-height: 1.6; font-size: 15px;">Please review the job details or contact the placement coordinator for more information.</p>
-              <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
-              <p style="font-size: 12px; color: #999;">Radharaman Group of Institutes (RGI) Training & Placement Cell.</p>
-            </div>
-          `,
+          html: driveRejectionTemplate(drive.recruiter.name, drive.companyName, drive.roleName),
           template: "driveRejectionTemplate",
         },
         inApp: {
@@ -219,15 +217,7 @@ async function notifyAlumniForReferrals(referralIds: string[], action: "approve"
         email: {
           to: ref.alumni.personalEmail,
           subject: `Referral Submission ${action === "approve" ? "Approved" : "Rejected"}: ${ref.position}`,
-          html: `
-            <div style="font-family: sans-serif; padding: 20px; color: #333;">
-              <h2 style="color: ${action === "approve" ? "#388E3C" : "#D32F2F"}; margin-bottom: 20px;">Referral Status Update</h2>
-              <p>Hello <strong>${ref.alumni.name}</strong>,</p>
-              <p style="line-height: 1.6; font-size: 15px;">Your submitted referral for <strong>${ref.position}</strong> at <strong>${ref.companyName}</strong> has been <strong>${action === "approve" ? "approved and published" : "rejected"}</strong> by the administration.</p>
-              <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
-              <p style="font-size: 12px; color: #999;">Radharaman Group of Institutes (RGI) Training & Placement Cell.</p>
-            </div>
-          `,
+          html: referralStatusUpdateTemplate(ref.alumni.name, ref.position, ref.companyName, action),
           template: "referralStatusUpdateTemplate",
         },
         inApp: {
@@ -299,15 +289,7 @@ async function notifyVolunteersApproval(volunteerIds: string[], triggeredBy: str
         email: {
           to: v.student.email,
           subject: `Volunteer Status Approved!`,
-          html: `
-            <div style="font-family: sans-serif; padding: 20px; color: #333;">
-              <h2 style="color: #388E3C; margin-bottom: 20px;">Volunteer Approved!</h2>
-              <p>Hello <strong>${v.student.name}</strong>,</p>
-              <p style="line-height: 1.6; font-size: 15px;">Congratulations! You have been approved as a student volunteer for Training & Placement cell events.</p>
-              <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
-              <p style="font-size: 12px; color: #999;">Radharaman Group of Institutes (RGI) Training & Placement Cell.</p>
-            </div>
-          `,
+          html: volunteerApprovedTemplate(v.student.name),
           template: "volunteerApprovedTemplate",
         },
         inApp: {
@@ -674,7 +656,7 @@ export async function POST(req: NextRequest) {
                   email: {
                     to: student.email,
                     subject: "Account Verified Successfully",
-                    html: `<p>Hello ${student.name}, your external student registration is verified!</p>`,
+                    html: externalVerificationSuccessTemplate(student.name),
                     template: "externalVerificationSuccess",
                   },
                   inApp: {
@@ -788,7 +770,7 @@ export async function POST(req: NextRequest) {
                   email: {
                     to: student.email,
                     subject: "Account Verified Successfully",
-                    html: `<p>Hello ${student.name}, your student account has been verified by the administrator.</p>`,
+                    html: studentVerificationSuccessTemplate(student.name),
                     template: "studentVerificationSuccess",
                   },
                   inApp: {
