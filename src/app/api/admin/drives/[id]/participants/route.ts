@@ -82,6 +82,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
             batch: true,
             currentCompany: true,
             jobTitle: true,
+            cgpa: true,
+            twelfthPercentage: true,
+            tenthPercentage: true
           }
         }
       },

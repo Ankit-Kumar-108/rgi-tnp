@@ -38,8 +38,8 @@ export default function AdminDrivesPage() {
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formMsg, setFormMsg] = useState<{ msg: string; ok: boolean } | null>(null);
-  const [form, setForm] = useState({
-    companyName: "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full-Time", genderPreference: "Both", interviewProcess: "", duration: "", allowAlumni: false
+  const [form, setForm] = useState<{ companyName: string, roleName: string, jobDescription: string, ctc: string, eligibleBranches: string, minCGPA: number, minBatch: string, maxBatch: string, course: string, driveDate: string, driveType: string, jobType: string, genderPreference: string, interviewProcess: string, duration: string, allowAlumni: boolean }>({
+    companyName: "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full Time", genderPreference: "Both", interviewProcess: "", duration: "", allowAlumni: false
   });
   const observer = useRef<IntersectionObserver | null>(null);
 
@@ -492,20 +492,20 @@ export default function AdminDrivesPage() {
                               onClick={() => {
                                 setEditDriveId(drive.id);
                                 setForm({
-                                  companyName: drive.companyName,
-                                  roleName: drive.roleName,
-                                  jobDescription: drive.jobDescription,
-                                  ctc: drive.ctc,
-                                  eligibleBranches: drive.eligibleBranches,
-                                  minCGPA: drive.minCGPA,
-                                  genderPreference: drive.genderPreference,
-                                  interviewProcess: drive.interviewProcess,
-                                  minBatch: drive.minBatch,
-                                  maxBatch: drive.maxBatch,
+                                  companyName: drive.companyName || "",
+                                  roleName: drive.roleName || "",
+                                  jobDescription: drive.jobDescription || "",
+                                  ctc: drive.ctc || "",
+                                  eligibleBranches: drive.eligibleBranches || "",
+                                  minCGPA: drive.minCGPA || 0,
+                                  genderPreference: drive.genderPreference || "Both",
+                                  interviewProcess: drive.interviewProcess || "",
+                                  minBatch: drive.minBatch || "",
+                                  maxBatch: drive.maxBatch || "",
                                   course: drive.course || "B.Tech",
-                                  driveDate: new Date(drive.driveDate).toISOString().split('T')[0],
-                                  driveType: drive.driveType,
-                                  jobType: drive.jobType || "Full-Time",
+                                  driveDate: drive.driveDate ? new Date(drive.driveDate).toISOString().split('T')[0] : "",
+                                  driveType: drive.driveType || "Closed",
+                                  jobType: drive.jobType || "Full Time",
                                   duration: drive.duration || "",
                                   allowAlumni: drive.allowAlumni || false,
                                 });

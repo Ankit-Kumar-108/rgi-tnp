@@ -15,7 +15,6 @@ import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
 import { toast } from "sonner";
 import QRCode from "qrcode";
-import { data } from "motion/react-client";
 
 // Types
 type Participant = {
@@ -45,6 +44,7 @@ type StudentUser = {
   skills?: string[];
   tenthPercentage?: number | string;
   twelfthPercentage?: number | string;
+  personalEmail?: string;
 };
 
 //Status Config 
@@ -662,8 +662,8 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
                           onChange={(e) => setComposeData({ ...composeData, to: e.target.value})}
                           className="w-full appearance-none bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 pr-10 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand transition-all"
                         >
-                          <option value="all_drive_participants">All Students{id}</option>
-                          <option value="internal_drive_participants">Readharaman Students</option>
+                          <option value="all_drive_participants">All Students</option>
+                          <option value="internal_drive_participants">Radharaman Students</option>
                           <option value="external_drive_participants">Other Students</option>
                         </select>
                         <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
@@ -795,10 +795,10 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
           ) : (
             <div className="space-y-2.5">
               {filteredParticipants.map((reg, index) => {
-                const user = reg.student || reg.externalStudent || reg.alumni || {} as StudentUser;
                 const isSelected = selectedIds.has(reg.id);
                 const isInternal = !!reg.student;
-                const isAlumni = !!reg.alumni;
+                const alumniUser = reg.alumni ? { ...reg.alumni, email: reg.alumni.personalEmail } : null
+                const user = reg.student || reg.externalStudent || alumniUser || {} as StudentUser;
                 const isLast = index === filteredParticipants.length - 1;
 
                 return (
@@ -864,9 +864,9 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
 
                         {/* Row 2: Degree · College · Branch · Batch */}
                         <div className="flex items-center gap-1.5 flex-wrap text-xs text-muted-foreground mb-1.5">
-                          <span className="font-medium text-foreground">{user.course || "B.Tech"}</span>
+                          <span className="font-extrabold text-foreground">{user.course || "B.Tech"}</span>
                           <span className="text-border">·</span>
-                          <span className="font-semibold text-brand">{user.collegeName || "RGI"}</span>
+                          <span className="font-extrabold text-brand">{user.collegeName || "RGI"}</span>
                           <span className="text-border">·</span>
                           <span>{user.branch || "—"}</span>
                           {user.batch && <><span className="text-border">·</span><span>Batch {user.batch}</span></>}
@@ -877,14 +877,14 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
                         {/* Row 3: Stats + Skills */}
                         <div className="flex items-center gap-4 flex-wrap mb-2.5">
                           <div className="flex flex-wrap items-center gap-3 divide-x divide-border">
+                            {user.enrollmentNumber && (
+                              <div className="pr-3">
+                                <StatChip value={user.enrollmentNumber} label="Enrollment Number" />
+                              </div>
+                            )}
                             {user.cgpa && (
                               <div className="pr-3">
                                 <span className="flex"><StatChip value={user.cgpa} label="CGPA" /><p className="text-sm font-bold">%</p></span>
-                              </div>
-                            )}
-                            {user.enrollmentNumber && (
-                              <div className="pr-3">
-                                <span className="text-[10px] text-muted-foreground font-medium">{user.enrollmentNumber}</span>
                               </div>
                             )}
                             <div className="pr-3">
@@ -894,7 +894,7 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
                             </div>
                             <div className="pr-3">
                               {user.twelfthPercentage === 0 ? (``) : (
-                                <StatChip value={`${user.twelfthPercentage}%`} label="12th/Diploma" />
+                                <StatChip value={`${user.twelfthPercentage || 0}%`} label="12th/Diploma" />
                               )}
                             </div>
                           </div>

@@ -92,6 +92,9 @@ model Alumni {
   profileImageUrl              String
   jobTitle                     String?
   city                         String?
+  cgpa                         Float?
+  twelfthPercentage            Float?
+  tenthPercentage              Float?
   country                      String?
   linkedInUrl                  String?
   phoneNumber                  String?

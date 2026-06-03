@@ -96,7 +96,10 @@ export async function POST(req: NextRequest) {
           student.name,
           student.branch,
           student.course,
-          student.batch
+          student.batch,
+          student.cgpa,
+          student.twelfthPercentage,
+          student.tenthPercentage
         );
 
         let placementSnapsJson: any[] = [];
@@ -126,6 +129,9 @@ export async function POST(req: NextRequest) {
             isProfileComplete: false,
             isTransferred: true,
             placementSnapsJson: placementSnapsJson,
+            cgpa: student.cgpa,
+            twelfthPercentage: student.twelfthPercentage,
+            tenthPercentage: student.tenthPercentage
           },
         });
 

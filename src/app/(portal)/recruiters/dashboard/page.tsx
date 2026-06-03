@@ -262,7 +262,7 @@ export default function RecruiterDashboard() {
               <button
                 onClick={() => {
                   setEditDriveId(null);
-                  setForm({ companyName: user?.company || "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full-Time", genderPreference: "Both", duration: "", interviewProcess: "", allowAlumni: false });
+                  setForm({ companyName: user?.company || "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full Time", genderPreference: "Both", duration: "", interviewProcess: "", allowAlumni: false });
                   setFormMsg(null);
                   setShowForm(true);
                 }}
@@ -571,18 +571,18 @@ export default function RecruiterDashboard() {
                                 onClick={() => {
                                   setEditDriveId(drive.id);
                                   setForm({
-                                    companyName: drive.companyName,
-                                    roleName: drive.roleName,
-                                    jobDescription: drive.jobDescription,
-                                    ctc: drive.ctc,
-                                    eligibleBranches: drive.eligibleBranches,
-                                    minCGPA: drive.minCGPA,
-                                    minBatch: drive.minBatch,
-                                    maxBatch: drive.maxBatch,
+                                    companyName: drive.companyName || "",
+                                    roleName: drive.roleName || "",
+                                    jobDescription: drive.jobDescription || "",
+                                    ctc: drive.ctc || "",
+                                    eligibleBranches: drive.eligibleBranches || "",
+                                    minCGPA: drive.minCGPA || 0,
+                                    minBatch: drive.minBatch || "",
+                                    maxBatch: drive.maxBatch || "",
                                     course: drive.course || "B.Tech",
-                                    driveDate: new Date(drive.driveDate).toISOString().split('T')[0],
-                                    driveType: drive.driveType,
-                                    jobType: drive.jobType || "Full-Time",
+                                    driveDate: drive.driveDate ? new Date(drive.driveDate).toISOString().split('T')[0] : "",
+                                    driveType: drive.driveType || "Closed",
+                                    jobType: drive.jobType || "Full Time",
                                     genderPreference: drive.genderPreference || "Both",
                                     duration: drive.duration || "",
                                     interviewProcess: drive.interviewProcess || "",

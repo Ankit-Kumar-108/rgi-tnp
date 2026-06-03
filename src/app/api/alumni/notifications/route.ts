@@ -59,7 +59,8 @@ export async function GET(req: NextRequest) {
             db.notification.count({
                 where: {
                     alumniId: Alumni.id,
-                    recipientType: "alumni"
+                    recipientType: "alumni",
+                    isRead: false
                 }
             })
         ])

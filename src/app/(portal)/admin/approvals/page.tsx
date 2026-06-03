@@ -86,6 +86,7 @@ const emptyDriveForm = {
   genderPreference: "Both",
   interviewProcess: "",
   duration: "",
+  allowAlumni: false,
 };
 
 type DriveEditForm = typeof emptyDriveForm;
@@ -226,6 +227,7 @@ export default function AdminApprovalsPage() {
       genderPreference: drive.genderPreference || "Both",
       interviewProcess: drive.interviewProcess || "",
       duration: drive.duration || "",
+      allowAlumni: drive.allowAlumni || false,
     });
     setDriveFormMsg(null);
     setShowDriveEditForm(true);
@@ -478,7 +480,6 @@ export default function AdminApprovalsPage() {
                     onChange={(e) => setDriveForm({ ...driveForm, jobType: e.target.value })}
                     className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none"
                   >
-                    {driveForm.jobType === "Full-Time" && <option value="Full-Time">Full Time</option>}
                     <option value="Full Time">Full Time</option>
                     <option value="Internship with PPO">Internship with PPO</option>
                     <option value="Internship">Internship</option>
@@ -512,6 +513,25 @@ export default function AdminApprovalsPage() {
                     />
                   </div>
                 )}
+              </div>
+
+              <div className="space-y-2">
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={driveForm.allowAlumni || false}
+                    onChange={(e) => setDriveForm({ ...driveForm, allowAlumni: e.target.checked })}
+                    className="w-5 h-5 text-brand focus:ring-brand border-border rounded"
+                  />
+                  <div>
+                    <span className="text-sm font-bold text-foreground group-hover:text-brand transition-colors">
+                      Allow Alumni / Experienced Pass-outs
+                    </span>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Experienced alumni from this college can also apply
+                    </p>
+                  </div>
+                </label>
               </div>
 
               <div>

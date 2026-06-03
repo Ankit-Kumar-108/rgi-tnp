@@ -499,14 +499,14 @@ Verify Token + Role Authorization
 - [ ] **Admin Panel (in drive management section add custom email function so admin can send custom email to all applicants of drive or selected applicants of drive)  (to change on 10/06/2026 [Done])**
 - add custom email function in drive management section of admin panel so admin can send custom email to all applicants of drive or selected applicants of drive for better communication and understanding of status of drive and also add template for that email
 
+- [ ] **Notification Center (add send mail to all students, alumni, recruiters and course specific students)  (to change on 25/06/2026 [Done])**
+ - add notification center in admin panel where admin can send mail to all students, alumni, recruiters and course specific students for better communication and understanding of status of drive and also add template for that email
+
 - [ ] **Backend (add linkedin api and googleSheet api integration)  (to change on 15/06/2026 [to be Done])**
 - add linkedin api to post drive in linkedin and google sheet api to maintain record of drives, applicants, students batch wise, alumni, referrals etc. for better visibility and understanding of data and also add automation for that
 
 - [ ] **Referral (add a page where referral are posted by alumni and also appears in the students dashboard)  (to change on 20/06/2026 [to be Done])**
  - add a page where referral are posted by alumni for better visibility and understanding of referral and also add filter in that page for better visibility only logged in student and alumni can see that page
-
-- [ ] **Notification Center (add send mail to all students, alumni, recruiters and course specific students)  (to change on 25/06/2026 [Done])**
- - add notification center in admin panel where admin can send mail to all students, alumni, recruiters and course specific students for better communication and understanding of status of drive and also add template for that email
 
 - [ ] **Site (improve site content)  (to change on 25/06/2026 [to be Done])** 
   - improve content of site and add more content in home page and about us page for better visibility and understanding of site
