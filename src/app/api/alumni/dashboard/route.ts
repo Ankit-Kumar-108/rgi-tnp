@@ -39,8 +39,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Alumni not found" }, { status: 404 });
     }
 
-    // Get referrals with counts at database level (avoid filtering in-memory)
-    const [referrals, feedbacks, memories, referralCounts, alumniDrives] = await Promise.all([
+    const [referrals, feedbacks, memories, referralCounts, alumniDrives, registrations, archivedDrives] = await Promise.all([
       db.referral.findMany({
         where: { alumniId: alumni.id },
         orderBy: { id: "desc" },
@@ -74,12 +73,31 @@ export async function GET(req: NextRequest) {
         orderBy: { driveDate: "desc" },
         take: 10,
       }),
+      db.driveRegistration.findMany({
+        where: { alumniId: alumni.id },
+        include: {
+          drive: { select: { companyName: true, roleName: true, driveDate: true, status: true } },
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+      db.placementDrive.findMany({
+        where: { allowAlumni: true, status: "completed" },
+        take: 10, // Limit archived drives
+        orderBy: { driveDate: "desc" },
+      }),
     ]);
     // Map drives to add isRegistered flag
     const formattedDrives = alumniDrives.map((d: any) => ({
       ...d,
       isRegistered: d.registrations.length > 0,
       registrations: undefined,
+    }));
+    
+    const registeredDriveIds = registrations.map((r: any) => r.driveId);
+    
+    const formattedArchivedDrives = archivedDrives.map((d: any) => ({
+      ...d,
+      isRegistered: registeredDriveIds.includes(d.id),
     }));
 
     const [totalReferrals, approvedReferrals, pendingReferrals] = referralCounts;
@@ -90,6 +108,8 @@ export async function GET(req: NextRequest) {
       referrals,
       memories,
       drives: formattedDrives,
+      registrations,
+      archivedDrives: formattedArchivedDrives,
       stats: {
         totalReferrals,
         approvedReferrals,

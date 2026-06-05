@@ -95,6 +95,7 @@ model Alumni {
   cgpa                         Float?
   twelfthPercentage            Float?
   tenthPercentage              Float?
+  gender                       String?
   country                      String?
   linkedInUrl                  String?
   phoneNumber                  String?

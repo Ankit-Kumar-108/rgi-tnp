@@ -29,7 +29,7 @@ export default function JobDetailsModal({
     isOpen: boolean;
     onClose: () => void;
     onSuccess: () => void;
-    role?: "student" | "external_student" | "admin" | "recruiter";
+    role?: "student" | "external_student" | "admin" | "recruiter" | "alumni";
     publicMode?: boolean;
     readonly?: boolean;
     isRegistered?: boolean;
@@ -67,7 +67,9 @@ export default function JobDetailsModal({
         setRegistering(true);
         try {
             const token = getToken(role);
-            const endpoint = role === "external_student" ? "/api/external/dashboard" : "/api/student/drives";
+            let endpoint = "/api/student/drives";
+            if (role === "external_student") endpoint = "/api/external/dashboard";
+            else if (role === "alumni") endpoint = "/api/alumni/drives";
             const res = await fetchWithRetry(endpoint, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },

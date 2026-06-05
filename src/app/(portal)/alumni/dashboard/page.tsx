@@ -33,7 +33,9 @@ import {
   Camera,
   Trash2,
   Upload,
-  AlertTriangle
+  AlertTriangle,
+  CalendarDays,
+  Clock
 } from "lucide-react";
 import Nav from "@/components/layout/nav/nav";
 import Footer from "@/components/layout/footer/footer";
@@ -44,13 +46,19 @@ import { toast } from "sonner";
 import { DriveRegistration, Memory, PlacementDrive, Student } from "@/types";
 import { uploadFileToR2 } from "@/lib/upload-r2";
 import NotificationBell from "@/components/ui/NotificationBell";
+import dynamic from "next/dynamic";
 
+const JobDetailsModal = dynamic(
+  () => import("@/components/forms/studentApplyModal/modal"),
+  { ssr: false }
+);
 export default function AlumniDashboard() {
   const { loading: authLoading, authenticated, user } = useAuth("alumni", "/alumni/login");
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const router = useRouter();
-
+  const [selectedDrive, setSelectedDrive] = useState<PlacementDrive | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   // Referral form
   const [refForm, setRefForm] = useState({
     companyName: "",
@@ -413,10 +421,13 @@ export default function AlumniDashboard() {
   }
 
   const alumni = data?.alumni;
-  const isProfileIncomplete = alumni && (!alumni.city || !alumni.linkedInUrl);
+  const isProfileIncomplete = alumni && (!alumni.city || !alumni.linkedInUrl || !alumni.about);
   const referrals = data?.referrals || [];
   const stats = data?.stats || {};
   const memories = data?.memories || [];
+  const drives = data?.drives || [];
+  const archivedDrives = data?.archivedDrives || [];
+  const registrations = data?.registrations || [];
 
   return (
     <>
@@ -454,6 +465,21 @@ export default function AlumniDashboard() {
           </div>
         </div>
       )}
+      {selectedDrive && (
+        <JobDetailsModal
+          drive={selectedDrive}
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedDrive(null);
+          }}
+          onSuccess={() => {
+            fetchDashboard();
+          }}
+          role="alumni"
+          isRegistered={registrations.some((r: any) => r.driveId === selectedDrive.id)}
+        />
+      )}
       {/* body */}
       <div className="bg-background text-foreground antialiased font-sans min-h-screen mt-15 overflow-hidden">
         <div className="fixed bottom-0 right-0 w-96 h-96 bg-brand/5 rounded-full blur-[120px] -z-10" />
@@ -490,8 +516,16 @@ export default function AlumniDashboard() {
             </div>
           </section>
 
+          {/* Loader State */}
+          {loading && (
+            <div className="flex justify-center py-20">
+              <Loader2 className="w-10 h-10 animate-spin text-brand" />
+            </div>
+          )}
+
           {/* Hero Section */}
-          <section className="w-full">
+          {!loading && !fetchError && (
+          <section className="w-full z-40">
             <div className="flex flex-col items-center justify-between gap-6 mt-2">
               {alumni && (
                 <div className="w-full relative group">
@@ -568,19 +602,19 @@ export default function AlumniDashboard() {
                       <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-6 md:gap-y-0 md:pt-6 border-t border-border/50 pt-6">
                         <div className="px-2 md:pr-6 md:border-r border-border/50 text-left">
                           <p className="text-xs md:text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Current Role</p>
-                          <p className="text-sm md:text-lg font-extrabold text-foreground leading-snug truncate">{alumni?.jobTitle || "â€”"}</p>
+                          <p className="text-sm md:text-lg font-extrabold text-foreground leading-snug truncate">{alumni?.jobTitle || "N/A"}</p>
                         </div>
                         <div className="px-2 md:px-6 md:border-r border-border/50 text-left">
                           <p className="text-xs md:text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Company</p>
-                          <p className="text-sm md:text-lg font-extrabold text-foreground leading-snug truncate">{alumni?.currentCompany || "â€”"}</p>
+                          <p className="text-sm md:text-lg font-extrabold text-foreground leading-snug truncate">{alumni?.currentCompany || "N/A"}</p>
                         </div>
                         <div className="px-2 md:px-6 md:border-r border-border/50 text-left text-left">
                           <p className="text-xs md:text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">City</p>
-                          <p className="text-sm md:text-lg font-extrabold text-foreground leading-snug truncate">{alumni?.city || "â€”"}</p>
+                          <p className="text-sm md:text-lg font-extrabold text-foreground leading-snug truncate">{alumni?.city || "N/ A"}</p>
                         </div>
                         <div className="px-2 md:pl-6 text-left">
                           <p className="text-xs md:text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Country</p>
-                          <p className="text-sm md:text-lg font-extrabold text-foreground leading-snug truncate">{alumni?.country || "â€”"}</p>
+                          <p className="text-sm md:text-lg font-extrabold text-foreground leading-snug truncate">{alumni?.country || "N/A"}</p>
                         </div>
                       </div>
 
@@ -614,7 +648,7 @@ export default function AlumniDashboard() {
               )}
             </div>
           </section>
-
+          )}
           {/* Profile Form (Full Screen Overlay) */}
           {showProfileForm && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6">
@@ -664,7 +698,7 @@ export default function AlumniDashboard() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
                     <div className="space-y-2">
-                      <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Current Company</label>
+                      <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Current Company (Optional)</label>
                       <div className="relative group">
                         <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-background rounded-lg border border-border group-focus-within:border-brand/50 transition-colors">
                           <Briefcase className="w-3.5 h-3.5 text-muted-foreground" />
@@ -679,7 +713,7 @@ export default function AlumniDashboard() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Job Title</label>
+                      <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Job Title (Optional)</label>
                       <div className="relative group">
                         <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-background rounded-lg border border-border group-focus-within:border-brand/50 transition-colors">
                           <TrendingUp className="w-3.5 h-3.5 text-muted-foreground" />
@@ -709,7 +743,7 @@ export default function AlumniDashboard() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Location (City)</label>
+                      <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Location (Current City)</label>
                       <div className="relative group">
                         <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-background rounded-lg border border-border">
                           <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
@@ -731,7 +765,7 @@ export default function AlumniDashboard() {
                         value={profileForm.country}
                         onChange={(e) => setProfileForm({ ...profileForm, country: e.target.value })}
                         className="w-full bg-muted/50 px-6 py-4 rounded-2xl border border-transparent focus:border-brand/30 focus:bg-background transition-all text-sm outline-none text-foreground font-bold"
-                        placeholder="India"
+                        placeholder="e.g. India"
                       />
                     </div>
 
@@ -818,112 +852,362 @@ export default function AlumniDashboard() {
             </section>
           )}
 
-          {/* Campus Drives Section */}
-          {!loading && !fetchError && (data?.drives?.length > 0) && (
-            <section className="space-y-6">
-              <div className="flex items-center justify-between">
+          {/* Upcoming Drives */}
+          {!loading && !fetchError && (
+            <section>
+              <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center">
-                    <Briefcase className="w-5 h-5 text-brand" />
+                  <div className="p-2.5 bg-brand/10 rounded-full">
+                    <CalendarDays className="w-5 h-5 text-brand" />
                   </div>
                   <div>
-                    <h2 className="text-lg md:text-xl font-black text-foreground tracking-tight">
-                      Campus Drives
-                    </h2>
-                    <p className="text-xs text-muted-foreground">
-                      Drives open for experienced alumni
-                    </p>
+                    <h2 className="text-xl font-bold text-foreground">Upcoming Drives</h2>
+                    <p className="text-xs text-muted-foreground mt-0.5">Browse open positions for alumni</p>
                   </div>
                 </div>
+                <span className="text-xs font-bold bg-brand/10 text-brand px-3 py-1.5 rounded-full">{drives.length} Available</span>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {data.drives.map((drive: any) => (
-                  <div
-                    key={drive.id}
-                    className="bg-card rounded-2xl p-6 border border-border
-                     shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)]
-                     transition-all duration-300 group"
+              {drives.length === 0 ? (
+                <div className="bg-gradient-to-br from-muted/30 to-muted/10 rounded-[2rem] border-2 border-dashed border-border p-12 text-center space-y-4 group hover:border-brand/30 transition-colors">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-muted rounded-full group-hover:bg-brand/10 transition-colors">
+                    <Briefcase className="w-8 h-8 text-muted-foreground group-hover:text-brand transition-colors" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-foreground mb-1">No Eligible Drives Yet</h3>
+                    <p className="text-sm text-muted-foreground">Come back soon for new placement opportunities</p>
+                  </div>
+                  <button
+                    onClick={() => { fetchDashboard(); }}
+                    className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-brand/10 text-brand rounded-xl font-bold text-sm hover:bg-brand/20 transition-colors"
                   >
-                    {/* Company + Role */}
-                    <div className="flex items-start justify-between gap-3 mb-4">
-                      <div>
-                        <h3 className="text-base font-black text-foreground leading-tight">
-                          {drive.companyName}
-                        </h3>
-                        <p className="text-sm text-muted-foreground font-medium mt-0.5">
-                          {drive.roleName}
+                    <RefreshCw className="w-4 h-4" /> Check Again
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {/* MOBILE VIEW: Grid of Cards */}
+                  <div className="grid grid-cols-1 gap-4 md:hidden">
+                    {drives.map((drive: any) => (
+                      <div key={drive.id} className="bg-card border border-border rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-brand/30 transition-all space-y-4 group">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
+                              <Building2 className="w-5 h-5 text-brand" />
+                            </div>
+                            <div className="min-w-0">
+                              <h3 className="font-bold text-foreground leading-tight truncate">{drive.companyName}</h3>
+                              <p className="text-xs text-muted-foreground truncate">{drive.roleName}</p>
+                            </div>
+                          </div>
+                          <span className={`text-xs px-2.5 py-1 rounded-full font-bold whitespace-nowrap ml-2 ${drive.driveType === "Open" ? "bg-green-500/15 text-green-700" : "bg-blue-500/15 text-blue-700"}`}>
+                            {drive.driveType}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4 py-3 border-y border-border/50">
+                          <div>
+                            <p className="text-xs uppercase font-black text-muted-foreground tracking-wider mb-1">CTC</p>
+                            <p className="text-sm font-bold text-foreground">{drive.ctc}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs uppercase font-black text-muted-foreground tracking-wider mb-1">Date</p>
+                            <p className="text-sm font-bold text-foreground">{new Date(drive.driveDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex justify-end">
+                          {drive.isRegistered ? (
+                            <button
+                              onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
+                              className="inline-flex items-center gap-1.5 text-green-600 bg-green-500/10 hover:bg-green-500/20 px-4 py-2 rounded-xl text-xs font-bold transition-all"
+                            >
+                              <CheckCircle className="w-4 h-4" /> View Details
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
+                              className="shrink-0 text-xs font-bold px-4 py-2 rounded-xl bg-brand text-white hover:bg-brand/90 transition-all shadow-md shadow-brand/25"
+                            >
+                              View Details
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* DESKTOP VIEW: Professional Table */}
+                  <div className="hidden md:block bg-card rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="bg-gradient-to-r from-muted/50 to-muted/30 border-b border-border">
+                          <th className="text-left px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Company</th>
+                          <th className="text-left px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Position</th>
+                          <th className="text-left px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">CTC</th>
+                          <th className="text-center px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Drive Date</th>
+                          <th className="text-center px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Type</th>
+                          <th className="text-right px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/40">
+                        {drives.map((drive: any) => (
+                          <tr key={drive.id} className="hover:bg-muted/20 transition-colors group">
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
+                                  <Building2 className="w-5 h-5 text-brand" />
+                                </div>
+                                <span className="font-bold text-foreground">{drive.companyName}</span>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className="text-muted-foreground font-medium">{drive.roleName}</span>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className="font-bold text-foreground">{drive.ctc}</span>
+                            </td>
+                            <td className="px-6 py-4 text-center">
+                              <span className="text-muted-foreground font-medium">{new Date(drive.driveDate).toLocaleDateString('en-IN')}</span>
+                            </td>
+                            <td className="px-6 py-4 text-center">
+                              <span className={`inline-flex px-3 py-1 rounded-full text-xs font-bold ${drive.driveType === "Open" ? "bg-green-500/15 text-green-700" : "bg-blue-500/15 text-blue-700"}`}>
+                                {drive.driveType}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 flex justify-end">
+                              {drive.isRegistered ? (
+                                <button
+                                  onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
+                                  className="inline-flex items-center gap-1.5 text-green-600 bg-green-500/10 hover:bg-green-500/20 px-4 py-2 rounded-xl text-xs font-bold transition-all"
+                                >
+                                  <CheckCircle className="w-4 h-4" /> View Details
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
+                                  className="shrink-0 text-xs font-bold px-4 py-2 rounded-xl bg-brand text-white hover:bg-brand/90 transition-all shadow-md shadow-brand/25"
+                                >
+                                  View Details
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
+            </section>
+          )}
+
+          {/* My Registrations */}
+          {!loading && !fetchError && (
+            <section>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-brand/10 rounded-full">
+                    <FileText className="w-5 h-5 text-brand" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-foreground">My Applications</h2>
+                    <p className="text-xs text-muted-foreground mt-0.5">Track your drive participation</p>
+                  </div>
+                </div>
+                <span className="text-xs font-bold bg-brand/10 text-brand px-3 py-1.5 rounded-full">{registrations.length} Applied</span>
+              </div>
+
+              {registrations.length === 0 ? (
+                <div className="bg-gradient-to-br from-muted/30 to-muted/10 rounded-[2rem] border-2 border-dashed border-border p-12 text-center space-y-4 group hover:border-brand/30 transition-colors">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-muted rounded-full group-hover:bg-brand/10 transition-colors">
+                    <Briefcase className="w-8 h-8 text-muted-foreground group-hover:text-brand transition-colors" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-foreground mb-1">No Applications Yet</h3>
+                    <p className="text-sm text-muted-foreground">Start applying to drives from the list above</p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {/* MOBILE VIEW: Cards */}
+                  <div className="grid grid-cols-1 gap-4 md:hidden">
+                    {registrations.map((reg: any) => (
+                      <div key={reg.id} className="bg-card border border-border rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-brand/30 transition-all space-y-4 group">
+                        <div className="flex justify-between items-start gap-3">
+                          <div className="min-w-0 flex-1">
+                            <h3 className="font-bold text-foreground leading-tight truncate">{reg.drive?.companyName}</h3>
+                            <p className="text-xs text-muted-foreground truncate">{reg.drive?.roleName}</p>
+                          </div>
+                          <span className={`text-xs px-2.5 py-1 rounded-full font-bold whitespace-nowrap ${reg.drive?.status === "active" ? "bg-green-500/15 text-green-700" : reg.drive?.status === "completed" ? "bg-blue-500/15 text-blue-700" : "bg-muted text-muted-foreground"}`}>
+                            {reg.drive?.status}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between py-3 border-y border-border/50">
+                          <div className="space-y-1">
+                            <p className="text-xs uppercase font-black text-muted-foreground tracking-wider">Status</p>
+                            <span className={`inline-flex px-2.5 py-1 rounded-lg text-xs font-bold tracking-wider ${reg.status === "Selected" ? "bg-green-500/15 text-green-700" :
+                              reg.status === "Rejected" ? "bg-red-500/15 text-red-600" :
+                                reg.status === "Shortlisted" ? "bg-yellow-500/15 text-yellow-700" :
+                                  "bg-muted text-muted-foreground"
+                              }`}>
+                              {reg.status || "Applied"}
+                            </span>
+                          </div>
+                          <div className="text-right space-y-1">
+                            <p className="text-xs uppercase font-black text-muted-foreground tracking-wider">Attendance</p>
+                            {reg.attended ? (
+                              <span className="text-green-600 text-xs font-bold flex items-center justify-end gap-1.5">
+                                <CheckCircle className="w-3.5 h-3.5" /> Present
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground text-xs font-bold flex items-center justify-end gap-1.5">
+                                <Clock className="w-3.5 h-3.5" /> Upcoming
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <p className="text-xs text-muted-foreground">
+                          📅 {reg.drive?.driveDate ? new Date(reg.drive.driveDate).toLocaleDateString('en-IN') : "—"}
                         </p>
                       </div>
+                    ))}
+                  </div>
+
+                  {/* DESKTOP VIEW: Professional Table */}
+                  <div className="hidden md:block bg-card rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="bg-gradient-to-r from-muted/50 to-muted/30 border-b border-border">
+                            <th className="text-left px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Company & Role</th>
+                            <th className="text-center px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Drive Date</th>
+                            <th className="text-center px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Application Status</th>
+                            <th className="text-center px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Drive Status</th>
+                            <th className="text-right px-6 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Attendance</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border/40">
+                          {registrations.map((reg: any) => (
+                            <tr key={reg.id} className="hover:bg-muted/20 transition-colors group">
+                              <td className="px-6 py-4">
+                                <div className="flex items-center gap-3 group">
+                                  <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
+                                    <Briefcase className="w-5 h-5 text-brand" />
+                                  </div>
+                                  <div className="min-w-0">
+                                    <p className="font-bold text-foreground">{reg.drive?.companyName}</p>
+                                    <p className="text-xs text-muted-foreground truncate">{reg.drive?.roleName}</p>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 text-center">
+                                <span className="text-muted-foreground font-medium text-sm">
+                                  {reg.drive?.driveDate ? new Date(reg.drive.driveDate).toLocaleDateString('en-IN') : "—"}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 text-center">
+                                <span className={`inline-flex px-3 py-1.5 rounded-lg text-xs font-bold ${reg.status === "Selected" ? "bg-green-500/15 text-green-700" :
+                                  reg.status === "Rejected" ? "bg-red-500/15 text-red-600" :
+                                    reg.status === "Shortlisted" ? "bg-yellow-500/15 text-yellow-700" :
+                                      "bg-muted text-muted-foreground"
+                                  }`}>
+                                  {reg.status || "Applied"}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 text-center">
+                                <span className={`text-xs px-3 py-1.5 rounded-lg font-bold ${reg.drive?.status === "active" ? "bg-green-500/15 text-green-700" :
+                                  reg.drive?.status === "completed" ? "bg-blue-500/15 text-blue-700" :
+                                    "bg-muted text-muted-foreground"
+                                  }`}>
+                                  {reg.drive?.status || "Unknown"}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 text-right">
+                                {reg.attended ? (
+                                  <span className="text-green-600 font-bold inline-flex items-center gap-1.5">
+                                    <CheckCircle className="w-4 h-4" /> Present
+                                  </span>
+                                ) : (
+                                  <span className="text-muted-foreground font-bold inline-flex items-center justify-end gap-1.5 w-full">
+                                    <Clock className="w-4 h-4" /> Upcoming
+                                  </span>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </>
+              )}
+            </section>
+          )}
+
+          {/* Archived Drives */}
+          {!loading && !fetchError && archivedDrives.length > 0 && (
+            <section className="opacity-70 hover:opacity-100 transition-opacity duration-300">
+              <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+                <CalendarDays className="w-5 h-5 text-brand" />
+                Archived Drives History
+              </h2>
+
+              {/* MOBILE VIEW: Compact List */}
+              <div className="grid grid-cols-1 gap-3 md:hidden">
+                {archivedDrives.map((drive: any) => (
+                  <div key={drive.id} className="bg-card/50 border border-border rounded-xl p-4 flex justify-between items-center">
+                    <div className="space-y-1">
+                      <h3 className="text-sm font-bold text-foreground truncate max-w-[15rem]">
+                        {drive.companyName}
+                      </h3>
+                      <p className="text-xs text-muted-foreground">
+                        {drive.roleName} • {new Date(drive.driveDate).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div>
                       {drive.isRegistered ? (
-                        <span className="shrink-0 inline-flex items-center gap-1.5 text-xs
-                               font-bold px-3 py-1.5 rounded-full bg-green-500/10
-                               text-green-600 border border-green-500/20">
-                          <CheckCircle className="w-3.5 h-3.5" />
+                        <span className="bg-brand/10 text-brand text-xs px-2 py-0.5 rounded-full font-bold">
                           Registered
                         </span>
                       ) : (
-                        <button
-                          onClick={async () => {
-                            try {
-                              const token = getToken("alumni");
-                              const res = await fetch("/api/alumni/drives", {
-                                method: "POST",
-                                headers: {
-                                  "Content-Type": "application/json",
-                                  Authorization: `Bearer ${token}`,
-                                },
-                                body: JSON.stringify({ driveId: drive.id }),
-                              });
-                              const d = (await res.json()) as any;
-                              if (d.success) {
-                                toast.success(d.message);
-                                fetchDashboard(); // 💡 Refresh to update isRegistered
-                              } else {
-                                toast.error(d.message || "Registration failed");
-                              }
-                            } catch {
-                              toast.error("Failed to register");
-                            }
-                          }}
-                          className="shrink-0 text-xs font-bold px-4 py-1.5 rounded-full
-                           bg-brand text-white hover:bg-brand/90 transition-all
-                           shadow-md shadow-brand/25"
-                        >
-                          Register
-                        </button>
+                        <span className="bg-muted text-muted-foreground text-xs px-2 py-0.5 rounded-full font-bold">
+                          Missed
+                        </span>
                       )}
                     </div>
-
-                    {/* Drive Details */}
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                      <span className="inline-flex items-center gap-1 font-semibold">
-                        <Calendar className="w-3 h-3" />
-                        {new Date(drive.driveDate).toLocaleDateString("en-IN", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </span>
-                      <span className="text-border">·</span>
-                      <span className="font-medium">{drive.ctc}</span>
-                      <span className="text-border">·</span>
-                      <span>{drive.jobType}</span>
-                      <span className="text-border">·</span>
-                      <span>{drive.driveType}</span>
-                    </div>
-
-                    {/* Recruiter info */}
-                    {drive.recruiter && (
-                      <div className="mt-3 pt-3 border-t border-border/50
-                            text-xs text-muted-foreground">
-                        <span className="font-semibold">{drive.recruiter.company}</span>
-                        {" · "}
-                        <span>{drive.recruiter.name}</span>
-                      </div>
-                    )}
                   </div>
                 ))}
+              </div>
+
+              {/* DESKTOP VIEW: Compact Table */}
+              <div className="hidden md:block bg-card/50 rounded-2xl border border-border overflow-hidden">
+                <table className="w-full">
+                  <tbody className="divide-y divide-border/40">
+                    {archivedDrives.map((drive: any) => (
+                      <tr key={drive.id} className="hover:bg-muted/20 transition-colors">
+                        <td className="px-6 py-3">
+                          <span className="font-bold text-foreground text-sm">{drive.companyName}</span>
+                        </td>
+                        <td className="px-6 py-3 text-muted-foreground text-sm">{drive.roleName}</td>
+                        <td className="px-6 py-3 text-muted-foreground text-sm">{new Date(drive.driveDate).toLocaleDateString()}</td>
+                        <td className="px-6 py-3 text-right">
+                          {drive.isRegistered ? (
+                            <span className="inline-flex items-center gap-1.5 bg-brand/10 text-brand text-xs px-2.5 py-1 rounded-full font-bold">
+                              <CheckCircle className="w-3.5 h-3.5" /> Registered
+                            </span>
+                          ) : (
+                            <span className="bg-muted text-muted-foreground text-xs px-2.5 py-1 rounded-full font-bold">
+                              Missed
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </section>
           )}
@@ -944,11 +1228,11 @@ export default function AlumniDashboard() {
           {/* Action Modals */}
           {!loading && !fetchError && (
             <>
-              {/* â”€â”€ Referral Modal â”€â”€ */}
+              {/*Referral Modal*/}
               {showReferralModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                <div className="fixed w-full h-full top-0 left-0 z-50 flex items-center justify-center p-4">
                   <div className="absolute inset-0 bg-background/60 backdrop-blur-xl animate-in fade-in duration-300" onClick={() => setShowReferralModal(false)} />
-                  <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-card rounded-2xl border border-border/80 shadow-xl text-left animate-in zoom-in-95 duration-300">
+                  <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-background rounded-2xl border border-border/80 shadow-xl text-left animate-in zoom-in-95 duration-300 overflow-x-hidden">
                     <button onClick={() => setShowReferralModal(false)} className="absolute top-4 right-4 z-10 p-2 text-muted-foreground hover:bg-muted rounded-full">
                       <X className="w-5 h-5" />
                     </button>
@@ -957,7 +1241,7 @@ export default function AlumniDashboard() {
                     <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-blue-500/[0.04] to-transparent rounded-tr-[4rem]" />
                     <div className="absolute top-1/3 -right-6 w-12 h-12 bg-brand/5 rounded-full blur-xl" />
 
-                    <div className="relative p-5 md:p-6 space-y-6">
+                    <div className="relative p-5 md:p-6 space-y-6 bg-card">
                       {/* Header */}
                       <div className="flex items-start gap-3">
                         <div className="relative shrink-0">
@@ -983,11 +1267,11 @@ export default function AlumniDashboard() {
                             <div className="w-6 h-6 rounded-lg bg-blue-500/10 flex items-center justify-center">
                               <Building2 className="w-3.5 h-3.5 text-blue-500" />
                             </div>
-                            <span className="text-xs md:text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Company & Role</span>
+                            <span className="text-xs md:text-xs font-black uppercase tracking-[0.15em] text-foreground">Company & Role</span>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-1.5">
-                              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Company Name *</label>
+                              <label className="text-xs font-bold uppercase tracking-widest text-foreground/70 ml-1">Company Name *</label>
                               <div className="relative group/input">
                                 <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-muted/80 rounded-xl flex items-center justify-center border border-border/50 group-focus-within/input:border-brand/30 group-focus-within/input:bg-brand/5 transition-all">
                                   <Building2 className="w-3.5 h-3.5 text-muted-foreground group-focus-within/input:text-brand transition-colors" />
@@ -998,7 +1282,7 @@ export default function AlumniDashboard() {
                               </div>
                             </div>
                             <div className="space-y-1.5">
-                              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Job Type *</label>
+                              <label className="text-xs font-bold uppercase tracking-widest text-foreground/70 ml-1">Job Type *</label>
                               <div className="relative group/input">
                                 <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-muted/80 rounded-xl flex items-center justify-center border border-border/50 group-focus-within/input:border-brand/30 group-focus-within/input:bg-brand/5 transition-all">
                                   <Briefcase className="w-3.5 h-3.5 text-muted-foreground group-focus-within/input:text-brand transition-colors" />
@@ -1016,7 +1300,7 @@ export default function AlumniDashboard() {
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-1.5">
-                              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Role / Position *</label>
+                              <label className="text-xs font-bold uppercase tracking-widest text-foreground/70 ml-1">Role / Position *</label>
                               <div className="relative group/input">
                                 <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-muted/80 rounded-xl flex items-center justify-center border border-border/50 group-focus-within/input:border-brand/30 group-focus-within/input:bg-brand/5 transition-all">
                                   <Award className="w-3.5 h-3.5 text-muted-foreground group-focus-within/input:text-brand transition-colors" />
@@ -1027,7 +1311,7 @@ export default function AlumniDashboard() {
                               </div>
                             </div>
                             <div className="space-y-1.5">
-                              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Location</label>
+                              <label className="text-xs font-bold uppercase tracking-widest text-foreground/70 ml-1">Location</label>
                               <div className="relative group/input">
                                 <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-muted/80 rounded-xl flex items-center justify-center border border-border/50 group-focus-within/input:border-brand/30 group-focus-within/input:bg-brand/5 transition-all">
                                   <MapPin className="w-3.5 h-3.5 text-muted-foreground group-focus-within/input:text-brand transition-colors" />
@@ -1051,10 +1335,10 @@ export default function AlumniDashboard() {
                             <div className="w-6 h-6 rounded-lg bg-purple-500/10 flex items-center justify-center">
                               <FileText className="w-3.5 h-3.5 text-purple-500" />
                             </div>
-                            <span className="text-xs md:text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Job Description</span>
+                            <span className="text-xs md:text-xs font-black uppercase tracking-[0.15em] text-foreground">Job Description</span>
                           </div>
                           <div className="space-y-1.5">
-                            <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Description *</label>
+                            <label className="text-xs font-bold uppercase tracking-widest text-foreground/70 ml-1">Description *</label>
                             <textarea required value={refForm.description} onChange={(e) => setRefForm({ ...refForm, description: e.target.value })} rows={3}
                               className="w-full bg-muted/40 px-5 py-4 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none resize-none text-foreground font-medium placeholder:text-muted-foreground/40 min-h-[110px] leading-relaxed"
                               placeholder="Job details, responsibilities, required skills, eligibility criteria..." />
@@ -1072,23 +1356,23 @@ export default function AlumniDashboard() {
                             <div className="w-6 h-6 rounded-lg bg-amber-500/10 flex items-center justify-center">
                               <Users className="w-3.5 h-3.5 text-amber-500" />
                             </div>
-                            <span className="text-xs md:text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Requirements & Eligibility</span>
+                            <span className="text-xs md:text-xs font-black uppercase tracking-[0.15em] text-foreground">Requirements & Eligibility</span>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div className="space-y-1.5">
-                              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Min CGPA</label>
+                              <label className="text-xs font-bold uppercase tracking-widest text-foreground/70 ml-1">Min CGPA</label>
                               <input type="number" step="0.01" value={refForm.minCGPA} onChange={(e) => setRefForm({ ...refForm, minCGPA: e.target.value })}
                                 className="w-full bg-muted/40 px-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium placeholder:text-muted-foreground/40"
                                 placeholder="e.g. 7.0" />
                             </div>
                             <div className="space-y-1.5">
-                              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Experience</label>
+                              <label className="text-xs font-bold uppercase tracking-widest text-foreground/70 ml-1">Experience</label>
                               <input value={refForm.experience} onChange={(e) => setRefForm({ ...refForm, experience: e.target.value })}
                                 className="w-full bg-muted/40 px-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium placeholder:text-muted-foreground/40"
                                 placeholder="e.g. 0-1 years" />
                             </div>
                             <div className="space-y-1.5">
-                              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Batch Eligible</label>
+                              <label className="text-xs font-bold uppercase tracking-widest text-foreground/70 ml-1">Batch Eligible</label>
                               <input value={refForm.batchEligible} onChange={(e) => setRefForm({ ...refForm, batchEligible: e.target.value })}
                                 className="w-full bg-muted/40 px-5 py-3.5 rounded-xl border border-transparent hover:border-border/50 focus:border-brand/30 focus:bg-background focus:ring-2 focus:ring-brand/10 transition-all text-sm outline-none text-foreground font-medium placeholder:text-muted-foreground/40"
                                 placeholder="e.g. 2024, 2025" />
@@ -1107,11 +1391,11 @@ export default function AlumniDashboard() {
                             <div className="w-6 h-6 rounded-lg bg-green-500/10 flex items-center justify-center">
                               <Link2 className="w-3.5 h-3.5 text-green-500" />
                             </div>
-                            <span className="text-xs md:text-xs font-black uppercase tracking-[0.15em] text-muted-foreground">Links & Deadline</span>
+                            <span className="text-xs md:text-xs font-black uppercase tracking-[0.15em] text-foreground">Links & Deadline</span>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-1.5">
-                              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">
+                              <label className="text-xs font-bold uppercase tracking-widest text-foreground/70 ml-1">
                                 Referral Code <span className="text-brand/60 normal-case tracking-normal">(Optional)</span>
                               </label>
                               <input value={refForm.referralCode} onChange={(e) => setRefForm({ ...refForm, referralCode: e.target.value })}
@@ -1119,7 +1403,7 @@ export default function AlumniDashboard() {
                                 placeholder="e.g. REF2024" />
                             </div>
                             <div className="space-y-1.5">
-                              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Deadline</label>
+                              <label className="text-xs font-bold uppercase tracking-widest text-foreground/70 ml-1">Deadline</label>
                               <div className="relative group/input">
                                 <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-muted/80 rounded-xl flex items-center justify-center border border-border/50 group-focus-within/input:border-brand/30 group-focus-within/input:bg-brand/5 transition-all">
                                   <Calendar className="w-3.5 h-3.5 text-muted-foreground group-focus-within/input:text-brand transition-colors" />
@@ -1130,7 +1414,7 @@ export default function AlumniDashboard() {
                             </div>
                           </div>
                           <div className="space-y-1.5">
-                            <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">
+                            <label className="text-xs font-bold uppercase tracking-widest text-foreground/70 ml-1">
                               Referral Link <span className="text-brand/60 normal-case tracking-normal">(Optional)</span>
                             </label>
                             <div className="relative group/input">
@@ -1143,7 +1427,7 @@ export default function AlumniDashboard() {
                             </div>
                           </div>
                           <div className="space-y-1.5">
-                            <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground/70 ml-1">Apply Link / Email *</label>
+                            <label className="text-xs font-bold uppercase tracking-widest text-foreground/70 ml-1">Apply Link / Email *</label>
                             <div className="relative group/input">
                               <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-8 h-8 bg-brand/10 rounded-xl flex items-center justify-center border border-brand/20">
                                 <ExternalLink className="w-3.5 h-3.5 text-brand" />

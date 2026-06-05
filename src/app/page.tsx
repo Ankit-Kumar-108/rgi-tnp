@@ -262,7 +262,7 @@ export default function Home() {
                       {/* Drive title */}
                       <div className="flex items-center justify-center mb-6">
                         <div className="bg-card border border-border rounded-2xl px-6 py-3 shadow-md flex items-center gap-3">
-                          <div className="w-2 h-2 rounded-full bg-brand animate-pulse" />
+                          <div className="w-2 h-2 rounded-full bg-brand animate-pulse shrink-0" />
                           <h3 className="text-base md:text-lg font-bold text-foreground">
                             {/* Successful Campus Drive of{" "} */}
                             <span className="text-brand">{group.images[0]?.title}</span>
@@ -511,7 +511,7 @@ export default function Home() {
 
         {/* Stakeholder Sections */}
         <section className="section-y px-4 md:px-8 lg:px-20 max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-8">
             {[
               {
                 title: "For Students",
@@ -523,7 +523,7 @@ export default function Home() {
               {
                 title: "For Recruiters",
                 desc: "Hire top-tier talent and schedule campus recruitment drives.",
-                btn: "Recruitment Portal",
+                btn: "Recruiter Login",
                 link: "/recruiters/login",
                 img: "https://lh3.googleusercontent.com/aida-public/AB6AXuDI3AGXNcBdGYNnQC6rTAaVBW9jOcMUXZsclcq6racWYLm5CE51KLDmOpDGPCxuImcM64dL2yzo6NbPLi48ZGWDbKHoFsShQDhbrE5a7AB3Zd8-pI96vVUd3FZTMPRviTnSNrE15dg2CaGTu0tUKxb1hlgBFuIC6cJtb84L7Ow3753HPwNwP6bA_O2xDRTynWdRvy2_Sg5QaKwnaMJ2Px55UQMeQgWIUjAwYZp1wYe3HE1klyE8JAZxIZgDs4FtUY1BduXqQblkAQ"
               },
@@ -537,10 +537,10 @@ export default function Home() {
             ].map((item, i) => (
               <div
                 key={i}
-                className="relative group overflow-hidden rounded-2xl h-100"
+                className="relative group overflow-hidden rounded-lg md:rounded-xl lg:rounded-2xl h-60"
               >
                 <Image
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="absolute inset-0 w-full object-cover transition-transform duration-500 group-hover:scale-110"
                   src={item.img}
                   alt={item.title}
                   fill
@@ -548,10 +548,10 @@ export default function Home() {
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent"></div>
-                <div className="absolute bottom-0 p-8 w-full">
-                  <h3 className="text-white text-2xl font-bold mb-2">{item.title}</h3>
-                  <p className="text-white/70 text-sm mb-4">{item.desc}</p>
-                  <Link href={item.link} className="text-brand font-bold flex items-center gap-2 hover:translate-x-2 transition-transform w-fit">
+                <div className="absolute bottom-0 p-3 md:p-6 lg:p-8 w-full">
+                  <h3 className="text-white text-lg md:text-xl lg:text-2xl font-bold mb-2">{item.title}</h3>
+                  <p className="text-white/70 text-xs md:text-sm mb-4">{item.desc}</p>
+                  <Link href={item.link} className="text-brand text-sm font-bold flex items-center gap-2 hover:translate-x-2 transition-transform w-fit">
                     {item.btn} <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>

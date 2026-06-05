@@ -112,7 +112,7 @@ export default function Nav() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass-effect px-6 lg:px-20">
+    <nav className="fixed top-0 left-0 right-0 z-50 glass-effect px-2 md:px-6 lg:px-20">
       <div className="max-w-7xl mx-auto flex h-20 items-center justify-between">
 
         {/* Logo Section */}

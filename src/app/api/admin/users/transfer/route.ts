@@ -96,10 +96,7 @@ export async function POST(req: NextRequest) {
           student.name,
           student.branch,
           student.course,
-          student.batch,
-          student.cgpa,
-          student.twelfthPercentage,
-          student.tenthPercentage
+          student.batch
         );
 
         let placementSnapsJson: any[] = [];
@@ -131,7 +128,8 @@ export async function POST(req: NextRequest) {
             placementSnapsJson: placementSnapsJson,
             cgpa: student.cgpa,
             twelfthPercentage: student.twelfthPercentage,
-            tenthPercentage: student.tenthPercentage
+            tenthPercentage: student.tenthPercentage,
+            gender: student.gender
           },
         });
 

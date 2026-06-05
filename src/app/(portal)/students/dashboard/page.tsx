@@ -57,6 +57,10 @@ const dashboardFetcher = async <T = any,>(url: string): Promise<T> => {
   });
   if (!res.ok) {
     const errData = await res.json().catch(() => ({}));
+    if (res.status === 401 || res.status === 404) {
+      logout("student");
+      window.location.href = "/students/login";
+    }
     throw new Error((errData as any)?.message || `HTTP ${res.status}`);
   }
   return res.json() as Promise<T>;
