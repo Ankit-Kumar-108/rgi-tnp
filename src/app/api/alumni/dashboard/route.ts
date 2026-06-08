@@ -1,24 +1,10 @@
 export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import * as jose from "jose";
-
-async function getAlumniFromToken(req: NextRequest) {
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader) return null;
-  const token = authHeader.replace("Bearer ", "");
-  try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
-    const { payload } = await jose.jwtVerify(token, secret);
-    return payload as any;
-  } catch {
-    return null;
-  }
-}
-
+import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
 export async function GET(req: NextRequest) {
   try {
-    const alumni = await getAlumniFromToken(req);
+    const alumni = await getVerifiedAuthPayloadFromRequest(req, ["alumni"]);
     if (!alumni) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }

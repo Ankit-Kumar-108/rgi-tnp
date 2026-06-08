@@ -41,7 +41,7 @@ export default function AlumniLogin() {
             const data = (await res.json()) as {
                 success?: boolean;
                 message?: string;
-                token?: string;
+                expiresAt?: number;
                 alumni?: any;
             };
 
@@ -50,7 +50,7 @@ export default function AlumniLogin() {
                 return;
             }
 
-            saveAuth("alumni", data.token!, data.alumni);
+            saveAuth("alumni", data.expiresAt!, data.alumni);
             router.push("/alumni/dashboard");
         } catch {
             setError("Something went wrong. Please try again.");

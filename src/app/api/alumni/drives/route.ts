@@ -2,23 +2,12 @@ export const runtime = 'edge';
 
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import * as jose from "jose";
 import { NotificationService } from "@/lib/notification-service";
 import { driveRegistrationTemplate } from "@/lib/email-templates";
+import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
 
 // Same token extraction pattern as your student/drives/route.ts
-async function getAlumniFromToken(req: NextRequest) {
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader) return null;
-  const token = authHeader.replace("Bearer ", "");
-  try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
-    const { payload } = await jose.jwtVerify(token, secret);
-    return payload as any;
-  } catch {
-    return null;
-  }
-}
+
 
 
 function parseBranches(branchesStr: string): Set<string> {
@@ -30,7 +19,7 @@ function parseBranches(branchesStr: string): Set<string> {
 // GET: Fetch drives eligible for this alumni
 export async function GET(req: NextRequest) {
   try {
-    const alumni = await getAlumniFromToken(req);
+    const alumni = await getVerifiedAuthPayloadFromRequest(req, ["alumni"]);
     if (!alumni) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
@@ -111,7 +100,7 @@ export async function GET(req: NextRequest) {
 // POST: Register alumni for a drive
 export async function POST(req: NextRequest) {
   try {
-    const alumni = await getAlumniFromToken(req);
+    const alumni = await getVerifiedAuthPayloadFromRequest(req, ["alumni"]);
     if (!alumni) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },

@@ -3,7 +3,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { loginSchema } from "@/lib/validations/student";
 import { getDb } from "@/lib/db";
 import { verifyPassword } from "@/lib/auth-utils";
-import { signAuthToken } from "@/lib/auth-jwt";
+import { signAuthToken, attachAuthCookie } from "@/lib/auth-jwt";
 
 export async function POST(req: NextRequest) {
     try {
@@ -40,8 +40,10 @@ export async function POST(req: NextRequest) {
             role: "student",
         });
 
-        return NextResponse.json({ success: true, message: "Login successful", 
-            token: token,
+        const response = NextResponse.json({ 
+            success: true, 
+            message: "Login successful", 
+            expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
             student: {
                 name: student.name,
                 email: student.email,
@@ -50,6 +52,8 @@ export async function POST(req: NextRequest) {
                 branch: student.branch,
             }
          }, { status: 200 });
+
+         return attachAuthCookie(response, "student", token);
 
     } catch (error: any) {
         console.error("Error in Student Login:", error)

@@ -29,12 +29,10 @@ export default function RootLayout({
     /* 1. Added suppressHydrationWarning (Required for next-themes) */
     <html lang="en" className={cn("scroll-smooth", "font-sans", geist.variable)} suppressHydrationWarning>
       <body 
-        className={`
-          ${lexend.variable} 
-          antialiased 
-          /* 2. Use the CSS variables we defined in globals.css instead of hardcoded hex codes */
-          bg-background text-foreground
-        `}
+        className={cn(
+          lexend.variable,
+          "antialiased bg-background text-foreground"
+        )}
       >
         {/* Top Loader */}
         <NextTopLoader

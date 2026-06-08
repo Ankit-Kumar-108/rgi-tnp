@@ -3,7 +3,9 @@ import { getDb } from "@/lib/db";
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
-    const limit = searchParams.get("limit") || "4";
+    const rawLimit = searchParams.get("limit") || "4";
+    const isAll = rawLimit === 'all';
+    const parsedLimit = isAll ? undefined : Math.max(1, Math.min(parseInt(rawLimit) || 4, 50));
   const db = getDb();
     const volunteers = await db.volunteer.findMany({
         where: {
@@ -25,7 +27,7 @@ export async function GET(req: Request) {
         orderBy: {
             createdAt: "desc",
         },
-        take: limit === 'all' ? undefined : (parseInt(limit) || 4),
+        take: parsedLimit,
     });
     return Response.json(
       { success: true, volunteers },

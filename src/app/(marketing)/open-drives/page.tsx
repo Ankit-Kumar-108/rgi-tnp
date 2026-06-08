@@ -46,54 +46,60 @@ export default function PublicOpenDrivesPage() {
           role="external_student"
         />
       )}
-      <div className="bg-background text-foreground antialiased font-sans flex flex-col min-h-screen selection:bg-brand/10 selection:text-brand">
+      <div className="bg-[#fcfbf9] dark:bg-background text-foreground antialiased font-sans flex flex-col min-h-screen">
         <main className="flex-1 w-full pt-20 pb-24">
           
           {/* Hero Section */}
-          <section className="max-w-7xl mx-auto px-4 md:px-8 mb-16 md:mb-20">
-            <div className="mb-12 text-center md:text-left">
-              <span className="inline-block bg-brand/10 text-brand text-sm font-bold tracking-widest uppercase px-4 py-1 rounded-full mb-4">
+          <section className="max-w-7xl mx-auto px-5 md:px-8 mb-16 md:mb-24 mt-8">
+            <div className="mb-12 text-center md:text-left animate-in fade-in slide-in-from-bottom-4 duration-700">
+              <span className="inline-block text-brand text-sm font-bold tracking-widest uppercase mb-4">
                 Global Opportunities
               </span>
-              <h1 className="text-4xl md:text-5xl lg:text-7xl font-black tracking-tight leading-[1.05] text-foreground mb-4 md:mb-6">
-                Open Campus <br />
-                <span className="text-brand">Drives.</span>
+              <h1 className="text-4xl md:text-6xl lg:text-[5rem] font-serif tracking-tight leading-tight text-foreground mb-6">
+                Open Campus <br className="hidden md:block" />
+                <span className="italic text-brand">Drives.</span>
               </h1>
               <p className="text-base md:text-lg text-muted-foreground font-light max-w-2xl">
                 Explore exciting placement opportunities available for students from all colleges. Register and start your journey with top organizations.
               </p>
             </div>
+            
+            <div className="w-full border-b border-border/60 pb-4 max-w-3xl hidden md:block"></div>
           </section>
 
           {/* Drives Section */}
-          <section className="max-w-7xl mx-auto px-6 md:px-8">
+          <section className="max-w-7xl mx-auto px-5 md:px-8">
             {loading ? (
-              <div className="flex items-center justify-center py-20">
+              <div className="flex items-center justify-center py-32">
                 <Loader2 className="w-10 h-10 animate-spin text-brand" />
               </div>
             ) : drives.length === 0 ? (
-              <div className="bg-card rounded-[2rem] border border-border p-16 text-center shadow-sm">
-                <Briefcase className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
-                <h3 className="text-2xl font-bold text-foreground">No Drives Available</h3>
-                <p className="text-muted-foreground mt-2">There are currently no open campus drives scheduled. Check back soon!</p>
+              <div className="flex flex-col items-center justify-center py-40 text-muted-foreground">
+                <Briefcase className="w-12 h-12 text-muted-foreground/20 mb-6" />
+                <h3 className="font-serif text-2xl text-foreground mb-2">No Drives Available</h3>
+                <p className="text-sm">There are currently no open campus drives scheduled. Check back soon!</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {drives.map((drive) => (
-                  <div key={drive.id} className="group flex flex-col bg-card rounded-[2rem] p-8 shadow-[var(--shadow-sm)] border border-border hover:shadow-[var(--shadow-xl)] hover:border-brand/30 transition-all duration-300">
+              <div className="columns-1 md:columns-2 lg:columns-3 gap-5 md:gap-8 space-y-5 md:space-y-8">
+                {drives.map((drive, index) => (
+                  <div 
+                    key={drive.id} 
+                    className="break-inside-avoid group flex flex-col bg-card p-6 md:p-8 rounded-2xl md:rounded-none md:rounded-tr-3xl md:rounded-bl-3xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-border/40 hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] hover:border-brand/20 transition-all duration-500 animate-in fade-in slide-in-from-bottom-8 fill-mode-both"
+                    style={{ animationDelay: `${(index % 12) * 50}ms` }}
+                  >
                     <div className="flex items-start justify-between mb-6">
-                      <div className="w-14 h-14 rounded-2xl bg-brand/10 flex items-center justify-center border border-brand/20">
-                        <Building2 className="w-6 h-6 text-brand" />
+                      <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center border border-border shrink-0">
+                        <Building2 className="w-5 h-5 text-muted-foreground group-hover:text-brand transition-colors duration-300" />
                       </div>
-                      <span className="px-3 py-1 bg-green-500/10 text-green-600 text-xs font-bold uppercase tracking-widest rounded-full">
+                      <span className="text-[10px] font-bold tracking-widest uppercase text-brand">
                         {drive.ctc}
                       </span>
                     </div>
                     
-                    <h3 className="text-2xl font-black text-foreground mb-1 group-hover:text-brand transition-colors">
+                    <h3 className="font-serif text-xl md:text-2xl text-foreground mb-1 group-hover:text-brand transition-colors duration-300 leading-tight">
                       {drive.roleName}
                     </h3>
-                    <p className="text-base text-muted-foreground font-medium mb-6">
+                    <p className="text-sm text-muted-foreground font-medium mb-6">
                       {drive.companyName}
                     </p>
 
@@ -112,12 +118,17 @@ export default function PublicOpenDrivesPage() {
                       </div>
                     </div>
 
-                    <button 
-                      onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
-                      className="w-full bg-background border-2 border-brand/20 text-brand py-3.5 rounded-full font-bold hover:bg-brand hover:text-primary-foreground hover:border-brand transition-colors text-sm"
-                    >
-                      View Details
-                    </button>
+                    <div className="pt-6 border-t border-border/40 mt-auto">
+                      <button 
+                        onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
+                        className="flex items-center justify-between w-full text-sm font-bold uppercase tracking-widest text-muted-foreground group-hover:text-brand transition-colors duration-300"
+                      >
+                        <span>View Details</span>
+                        <span className="w-6 h-6 rounded-full border border-border flex items-center justify-center group-hover:border-brand transition-colors">
+                          <span className="text-brand">→</span>
+                        </span>
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

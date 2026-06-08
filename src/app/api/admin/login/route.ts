@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
     const response = NextResponse.json({
       success: true,
       message: "Admin login successful",
-      token,
+      expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
       admin: {
         id: admin.id,
         email: admin.email,

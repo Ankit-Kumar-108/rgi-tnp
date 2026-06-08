@@ -39,7 +39,7 @@ export default function RecruiterLogin() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
             });
-            const data = (await res.json()) as { success?: boolean; message?: string; token?: string; recruiter?: any };
+            const data = await res.json() as { success?: boolean; message?: string; expiresAt?: number; recruiter?: any };
 
             if (!res.ok || !data.success) {
                 setError(data.message || "Login failed");
@@ -47,7 +47,7 @@ export default function RecruiterLogin() {
                 return;
             }
 
-            saveAuth("recruiter", data.token!, data.recruiter);
+            saveAuth("recruiter", data.expiresAt!, data.recruiter);
             toast.success("Logged in successfully");
             router.push("/recruiters/dashboard");
         } catch {

@@ -1,16 +1,14 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { 
-  School, 
   ShieldCheck, 
-  ArrowRight, 
-  Lock, 
-  Zap, 
-  Headset,
+  Users,
   ChevronRight,
+  Lock,
+  Server,
+  UserCheck,
   type LucideIcon
 } from "lucide-react";
 import Nav from "@/components/layout/nav/nav";
@@ -18,119 +16,117 @@ import Footer from "@/components/layout/footer/footer";
 
 const gateways = [
   {
-    title: "Volunteer Portal",
-    role: "Student Access",
-    description: "Coordinate placement logistics, manage event media, and track your volunteer hours and contributions.",
-    icon: <School className="w-6 h-6" />,
-    buttonText: "Enter Volunteer Space",
-    href: "/volunteer/login",
-    image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=800&auto=format&fit=crop",
-    accent: "blue"
+    title: "Administrative Hub",
+    role: "Faculty & Staff Access",
+    description: "Complete oversight of recruitment drives, student analytics, and institutional configurations.",
+    icon: ShieldCheck,
+    href: "/admin/login",
+    primaryColor: "text-blue-600 dark:text-blue-400",
+    bgColor: "bg-blue-50 dark:bg-blue-500/10",
+    borderColor: "border-blue-100 dark:border-blue-500/20",
+    hoverBorder: "hover:border-blue-300 dark:hover:border-blue-500/40",
+    hoverShadow: "hover:shadow-blue-500/10",
+    buttonBg: "bg-blue-600 hover:bg-blue-700 text-white",
   },
   {
-    title: "Administrative Hub",
-    role: "Staff Access",
-    description: "Full oversight of recruitment drives, student analytics, and portal moderation for institutional growth.",
-    icon: <ShieldCheck className="w-6 h-6" />,
-    buttonText: "Enter Admin Suite",
-    href: "/admin/login",
-    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=800&auto=format&fit=crop",
-    accent: "indigo"
+    title: "Volunteer Portal",
+    role: "Student Coordinator Access",
+    description: "Coordinate placement logistics, manage event media, and track volunteer contributions.",
+    icon: Users,
+    href: "/volunteer/login",
+    primaryColor: "text-emerald-600 dark:text-emerald-400",
+    bgColor: "bg-emerald-50 dark:bg-emerald-500/10",
+    borderColor: "border-emerald-100 dark:border-emerald-500/20",
+    hoverBorder: "hover:border-emerald-300 dark:hover:border-emerald-500/40",
+    hoverShadow: "hover:shadow-emerald-500/10",
+    buttonBg: "bg-emerald-600 hover:bg-emerald-700 text-white",
   }
 ];
 
-const features: { icon: LucideIcon; title: string; desc: string }[] = [
-  { icon: Lock, title: "Secure Protocol", desc: "Enterprise-grade AES-256 encryption." },
-  { icon: Zap, title: "High Velocity", desc: "Built for peak recruitment traffic." },
-  { icon: Headset, title: "Live Support", desc: "Instant tech-assistance for staff." }
+const securityFeatures: { icon: LucideIcon; title: string; desc: string }[] = [
+  { icon: Lock, title: "Secure Access", desc: "End-to-end encrypted authentication protocols." },
+  { icon: UserCheck, title: "Role-Based Control", desc: "Strict permission boundaries and data segregation." },
+  { icon: Server, title: "Data Integrity", desc: "Automated backups and high-availability infrastructure." }
 ];
 
-export default function AccessPage() {
+export default function AdministrationPanelPage() {
   return (
-    <div className="bg-[#fafafa] dark:bg-zinc-950 min-h-screen flex flex-col font-sans selection:bg-indigo-100">
+    <div className="bg-background min-h-screen flex flex-col font-sans selection:bg-brand/20">
       <Nav />
 
-      <main className="grow pt-32 pb-24 px-4 max-w-6xl mx-auto w-full">
-        {/* Header Section */}
-        <div className="text-center max-w-3xl mx-auto mb-20 space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-            </span>
-            <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">
-              T&P Management System
-            </span>
-          </div>
+      <main className="grow pt-32 pb-24 px-4 w-full flex flex-col items-center justify-center relative overflow-hidden">
+        
+        {/* Subtle Background Pattern */}
+        <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.03] dark:opacity-[0.02]" 
+             style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)', backgroundSize: '32px 32px' }}>
+        </div>
+
+        <div className="max-w-5xl mx-auto w-full relative z-10">
           
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-zinc-900 dark:text-white">
-            Radharaman Group of Institutes
-          </h1>
-          <p className="text-lg text-zinc-500 dark:text-zinc-400 font-medium">
-            Please choose your destination to continue to the Training & Placement ecosystem.
-          </p>
-        </div>
+          {/* Header Section */}
+          <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
+            <div className="inline-flex items-center justify-center p-3 mb-4 rounded-2xl bg-brand/5 text-brand ring-1 ring-brand/10">
+              <ShieldCheck className="w-8 h-8" strokeWidth={1.5} />
+            </div>
+            
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground">
+              Administration <span className="text-brand">Portal</span>
+            </h1>
+            <p className="text-lg text-muted-foreground font-medium">
+              Radharaman Group of Institutes Training & Placement Cell
+            </p>
+            <div className="h-1 w-12 bg-brand/20 rounded-full mx-auto mt-6"></div>
+          </div>
 
-        {/* Gateway Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {gateways.map((gate, i) => (
-            <Link 
-              key={i} 
-              href={gate.href}
-              className="group relative flex flex-col bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 overflow-hidden hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-1 transition-all duration-300"
-            >
-              {/* Image Header */}
-              <div className="h-48 relative overflow-hidden">
-                <Image 
-                  src={gate.image} 
-                  alt={gate.title} 
-                  fill 
-                  className="object-cover grayscale-[0.5] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <div className="absolute bottom-4 left-6">
-                  <span className="text-xs font-bold text-white/80 uppercase tracking-widest">{gate.role}</span>
-                  <h2 className="text-2xl font-bold text-white">{gate.title}</h2>
-                </div>
-              </div>
-
-              {/* Body */}
-              <div className="p-8 flex flex-col grow">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">
-                    {gate.icon}
+          {/* Gateway Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto">
+            {gateways.map((gate, i) => (
+              <Link 
+                key={i} 
+                href={gate.href}
+                className={`group flex flex-col bg-card rounded-2xl border transition-all duration-300 overflow-hidden shadow-sm hover:shadow-xl ${gate.borderColor} ${gate.hoverBorder} ${gate.hoverShadow} hover:-translate-y-1`}
+              >
+                <div className="p-8 flex flex-col grow">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className={`p-4 rounded-xl ${gate.bgColor} ${gate.primaryColor}`}>
+                      <gate.icon className="w-8 h-8" strokeWidth={1.5} />
+                    </div>
+                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-3 py-1 rounded-full bg-secondary">
+                      {gate.role}
+                    </span>
                   </div>
-                  <div className="h-px grow bg-zinc-100 dark:bg-zinc-800" />
-                </div>
-                
-                <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed mb-8 grow text-[15px]">
-                  {gate.description}
-                </p>
+                  
+                  <h2 className="text-2xl font-bold text-foreground mb-3">{gate.title}</h2>
+                  <p className="text-muted-foreground leading-relaxed mb-8 grow">
+                    {gate.description}
+                  </p>
 
-                <div className="flex items-center text-indigo-600 dark:text-indigo-400 font-semibold group-hover:gap-2 transition-all">
-                  {gate.buttonText}
-                  <ChevronRight className="w-4 h-4 opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all" />
+                  <div className={`mt-auto inline-flex items-center justify-center w-full py-3 px-4 rounded-xl font-semibold transition-colors duration-200 ${gate.buttonBg}`}>
+                    Access Portal
+                    <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </div>
                 </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {/* Feature Footer */}
-        <div className="mt-20 pt-12 border-t border-zinc-200 dark:border-zinc-800">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-12">
-            {features.map((f, i) => (
-              <div key={i} className="flex gap-4 items-start">
-                <div className="mt-1 text-indigo-500">
-                  <f.icon size={20} />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">{f.title}</h3>
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">{f.desc}</p>
-                </div>
-              </div>
+              </Link>
             ))}
           </div>
+
+          {/* Security Features Footer */}
+          <div className="mt-24 pt-10 border-t border-border">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto text-center md:text-left">
+              {securityFeatures.map((f, i) => (
+                <div key={i} className="flex flex-col md:flex-row gap-4 items-center md:items-start">
+                  <div className="p-2 rounded-lg bg-secondary text-muted-foreground shrink-0">
+                    <f.icon className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-foreground">{f.title}</h3>
+                    <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{f.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
         </div>
       </main>
 

@@ -30,7 +30,7 @@ function ExternalLoginContent() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
             });
-            const data = (await res.json()) as { success?: boolean; message?: string; token?: string; student?: any };
+            const data = (await res.json()) as { success?: boolean; message?: string; expiresAt?: number; student?: any };
 
             if (!res.ok || !data.success) {
                 setError(data.message || "Login failed");
@@ -38,7 +38,7 @@ function ExternalLoginContent() {
                 return;
             }
 
-            saveAuth("external_student", data.token!, data.student);
+            saveAuth("external_student", data.expiresAt!, data.student);
             toast.success("Logged in successfully!");
             
             const redirect = searchParams.get("redirect");

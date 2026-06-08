@@ -1,6 +1,7 @@
 "use client"
 import { AnimatedThemeToggler } from '../../ui/animated-theme-toggler'
 import Link from 'next/link'
+import { AnimatePresence, motion } from 'motion/react'
 import {
   Menu,
   X,
@@ -178,51 +179,64 @@ export default function Nav() {
           <AnimatedThemeToggler />
           
           <div className='xl:hidden flex items-center gap-4'>
-            <div
+            <button
               onClick={() => setIsOpen(!isOpen)}
-              className='size-7 cursor-pointer'>
+              className='size-7 cursor-pointer'
+              aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}>
               {isOpen ? (<X />) : (<Menu />)}
-            </div>
+            </button>
           </div>
         </div>
 
         {/* Mobile Menu */}
-        {isOpen && (
-          <>
-            <div className='xl:hidden fixed z-50 right-5 top-24 bg-background border border-brand/20 w-56 rounded-2xl flex flex-col p-2 shadow-xl shadow-brand/10 max-h-[75vh] overflow-y-auto'>
-              <div className="flex flex-col divide-y divide-brand/10">
-                {navItems.map((item) => (
-                  <div key={item.name} className="flex flex-col">
-                    {item.link && !item.subMenu ? (
-                      <Link 
-                        href={item.link} 
-                        onClick={() => setIsOpen(false)} 
-                        className='flex items-center gap-4 p-3 rounded-lg hover:bg-brand/5 transition-colors'
-                      >
-                        {item.icon && <item.icon className='text-brand size-5' />}
-                        <p className="font-medium text-sm text-foreground">{item.name}</p>
-                      </Link>
-                    ) : (
-                      <>
-                        <div className='flex items-center gap-4 p-3'>
+        <AnimatePresence>
+          {isOpen && (
+            <>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: -8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -8 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                className='xl:hidden fixed z-50 right-5 top-24 bg-background border border-brand/20 w-56 rounded-2xl flex flex-col p-2 shadow-xl shadow-brand/10 max-h-[75vh] overflow-y-auto'
+              >
+                <div className="flex flex-col divide-y divide-brand/10">
+                  {navItems.map((item) => (
+                    <div key={item.name} className="flex flex-col">
+                      {item.link && !item.subMenu ? (
+                        <Link 
+                          href={item.link} 
+                          onClick={() => setIsOpen(false)} 
+                          className='flex items-center gap-4 p-3 rounded-lg hover:bg-brand/5 transition-colors'
+                        >
                           {item.icon && <item.icon className='text-brand size-5' />}
                           <p className="font-medium text-sm text-foreground">{item.name}</p>
-                        </div>
-                        {renderMobileSubMenu(item.name)}
-                      </>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
+                        </Link>
+                      ) : (
+                        <>
+                          <div className='flex items-center gap-4 p-3'>
+                            {item.icon && <item.icon className='text-brand size-5' />}
+                            <p className="font-medium text-sm text-foreground">{item.name}</p>
+                          </div>
+                          {renderMobileSubMenu(item.name)}
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
 
-            {/* Overlay Backdrop */}
-            <div
-              onClick={() => setIsOpen(false)}
-              className='w-dvw h-dvh fixed left-0 top-0 z-20'
-            ></div>
-          </>
-        )}
+              {/* Overlay Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                onClick={() => setIsOpen(false)}
+                className='w-dvw h-dvh fixed left-0 top-0 z-20'
+              />
+            </>
+          )}
+        </AnimatePresence>
       </div>
     </nav>
   )

@@ -315,15 +315,15 @@ export default function JobDetailsModal({
                                     isRegistered ?
                                         "Registered"
                                         :
-                                    registering ?
-                                        (
-                                            <div className="flex items-center justify-center gap-2">
-                                                <div className="w-4 h-4 animate-spin rounded-full border-2 border-t-brand border-r-brand border-b-brand border-l-transparent">
+                                        registering ?
+                                            (
+                                                <div className="flex items-center justify-center gap-2">
+                                                    <div className="w-4 h-4 animate-spin rounded-full border-2 border-t-brand border-r-brand border-b-brand border-l-transparent">
+                                                    </div>
+                                                    Registering...
                                                 </div>
-                                                Registering...
-                                            </div>
-                                        ) :
-                                        "Apply for Role"}
+                                            ) :
+                                            "Apply for Role"}
                             </button>
                         </div>
                     </div>

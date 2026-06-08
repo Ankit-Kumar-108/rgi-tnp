@@ -17,14 +17,12 @@ const USER_KEYS: Record<string, string> = {
 
 export type UserRole = "student" | "recruiter" | "alumni" | "admin" | "external_student";
 
-export const saveAuth = (role: UserRole, token: string, user: any) => {
-  localStorage.setItem(TOKEN_KEYS[role], token);
-  localStorage.setItem(USER_KEYS[role], JSON.stringify(user));
-};
+// Dummy export to satisfy legacy imports during transition
+export const getToken = (role: UserRole): string | null => null;
 
-export const getToken = (role: UserRole): string | null => {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem(TOKEN_KEYS[role]);
+export const saveAuth = (role: UserRole, expiresAt: number, user: any) => {
+  localStorage.setItem(TOKEN_KEYS[role], expiresAt.toString());
+  localStorage.setItem(USER_KEYS[role], JSON.stringify(user));
 };
 
 export const getUser = (role: UserRole): any | null => {
@@ -39,22 +37,19 @@ export const getUser = (role: UserRole): any | null => {
   }
 };
 
-export const isTokenExpired = (token: string): boolean => {
- const parts = token.split('.')
- if (parts.length !== 3){
-  return true
- }
-
- const payload = JSON.parse(atob(parts[1]))
- const expiresAt = payload.exp* 1000
- const bufferTime = 30*1000 // buffer time
- return (Date.now() + bufferTime) > expiresAt
+export const isTokenExpired = (role: UserRole): boolean => {
+  if (typeof window === "undefined") return true;
+  const expStr = localStorage.getItem(TOKEN_KEYS[role]);
+  if (!expStr) return true;
+  const expiresAt = parseInt(expStr, 10);
+  if (isNaN(expiresAt)) return true;
+  
+  const bufferTime = 30 * 1000; // 30 seconds buffer
+  return (Date.now() + bufferTime) > expiresAt;
 }
 
 export const isLoggedIn = (role: UserRole): boolean => {
-  const token = getToken(role)
-  if (!token) return false
-  return !isTokenExpired(token)
+  return !isTokenExpired(role);
 };
 
 export const logout = (role: UserRole) => {

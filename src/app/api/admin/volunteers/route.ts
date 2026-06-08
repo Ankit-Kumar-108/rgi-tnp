@@ -3,24 +3,10 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import * as jose from "jose";
-
-async function getAdminFromToken(req: NextRequest) {
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader) return null;
-  const token = authHeader.replace("Bearer ", "");
-  try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
-    const { payload } = await jose.jwtVerify(token, secret);
-    return payload as any;
-  } catch {
-    return null;
-  }
-}
-
+import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
 export async function GET(req: NextRequest) {
   try {
-    const adminTokenData = await getAdminFromToken(req);
+    const adminTokenData = await getVerifiedAuthPayloadFromRequest(req, ["admin"]);
     
     if (!adminTokenData || !adminTokenData.email) {
       return NextResponse.json(
@@ -69,7 +55,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const adminTokenData = await getAdminFromToken(req);
+    const adminTokenData = await getVerifiedAuthPayloadFromRequest(req, ["admin"]);
     
     if (!adminTokenData || !adminTokenData.email) {
       return NextResponse.json(

@@ -1,27 +1,14 @@
 export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import * as jose from "jose";
 import { driveRegistrationTemplate } from "@/lib/email-templates";
 import { NotificationService } from "@/lib/notification-service";
-
-async function getExternalFromToken(req: NextRequest) {
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader) return null;
-  const token = authHeader.replace("Bearer ", "");
-  try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
-    const { payload } = await jose.jwtVerify(token, secret);
-    return payload as any;
-  } catch {
-    return null;
-  }
-}
+import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
 
 export async function GET(req: NextRequest) {
   try {
-    const ext = await getExternalFromToken(req);
-    if (!ext) {
+    const ext = await getVerifiedAuthPayloadFromRequest(req, ["external_student"]);
+    if (!ext || !ext.id) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
@@ -114,8 +101,8 @@ export async function GET(req: NextRequest) {
 // POST: Register for an open drive
 export async function POST(req: NextRequest) {
   try {
-    const ext = await getExternalFromToken(req);
-    if (!ext) {
+    const ext = await getVerifiedAuthPayloadFromRequest(req, ["external_student"]);
+    if (!ext || !ext.id) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 

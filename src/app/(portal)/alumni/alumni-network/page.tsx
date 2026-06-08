@@ -153,7 +153,7 @@ export default function AlumniDiscovery() {
   return (
     <>
       <Nav />
-      <div className="bg-background text-foreground antialiased font-sans min-h-screen selection:bg-brand/10 selection:text-brand mt-20">
+      <div className="bg-[#fcfbf9] dark:bg-background text-foreground antialiased font-sans min-h-screen mt-20">
         <style dangerouslySetInnerHTML={{
           __html: `
           .custom-scrollbar::-webkit-scrollbar { height: 4px; }
@@ -215,19 +215,19 @@ export default function AlumniDiscovery() {
 
                     {/* Primary Professional Info */}
                     <div className="flex-1 text-center pt-0 sm:pt-2">
-                      <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-foreground tracking-tight leading-tight mb-2 sm:mb-3">
+                      <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl text-foreground tracking-tight leading-tight mb-2 sm:mb-3">
                         {selectedAlumni?.name}
                       </h1>
-                      <p className="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-brand mb-3 sm:mb-5 line-clamp-2">{selectedAlumni?.displayRole}</p>
+                      <p className="text-sm sm:text-base md:text-lg font-medium text-muted-foreground mb-4 sm:mb-6">{selectedAlumni?.displayRole}</p>
 
-                      <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
-                        <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-card rounded-full border border-border shadow-sm text-xs sm:text-sm">
-                          <Briefcase className="text-brand w-3 h-3 sm:w-4 sm:h-4" />
-                          <span className="font-semibold line-clamp-1">{selectedAlumni?.currentCompany}</span>
+                      <div className="flex flex-wrap justify-center gap-3">
+                        <div className="flex items-center gap-2 px-4 py-1.5 bg-background rounded-full border border-border/60 text-xs sm:text-sm">
+                          <Briefcase className="text-muted-foreground w-3.5 h-3.5" />
+                          <span className="font-medium line-clamp-1">{selectedAlumni?.currentCompany}</span>
                         </div>
-                        <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-card rounded-full border border-border shadow-sm text-xs sm:text-sm">
-                          <MapPin className="text-brand w-3 h-3 sm:w-4 sm:h-4" />
-                          <span className="font-semibold line-clamp-1">{selectedAlumni?.city}</span>
+                        <div className="flex items-center gap-2 px-4 py-1.5 bg-background rounded-full border border-border/60 text-xs sm:text-sm">
+                          <MapPin className="text-muted-foreground w-3.5 h-3.5" />
+                          <span className="font-medium line-clamp-1">{selectedAlumni?.city}</span>
                         </div>
                       </div>
                     </div>
@@ -299,12 +299,13 @@ export default function AlumniDiscovery() {
         <main className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-8 sm:py-12 md:py-20">
 
           {/* Header Console */}
-          <div className="mb-8 sm:mb-12 md:mb-16 text-center space-y-4 sm:space-y-6 md:space-y-8">
+          <div className="mb-8 sm:mb-12 md:mb-16 text-center space-y-4 sm:space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="max-w-3xl mx-auto space-y-2 sm:space-y-3 md:space-y-4">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black tracking-tight text-foreground">
-                Discovery Console
+              <h4 className="text-brand font-bold tracking-widest uppercase text-sm mb-6">Global Directory</h4>
+              <h1 className="text-4xl md:text-6xl lg:text-[5rem] font-serif tracking-tight leading-tight text-foreground mb-6">
+                Discovery <span className="italic">Console.</span>
               </h1>
-              <p className="text-sm sm:text-base md:text-lg text-muted-foreground font-light leading-relaxed">
+              <p className="text-sm sm:text-base md:text-lg text-muted-foreground font-light leading-relaxed max-w-2xl mx-auto">
                 Instantly explore the global Radharaman Group of Institutes (RGI) network.
                 Start typing to find alumni by role, company, or interests.
               </p>
@@ -438,7 +439,7 @@ export default function AlumniDiscovery() {
             </div>
 
             {loading ? (
-              <div className="flex justify-center py-20">
+              <div className="flex justify-center py-32">
                 <Loader2 className="w-10 h-10 animate-spin text-brand" />
               </div>
             ) : finalAlumniData.length === 0 ? (
@@ -455,46 +456,37 @@ export default function AlumniDiscovery() {
                       setIsModalOpen(!isModalOpen)
                       setSelectedAlumni(alumni)
                     }}
-                    className="group relative bg-card rounded-xl p-2 sm:p-3 md:p-5 shadow-sm hover:shadow-2xl transition-all duration-300 border border-border hover:border-brand/30 overflow-hidden flex flex-col justify-between"
+                    className="group relative flex flex-col bg-card p-3 sm:p-5 md:p-6 rounded-2xl md:rounded-none md:rounded-tr-3xl md:rounded-bl-3xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-border/40 hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] hover:border-brand/20 transition-all duration-500 cursor-pointer overflow-hidden"
                   >
-                    {/* Profile Image with Hover Overlay */}
-                    <div className="relative mb-6 rounded-xl overflow-hidden bg-muted">
+                    {/* Profile Image */}
+                    <div className="relative mb-5 rounded-xl md:rounded-2xl overflow-hidden bg-muted aspect-square">
                       <img
                         alt={`${alumni.name} profile portrait`}
-                        className="w-full md:h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                         src={alumni.image}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
-                        <button
-                          onClick={() => {
-                            setIsModalOpen(!isModalOpen)
-                            setSelectedAlumni(alumni)
-
-                          }}
-                          className="w-full bg-background text-foreground py-3 rounded-xl font-bold text-sm hover:bg-muted transition-colors">
-                          View Full Profile
-                        </button>
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500 flex items-end p-4">
                       </div>
                     </div>
 
                     {/* Details */}
-                    <div className="space-y-2 md:space-y-4 flex-1 flex flex-col justify-end">
-                      <div>
-                        <h3 className="text-md md:text-xl font-bold text-foreground group-hover:text-brand transition-colors">
+                    <div className="flex flex-col flex-1">
+                      <div className="mb-4">
+                        <h3 className="font-serif text-lg md:text-xl font-bold text-foreground group-hover:text-brand transition-colors leading-tight">
                           {alumni.name}
                         </h3>
-                        <p className="text-[10px] md:text-xs font-bold text-brand uppercase tracking-wider mt-1">
+                        <p className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1.5">
                           Batch of {alumni.displayBatch}
                         </p>
                       </div>
 
                       {alumni.jobTitle && alumni.currentCompany &&
-                      <div className="flex items-center gap-2 md:gap-3 bg-muted/50 p-1 md:p-3 rounded-2xl border border-border/50">
-                        <div className="size-7 md:size-10 rounded-xl bg-background border border-border flex items-center justify-center shadow-sm shrink-0">
-                          {alumni.icon}
-                        </div>
-                        <p className="text-[11px] md:text-xs font-semibold leading-snug text-foreground">
-                          {alumni.displayRole}
+                      <div className="mt-auto pt-4 border-t border-border/50">
+                        <p className="text-xs md:text-sm font-medium text-foreground line-clamp-1">
+                          {alumni.jobTitle}
+                        </p>
+                        <p className="text-[11px] md:text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                          at {alumni.currentCompany}
                         </p>
                       </div>
                       }

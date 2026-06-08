@@ -150,19 +150,3 @@ export async function signRefreshToken(payload: Record<string, unknown>){
   .setExpirationTime("30d")  // 30 days for refresh token
   .sign(getJwtSecret())
 }
-
-// API endpoint to refresh tokens
-// api/auth/refresh
-export async function POST(req: NextRequest) {
-  const payload = await getVerifiedAuthPayloadFromRequest(req);
-  
-  if (!payload?.role) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const newAccessToken = await signAuthToken(payload, "7d");
-  const response = NextResponse.json({ success: true });
-  
-  attachAuthCookie(response, payload.role as UserRole, newAccessToken);
-  return response;
-}

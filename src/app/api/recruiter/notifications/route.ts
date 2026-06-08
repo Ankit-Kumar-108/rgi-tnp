@@ -3,26 +3,11 @@ export const dynamic = "force-dynamic"
 
 import { NextResponse, NextRequest } from "next/server"
 import { getDb } from "@/lib/db"
-import * as jose from "jose"
-
-
-async function getRecruiterFromToken(req: NextRequest) {
-    const authHeader = req.headers.get("authorization")
-    if (!authHeader) return null
-    const token = authHeader.replace("Bearer ", "")
-    try {
-        const secret = new TextEncoder().encode(process.env.JWT_SECRET!)
-        const { payload } = await jose.jwtVerify(token, secret)
-        return payload as any
-    } catch (error: any) {
-        console.error("Error authenticating recruiter")
-        return null
-    }
-}
+import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
 
 export async function GET(req: NextRequest) {
     try {
-        const recruiterTokenData = await getRecruiterFromToken(req)
+        const recruiterTokenData = await getVerifiedAuthPayloadFromRequest(req, ["recruiter"])
         if (!recruiterTokenData) {
             return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 })
         }
@@ -83,7 +68,7 @@ export async function GET(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
     try {
-        const recruiterTokenData = await getRecruiterFromToken(req)
+        const recruiterTokenData = await getVerifiedAuthPayloadFromRequest(req, ["recruiter"])
         if (!recruiterTokenData) {
             return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 })
         }

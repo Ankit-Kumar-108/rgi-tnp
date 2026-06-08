@@ -3,28 +3,14 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import * as jose from "jose";
-
-async function getStudentFromToken(req: NextRequest) {
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader) return null;
-  const token = authHeader.replace("Bearer ", "");
-  try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
-    const { payload } = await jose.jwtVerify(token, secret);
-    return payload as any;
-  } catch {
-    return null;
-  }
-}
-
+import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
 /**
  * GET /api/student/notifications
  * Returns paginated notifications for the student and the total unread count.
  */
 export async function GET(req: NextRequest) {
   try {
-    const studentTokenData = await getStudentFromToken(req);
+    const studentTokenData = await getVerifiedAuthPayloadFromRequest(req, ["student"]);
     if (!studentTokenData) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
@@ -89,7 +75,7 @@ export async function GET(req: NextRequest) {
  // Marks a single notification (or all notifications) as read.
  export async function PATCH(req: NextRequest) {
   try {
-    const studentTokenData = await getStudentFromToken(req);
+    const studentTokenData = await getVerifiedAuthPayloadFromRequest(req, ["student"]);
     if (!studentTokenData) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }

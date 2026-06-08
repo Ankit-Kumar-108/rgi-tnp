@@ -27,10 +27,10 @@ export default function AdminLoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      const data = (await res.json()) as { success: boolean; message?: string; token?: string; admin?: any };
+      const data = (await res.json()) as { success: boolean; message?: string; expiresAt?: number; admin?: any };
 
       if (data.success) {
-        saveAuth("admin", data.token!, data.admin);
+        saveAuth("admin", data.expiresAt!, data.admin);
         toast.success("Login Success")
         router.push("/admin/dashboard");
       } else {

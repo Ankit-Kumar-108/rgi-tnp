@@ -1,22 +1,11 @@
 export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import * as jose from "jose";
 import { driveRegistrationTemplate } from "@/lib/email-templates";
 import { NotificationService } from "@/lib/notification-service";
+import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
 
-async function getStudentFromToken(req: NextRequest) {
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader) return null;
-  const token = authHeader.replace("Bearer ", "");
-  try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
-    const { payload } = await jose.jwtVerify(token, secret);
-    return payload as any;
-  } catch {
-    return null;
-  }
-}
+
 
 // Helper function to extract batch number from batch string (e.g., "2023-1" -> 1)
 function extractBatchNumber(batchStr: string): number {
@@ -37,7 +26,7 @@ function parseBranches(branchesStr: string): Set<string> {
 // POST: Register for a drive
 export async function POST(req: NextRequest) {
   try {
-    const student = await getStudentFromToken(req);
+    const student = await getVerifiedAuthPayloadFromRequest(req, ["student"]);
     if (!student) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }

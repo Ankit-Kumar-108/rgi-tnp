@@ -135,12 +135,12 @@ export default function NotificationBell({role}: NotificationBell) {
           setIsOpen(!isOpen);
           if (!isOpen) fetchNotifications();
         }}
-        className="relative p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/40 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800/60 transition-all duration-200 shadow-sm"
+        className="relative p-2.5 rounded-xl bg-muted hover:bg-accent text-muted-foreground border border-border transition-all duration-200 shadow-sm"
         aria-label="Toggle notifications"
       >
         <Bell className="w-5 h-5 transition-transform duration-300 hover:rotate-12" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 bg-red-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white dark:border-[#090D16] animate-bounce shadow-md">
+          <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 bg-destructive text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-card animate-bounce shadow-md">
             {unreadCount}
           </span>
         )}
@@ -148,18 +148,18 @@ export default function NotificationBell({role}: NotificationBell) {
 
       {/* Dropdown glassmorphism feed */}
       {isOpen && (
-        <div className="absolute right-0 mt-3.5 w-80 md:w-96 bg-white/95 dark:bg-[#0D1527]/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800/80 shadow-2xl rounded-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-200 origin-top-right">
+        <div className="absolute right-0 mt-3.5 w-80 md:w-96 bg-card/95 backdrop-blur-xl border border-border shadow-2xl rounded-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-200 origin-top-right">
           {/* Header */}
-          <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800/60 flex items-center justify-between">
+          <div className="px-5 py-4 border-b border-border flex items-center justify-between">
             <div>
-              <h4 className="font-black text-sm text-slate-900 dark:text-white">Notifications Feed</h4>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500">Stay updated on your placement process</p>
+              <h4 className="font-black text-sm text-foreground">Notifications Feed</h4>
+              <p className="text-[10px] text-muted-foreground">Stay updated on your placement process</p>
             </div>
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllAsRead}
                 disabled={loading}
-                className="text-xs font-bold text-[#0F52BA] hover:text-[#0D4196] dark:text-blue-400 dark:hover:text-blue-300 transition-colors flex items-center gap-1"
+                className="text-xs font-bold text-brand hover:text-brand/80 transition-colors flex items-center gap-1"
               >
                 {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
                 Mark all read
@@ -168,9 +168,9 @@ export default function NotificationBell({role}: NotificationBell) {
           </div>
 
           {/* List */}
-          <div className="max-h-80 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/40 scrollbar-hide">
+          <div className="max-h-80 overflow-y-auto divide-y divide-border scrollbar-hide">
             {notifications.length === 0 ? (
-              <div className="py-12 text-center text-slate-400 dark:text-slate-500">
+              <div className="py-12 text-center text-muted-foreground">
                 <Bell className="w-10 h-10 mx-auto mb-3 opacity-30 animate-pulse" />
                 <p className="text-xs font-semibold">All caught up!</p>
                 <p className="text-[10px] opacity-75 mt-0.5">No new placement updates available.</p>
@@ -180,25 +180,25 @@ export default function NotificationBell({role}: NotificationBell) {
                 <div
                   key={n.id}
                   onClick={() => handleMarkAsRead(n.id, n.link)}
-                  className={`px-5 py-4 cursor-pointer hover:bg-slate-50/50 dark:hover:bg-slate-800/10 transition-colors flex gap-3.5 relative group ${
-                    !n.isRead ? "bg-[#0F52BA]/5 dark:bg-blue-500/5" : ""
+                  className={`px-5 py-4 cursor-pointer hover:bg-muted/50 transition-colors flex gap-3.5 relative group ${
+                    !n.isRead ? "bg-brand/5" : ""
                   }`}
                 >
                   {/* Unread indicator dot */}
                   {!n.isRead && (
-                    <span className="absolute top-4 left-2 w-2 h-2 bg-[#0F52BA] dark:bg-blue-500 rounded-full" />
+                    <span className="absolute top-4 left-2 w-2 h-2 bg-brand rounded-full" />
                   )}
 
                   <div className="flex-1 space-y-1">
-                    <p className="text-xs font-black text-slate-900 dark:text-white leading-tight group-hover:text-[#0F52BA] dark:group-hover:text-blue-400 transition-colors flex items-center gap-1.5 justify-between">
+                    <p className="text-xs font-black text-foreground leading-tight group-hover:text-brand transition-colors flex items-center gap-1.5 justify-between">
                       <span>{n.title}</span>
-                      {n.link && <ArrowRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 -translate-x-1.5 group-hover:translate-x-0 transition-all text-slate-400 flex-shrink-0" />}
+                      {n.link && <ArrowRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 -translate-x-1.5 group-hover:translate-x-0 transition-all text-muted-foreground flex-shrink-0" />}
                     </p>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-normal">
+                    <p className="text-[11px] text-muted-foreground leading-normal">
                       {n.message}
                     </p>
-                    <p className="text-[9px] text-slate-400 dark:text-slate-500 flex items-center gap-1 pt-0.5">
-                      <Clock className="w-2.5 h-2.5 text-slate-300 dark:text-slate-600" />
+                    <p className="text-[9px] text-muted-foreground/70 flex items-center gap-1 pt-0.5">
+                      <Clock className="w-2.5 h-2.5" />
                       {new Date(n.createdAt).toLocaleDateString(undefined, {
                         month: "short",
                         day: "numeric",

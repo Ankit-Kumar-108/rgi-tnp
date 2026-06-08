@@ -41,7 +41,7 @@ function StudentLoginContent() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
             });
-            const data = (await res.json()) as { success?: boolean; message?: string; token?: string; student?: any };
+            const data = await res.json() as { success?: boolean; message?: string; expiresAt?: number; student?: any };
 
             if (!res.ok || !data.success) {
                 setError(data.message || "Login failed");
@@ -49,13 +49,13 @@ function StudentLoginContent() {
                 return;
             }
 
-            saveAuth("student", data.token!, data.student);
+            saveAuth("student", data.expiresAt!, data.student);
             toast.success("Login successful");
             setTimeout(() => {
                 const redirect = searchParams.get("redirect");
                 const safeRedirect = redirect?.startsWith("/") ? redirect : "/students/dashboard";
                 router.push(safeRedirect);
-            }, 1000);
+            }, 300);
         } catch (error: any) {
             console.error("Error during login", error);
             setError("Something went wrong. Please try again.");

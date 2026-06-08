@@ -883,7 +883,7 @@ export default function ExternalStudentDashboard() {
               {/* Feedback Modal */}
               {showFeedbackModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                  <div className="absolute inset-0 bg-background/60 backdrop-blur-xl animate-in fade-in duration-300" onClick={() => setShowFeedbackModal(false)} />
+                  <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setShowFeedbackModal(false)} />
                   <div className="relative w-full max-w-2xl animate-in zoom-in-95 duration-300">
                     <FeedbackComp onClose={() => setShowFeedbackModal(false)} />
                   </div>

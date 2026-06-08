@@ -42,7 +42,7 @@ export default function VolunteerLogin() {
       const data = (await res.json()) as {
         success?: boolean;
         message?: string;
-        token?: string;
+        expiresAt?: number;
         student?: any;
       };
 
@@ -52,7 +52,7 @@ export default function VolunteerLogin() {
         return;
       }
 
-      saveAuth("student", data.token!, data.student);
+      saveAuth("student", data.expiresAt!, data.student);
       toast.success("Login successful! Redirecting to volunteer dashboard...");
       setTimeout(() => {
         router.push("/volunteer/dashboard");

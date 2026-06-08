@@ -3,7 +3,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { externalStudentLoginSchema } from "@/lib/validations/external-student";
 import { getDb } from "@/lib/db";
 import { verifyPassword } from "@/lib/auth-utils";
-import { signAuthToken } from "@/lib/auth-jwt";
+import { signAuthToken, attachAuthCookie } from "@/lib/auth-jwt";
 
 export async function POST(req: NextRequest) {
     try {
@@ -43,10 +43,10 @@ export async function POST(req: NextRequest) {
             role: "external_student",
         });
 
-        return NextResponse.json({ 
+        const response = NextResponse.json({ 
             success: true, 
             message: "Login successful", 
-            token: token,
+            expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
             student: {
                 id: externalStudent.id,
                 name: externalStudent.name,
@@ -54,6 +54,8 @@ export async function POST(req: NextRequest) {
                 isVerified: externalStudent.isVerified,
             }
          }, { status: 200 });
+
+         return attachAuthCookie(response, "external_student", token);
 
     } catch (error: any) {
         console.error("Error in External Student Login:", error);

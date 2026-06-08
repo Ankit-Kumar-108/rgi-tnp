@@ -3,26 +3,14 @@ export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { verifyAuthToken } from "@/lib/auth-jwt";
-import * as jose from "jose";
-
+import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
 // Read the student's login token from the request header
-async function getStudentFromToken(req: NextRequest) {
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader) return null;
-  const token = authHeader.replace("Bearer ", "");
-  try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
-    const { payload } = await jose.jwtVerify(token, secret);
-    return payload as any;
-  } catch {
-    return null;
-  }
-}
+
 
 export async function POST(req: NextRequest) {
   try {
     // PART A: Figure out WHO is scanning\
-    const studentData = await getStudentFromToken(req);
+    const studentData = await getVerifiedAuthPayloadFromRequest(req, ["student"]);
 
     if (!studentData) {
       return NextResponse.json(

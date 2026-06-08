@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import {
     Wrench,
     Award,
@@ -15,7 +16,6 @@ import {
 } from "lucide-react";
 import Nav from "@/components/layout/nav/nav";
 import Footer from "@/components/layout/footer/footer";
-import Image from "next/image";
 import Link from "next/link";
 
 export default function StrategicAlliances() {
@@ -97,8 +97,10 @@ export default function StrategicAlliances() {
                     {/* HERO SECTION */}
                     <section className="relative min-h-[480px] md:min-h-[640px] flex items-end overflow-hidden bg-foreground mt-16 md:mt-20">
                         <div className="absolute inset-0">
-                            <img
-                                className="w-full h-full object-cover"
+                            <Image
+                                fill
+                                priority
+                                className="object-cover"
                                 alt="Professional corporate partnership handshake"
                                 src="https://images.unsplash.com/photo-1556761175-4b46a572b786?q=80&w=2874&auto=format&fit=crop"
                             />

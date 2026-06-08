@@ -1,25 +1,14 @@
 export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import * as jose from "jose";
 import {deleteFromR2} from "@/lib/r2-delete"
+import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
 
-async function getStudentFromToken(req: NextRequest) {
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader) return null;
-  const token = authHeader.replace("Bearer ", "");
-  try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
-    const { payload } = await jose.jwtVerify(token, secret);
-    return payload as any;
-  } catch {
-    return null;
-  }
-}
+
 
 export async function POST(req: NextRequest) {
   try {
-    const studentTokenData = await getStudentFromToken(req);
+    const studentTokenData = await getVerifiedAuthPayloadFromRequest(req, ["student"]);
     if (!studentTokenData) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
@@ -69,7 +58,7 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const studentTokenData = await getStudentFromToken(req);
+    const studentTokenData = await getVerifiedAuthPayloadFromRequest(req, ["student"]);
     if (!studentTokenData) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
