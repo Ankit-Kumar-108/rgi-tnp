@@ -2,6 +2,7 @@ export const runtime = 'edge';
 
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { normalizeAcademicScoreToCgpa } from "@/lib/cgpa-utils";
 
 // GET: Fetch all drives with registration counts
 // GET: Fetch all drives with registration counts
@@ -133,7 +134,7 @@ export async function PUT(req: NextRequest) {
         jobDescription: body.jobDescription,
         ctc: body.ctc,
         eligibleBranches: body.eligibleBranches,
-        minCGPA: body.minCGPA,
+        minCGPA: normalizeAcademicScoreToCgpa(body.minCGPA) ?? 0,
         minBatch: body.minBatch,
         maxBatch: body.maxBatch,
         duration: body.duration,

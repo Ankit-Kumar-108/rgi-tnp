@@ -162,6 +162,22 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
   const [sendSuccess, setSendSuccess] = useState(false);
   const [sendError, setSendError] = useState("");
 
+  const openCompose = (target?: string) => {
+    setSendError("");
+    setSendSuccess(false);
+    setComposeData((prev) => {
+      const fallbackTarget = prev.to === "selected_drive_participants" && selectedIds.size === 0
+        ? "all_drive_participants"
+        : prev.to;
+
+      return {
+        ...prev,
+        to: target || (selectedIds.size > 0 ? "selected_drive_participants" : fallbackTarget),
+      };
+    });
+    setShowCompose(true);
+  };
+
   // Handle broadcast send
   const handleSendBroadcast = async () => {
     if (!composeData.subject || !composeData.message) {
@@ -174,8 +190,15 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
       return;
     }
 
+    if (composeData.to === "selected_drive_participants" && selectedIds.size === 0) {
+      setSendError("Please select at least one participant");
+      return;
+    }
+
     setSending(true);
     setSendError("");
+
+    const selectedRegistrationIds = Array.from(selectedIds);
 
     try {
       const res = await fetch("/api/admin/notifications", {
@@ -187,6 +210,8 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
           message: composeData.message,
           emailChannel: composeData.emailChannel,
           inAppChannel: composeData.inAppChannel,
+          driveId: id,
+          registrationIds: composeData.to === "selected_drive_participants" ? selectedRegistrationIds : undefined,
         }),
       });
 
@@ -445,6 +470,14 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
                   <span className="whitespace-nowrap">{action.label}</span>
                 </button>
               ))}
+              <button
+                onClick={() => openCompose("selected_drive_participants")}
+                disabled={actionLoading}
+                className="flex items-center gap-1.5 h-7 px-3 rounded-lg text-xs font-bold text-brand hover:bg-brand/10 transition-colors disabled:opacity-50 shrink-0"
+              >
+                <Mail className="w-3.5 h-3.5" />
+                <span className="whitespace-nowrap">Mail</span>
+              </button>
               <button onClick={() => setSelectedIds(new Set())}
                 className="ml-auto text-muted-foreground hover:text-foreground transition-colors shrink-0 pl-2">
                 <XCircle className="w-4 h-4" />
@@ -471,7 +504,7 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
               <span className="hidden sm:inline">Export CSV</span>
             </button>
             <button
-            onClick={() => setShowCompose(true)}
+            onClick={() => openCompose()}
               className="group bg-brand text-white p-2.5 rounded-lg text-xs font-bold shadow-lg shadow-brand/25 transition-all duration-300 flex items-center gap-2 cursor-pointer"
             >
               <Send className="group-hover:translate-x-2 group-hover:-translate-y-2 transition-all duration-300 size-3.5" />
@@ -662,9 +695,13 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
                           onChange={(e) => setComposeData({ ...composeData, to: e.target.value})}
                           className="w-full appearance-none bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 pr-10 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand transition-all"
                         >
-                          <option value="all_drive_participants">All Students</option>
+                          <option value="selected_drive_participants" disabled={selectedIds.size === 0}>
+                            Selected Participants ({selectedIds.size})
+                          </option>
+                          <option value="all_drive_participants">All Participants</option>
                           <option value="internal_drive_participants">Radharaman Students</option>
                           <option value="external_drive_participants">Other Students</option>
+                          <option value="alumni_drive_participants">Alumni</option>
                         </select>
                         <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                       </div>
@@ -884,7 +921,7 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
                             )}
                             {user.cgpa && (
                               <div className="pr-3">
-                                <span className="flex"><StatChip value={user.cgpa} label="CGPA" /><p className="text-sm font-bold">%</p></span>
+                                <span className="flex"><StatChip value={user.cgpa} label="Graduation" /><p className="text-sm font-bold">%</p></span>
                               </div>
                             )}
                             <div className="pr-3">

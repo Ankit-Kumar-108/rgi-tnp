@@ -268,10 +268,10 @@ export default function VolunteerDashboard() {
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-0 pt-6 border-t border-border">
                 <div className="md:pr-6 md:border-r border-border">
                   <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">
-                    Current CGPA
+                    Graduation %
                   </p>
                   <p className="text-xl md:text-2xl font-bold text-brand">
-                    {student?.cgpa}
+                    {student?.cgpa ? `${student.cgpa}%` : "N/A"}
                   </p>
                 </div>
                 <div className="md:px-6 md:border-r border-border">

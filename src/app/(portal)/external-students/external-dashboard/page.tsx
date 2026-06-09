@@ -32,6 +32,7 @@ import { uploadFileToR2 } from "@/lib/upload-r2";
 import { PlacementDrive } from "@/types";
 import { toast } from "sonner";
 import NotificationBell from "@/components/ui/NotificationBell";
+import { meetsCgpaCriteria } from "@/lib/cgpa-utils";
 
 // Lazy load heavy modal components — only loaded when user interacts
 const JobDetailsModal = dynamic(
@@ -81,7 +82,7 @@ export default function ExternalStudentDashboard() {
     let reason = "";
     if (drive.course !== "All" && !drive.course?.includes(student?.course)) reason = "Course Ineligible";
     else if (!drive.eligibleBranches?.includes(student?.branch)) reason = "Branch Ineligible";
-    else if ((student?.cgpa || 0) < drive.minCGPA) reason = "CGPA too low";
+    else if (!meetsCgpaCriteria(student?.cgpa, drive.minCGPA)) reason = "CGPA too low";
     else if (student?.batch && drive.minBatch && drive.maxBatch) {
       const sBatch = parseInt(student.batch.split('-').pop(), 10);
       const minB = parseInt(drive.minBatch.split('-').pop(), 10);
@@ -522,8 +523,8 @@ export default function ExternalStudentDashboard() {
                     {/* Horizontal Grid Stats */}
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-0 pt-6 border-t border-border">
                       <div className="md:pr-6 md:border-r border-border">
-                        <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Current CGPA</p>
-                        <p className="text-xl md:text-2xl font-bold text-brand">{student?.cgpa || "N/A"}%</p>
+                        <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Graduation %</p>
+                        <p className="text-xl md:text-2xl font-bold text-brand">{student?.cgpa ? `${student.cgpa}%` : "N/A"}</p>
                       </div>
                       <div className="md:px-6 md:border-r border-border">
                         <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Branch</p>
@@ -897,4 +898,3 @@ export default function ExternalStudentDashboard() {
     </>
   );
 }
-

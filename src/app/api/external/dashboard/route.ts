@@ -4,6 +4,7 @@ import { getDb } from "@/lib/db";
 import { driveRegistrationTemplate } from "@/lib/email-templates";
 import { NotificationService } from "@/lib/notification-service";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
+import { formatCgpaCriteria, meetsCgpaCriteria } from "@/lib/cgpa-utils";
 
 export async function GET(req: NextRequest) {
   try {
@@ -141,8 +142,11 @@ export async function POST(req: NextRequest) {
     if (!drive.eligibleBranches.includes(student.branch)) {
       return NextResponse.json({ success: false, message: "Branch not eligible" }, { status: 403 });
     }
-    if (student.cgpa === null || student.cgpa < drive.minCGPA) {
-      return NextResponse.json({ success: false, message: "CGPA requirement not met" }, { status: 403 });
+    if (!meetsCgpaCriteria(student.cgpa, drive.minCGPA)) {
+      return NextResponse.json(
+        { success: false, message: `Minimum CGPA ${formatCgpaCriteria(drive.minCGPA)} required` },
+        { status: 403 }
+      );
     }
 
     // Gender eligibility check

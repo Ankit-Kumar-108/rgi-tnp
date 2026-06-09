@@ -89,7 +89,12 @@ export async function POST(req: NextRequest) {
     const adminEmail = req.headers.get("x-admin-email") || "system";
     const body = await req.json() as any;
     const audience = body.audience || body.to;
-    const { subject, message, course, branch } = body;
+    const { subject, message, course, branch, driveId } = body;
+    const registrationIds = Array.isArray(body.registrationIds)
+      ? body.registrationIds
+        .filter((id: unknown): id is string => typeof id === "string" && id.trim().length > 0)
+        .map((id: string) => id.trim())
+      : undefined;
     
     let channels = body.channels;
     if (!channels) {
@@ -105,6 +110,35 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (
+      [
+        "selected_drive_participants",
+        "all_drive_participants",
+        "internal_drive_participants",
+        "external_drive_participants",
+        "alumni_drive_participants",
+      ].includes(audience) && !driveId
+    ) {
+      return NextResponse.json(
+        { success: false, message: "Drive ID is required for participant broadcasts" },
+        { status: 400 }
+      );
+    }
+
+    if (audience === "selected_drive_participants" && !registrationIds?.length) {
+      return NextResponse.json(
+        { success: false, message: "Please select at least one participant" },
+        { status: 400 }
+      );
+    }
+
+    if (registrationIds && registrationIds.length > 1000) {
+      return NextResponse.json(
+        { success: false, message: "Maximum 1000 selected participants per broadcast" },
+        { status: 400 }
+      );
+    }
+
     // Trigger asynchronous broadcast distribution utilizing Cloudflare waitUntil
     const result = await NotificationService.triggerBroadcast({
       audience,
@@ -114,6 +148,8 @@ export async function POST(req: NextRequest) {
       channels,
       course,
       branch,
+      driveId,
+      registrationIds,
     });
 
     if(!result.success) {

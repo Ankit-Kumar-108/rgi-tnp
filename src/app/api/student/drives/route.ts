@@ -4,6 +4,7 @@ import { getDb } from "@/lib/db";
 import { driveRegistrationTemplate } from "@/lib/email-templates";
 import { NotificationService } from "@/lib/notification-service";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
+import { formatCgpaCriteria, meetsCgpaCriteria } from "@/lib/cgpa-utils";
 
 
 
@@ -85,9 +86,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Check: CGPA eligible?
-    if (studentData.cgpa < drive.minCGPA) {
+    if (!meetsCgpaCriteria(studentData.cgpa, drive.minCGPA)) {
       return NextResponse.json(
-        { success: false, message: `Minimum CGPA ${drive.minCGPA} required` },
+        { success: false, message: `Minimum CGPA ${formatCgpaCriteria(drive.minCGPA)} required` },
         { status: 403 }
       );
     }

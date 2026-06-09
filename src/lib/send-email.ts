@@ -7,9 +7,9 @@ interface SendEmailOptions {
 }
 export async function sendEmail({ to, subject, html, from }: SendEmailOptions): Promise<{ success: boolean; error?: string }> {
   const validate = validateEmail(to)
-  if(!validate.valid){
-  console.error(`Email validation error: ${validate.error}`);
-  return { success: false, error: validate.error };
+  if (!validate.valid) {
+    console.error(`Email validation error: ${validate.error}`);
+    return { success: false, error: validate.error };
   }
   const GMAIL_USER = process.env.GMAIL_USER;
   const CLIENT_ID = process.env.GMAIL_CLIENT_ID;
@@ -45,7 +45,7 @@ export async function sendEmail({ to, subject, html, from }: SendEmailOptions): 
     // 2. Construct the email in RFC 2822 format (MIME)
     const senderEmail = from || GMAIL_USER;
     const base64Subject = Buffer.from(subject).toString('base64');
-    
+
     // Cloudflare Workers support Buffer via their 'nodejs_compat' compatibility flag
     const rawMessage = [
       `From: RGI Training and Placement Department <${senderEmail}>`,

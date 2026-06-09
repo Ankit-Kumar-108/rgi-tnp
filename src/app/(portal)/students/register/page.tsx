@@ -514,7 +514,7 @@ export default function StudentRegister() {
 
                             <div className="space-y-1">
                                 <label className="text-xs sm:text-sm font-semibold text-foreground">Graduation Percentage</label>
-                                <input className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} type="number" step="0.01" min="10" max="100" placeholder="88.5% cgpa" required value={form.cgpa} onChange={update("cgpa")} />
+                                <input className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} type="number" step="0.01" min="10" max="100" placeholder="e.g. 88.5%" required value={form.cgpa} onChange={update("cgpa")} />
                             </div>
                             <div className="space-y-1">
                                 <label className="text-xs sm:text-sm font-semibold text-foreground">Phone Number</label>
@@ -635,5 +635,4 @@ export default function StudentRegister() {
         </div>
     );
 }
-
 

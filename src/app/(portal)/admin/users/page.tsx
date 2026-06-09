@@ -933,7 +933,7 @@ export default function AdminUsersPage() {
                           <div className="flex items-center gap-3 divide-x divide-border">
                             {user.cgpa && (
                               <div className="pr-3">
-                                <StatChip value={user.cgpa} label="CGPA" />
+                                <StatChip value={user.cgpa} label="Graduation %" />
                               </div>
                             )}
                             {user.enrollmentNumber && (
@@ -1019,4 +1019,3 @@ export default function AdminUsersPage() {
     </div>
   );
 }
-

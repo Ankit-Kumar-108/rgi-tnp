@@ -16,6 +16,12 @@ import {
   Trash2,
   X,
   Plus,
+  Building2,
+  GraduationCap,
+  ListChecks,
+  DollarSign,
+  CheckSquare,
+  CheckCircle,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import JobDetailsModal from "@/components/forms/studentApplyModal/modal";
@@ -159,179 +165,252 @@ export default function AdminDrivesPage() {
 
       {/* Drive Edit Modal */}
       {showForm && (
-        <div className="fixed inset-0 z-60 backdrop-blur-xs bg-black/50 flex flex-col items-center justify-center p-4" onClick={() => setShowForm(false)}>
-          <div className="bg-card rounded-2xl border border-border shadow-2xl max-w-lg w-full p-6 max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold text-foreground">Edit Drive Details</h3>
-              <button onClick={() => setShowForm(false)} className="text-muted-foreground hover:text-foreground"><X className="w-5 h-5" /></button>
+        <div className="fixed inset-0 w-full h-full z-60 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 xl:p-6 transition-all duration-300" onClick={() => setShowForm(false)}>
+          <div className="bg-card rounded-2xl border border-border shadow-2xl max-w-4xl w-full flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            
+            {/* Modal Header (Fixed) */}
+            <div className="bg-muted/30 border-b border-border px-6 py-5 flex items-center justify-between sticky top-0 z-10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center text-brand">
+                  <Edit className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-foreground tracking-tight">Edit Drive Details</h3>
+                  <p className="text-xs text-muted-foreground font-medium mt-0.5">Modify the requirements for the recruitment drive.</p>
+                </div>
+              </div>
+              <button onClick={() => setShowForm(false)} className="text-muted-foreground hover:text-foreground bg-muted hover:bg-muted/80 p-2 rounded-xl transition-all">
+                <X className="w-5 h-5" />
+              </button>
             </div>
-            <form onSubmit={handleSubmitDrive} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Company Name</label>
-                  <input required value={form.companyName} onChange={(e) => setForm({ ...form, companyName: e.target.value })}
-                    className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Role</label>
-                  <input required value={form.roleName} onChange={(e) => setForm({ ...form, roleName: e.target.value })}
-                    className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Job Description</label>
-                <textarea required value={form.jobDescription} onChange={(e) => setForm({ ...form, jobDescription: e.target.value })} rows={10}
-                  className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">CTC / Stipend</label>
-                  <input required value={form.ctc} onChange={(e) => setForm({ ...form, ctc: e.target.value })}
-                    className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" placeholder="e.g. 7 LPA" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Min CGPA</label>
-                  <input required type="number" step="0.1" min="0" max="10" value={form.minCGPA} onChange={(e) => setForm({ ...form, minCGPA: parseFloat(e.target.value) || 0 })}
-                    className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Job Type</label>
-                  <select required value={form.jobType} onChange={(e) => setForm({ ...form, jobType: e.target.value })}
-                    className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none">
-                    <option value="Full Time">Full Time</option>
-                    <option value="Internship with PPO">Internship with PPO</option>
-                    <option value="Internship">Internship</option>
-                    <option value="Full Time with Bond">Full Time with Bond</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Eligible Gender</label>
-                  <select required value={form.genderPreference} onChange={(e) => setForm({ ...form, genderPreference: e.target.value })}
-                    className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none">
-                    <option value="Both">Both Gender</option>
-                    <option value="Male">Male Only</option>
-                    <option value="Female">Female Only</option>
-                  </select>
-                </div>
-                {(form.jobType === "Internship" || form.jobType === "Full Time with Bond" || form.jobType === "Internship with PPO") && (
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">
-                      {form.jobType === "Internship" ? "Internship Duration" : form.jobType === "Full Time with Bond" ? "Bond Duration" : form.jobType === "Internship with PPO" ? "Internship Duration" : "Bond/Contract Duration"}
-                    </label>
-                    <input required value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })}
-                      placeholder={form.jobType === "Internship" || form.jobType === "Internship with PPO" ? "e.g., 6 months" : "e.g., 2 years"}
-                      className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
+
+            {/* Modal Body (Scrollable) */}
+            <div className="overflow-y-auto p-6 md:p-8 custom-scrollbar bg-card">
+              <form id="drive-form" onSubmit={handleSubmitDrive} className="space-y-10">
+                
+                {/* Section 1: Basic Role Details */}
+                <div className="space-y-6">
+                  <div className="flex items-center gap-2 border-b border-border pb-2">
+                    <Building2 className="w-4 h-4 text-brand" />
+                    <h4 className="text-sm font-bold uppercase tracking-wider text-foreground">Basic Role Details</h4>
                   </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Company Name</label>
+                      <input required value={form.companyName} onChange={(e) => setForm({ ...form, companyName: e.target.value })}
+                        className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Role / Designation</label>
+                      <input required value={form.roleName} onChange={(e) => setForm({ ...form, roleName: e.target.value })}
+                        className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" placeholder="e.g. Software Engineer" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Job Type</label>
+                      <select required value={form.jobType} onChange={(e) => setForm({ ...form, jobType: e.target.value })}
+                        className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all appearance-none cursor-pointer">
+                        <option value="Full Time">Full Time</option>
+                        <option value="Internship with PPO">Internship with PPO</option>
+                        <option value="Internship">Internship</option>
+                        <option value="Full Time with Bond">Full Time with Bond</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">CTC / Stipend</label>
+                      <div className="relative">
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"><DollarSign className="w-4 h-4" /></div>
+                        <input required value={form.ctc} onChange={(e) => setForm({ ...form, ctc: e.target.value })}
+                          className="w-full bg-surface/50 border border-border rounded-xl pl-10 pr-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" placeholder="e.g. 7 LPA or 20k/month" />
+                      </div>
+                    </div>
+                    
+                    {(form.jobType === "Internship" || form.jobType === "Full Time with Bond" || form.jobType === "Internship with PPO") && (
+                      <div className="md:col-span-2">
+                        <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">
+                          {form.jobType === "Internship" ? "Internship Duration" : form.jobType === "Full Time with Bond" ? "Bond Duration" : "Internship Duration"}
+                        </label>
+                        <input required value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })}
+                          placeholder={form.jobType === "Internship" || form.jobType === "Internship with PPO" ? "e.g., 6 months" : "e.g., 2 years"}
+                          className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Section 2: Candidate Requirements */}
+                <div className="space-y-6">
+                  <div className="flex items-center gap-2 border-b border-border pb-2">
+                    <GraduationCap className="w-4 h-4 text-brand" />
+                    <h4 className="text-sm font-bold uppercase tracking-wider text-foreground">Candidate Requirements</h4>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
+                    {/* Course */}
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-3 text-muted-foreground">Eligible Courses</label>
+                      <div className="flex flex-wrap gap-2.5">
+                        {["B.Tech", "M.Tech", "MBA", "Diploma", "All"].map((c) => {
+                          const isSelected = (form.course === "All" && c === "All") || (form.course && form.course.includes(c) && form.course !== "All");
+                          return (
+                            <button key={c} type="button"
+                              onClick={() => {
+                                if (c === "All") { setForm({ ...form, course: "All" }); return; }
+                                let arr = form.course ? form.course.split(",") : [];
+                                if (arr.includes("All")) arr = [];
+                                const updated = arr.includes(c) ? arr.filter((x) => x !== c) : [...arr, c];
+                                setForm({ ...form, course: updated.join(",") });
+                              }}
+                              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${isSelected ? "bg-brand text-primary-foreground border-brand shadow-sm" : "bg-surface/50 border-border text-muted-foreground hover:border-brand/50 hover:bg-surface"}`}
+                            >
+                              {c === "All" ? "All Courses" : c}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Branches*/}
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-3 text-muted-foreground">Eligible Branches</label>
+                      <div className="flex flex-wrap gap-2.5 bg-surface/30 p-4 rounded-xl border border-border/50">
+                        <button type="button"
+                          onClick={() => {
+                            const allSelected = BRANCHES.every(b => form.eligibleBranches.includes(b));
+                            setForm({ ...form, eligibleBranches: allSelected ? "" : BRANCHES.join(",") });
+                          }}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${BRANCHES.every(b => form.eligibleBranches.includes(b)) ? "bg-brand text-background border-foreground shadow-sm" : "bg-transparent border-border text-foreground hover:bg-muted"}`}
+                        >Select All</button>
+                        {BRANCHES.map((b) => (
+                          <button key={b} type="button"
+                            onClick={() => {
+                              const arr = form.eligibleBranches ? form.eligibleBranches.split(",") : [];
+                              const updated = arr.includes(b) ? arr.filter((x) => x !== b) : [...arr, b];
+                              setForm({ ...form, eligibleBranches: updated.join(",") });
+                            }}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${form.eligibleBranches.includes(b) ? "bg-brand text-background border-foreground shadow-sm" : "bg-transparent border-border text-foreground hover:bg-muted"}`}
+                          >{b}</button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Batch & Criteria */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Min Batch (From)</label>
+                        <input required value={form.minBatch} onChange={(e) => setForm({ ...form, minBatch: e.target.value })}
+                          placeholder="e.g. 2021" className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Max Batch (To)</label>
+                        <input required value={form.maxBatch} onChange={(e) => setForm({ ...form, maxBatch: e.target.value })}
+                          placeholder="e.g. 2025" className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label htmlFor="minCGPA" className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Min CGPA Required</label>
+                        <input id="minCGPA" required type="number" step="0.1" min="0" max="10" value={form.minCGPA.toString()}
+                          onChange={(e) => { const val = parseFloat(e.target.value); setForm({ ...form, minCGPA: isNaN(val) ? 0 : val }); }}
+                          className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all font-mono" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Eligible Gender</label>
+                        <select required value={form.genderPreference} onChange={(e) => setForm({ ...form, genderPreference: e.target.value })}
+                          className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all cursor-pointer">
+                          <option value="Both">All Genders</option>
+                          <option value="Male">Male Only</option>
+                          <option value="Female">Female Only</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="flex items-start gap-3 p-4 border border-brand/20 bg-brand/5 rounded-xl cursor-pointer group hover:bg-brand/10 transition-colors">
+                        <input type="checkbox" checked={form.allowAlumni || false} onChange={(e) => setForm({ ...form, allowAlumni: e.target.checked })}
+                          className="mt-1 w-5 h-5 text-brand focus:ring-brand border-border rounded cursor-pointer" />
+                        <div>
+                          <span className="text-sm font-bold text-brand group-hover:text-brand/80 transition-colors flex items-center gap-2">
+                            <CheckSquare className="w-4 h-4" /> Allow Alumni / Experienced Pass-outs
+                          </span>
+                          <p className="text-xs text-brand/70 mt-1 leading-relaxed">
+                            Check this if you are actively hiring experienced candidates from previously graduated batches alongside freshers.
+                          </p>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 3: Process & Logistics */}
+                <div className="space-y-6">
+                  <div className="flex items-center gap-2 border-b border-border pb-2">
+                    <ListChecks className="w-4 h-4 text-brand" />
+                    <h4 className="text-sm font-bold uppercase tracking-wider text-foreground">Process & Logistics</h4>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Proposed Drive Date</label>
+                      <div className="relative">
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"><Calendar className="w-4 h-4" /></div>
+                        <input required type="date" value={form.driveDate} onChange={(e) => setForm({ ...form, driveDate: e.target.value })}
+                          className="w-full bg-surface/50 border border-border rounded-xl pl-10 pr-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all cursor-pointer" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Drive Mode</label>
+                      <div className="flex gap-2">
+                        {["Closed", "Open", "Pool"].map((t) => (
+                          <button key={t} type="button" onClick={() => setForm({ ...form, driveType: t })}
+                            className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all border ${form.driveType === t ? "bg-brand text-primary-foreground border-brand shadow-md" : "bg-surface/50 border-border text-muted-foreground hover:bg-surface hover:border-brand/50"}`}
+                          >{t}</button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Detailed Job Description</label>
+                      <textarea required value={form.jobDescription} onChange={(e) => setForm({ ...form, jobDescription: e.target.value })} rows={5}
+                        placeholder="Describe the roles, responsibilities, and expected skills..."
+                        className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all resize-y custom-scrollbar" />
+                    </div>
+                    
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Interview Process & Rounds</label>
+                      <textarea value={form.interviewProcess} onChange={(e) => setForm({ ...form, interviewProcess: e.target.value })} rows={3}
+                        placeholder="e.g. 1. Online Aptitude Test (60 mins) &#10;2. Group Discussion &#10;3. Technical Round &#10;4. HR Round"
+                        className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all resize-y custom-scrollbar" />
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            {/* Modal Footer (Fixed) */}
+            <div className="bg-muted/30 border-t border-border px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4 sticky bottom-0 z-10">
+              <div className="flex-1 w-full md:w-auto">
+                {formMsg && (
+                  <p className={`text-sm font-bold flex items-center gap-2 ${formMsg.ok ? "text-green-600" : "text-red-500"}`}>
+                    {formMsg.ok ? <CheckCircle className="w-4 h-4" /> : <X className="w-4 h-4" />}
+                    {formMsg.msg}
+                  </p>
                 )}
               </div>
-              <div className="space-y-2">
-                <label className="flex items-center gap-3 cursor-pointer group">
-                  <input
-                    type="checkbox"
-                    checked={form.allowAlumni || false}
-                    onChange={(e) => setForm({ ...form, allowAlumni: e.target.checked })}
-                    className="w-5 h-5 text-brand focus:ring-brand border-border rounded"
-                  />
-                  <div>
-                    <span className="text-sm font-bold text-foreground group-hover:text-brand transition-colors">
-                      Allow Alumni / Experienced Pass-outs
-                    </span>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      Experienced alumni from this college can also apply
-                    </p>
-                  </div>
-                </label>
+              <div className="flex gap-3 w-full md:w-auto">
+                <button type="button" onClick={() => setShowForm(false)} className="px-6 py-2.5 rounded-xl text-sm font-bold text-muted-foreground hover:bg-muted transition-colors border border-border bg-card w-full md:w-auto">
+                  Cancel
+                </button>
+                <button form="drive-form" type="submit" disabled={submitting}
+                  className="px-8 py-2.5 bg-brand text-primary-foreground rounded-xl text-sm font-bold hover:bg-brand/90 transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full md:w-auto"
+                >
+                  {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Edit className="w-4 h-4" />}
+                  {submitting ? "Updating..." : "Update Drive Details"}
+                </button>
               </div>
-              {/* Interview Process */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Interview Process</label>
-                <textarea value={form.interviewProcess} onChange={(e) => setForm({ ...form, interviewProcess: e.target.value })}
-                  placeholder="e.g., Online Test (1 hour) → Technical Round → HR Round"
-                  rows={5}
-                  className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
-              </div>
-              {/* Course */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Course</label>
-                <div className="flex flex-wrap gap-2">
-                  {["B.Tech", "M.Tech", "MBA", "Diploma", "All"].map((c) => (
-                    <button key={c} type="button"
-                      onClick={() => {
-                        if (c === "All") {
-                          setForm({ ...form, course: "All" });
-                          return;
-                        }
-                        let arr = form.course ? form.course.split(",") : [];
-                        if (arr.includes("All")) arr = [];
-                        const updated = arr.includes(c) ? arr.filter((x) => x !== c) : [...arr, c];
-                        setForm({ ...form, course: updated.join(",") });
-                      }}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${(form.course === "All" && c === "All") || (form.course && form.course.includes(c) && form.course !== "All") ? "bg-brand text-white" : "bg-muted border border-border text-muted-foreground"}`}
-                    >{c === "All" ? "All Courses" : c}</button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Eligible Branches</label>
-                <div className="flex flex-wrap gap-2">
-                  <button type="button"
-                    onClick={() => {
-                      const allSelected = BRANCHES.every(b => form.eligibleBranches.includes(b));
-                      setForm({ ...form, eligibleBranches: allSelected ? "" : BRANCHES.join(",") });
-                    }}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${BRANCHES.every(b => form.eligibleBranches.includes(b)) ? "bg-brand text-white" : "bg-muted border border-border text-muted-foreground"}`}
-                  >All Branches</button>
-                  {BRANCHES.map((b) => (
-                    <button key={b} type="button"
-                      onClick={() => {
-                        const arr = form.eligibleBranches ? form.eligibleBranches.split(",") : [];
-                        const updated = arr.includes(b) ? arr.filter((x) => x !== b) : [...arr, b];
-                        setForm({ ...form, eligibleBranches: updated.join(",") });
-                      }}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${form.eligibleBranches.includes(b) ? "bg-brand text-white" : "bg-muted border border-border text-muted-foreground"}`}
-                    >{b}</button>
-                  ))}
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Min Batch (From)</label>
-                  <input required value={form.minBatch} onChange={(e) => setForm({ ...form, minBatch: e.target.value })}
-                    placeholder="e.g. 2021" className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Max Batch (To)</label>
-                  <input required value={form.maxBatch} onChange={(e) => setForm({ ...form, maxBatch: e.target.value })}
-                    placeholder="e.g. 2025" className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Drive Date</label>
-                  <input required type="date" value={form.driveDate} onChange={(e) => setForm({ ...form, driveDate: e.target.value })}
-                    className="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-brand outline-none" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider mb-1.5 text-muted-foreground">Drive Type</label>
-                  <div className="flex gap-2">
-                    {["Closed", "Open", "Pool"].map((t) => (
-                      <button key={t} type="button" onClick={() => setForm({ ...form, driveType: t })}
-                        className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all ${form.driveType === t ? "bg-brand text-white" : "bg-muted border border-border text-muted-foreground"}`}
-                      >{t} Campus</button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              {formMsg && (
-                <p className={`text-sm font-medium ${formMsg.ok ? "text-green-600" : "text-red-500"}`}>{formMsg.msg}</p>
-              )}
-              <button type="submit" disabled={submitting}
-                className="w-full bg-brand text-white py-3 rounded-xl font-bold hover:bg-brand/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Edit className="w-4 h-4" />}
-                {submitting ? "Updating..." : "Update Drive Details"}
-              </button>
-            </form>
+            </div>
+
           </div>
         </div>
       )}

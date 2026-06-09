@@ -14,6 +14,7 @@ import {
     MapPin,
 } from "lucide-react";
 import { PlacementDrive } from "@/types";
+import { formatCgpaCriteria } from "@/lib/cgpa-utils";
 
 export default function JobDetailsModal({
     drive,
@@ -189,7 +190,7 @@ export default function JobDetailsModal({
                                         <p className="text-xs font-bold text-brand uppercase tracking-wider mb-1">
                                             Academic Grade
                                         </p>
-                                        <p className="text-lg font-bold text-foreground font-mono">CGPA: {drive.minCGPA}</p>
+                                        <p className="text-lg font-bold text-foreground font-mono">CGPA: {formatCgpaCriteria(drive.minCGPA)}</p>
                                         <p className="text-xs text-muted-foreground mt-1">Minimum requirement to apply.</p>
                                     </div>
                                     <div className="p-5 rounded-2xl bg-muted/50 border border-border group hover:border-brand/30 transition-colors">
@@ -283,7 +284,7 @@ export default function JobDetailsModal({
                                         <span className="w-6 h-6 rounded-full bg-brand text-primary-foreground text-xs font-bold flex items-center justify-center shrink-0">
                                             ✓
                                         </span>
-                                        Min CGPA: {drive.minCGPA}
+                                        Min CGPA: {formatCgpaCriteria(drive.minCGPA)}
                                     </li>
                                     <li className="flex items-center gap-3">
                                         <span className="w-6 h-6 rounded-full bg-brand text-primary-foreground text-xs font-bold flex items-center justify-center shrink-0">

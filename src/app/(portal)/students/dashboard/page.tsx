@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import useSWR from "swr";
 import { fetchWithRetry } from "@/lib/fetch-utils";
 import { PlacementDrive } from "@/types";
+import { meetsCgpaCriteria } from "@/lib/cgpa-utils";
 
 // Lazy load heavy modal components — only loaded when user interacts
 const JobDetailsModal = dynamic(
@@ -114,7 +115,7 @@ export default function StudentDashboard() {
     let reason = "";
     if (drive.course !== "All" && !drive.course?.includes(student?.course)) reason = "Course Ineligible";
     else if (!drive.eligibleBranches?.includes(student?.branch)) reason = "Branch Ineligible";
-    else if ((student?.cgpa || 0) < drive.minCGPA) reason = "CGPA too low";
+    else if (!meetsCgpaCriteria(student?.cgpa, drive.minCGPA)) reason = "CGPA too low";
     else if (student?.batch && drive.minBatch && drive.maxBatch) {
       const sBatch = parseInt(student.batch.split('-').pop(), 10);
       const minB = parseInt(drive.minBatch.split('-').pop(), 10);

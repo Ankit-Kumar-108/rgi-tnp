@@ -57,6 +57,7 @@ interface BroadcastOptions {
   course?: string;
   branch?: string;
   driveId?: string;
+  registrationIds?: string[];
 }
 
 const BROADCAST_BATCH_SIZE = 50;
@@ -226,6 +227,7 @@ export class NotificationService {
     course,
     branch,
     driveId,
+    registrationIds,
   }: BroadcastOptions) {
     const db = getDb();
     let recipients: { id: string; name: string; email: string; type: "student" | "alumni" | "recruiter" | "external_student" }[] = [];
@@ -290,23 +292,57 @@ export class NotificationService {
         select: { id: true, name: true, email: true },
       });
       recipients = list.map((r) => ({ ...r, type: "student" as const }));
-    } else if (audience === "all_drive_participants") {
+    } else if (audience === "selected_drive_participants") {
+      if (!registrationIds?.length) {
+        return { success: false, message: "No selected participants were provided" }
+      }
+
       const list = await db.driveRegistration.findMany({
-        where: { driveId: driveId },
+        where: {
+          driveId,
+          id: { in: registrationIds },
+        },
         select: {
           student: { select: { id: true, name: true, email: true } },
-          externalStudent: { select: { id: true, name: true, email: true } }
+          externalStudent: { select: { id: true, name: true, email: true } },
+          alumni: { select: { id: true, name: true, personalEmail: true } }
         }
       })
       const rawRecipients = list.map((reg) => {
         if (reg.student) return { ...reg.student, type: "student" as const }
         if (reg.externalStudent) return { ...reg.externalStudent, type: "external_student" as const }
+        if (reg.alumni) return { id: reg.alumni.id, name: reg.alumni.name, email: reg.alumni.personalEmail, type: "alumni" as const }
         return null
-      }).filter((r): r is NonNullable<typeof r> => r !== null)
-      const uniqueMap = new Map()
+      }).filter((r): r is NonNullable<typeof r> => Boolean(r?.email))
+
+      const uniqueMap = new Map<string, typeof rawRecipients[number]>()
       for (const person of rawRecipients) {
-        if (!uniqueMap.has(person.email)) {
-          uniqueMap.set(person.email, person)
+        const email = person.email.trim().toLowerCase()
+        if (!uniqueMap.has(email)) {
+          uniqueMap.set(email, person)
+        }
+      }
+      recipients = Array.from(uniqueMap.values())
+    } else if (audience === "all_drive_participants") {
+      const list = await db.driveRegistration.findMany({
+        where: { driveId: driveId },
+        select: {
+          student: { select: { id: true, name: true, email: true } },
+          externalStudent: { select: { id: true, name: true, email: true } },
+          alumni: { select: { id: true, name: true, personalEmail: true } }
+        }
+      })
+      const rawRecipients = list.map((reg) => {
+        if (reg.student) return { ...reg.student, type: "student" as const }
+        if (reg.externalStudent) return { ...reg.externalStudent, type: "external_student" as const }
+        if (reg.alumni) return { id: reg.alumni.id, name: reg.alumni.name, email: reg.alumni.personalEmail, type: "alumni" as const }
+        return null
+      }).filter((r): r is NonNullable<typeof r> => Boolean(r?.email))
+      const uniqueMap = new Map<string, typeof rawRecipients[number]>()
+      for (const person of rawRecipients) {
+        const email = person.email.trim().toLowerCase()
+        if (!uniqueMap.has(email)) {
+          uniqueMap.set(email, person)
         }
       }
       recipients = Array.from(uniqueMap.values())
@@ -327,12 +363,13 @@ export class NotificationService {
       const rawRecipients = list.map((reg) => {
         if (reg.student) return { ...reg.student, type: "student" as const }
         return null
-      }).filter((r): r is NonNullable<typeof r> => r !== null)
+      }).filter((r): r is NonNullable<typeof r> => Boolean(r?.email))
 
-      const uniqueMap = new Map()
+      const uniqueMap = new Map<string, typeof rawRecipients[number]>()
       for (const person of rawRecipients) {
-        if (!uniqueMap.has(person.email)) {
-          uniqueMap.set(person.email, person)
+        const email = person.email.trim().toLowerCase()
+        if (!uniqueMap.has(email)) {
+          uniqueMap.set(email, person)
         }
       }
       recipients = Array.from(uniqueMap.values())
@@ -353,12 +390,46 @@ export class NotificationService {
       const rawRecipients = list.map((reg) => {
         if (reg.externalStudent) return { ...reg.externalStudent, type: "external_student" as const }
         return null
-      }).filter((r): r is NonNullable<typeof r> => r !== null)
+      }).filter((r): r is NonNullable<typeof r> => Boolean(r?.email))
 
-      const uniqueMap = new Map()
+      const uniqueMap = new Map<string, typeof rawRecipients[number]>()
       for (const person of rawRecipients) {
-        if (!uniqueMap.has(person.email)) {
-          uniqueMap.set(person.email, person)
+        const email = person.email.trim().toLowerCase()
+        if (!uniqueMap.has(email)) {
+          uniqueMap.set(email, person)
+        }
+      }
+      recipients = Array.from(uniqueMap.values())
+    } else if (audience === "alumni_drive_participants") {
+      const list = await db.driveRegistration.findMany({
+        where: { driveId },
+        select: {
+          alumni: {
+            select: {
+              id: true,
+              name: true,
+              personalEmail: true,
+            }
+          }
+        }
+      })
+      const rawRecipients = list.map((reg) => {
+        if (reg.alumni) {
+          return {
+            id: reg.alumni.id,
+            name: reg.alumni.name,
+            email: reg.alumni.personalEmail,
+            type: "alumni" as const,
+          }
+        }
+        return null
+      }).filter((r): r is NonNullable<typeof r> => Boolean(r?.email))
+
+      const uniqueMap = new Map<string, typeof rawRecipients[number]>()
+      for (const person of rawRecipients) {
+        const email = person.email.trim().toLowerCase()
+        if (!uniqueMap.has(email)) {
+          uniqueMap.set(email, person)
         }
       }
       recipients = Array.from(uniqueMap.values())

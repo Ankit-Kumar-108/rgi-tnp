@@ -13,6 +13,7 @@ import {
 import { runInBackground } from "@/lib/background";
 import { deleteMultipleFromR2 } from "@/lib/r2-delete";
 import { NotificationService } from "@/lib/notification-service";
+import { meetsCgpaCriteria, normalizeAcademicScoreToCgpa } from "@/lib/cgpa-utils";
 
 type ApprovedDrive = {
   id: string;
@@ -25,6 +26,7 @@ type ApprovedDrive = {
   minBatch: string;
   maxBatch: string;
   course: string;
+  minCGPA: number;
 };
 
 const DRIVE_NOTIFICATION_BATCH_SIZE = 50;
@@ -87,6 +89,7 @@ async function notifyEligibleStudentsForDrive(drive: ApprovedDrive, triggeredBy:
       id: true,
       name: true,
       email: true,
+      cgpa: true,
     },
   });
 
@@ -97,7 +100,7 @@ async function notifyEligibleStudentsForDrive(drive: ApprovedDrive, triggeredBy:
   }).format(new Date(drive.driveDate));
 
   for (const studentsBatch of chunkArray(
-    eligibleStudents.filter((student) => Boolean(student.email)),
+    eligibleStudents.filter((student) => Boolean(student.email) && meetsCgpaCriteria(student.cgpa, drive.minCGPA)),
     DRIVE_NOTIFICATION_BATCH_SIZE,
   )) {
     await Promise.allSettled(
@@ -151,6 +154,7 @@ async function sendApprovedDriveNotifications(driveIds: string[], triggeredBy: s
       minBatch: true,
       maxBatch: true,
       course: true,
+      minCGPA: true,
     },
   });
 
@@ -1018,7 +1022,7 @@ export async function PUT(req :NextRequest) {
         jobDescription: body.jobDescription,
         ctc: body.ctc,
         eligibleBranches: body.eligibleBranches,
-        minCGPA: body.minCGPA,
+        minCGPA: normalizeAcademicScoreToCgpa(body.minCGPA) ?? 0,
         minBatch: body.minBatch,
         maxBatch: body.maxBatch,
         duration: body.duration,
