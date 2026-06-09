@@ -5,7 +5,7 @@ import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
 export async function GET(req: NextRequest) {
   try {
     const alumni = await getVerifiedAuthPayloadFromRequest(req, ["alumni"]);
-    if (!alumni) {
+    if (!alumni || !alumni.id) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
