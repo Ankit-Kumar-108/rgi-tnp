@@ -113,16 +113,6 @@ export default function RGIProfile() {
       icon: Leaf,
       color: "from-amber-600/90 to-orange-900/90",
     },
-    {
-      name: "Arts, Management & Commerce",
-      colleges: "RAMCH — Radharaman Arts, Management & Commerce Hub",
-      desc: "Comprehensive programs in BBA, BCA, B.Com, and Arts — preparing future business leaders and creative professionals.",
-      image:
-        "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2940&auto=format&fit=crop",
-      span: "",
-      icon: BookOpen,
-      color: "from-blue-600/90 to-cyan-900/90",
-    },
   ];
 
   const values = [
@@ -280,7 +270,7 @@ export default function RGIProfile() {
                     group rapidly expanded its footprint across Engineering,
                     Pharmacy, Ayurveda, Nursing, and most recently{" "}
                     <span className="text-foreground font-semibold">
-                      Arts, Management & Commerce (RAMCH)
+                      Management
                     </span>
                     , creating a truly diversified academic ecosystem.
                   </p>
@@ -489,8 +479,7 @@ export default function RGIProfile() {
                 </h2>
                 <p className="text-foreground/50 max-w-xl mx-auto">
                   Seven specialized institutions delivering world-class
-                  expertise across engineering, pharmacy, medicine, nursing,
-                  arts, management & commerce.
+                  expertise across engineering, pharmacy, medicine, nursing, management.
                 </p>
               </div>
 

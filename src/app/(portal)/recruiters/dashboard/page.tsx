@@ -445,7 +445,7 @@ export default function RecruiterDashboard() {
                                 const allSelected = BRANCHES.every(b => form.eligibleBranches.includes(b));
                                 setForm({ ...form, eligibleBranches: allSelected ? "" : BRANCHES.join(",") });
                               }}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${BRANCHES.every(b => form.eligibleBranches.includes(b)) ? "bg-foreground text-background border-foreground shadow-sm" : "bg-transparent border-border text-foreground hover:bg-muted"}`}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${BRANCHES.every(b => form.eligibleBranches.includes(b)) ? "bg-brand text-background border-foreground shadow-sm" : "bg-transparent border-border text-foreground hover:bg-muted"}`}
                             >Select All</button>
                             {BRANCHES.map((b) => (
                               <button key={b} type="button"
@@ -454,7 +454,7 @@ export default function RecruiterDashboard() {
                                   const updated = arr.includes(b) ? arr.filter((x) => x !== b) : [...arr, b];
                                   setForm({ ...form, eligibleBranches: updated.join(",") });
                                 }}
-                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${form.eligibleBranches.includes(b) ? "bg-foreground text-background border-foreground shadow-sm" : "bg-transparent border-border text-foreground hover:bg-muted"}`}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${form.eligibleBranches.includes(b) ? "bg-brand text-background border-foreground shadow-sm" : "bg-transparent border-border text-foreground hover:bg-muted"}`}
                               >{b}</button>
                             ))}
                           </div>

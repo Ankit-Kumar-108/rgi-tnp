@@ -41,14 +41,14 @@ export default function PublicOpenDrivesPage() {
             setIsModalOpen(false);
             setSelectedDrive(null);
           }}
-          onSuccess={() => {}} // Won't be called in publicMode
+          onSuccess={() => { }} // Won't be called in publicMode
           publicMode={true}
           role="external_student"
         />
       )}
       <div className="bg-[#fcfbf9] dark:bg-background text-foreground antialiased font-sans flex flex-col min-h-screen">
         <main className="flex-1 w-full pt-20 pb-24">
-          
+
           {/* Hero Section */}
           <section className="max-w-7xl mx-auto px-5 md:px-8 mb-16 md:mb-24 mt-8">
             <div className="mb-12 text-center md:text-left animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -56,14 +56,14 @@ export default function PublicOpenDrivesPage() {
                 Global Opportunities
               </span>
               <h1 className="text-4xl md:text-6xl lg:text-[5rem] font-serif tracking-tight leading-tight text-foreground mb-6">
-                Open Campus <br className="hidden md:block" />
+                Open Campus {" "}
                 <span className="italic text-brand">Drives.</span>
               </h1>
               <p className="text-base md:text-lg text-muted-foreground font-light max-w-2xl">
                 Explore exciting placement opportunities available for students from all colleges. Register and start your journey with top organizations.
               </p>
             </div>
-            
+
             <div className="w-full border-b border-border/60 pb-4 max-w-3xl hidden md:block"></div>
           </section>
 
@@ -80,55 +80,85 @@ export default function PublicOpenDrivesPage() {
                 <p className="text-sm">There are currently no open campus drives scheduled. Check back soon!</p>
               </div>
             ) : (
-              <div className="columns-1 md:columns-2 lg:columns-3 gap-5 md:gap-8 space-y-5 md:space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                 {drives.map((drive, index) => (
-                  <div 
-                    key={drive.id} 
-                    className="break-inside-avoid group flex flex-col bg-card p-6 md:p-8 rounded-2xl md:rounded-none md:rounded-tr-3xl md:rounded-bl-3xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-border/40 hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] hover:border-brand/20 transition-all duration-500 animate-in fade-in slide-in-from-bottom-8 fill-mode-both"
+                  <div
+                    key={drive.id}
+                    className="group flex flex-col bg-card hover:bg-card/80 border border-border/80 hover:border-brand/30 rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.01)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.04)] transition-all duration-300 relative overflow-hidden h-full animate-in fade-in slide-in-from-bottom-8 fill-mode-both"
                     style={{ animationDelay: `${(index % 12) * 50}ms` }}
                   >
-                    <div className="flex items-start justify-between mb-6">
-                      <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center border border-border shrink-0">
-                        <Building2 className="w-5 h-5 text-muted-foreground group-hover:text-brand transition-colors duration-300" />
-                      </div>
-                      <span className="text-[10px] font-bold tracking-widest uppercase text-brand">
-                        {drive.ctc}
-                      </span>
-                    </div>
+                    {/* Top Accent Gradient Line */}
+                    <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-brand/20 via-brand to-brand/20 transform -translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                     
-                    <h3 className="font-serif text-xl md:text-2xl text-foreground mb-1 group-hover:text-brand transition-colors duration-300 leading-tight">
-                      {drive.roleName}
-                    </h3>
-                    <p className="text-sm text-muted-foreground font-medium mb-6">
-                      {drive.companyName}
-                    </p>
-
-                    <div className="space-y-3 mb-8 mt-auto flex-1">
-                      <div className="flex items-center gap-3 text-sm text-foreground/80">
-                        <CalendarDays className="w-4 h-4 text-brand" />
-                        <span>Date: {new Date(drive.driveDate).toLocaleDateString()}</span>
+                    {/* Header */}
+                    <div className="flex items-start justify-between mb-5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-brand/5 border border-brand/10 flex items-center justify-center text-brand group-hover:scale-110 transition-transform duration-300 shrink-0">
+                          <Building2 className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-base text-foreground line-clamp-1">
+                            {drive.companyName}
+                          </h3>
+                          <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                            {drive.driveType} Campus
+                          </p>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-3 text-sm text-foreground/80">
-                        <Rocket className="w-4 h-4 text-brand" />
-                        <span>Branches: <span className="text-xs">{drive.eligibleBranches}</span></span>
-                      </div>
-                      <div className="flex items-center gap-3 text-sm text-foreground/80">
-                        <MapPin className="w-4 h-4 text-brand" />
-                        <span>Type: {drive.driveType} Campus</span>
+                      
+                      {/* CTC Badge */}
+                      <div className="px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400 text-xs font-bold whitespace-nowrap">
+                        {drive.ctc}
                       </div>
                     </div>
 
-                    <div className="pt-6 border-t border-border/40 mt-auto">
-                      <button 
-                        onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
-                        className="flex items-center justify-between w-full text-sm font-bold uppercase tracking-widest text-muted-foreground group-hover:text-brand transition-colors duration-300"
-                      >
-                        <span>View Details</span>
-                        <span className="w-6 h-6 rounded-full border border-border flex items-center justify-center group-hover:border-brand transition-colors">
-                          <span className="text-brand">→</span>
+                    {/* Role Title */}
+                    <div className="mb-5">
+                      <h4 className="font-serif text-xl text-foreground font-medium tracking-tight line-clamp-1 group-hover:text-brand transition-colors duration-300">
+                        {drive.roleName}
+                      </h4>
+                      {drive.jobType && (
+                        <span className="inline-block mt-1 text-[10px] text-muted-foreground font-bold uppercase tracking-wider px-2 py-0.5 bg-muted rounded border border-border/60">
+                          {drive.jobType}
                         </span>
-                      </button>
+                      )}
                     </div>
+
+                    {/* Key Details Grid */}
+                    <div className="grid grid-cols-2 gap-3 mb-6 mt-auto">
+                      <div className="p-3 rounded-2xl bg-muted/40 border border-border/40 hover:bg-muted/60 transition-colors">
+                        <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider block mb-1">Drive Date</span>
+                        <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                          <CalendarDays className="w-3.5 h-3.5 text-brand shrink-0" />
+                          <span>{new Date(drive.driveDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                        </div>
+                      </div>
+
+                      <div className="p-3 rounded-2xl bg-muted/40 border border-border/40 hover:bg-muted/60 transition-colors">
+                        <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider block mb-1">Cutoff Criteria</span>
+                        <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                          <Rocket className="w-3.5 h-3.5 text-brand shrink-0" />
+                          <span>{drive.minCGPA ? `${drive.minCGPA} CGPA` : "No CGPA"}</span>
+                        </div>
+                      </div>
+
+                      <div className="col-span-2 p-3 rounded-2xl bg-muted/40 border border-border/40 hover:bg-muted/60 transition-colors">
+                        <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider block mb-1">Eligible Branches</span>
+                        <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                          <MapPin className="w-3.5 h-3.5 text-brand shrink-0" />
+                          <span className="line-clamp-1">{drive.eligibleBranches || "All Branches"}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Action Button */}
+                    <button
+                      onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
+                      className="w-full py-3 px-4 rounded-2xl bg-brand text-primary-foreground hover:bg-brand/90 hover:shadow-lg hover:shadow-brand/20 text-xs font-bold tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 group/btn mt-2"
+                    >
+                      Apply & View Details
+                      <span className="text-sm transform group-hover/btn:translate-x-1 transition-transform duration-300">→</span>
+                    </button>
                   </div>
                 ))}
               </div>

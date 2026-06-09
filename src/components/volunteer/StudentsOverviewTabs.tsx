@@ -35,7 +35,7 @@ interface StudentsOverviewTabsProps {
 }
 
 const statusColors: Record<string, { bg: string; badge: string; text: string }> = {
-    Applied: { bg: "bg-card/500/20", badge: "bg-card text-text", text: "gray" },
+    Applied: { bg: "bg-muted/20", badge: "bg-muted text-muted-foreground", text: "gray" },
     Selected: { bg: "bg-green-500/20", badge: "bg-green-100 text-green-700", text: "green" },
     Rejected: { bg: "bg-red-500/20", badge: "bg-red-100 text-red-700", text: "red" },
     Shortlisted: { bg: "bg-yellow-500/20", badge: "bg-yellow-100 text-yellow-700", text: "yellow" },
@@ -71,10 +71,10 @@ export default function StudentsOverviewTabs({ students, loading = false }: Stud
             const query = searchQuery.toLowerCase();
             filtered = filtered.filter(
                 (s) =>
-                    s.name.toLowerCase().includes(query) ||
-                    s.enrollmentNumber.toLowerCase().includes(query) ||
-                    s.email.toLowerCase().includes(query) ||
-                    s.companyName.toLowerCase().includes(query)
+                    (s.name || "").toLowerCase().includes(query) ||
+                    (s.enrollmentNumber || "").toLowerCase().includes(query) ||
+                    (s.email || "").toLowerCase().includes(query) ||
+                    (s.companyName || "").toLowerCase().includes(query)
             );
         }
 
@@ -181,7 +181,7 @@ export default function StudentsOverviewTabs({ students, loading = false }: Stud
                             </thead>
                             <tbody className="divide-y divide-border">
                                 {filteredStudents.map((student) => {
-                                    const statusColor = statusColors[student.status];
+                                    const statusColor = statusColors[student.status] || statusColors.Applied;
                                     return (
                                         <tr
                                             key={`${student.registrationId}`}
@@ -192,32 +192,32 @@ export default function StudentsOverviewTabs({ students, loading = false }: Stud
                                                     {student.profileImageUrl ? (
                                                         <img
                                                             src={student.profileImageUrl}
-                                                            alt={student.name}
+                                                            alt={student.name || "Student"}
                                                             className="w-10 h-10 rounded-full object-cover shrink-0"
                                                         />
                                                     ) : (
                                                         <div className="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center text-xs font-semibold text-brand">
-                                                            {student.name.charAt(0).toUpperCase()}
+                                                            {(student.name || "S").charAt(0).toUpperCase()}
                                                         </div>
                                                     )}
                                                     <div>
                                                         <div className="font-medium text-foreground">
-                                                            {student.name}
+                                                            {student.name || "Unknown"}
                                                         </div>
                                                         <div className="text-xs text-muted-foreground">
-                                                            {student.email}
+                                                            {student.email || ""}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-4 py-3 text-sm text-foreground">
-                                                {student.enrollmentNumber}
+                                                {student.enrollmentNumber || "N/A"}
                                             </td>
                                             <td className="px-4 py-3 text-sm text-foreground">
-                                                {student.branch}
+                                                {student.branch || "N/A"}
                                             </td>
                                             <td className="px-4 py-3 text-sm text-foreground font-medium">
-                                                {student.cgpa.toFixed(2)}
+                                                {student.cgpa ? student.cgpa.toFixed(2) : "0.00"}
                                             </td>
                                             <td className="px-4 py-3 text-sm">
                                                 <div className="font-medium text-foreground">
@@ -247,7 +247,7 @@ export default function StudentsOverviewTabs({ students, loading = false }: Stud
             <div className="md:hidden space-y-3">
                 {filteredStudents.length === 0 ? null : (
                     filteredStudents.map((student) => {
-                        const statusColor = statusColors[student.status];
+                        const statusColor = statusColors[student.status] || statusColors.Applied;
                         return (
                             <div
                                 key={`${student.registrationId}`}
@@ -258,20 +258,20 @@ export default function StudentsOverviewTabs({ students, loading = false }: Stud
                                         {student.profileImageUrl ? (
                                             <img
                                                 src={student.profileImageUrl}
-                                                alt={student.name}
+                                                alt={student.name || "Student"}
                                                 className="w-10 h-10 rounded-full object-cover shrink-0"
                                             />
                                         ) : (
                                             <div className="w-10 h-10 rounded-full bg-brand/10 flex items-center justify-center text-sm font-semibold text-brand shrink-0">
-                                                {student.name.charAt(0).toUpperCase()}
+                                                {(student.name || "S").charAt(0).toUpperCase()}
                                             </div>
                                         )}
                                         <div className="min-w-0">
                                             <div className="font-semibold text-foreground truncate">
-                                                {student.name}
+                                                {student.name || "Unknown"}
                                             </div>
                                             <div className="text-xs text-muted-foreground truncate">
-                                                {student.enrollmentNumber}
+                                                {student.enrollmentNumber || ""}
                                             </div>
                                         </div>
                                     </div>
@@ -284,11 +284,11 @@ export default function StudentsOverviewTabs({ students, loading = false }: Stud
                                 <div className="grid grid-cols-2 gap-2 text-xs">
                                     <div>
                                         <span className="text-muted-foreground">Branch:</span>{" "}
-                                        <span className="font-medium">{student.branch}</span>
+                                        <span className="font-medium">{student.branch || "N/A"}</span>
                                     </div>
                                     <div>
                                         <span className="text-muted-foreground">CGPA:</span>{" "}
-                                        <span className="font-medium">{student.cgpa.toFixed(2)}</span>
+                                        <span className="font-medium">{student.cgpa ? student.cgpa.toFixed(2) : "0.00"}</span>
                                     </div>
                                     <div className="col-span-2">
                                         <span className="text-muted-foreground">Company:</span>{" "}

@@ -303,7 +303,7 @@ export default function AlumniDiscovery() {
             <div className="max-w-3xl mx-auto space-y-2 sm:space-y-3 md:space-y-4">
               <h4 className="text-brand font-bold tracking-widest uppercase text-sm mb-6">Global Directory</h4>
               <h1 className="text-4xl md:text-6xl lg:text-[5rem] font-serif tracking-tight leading-tight text-foreground mb-6">
-                Discovery <span className="italic">Console.</span>
+                Discovery <span className="italic text-brand">Console.</span>
               </h1>
               <p className="text-sm sm:text-base md:text-lg text-muted-foreground font-light leading-relaxed max-w-2xl mx-auto">
                 Instantly explore the global Radharaman Group of Institutes (RGI) network.
