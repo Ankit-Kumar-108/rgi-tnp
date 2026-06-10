@@ -5,6 +5,7 @@ import { getDb } from "@/lib/db";
 import { NotificationService } from "@/lib/notification-service";
 import { driveRegistrationTemplate } from "@/lib/email-templates";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
+import { formatCgpaCriteria, meetsCgpaCriteria } from "@/lib/cgpa-utils";
 
 // Same token extraction pattern as your student/drives/route.ts
 
@@ -14,6 +15,11 @@ function parseBranches(branchesStr: string): Set<string> {
   return new Set(
     branchesStr.split(',').map(b => b.trim()).filter(b => b.length > 0)
   );
+}
+
+function extractBatchNumber(batchStr: string): number {
+  if (!batchStr) return NaN;
+  return parseInt(batchStr.split('-').pop() || "0", 10);
 }
 
 // GET: Fetch drives eligible for this alumni
@@ -32,7 +38,7 @@ export async function GET(req: NextRequest) {
     // Fetch alumni data to know their branch/course/batch for eligibility
     const alumniData = await db.alumni.findUnique({
       where: { id: alumni.id },
-      select: { id: true, branch: true, course: true, batch: true },
+      select: { id: true, branch: true, course: true, batch: true, cgpa: true, gender: true },
     });
 
     if (!alumniData) {
@@ -73,7 +79,26 @@ export async function GET(req: NextRequest) {
         if (!branches.has(alumniData.branch)) {
           return false;
         }
-        // We skip CGPA and gender checks for alumni — they're experienced
+        
+        // Batch check
+        const alumniBatchNum = extractBatchNumber(alumniData.batch);
+        const minBatchNum = extractBatchNumber(drive.minBatch);
+        const maxBatchNum = extractBatchNumber(drive.maxBatch);
+        if (!isNaN(alumniBatchNum) && !isNaN(minBatchNum) && !isNaN(maxBatchNum) && 
+            (alumniBatchNum < minBatchNum || alumniBatchNum > maxBatchNum)) {
+          return false;
+        }
+        
+        // CGPA check
+        if (!meetsCgpaCriteria(alumniData.cgpa, drive.minCGPA)) {
+          return false;
+        }
+        
+        // Gender check
+        if (drive.genderPreference !== "Both" && alumniData.gender !== drive.genderPreference) {
+          return false;
+        }
+
         return true;
       })
       .map((drive) => ({
@@ -169,6 +194,34 @@ export async function POST(req: NextRequest) {
     if (!eligibleBranches.has(alumniData.branch)) {
       return NextResponse.json(
         { success: false, message: "Your branch is not eligible for this drive" },
+        { status: 403 }
+      );
+    }
+
+    // Check: batch eligible?
+    const alumniBatchNum = extractBatchNumber(alumniData.batch);
+    const minBatchNum = extractBatchNumber(drive.minBatch);
+    const maxBatchNum = extractBatchNumber(drive.maxBatch);
+    if (!isNaN(alumniBatchNum) && !isNaN(minBatchNum) && !isNaN(maxBatchNum) && 
+        (alumniBatchNum < minBatchNum || alumniBatchNum > maxBatchNum)) {
+      return NextResponse.json(
+        { success: false, message: `Your batch is not eligible. Eligible range: ${drive.minBatch} to ${drive.maxBatch}` },
+        { status: 403 }
+      );
+    }
+    
+    // Check: CGPA eligible?
+    if (!meetsCgpaCriteria(alumniData.cgpa, drive.minCGPA)) {
+      return NextResponse.json(
+        { success: false, message: `Minimum CGPA ${formatCgpaCriteria(drive.minCGPA)} required` },
+        { status: 403 }
+      );
+    }
+    
+    // Check: Gender eligible?
+    if (drive.genderPreference !== "Both" && alumniData.gender !== drive.genderPreference) {
+      return NextResponse.json(
+        { success: false, message: `This drive is open to ${drive.genderPreference} candidates only` },
         { status: 403 }
       );
     }

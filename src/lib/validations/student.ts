@@ -25,8 +25,8 @@ export const registrationSchema = z.object({
     .max(8, 'Semester cannot be more than 8'),
   cgpa: z.coerce
     .number()
-    .min(10, 'Graduation percentage must be at least 10')
-    .max(100, 'Graduation percentage cannot be more than 100'),
+    .min(0, 'CGPA must be at least 0')
+    .max(10, 'CGPA cannot be more than 10'),
   batch: z.string().trim().min(1, 'Batch is required'),
   phoneNumber: z
     .string()

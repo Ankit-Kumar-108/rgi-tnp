@@ -116,11 +116,11 @@ export default function ProfileCompletionForm({
                 </div>
               )}
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Graduation/ Diploma Percentage</label>
-                <input type="number" step="0.01" min="10" max="100"
+                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Graduation CGPA (Out of 10)</label>
+                <input type="number" step="0.01" min="0" max="10"
                   value={profileForm.cgpa} onChange={(e) => setProfileForm({ ...profileForm, cgpa: e.target.value })}
                   className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
-                  placeholder="e.g. 82.5" />
+                  placeholder="e.g. 8.25" />
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Active Backlogs</label>

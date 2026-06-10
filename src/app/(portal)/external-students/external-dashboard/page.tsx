@@ -376,11 +376,11 @@ export default function ExternalStudentDashboard() {
                   </div>
                   )}
                   <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Graduation Percentage</label>
-                    <input type="number" step="0.01" min="10" max="100"
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Graduation CGPA (Out of 10)</label>
+                    <input type="number" step="0.01" min="0" max="10"
                       value={profileForm.cgpa} onChange={(e) => setProfileForm({ ...profileForm, cgpa: e.target.value })}
                       className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
-                      placeholder="e.g. 78.30" />
+                      placeholder="e.g. 8.5" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Active Backlogs</label>
@@ -523,8 +523,8 @@ export default function ExternalStudentDashboard() {
                     {/* Horizontal Grid Stats */}
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-0 pt-6 border-t border-border">
                       <div className="md:pr-6 md:border-r border-border">
-                        <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Graduation %</p>
-                        <p className="text-xl md:text-2xl font-bold text-brand">{student?.cgpa ? `${student.cgpa}%` : "N/A"}</p>
+                        <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Graduation CGPA</p>
+                        <p className="text-xl md:text-2xl font-bold text-brand">{student?.cgpa ? `${Number(student.cgpa).toFixed(2)}` : "N/A"}</p>
                       </div>
                       <div className="md:px-6 md:border-r border-border">
                         <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Branch</p>

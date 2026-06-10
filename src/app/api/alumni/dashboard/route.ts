@@ -2,6 +2,18 @@ export const runtime = 'edge';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
+import { formatCgpaCriteria, meetsCgpaCriteria } from "@/lib/cgpa-utils";
+
+function parseBranches(branchesStr: string): Set<string> {
+  return new Set(
+    branchesStr.split(',').map(b => b.trim()).filter(b => b.length > 0)
+  );
+}
+
+function extractBatchNumber(batchStr: string): number {
+  if (!batchStr) return NaN;
+  return parseInt(batchStr.split('-').pop() || "0", 10);
+}
 export async function GET(req: NextRequest) {
   try {
     const alumni = await getVerifiedAuthPayloadFromRequest(req, ["alumni"]);
@@ -18,6 +30,7 @@ export async function GET(req: NextRequest) {
         linkedInUrl: true, phoneNumber: true, isProfileComplete: true,
         isVerified: true, about: true, branch: true, batch: true,
         course: true, profileImageUrl: true, privacyJson: true,
+        cgpa: true, gender: true,
       },
     });
 
@@ -72,12 +85,45 @@ export async function GET(req: NextRequest) {
         orderBy: { driveDate: "desc" },
       }),
     ]);
-    // Map drives to add isRegistered flag
-    const formattedDrives = alumniDrives.map((d: any) => ({
-      ...d,
-      isRegistered: d.registrations.length > 0,
-      registrations: undefined,
-    }));
+    // Map drives to add isRegistered flag and filter eligible drives
+    const formattedDrives = alumniDrives
+      .filter((drive: any) => {
+        // Course check
+        if (drive.course !== "All" && !drive.course.includes(alumniData.course)) {
+          return false;
+        }
+        // Branch check
+        const branches = parseBranches(drive.eligibleBranches);
+        if (!branches.has(alumniData.branch)) {
+          return false;
+        }
+        
+        // Batch check
+        const alumniBatchNum = extractBatchNumber(alumniData.batch);
+        const minBatchNum = extractBatchNumber(drive.minBatch);
+        const maxBatchNum = extractBatchNumber(drive.maxBatch);
+        if (!isNaN(alumniBatchNum) && !isNaN(minBatchNum) && !isNaN(maxBatchNum) && 
+            (alumniBatchNum < minBatchNum || alumniBatchNum > maxBatchNum)) {
+          return false;
+        }
+        
+        // CGPA check
+        if (!meetsCgpaCriteria(alumniData.cgpa, drive.minCGPA)) {
+          return false;
+        }
+        
+        // Gender check
+        if (drive.genderPreference !== "Both" && alumniData.gender !== drive.genderPreference) {
+          return false;
+        }
+
+        return true;
+      })
+      .map((d: any) => ({
+        ...d,
+        isRegistered: d.registrations.length > 0,
+        registrations: undefined,
+      }));
     
     const registeredDriveIds = registrations.map((r: any) => r.driveId);
     

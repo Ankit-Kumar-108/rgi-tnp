@@ -37,6 +37,9 @@ export const referralSchema = z.object({
     minCGPA: z.string().trim().optional().transform(v => v === '' ? undefined : v).refine(
         (val) => !val || !isNaN(parseFloat(val)),
         'Min CGPA must be a valid number'
+    ).refine(
+        (val) => !val || (parseFloat(val) >= 0 && parseFloat(val) <= 10),
+        'Min CGPA must be between 0 and 10'
     ),
     experience: z.string().trim().optional().transform(v => v === '' ? undefined : v),
     batchEligible: z.string().trim().optional().transform(v => v === '' ? undefined : v),
