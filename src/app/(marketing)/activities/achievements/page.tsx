@@ -252,7 +252,7 @@ export default function AchievementsPage() {
                         key={i}
                         className="py-3.5 md:py-6 px-2.5 md:px-8 flex items-center gap-2 md:gap-4"
                       >
-                        <div className="w-10 h-10 rounded-xl bg-brand/20 flex items-center justify-center shrink-0 hidden md:flex">
+                        <div className="w-10 h-10 rounded-lg bg-brand/20 flex items-center justify-center shrink-0 hidden md:flex">
                           <Icon className="w-5 h-5 text-brand" />
                         </div>
                         <div>
@@ -296,11 +296,11 @@ export default function AchievementsPage() {
                 return (
                   <div
                     key={i}
-                    className="bg-card rounded-xl md:rounded-2xl p-5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 hover:-translate-y-0.5 group relative overflow-hidden"
+                    className="bg-card rounded-lg p-5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 hover:-translate-y-0.5 group relative overflow-hidden"
                   >
                     <div className="absolute top-0 right-0 w-20 h-20 bg-brand/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-brand/10 transition-colors"></div>
                     <div className="relative z-10">
-                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-brand/10 flex items-center justify-center mb-4 group-hover:bg-brand/20 transition-colors">
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-brand/10 flex items-center justify-center mb-4 group-hover:bg-brand/20 transition-colors">
                         <Icon className="w-5 h-5 md:w-6 md:h-6 text-brand" />
                       </div>
                       <h3 className="text-sm md:text-base font-bold text-foreground mb-2 leading-snug">
@@ -316,8 +316,8 @@ export default function AchievementsPage() {
             </div>
 
             {/* Chairman meets APJ Abdul Kalam highlight */}
-            <div className="mt-8 md:mt-12 bg-muted rounded-xl md:rounded-2xl p-5 md:p-8 border border-border flex flex-col md:flex-row items-center gap-5 md:gap-8">
-              <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-brand/10 flex items-center justify-center shrink-0">
+            <div className="mt-8 md:mt-12 bg-muted rounded-lg  p-5 md:p-8 border border-border flex flex-col md:flex-row items-center gap-5 md:gap-8">
+              <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl bg-brand/10 flex items-center justify-center shrink-0">
                 <Star className="w-7 h-7 md:w-8 md:h-8 text-brand" />
               </div>
               <div>
@@ -359,10 +359,10 @@ export default function AchievementsPage() {
                   return (
                     <div
                       key={i}
-                      className="bg-card rounded-xl md:rounded-2xl p-5 md:p-8 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 hover:-translate-y-0.5 group"
+                      className="bg-card rounded-lg  p-5 md:p-8 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 hover:-translate-y-0.5 group"
                     >
                       <div className="flex items-center gap-3 md:gap-4 mb-4">
-                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-brand/10 flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
+                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-brand/10 flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
                           <Icon className="w-5 h-5 md:w-6 md:h-6 text-brand" />
                         </div>
                         <div>
@@ -411,10 +411,10 @@ export default function AchievementsPage() {
                     return (
                       <div
                         key={i}
-                        className="bg-card rounded-xl md:rounded-2xl p-5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 group"
+                        className="bg-card rounded-lg  p-5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 group"
                       >
                         <div className="flex items-start gap-3 md:gap-4">
-                          <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-brand/10 flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
+                          <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-brand/10 flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
                             <Icon className="w-5 h-5 md:w-6 md:h-6 text-brand" />
                           </div>
                           <div>
@@ -437,7 +437,7 @@ export default function AchievementsPage() {
 
               {/* Image */}
               <div className="space-y-4">
-                <div className="rounded-2xl md:rounded-3xl overflow-hidden relative h-56 sm:h-72 md:h-96 group">
+                <div className="rounded-lg md:rounded-xl overflow-hidden relative h-56 sm:h-72 md:h-96 group">
                   <Image
                     className="object-cover group-hover:scale-105 transition-transform duration-700"
                     alt="Academic achievements at RGI"
@@ -447,7 +447,7 @@ export default function AchievementsPage() {
                   />
                 </div>
                 <div className="grid grid-cols-3 gap-3 md:gap-4">
-                  <div className="bg-brand rounded-xl md:rounded-2xl p-4 md:p-6 text-center">
+                  <div className="bg-brand rounded-lg  p-4 md:p-6 text-center">
                     <div className="text-xl md:text-3xl font-black text-white">
                       10+
                     </div>
@@ -455,7 +455,7 @@ export default function AchievementsPage() {
                       University Rankers
                     </div>
                   </div>
-                  <div className="bg-card rounded-xl md:rounded-2xl p-4 md:p-6 text-center border border-border shadow-[var(--shadow-sm)]">
+                  <div className="bg-card rounded-lg  p-4 md:p-6 text-center border border-border shadow-[var(--shadow-sm)]">
                     <div className="text-xl md:text-3xl font-black text-brand">
                       2
                     </div>
@@ -463,7 +463,7 @@ export default function AchievementsPage() {
                       Gold Medals
                     </div>
                   </div>
-                  <div className="bg-card rounded-xl md:rounded-2xl p-4 md:p-6 text-center border border-border shadow-[var(--shadow-sm)]">
+                  <div className="bg-card rounded-lg  p-4 md:p-6 text-center border border-border shadow-[var(--shadow-sm)]">
                     <div className="text-xl md:text-3xl font-black text-brand">
                       A
                     </div>
@@ -500,8 +500,8 @@ export default function AchievementsPage() {
                   </p>
 
                   <div className="space-y-3 md:space-y-4 mb-8">
-                    <div className="bg-card/80 border border-border rounded-xl p-4 md:p-5 flex items-center gap-3 md:gap-4">
-                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-brand/20 flex items-center justify-center shrink-0">
+                    <div className="bg-card/80 border border-border rounded-lg p-4 md:p-5 flex items-center gap-3 md:gap-4">
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-brand/20 flex items-center justify-center shrink-0">
                         <Zap className="w-5 h-5 md:w-6 md:h-6 text-brand" />
                       </div>
                       <div>
@@ -514,8 +514,8 @@ export default function AchievementsPage() {
                         </p>
                       </div>
                     </div>
-                    <div className="bg-card/80 border border-border rounded-xl p-4 md:p-5 flex items-center gap-3 md:gap-4">
-                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-brand/20 flex items-center justify-center shrink-0">
+                    <div className="bg-card/80 border border-border rounded-lg p-4 md:p-5 flex items-center gap-3 md:gap-4">
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-brand/20 flex items-center justify-center shrink-0">
                         <Users className="w-5 h-5 md:w-6 md:h-6 text-brand" />
                       </div>
                       <div>
@@ -558,14 +558,14 @@ export default function AchievementsPage() {
                 {/* Image Grid */}
                 <div className="grid grid-cols-2 gap-3 md:gap-4">
                   <div className="space-y-3 md:space-y-4">
-                    <div className="rounded-xl md:rounded-2xl overflow-hidden aspect-square shadow-lg">
+                    <div className="rounded-lg  overflow-hidden aspect-square shadow-lg">
                       <img
                         alt="VIHAN Technofest at RGI"
                         className="w-full h-full object-cover object-top"
                         src="/images/vihan1.png"
                       />
                     </div>
-                    <div className="bg-brand rounded-xl md:rounded-2xl p-5 md:p-6 text-center">
+                    <div className="bg-brand rounded-lg  p-5 md:p-6 text-center">
                       <span className="text-2xl md:text-4xl font-black text-white block">
                         1.5k+
                       </span>
@@ -575,7 +575,7 @@ export default function AchievementsPage() {
                     </div>
                   </div>
                   <div className="space-y-3 md:space-y-4 pt-6 md:pt-10">
-                    <div className="bg-card border border-border rounded-xl md:rounded-2xl p-5 md:p-6 text-center">
+                    <div className="bg-card border border-border rounded-lg  p-5 md:p-6 text-center">
                       <span className="text-2xl md:text-4xl font-black text-brand block">
                         50+
                       </span>
@@ -583,7 +583,7 @@ export default function AchievementsPage() {
                         Events
                       </span>
                     </div>
-                    <div className="rounded-xl md:rounded-2xl overflow-hidden aspect-[3/4] shadow-lg">
+                    <div className="rounded-lg  overflow-hidden aspect-[3/4] shadow-lg">
                       <img
                         alt="Cultural performance at VIHAN"
                         className="w-full h-full object-cover"
@@ -601,14 +601,14 @@ export default function AchievementsPage() {
             <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
               {/* Images */}
               <div className="grid grid-cols-2 gap-3 md:gap-4 order-2 lg:order-1">
-                <div className="rounded-xl md:rounded-2xl overflow-hidden aspect-[4/5] shadow-[var(--shadow-md)]">
+                <div className="rounded-lg  overflow-hidden aspect-[4/5] shadow-[var(--shadow-md)]">
                   <img
                     alt="Basketball at RGI"
                     className="w-full h-full object-cover"
                     src="/images/basketball.png"
                   />
                 </div>
-                <div className="rounded-xl md:rounded-2xl overflow-hidden aspect-[4/5] shadow-[var(--shadow-md)] mt-6 md:mt-10">
+                <div className="rounded-lg  overflow-hidden aspect-[4/5] shadow-[var(--shadow-md)] mt-6 md:mt-10">
                   <img
                     alt="Track & Field at RGI"
                     className="w-full h-full object-cover"
@@ -641,9 +641,9 @@ export default function AchievementsPage() {
                     return (
                       <div
                         key={i}
-                        className="bg-card rounded-xl md:rounded-2xl p-4 md:p-5 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 flex items-start gap-3 md:gap-4 group"
+                        className="bg-card rounded-lg  p-4 md:p-5 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 flex items-start gap-3 md:gap-4 group"
                       >
-                        <div className="w-10 h-10 rounded-xl bg-brand/10 flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
+                        <div className="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
                           <Icon className="w-5 h-5 text-brand" />
                         </div>
                         <div>
@@ -664,7 +664,7 @@ export default function AchievementsPage() {
 
           {/* CTA BANNER */}
           <section className="max-w-7xl mx-auto px-5 md:px-8 lg:px-20 pb-14 md:pb-28">
-            <div className="bg-brand rounded-2xl md:rounded-[2rem] p-6 md:p-16 relative overflow-hidden">
+            <div className="bg-brand rounded-lg md: p-6 md:p-16 relative overflow-hidden">
               {/* Decorative */}
               <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
               <div className="absolute -bottom-20 -left-20 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>

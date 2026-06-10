@@ -190,8 +190,8 @@ export default function CertificatesPage() {
               </h2>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center bg-card rounded-2xl md:rounded-3xl p-5 md:p-10 border border-border shadow-[var(--shadow-md)]">
-              <div className="relative group rounded-xl md:rounded-2xl overflow-hidden h-52 sm:h-64 md:h-80">
+            <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center bg-card rounded-lg md:rounded-xl p-5 md:p-10 border border-border shadow-[var(--shadow-md)]">
+              <div className="relative group rounded-lg overflow-hidden h-52 sm:h-64 md:h-80">
                 <Image
                   alt="Certificate of Appreciation from TCS"
                   className="object-cover group-hover:scale-105 transition-transform duration-700"
@@ -199,7 +199,7 @@ export default function CertificatesPage() {
                   fill
                   sizes="(max-width: 1024px) 100vw, 50vw"
                 />
-                <div className="absolute bottom-3 right-3 md:bottom-4 md:right-4 bg-background/90 backdrop-blur-md p-2.5 md:p-3 rounded-xl border border-border shadow-sm">
+                <div className="absolute bottom-3 right-3 md:bottom-4 md:right-4 bg-background/90 backdrop-blur-md p-2.5 md:p-3 rounded-lg border border-border shadow-sm">
                   <BadgeCheck className="text-brand w-6 h-6 md:w-8 md:h-8" />
                 </div>
               </div>
@@ -219,11 +219,11 @@ export default function CertificatesPage() {
                   professionals.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                  <div className="flex items-center gap-3 p-3.5 md:p-4 bg-muted rounded-xl border border-border/50">
+                  <div className="flex items-center gap-3 p-3.5 md:p-4 bg-muted rounded-lg border border-border/50">
                     <Handshake className="text-brand w-5 h-5 md:w-6 md:h-6 shrink-0" />
                     <span className="text-xs md:text-sm font-medium">Strategic Academic Partner</span>
                   </div>
-                  <div className="flex items-center gap-3 p-3.5 md:p-4 bg-muted rounded-xl border border-border/50">
+                  <div className="flex items-center gap-3 p-3.5 md:p-4 bg-muted rounded-lg border border-border/50">
                     <Award className="text-brand w-5 h-5 md:w-6 md:h-6 shrink-0" />
                     <span className="text-xs md:text-sm font-medium">Tier-1 Placement Priority</span>
                   </div>
@@ -255,10 +255,10 @@ export default function CertificatesPage() {
                   return (
                     <div
                       key={i}
-                      className="bg-card rounded-xl md:rounded-2xl p-5 md:p-8 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 hover:-translate-y-0.5 group"
+                      className="bg-card rounded-lg p-5 md:p-8 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 hover:-translate-y-0.5 group"
                     >
                       <div className="flex items-center gap-3 md:gap-4 mb-4">
-                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-brand/10 flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
+                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-brand/10 flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
                           <Icon className="w-5 h-5 md:w-6 md:h-6 text-brand" />
                         </div>
                         <div>
@@ -293,7 +293,7 @@ export default function CertificatesPage() {
             </div>
 
             {/* Featured HCL Card */}
-            <div className="bg-brand rounded-xl md:rounded-2xl p-5 md:p-10 mb-4 md:mb-6 relative overflow-hidden">
+            <div className="bg-brand rounded-lg p-5 md:p-10 mb-4 md:mb-6 relative overflow-hidden">
               <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
               <div className="relative z-10 grid md:grid-cols-2 gap-6 md:gap-8 items-center">
                 <div>
@@ -308,7 +308,7 @@ export default function CertificatesPage() {
                   <span className="text-white/60 text-xs font-bold tracking-widest uppercase">
                     Verified Partner
                   </span>
-                  <button className="bg-white text-brand px-5 md:px-6 py-2.5 md:py-3 rounded-xl text-xs md:text-sm font-bold hover:bg-white/90 transition-colors cursor-pointer">
+                  <button className="bg-white text-brand px-5 md:px-6 py-2.5 md:py-3 rounded-lg text-xs md:text-sm font-bold hover:bg-white/90 transition-colors cursor-pointer">
                     View Letter
                   </button>
                 </div>
@@ -322,9 +322,9 @@ export default function CertificatesPage() {
                 return (
                   <div
                     key={i}
-                    className="bg-card rounded-xl md:rounded-2xl p-5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 hover:-translate-y-0.5 group flex flex-col"
+                    className="bg-card rounded-lg p-5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 hover:-translate-y-0.5 group flex flex-col"
                   >
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-brand/10 flex items-center justify-center mb-4 group-hover:bg-brand/20 transition-colors">
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-brand/10 flex items-center justify-center mb-4 group-hover:bg-brand/20 transition-colors">
                       <Icon className="w-5 h-5 md:w-6 md:h-6 text-brand" />
                     </div>
                     <h3 className="text-sm md:text-base font-bold text-foreground mb-1">{item.name}</h3>
@@ -349,7 +349,7 @@ export default function CertificatesPage() {
             <div className="max-w-7xl mx-auto px-5 md:px-8 lg:px-20 py-14 md:py-28 relative z-10">
               <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
                 <div className="relative">
-                  <div className="rounded-2xl md:rounded-3xl overflow-hidden relative h-56 sm:h-72 md:h-96">
+                  <div className="rounded-lg md:rounded-xl overflow-hidden relative h-56 sm:h-72 md:h-96">
                     <Image
                       className="object-cover"
                       alt="Students collaborating at RGI campus"
@@ -358,7 +358,7 @@ export default function CertificatesPage() {
                       sizes="(max-width: 1024px) 100vw, 50vw"
                     />
                   </div>
-                  <div className="absolute -bottom-4 -right-4 md:-bottom-6 md:-right-6 bg-brand p-5 md:p-8 rounded-xl md:rounded-2xl shadow-xl z-20">
+                  <div className="absolute -bottom-4 -right-4 md:-bottom-6 md:-right-6 bg-brand p-5 md:p-8 rounded-lg shadow-xl z-20">
                     <div className="text-2xl md:text-4xl font-black text-white">10+</div>
                     <div className="text-white/80 font-bold text-[10px] md:text-sm tracking-widest uppercase mt-0.5 md:mt-1">Active Alliances</div>
                   </div>
@@ -394,7 +394,7 @@ export default function CertificatesPage() {
                       const Icon = item.icon;
                       return (
                         <div key={i} className="flex items-start gap-3 md:gap-4">
-                          <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-brand/20 flex items-center justify-center shrink-0">
+                          <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-brand/20 flex items-center justify-center shrink-0">
                             <Icon className="w-5 h-5 md:w-6 md:h-6 text-brand" />
                           </div>
                           <div>
@@ -412,7 +412,7 @@ export default function CertificatesPage() {
 
           {/* CTA BANNER */}
           <section className="max-w-7xl mx-auto px-5 md:px-8 lg:px-20 py-14 md:py-28">
-            <div className="bg-brand rounded-2xl md:rounded-[2rem] p-6 md:p-16 relative overflow-hidden">
+            <div className="bg-brand rounded-lg p-6 md:p-16 relative overflow-hidden">
               <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
               <div className="absolute -bottom-20 -left-20 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
 

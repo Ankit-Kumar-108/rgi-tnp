@@ -84,7 +84,7 @@ export default function PublicOpenDrivesPage() {
                 {drives.map((drive, index) => (
                   <div
                     key={drive.id}
-                    className="group flex flex-col bg-card hover:bg-card/80 border border-border/80 hover:border-brand/30 rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.01)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.04)] transition-all duration-300 relative overflow-hidden h-full animate-in fade-in slide-in-from-bottom-8 fill-mode-both"
+                    className="group flex flex-col bg-card hover:bg-card/80 border border-border/80 hover:border-brand/30 rounded-xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.01)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.04)] transition-all duration-300 relative overflow-hidden h-full animate-in fade-in slide-in-from-bottom-8 fill-mode-both"
                     style={{ animationDelay: `${(index % 12) * 50}ms` }}
                   >
                     {/* Top Accent Gradient Line */}
@@ -93,7 +93,7 @@ export default function PublicOpenDrivesPage() {
                     {/* Header */}
                     <div className="flex items-start justify-between mb-5">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-2xl bg-brand/5 border border-brand/10 flex items-center justify-center text-brand group-hover:scale-110 transition-transform duration-300 shrink-0">
+                        <div className="w-12 h-12 rounded-lg bg-brand/5 border border-brand/10 flex items-center justify-center text-brand group-hover:scale-110 transition-transform duration-300 shrink-0">
                           <Building2 className="w-6 h-6" />
                         </div>
                         <div>
@@ -126,7 +126,7 @@ export default function PublicOpenDrivesPage() {
 
                     {/* Key Details Grid */}
                     <div className="grid grid-cols-2 gap-3 mb-6 mt-auto">
-                      <div className="p-3 rounded-2xl bg-muted/40 border border-border/40 hover:bg-muted/60 transition-colors">
+                      <div className="p-3 rounded-lg bg-muted/40 border border-border/40 hover:bg-muted/60 transition-colors">
                         <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider block mb-1">Drive Date</span>
                         <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
                           <CalendarDays className="w-3.5 h-3.5 text-brand shrink-0" />
@@ -134,7 +134,7 @@ export default function PublicOpenDrivesPage() {
                         </div>
                       </div>
 
-                      <div className="p-3 rounded-2xl bg-muted/40 border border-border/40 hover:bg-muted/60 transition-colors">
+                      <div className="p-3 rounded-lg bg-muted/40 border border-border/40 hover:bg-muted/60 transition-colors">
                         <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider block mb-1">Cutoff Criteria</span>
                         <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
                           <Rocket className="w-3.5 h-3.5 text-brand shrink-0" />
@@ -142,7 +142,7 @@ export default function PublicOpenDrivesPage() {
                         </div>
                       </div>
 
-                      <div className="col-span-2 p-3 rounded-2xl bg-muted/40 border border-border/40 hover:bg-muted/60 transition-colors">
+                      <div className="col-span-2 p-3 rounded-lg bg-muted/40 border border-border/40 hover:bg-muted/60 transition-colors">
                         <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider block mb-1">Eligible Branches</span>
                         <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
                           <MapPin className="w-3.5 h-3.5 text-brand shrink-0" />
@@ -154,7 +154,7 @@ export default function PublicOpenDrivesPage() {
                     {/* Action Button */}
                     <button
                       onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
-                      className="w-full py-3 px-4 rounded-2xl bg-brand text-primary-foreground hover:bg-brand/90 hover:shadow-lg hover:shadow-brand/20 text-xs font-bold tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 group/btn mt-2"
+                      className="w-full py-3 px-4 rounded-lg bg-brand text-primary-foreground hover:bg-brand/90 hover:shadow-lg hover:shadow-brand/20 text-xs font-bold tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 group/btn mt-2"
                     >
                       Apply & View Details
                       <span className="text-sm transform group-hover/btn:translate-x-1 transition-transform duration-300">→</span>

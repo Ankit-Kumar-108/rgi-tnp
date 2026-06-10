@@ -85,7 +85,7 @@ export default function MemoriesGallery() {
               Institutional Archive
             </h4>
             <h1 className="text-4xl md:text-6xl lg:text-[5rem] font-serif tracking-tight leading-tight text-foreground mb-6 max-w-4xl">
-              Radharaman <span className="italic">Memories.</span>
+              Radharaman <span className="italic text-brand">Memories.</span>
             </h1>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl leading-relaxed">
               A curated visual archive capturing the spirit of excellence, campus life, and the milestones of our students.
@@ -113,7 +113,7 @@ export default function MemoriesGallery() {
                     onClick={() => setSelectedImage(memory)}
                   >
                     {/* Image Area */}
-                    <div className="rounded-xl overflow-hidden relative bg-muted aspect-auto">
+                    <div className="rounded-lg overflow-hidden relative bg-muted aspect-auto">
                       <img
                         src={memory.imageUrl}
                         alt={memory.title}
@@ -126,7 +126,7 @@ export default function MemoriesGallery() {
 
                     {/* Editorial Caption Area */}
                     <div className="pt-4 pb-2 px-2 flex flex-col justify-between h-full">
-                      <h3 className="font-serif text-lg md:text-xl text-foreground leading-snug mb-2 group-hover:text-brand transition-colors duration-300">
+                      <h3 className="text-lg md:text-xl text-foreground leading-snug mb-2 group-hover:text-brand transition-colors duration-300">
                         {memory.title}
                       </h3>
                       <div className="flex items-center gap-1.5 mt-auto">

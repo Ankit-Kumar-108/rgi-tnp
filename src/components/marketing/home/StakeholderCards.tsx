@@ -31,7 +31,7 @@ export default function StakeholderCards() {
         ].map((item, i) => (
           <div
             key={i}
-            className="relative group overflow-hidden rounded-lg md:rounded-xl lg:rounded-2xl h-60 lg:h-100"
+            className="relative group overflow-hidden rounded-lg md:rounded-xl lg:rounded-lg h-60 lg:h-100"
           >
             <Image
               className="absolute inset-0 w-full object-cover transition-transform duration-500 group-hover:scale-110"

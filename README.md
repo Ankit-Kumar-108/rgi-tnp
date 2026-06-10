@@ -508,7 +508,7 @@ Verify Token + Role Authorization
 - [ ] **Referral (add a page where referral are posted by alumni and also appears in the students dashboard)  (to change on 20/06/2026 [to be Done])**
  - add a page where referral are posted by alumni for better visibility and understanding of referral and also add filter in that page for better visibility only logged in student and alumni can see that page
 
-- [ ] **Site (improve site content)  (to change on 25/06/2026 [to be Done])** 
+- [ ] **Site (improve site content)  (to change on 25/06/2026 [Done])** 
   - improve content of site and add more content in home page and about us page for better visibility and understanding of site
 
 - [ ] **Take Suggestion from sir about final selection and mail notification**

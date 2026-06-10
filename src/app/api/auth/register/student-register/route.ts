@@ -31,10 +31,6 @@ export async function POST(req: NextRequest) {
       semester: validatedData.semester,
       gender: validatedData.gender.trim(),
     };
-
-    // 4. Verify Enrollment Number in Master Records
-    // Fetch all master records for this batch and compare with trimmed values
-    // This handles any existing data with extra whitespace
     const masterRecords = await db.studentMaster.findMany({
       where: {
         batch: trimmedData.batch,

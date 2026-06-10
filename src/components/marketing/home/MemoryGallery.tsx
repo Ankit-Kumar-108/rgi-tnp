@@ -31,7 +31,7 @@ export default function MemoryGallery({ memories }: { memories: MemoryData[] }) 
       {memories.length >= 4 ? (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-[200px]">
           {/* Memory 1 — Large (2 cols × 2 rows) */}
-          <div className="col-span-2 row-span-2 rounded-2xl overflow-hidden relative group">
+          <div className="col-span-2 row-span-2 rounded-lg overflow-hidden relative group">
             <Image
               className="object-cover group-hover:scale-110 transition-transform duration-700"
               alt={memories[0].title}
@@ -45,7 +45,7 @@ export default function MemoryGallery({ memories }: { memories: MemoryData[] }) 
             </div>
           </div>
           {/* Memory 2 */}
-          <div className="rounded-2xl overflow-hidden relative group">
+          <div className="rounded-lg overflow-hidden relative group">
             <Image
               className="object-cover group-hover:scale-110 transition-transform duration-700"
               alt={memories[1].title}
@@ -59,7 +59,7 @@ export default function MemoryGallery({ memories }: { memories: MemoryData[] }) 
             </div>
           </div>
           {/* Memory 3 */}
-          <div className="rounded-2xl overflow-hidden relative group">
+          <div className="rounded-lg overflow-hidden relative group">
             <Image
               className="object-cover group-hover:scale-110 transition-transform duration-700"
               alt={memories[2].title}
@@ -73,7 +73,7 @@ export default function MemoryGallery({ memories }: { memories: MemoryData[] }) 
             </div>
           </div>
           {/* Memory 4 — Wide (2 cols × 1 row) */}
-          <div className="col-span-2 rounded-2xl overflow-hidden relative group">
+          <div className="col-span-2 rounded-lg overflow-hidden relative group">
             <Image
               className="object-cover group-hover:scale-110 transition-transform duration-700"
               alt={memories[3].title}
@@ -90,25 +90,25 @@ export default function MemoryGallery({ memories }: { memories: MemoryData[] }) 
       ) : (
         /* ── Fallback: static placeholder grid ── */
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-[200px]">
-          <div className="col-span-2 row-span-2 rounded-2xl overflow-hidden relative group">
+          <div className="col-span-2 row-span-2 rounded-lg overflow-hidden relative group">
             <Image className="object-cover group-hover:scale-110 transition-transform duration-700" alt="Students celebrating" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC97PRhCgez5vt9saBg50a81NQl00I3X5oJekFcGncJ_rtn8lGAgg0R5rdfYKEJss12iI-MMSMIJO_5AAP8QVSVr4zN2sO4g-9DOSXkB3RmfbmhlPbFvFqLoOogUPSE6F3YveI_u4x8HKjtV1sfoBlbGstnVLEwiyLJLa2iTEAzgj0KRt5wgCCIJJNXoVXvwYpHWFpKlJf0wQX6LSTDrTEVnC8Aky63CuM1Q7s_mp2WIs1HYWn-q6LmaA5trwzhCtdW31OdBgx7zw" fill sizes="(max-width: 768px) 100vw, 50vw" />
             <div className="absolute inset-0 bg-gradient-to-t from-brand/70 via-brand/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
               <p className="text-white font-bold">Success Celebration 2023</p>
             </div>
           </div>
-          <div className="rounded-2xl overflow-hidden relative group">
+          <div className="rounded-lg overflow-hidden relative group">
             <Image className="object-cover group-hover:scale-110 transition-transform duration-700" alt="Workshop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDh6hS3y3An0YD7BtmPrJjDJy3QqxeWstYyROERKY0bxcMmfi3NtKSgBtciSNen085rHJLes5JrTcoA5T4Vf2WNw2IM8kRVvRLyoasWkdNmfAov8REckXa_OE0be3DmEtrTvkNzzfew3SjV3XPxzdopBINZ2o5vzBcqR7jYZez5IOP6LzmIYnvjp5gPQWTS5tYpBwlhyiNkgeN9P4YOck_f3zhTSgxGGAeIEWsTG4EcdZH06oT7Si25K0FozYFtqQkSJaOn-hOc8g" fill sizes="(max-width: 768px) 50vw, 25vw" />
             <div className="absolute inset-0 bg-gradient-to-t from-brand/70 via-brand/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
               <p className="text-white text-xs font-bold">Industry Workshop</p>
             </div>
           </div>
-          <div className="rounded-2xl overflow-hidden relative group">
+          <div className="rounded-lg overflow-hidden relative group">
             <Image className="object-cover group-hover:scale-110 transition-transform duration-700" alt="Career Fair" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfVL3bulkTn6s12N7oW80mh_GCLiSw_N7D4kSqzKOmW9UHhtz4eYA_dhYsnps6YBYyPDyK0b-VMfNHvHKsuz-q-4Wk3Oc1PfptLnBo8ms3ccnPWg14Cr7W6TOLNLmFWLeOvI30Uq3He2J8U-RWMqUpyfHiREvsA6uZZbhREsPCNnQJdqXfkBPrrT1a4qAvXr223gUxvoPH1wBvSTbad54mHToce10X7mwyZxOZYFstCQ1mfxW6UAe08UBm07ZZmtcUgM4KOPtGiQ" fill sizes="(max-width: 768px) 50vw, 25vw" />
             <div className="absolute inset-0 bg-gradient-to-t from-brand/70 via-brand/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
               <p className="text-white text-xs font-bold">Career Fair</p>
             </div>
           </div>
-          <div className="col-span-2 rounded-2xl overflow-hidden relative group">
+          <div className="col-span-2 rounded-lg overflow-hidden relative group">
             <Image className="object-cover group-hover:scale-110 transition-transform duration-700" alt="Mentorship" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTeMzT5fUnQNwQOk4-MtK4UKshACdx6vF5j3zM4xwJfWNXxO2LO9g37Nht5WGURIQCVpgw01qsuzaTli-rQkFp6_jc6PldL-Hpf43BoLX0IzXAY40OB3SudgNuAraLAVrJZjEdqdoj79narEEugwtM0OeghOU_Mggn4GTVSRHnsRfrzmzTZHeSi-9ndWU0iJYDWdBTVUAJV9uzq6lGBKYeXnGQIq1ziSdTYOhys206aN2QueMgXLfOFykuUFLCXSLK6WND8phzXg" fill sizes="(max-width: 768px) 100vw, 50vw" />
             <div className="absolute inset-0 bg-gradient-to-t from-brand/70 via-brand/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
               <p className="text-white font-bold">Corporate Mentorship</p>

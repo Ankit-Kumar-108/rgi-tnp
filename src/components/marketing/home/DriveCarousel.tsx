@@ -82,7 +82,7 @@ export default function DriveCarousel({ drives }: { drives: HomeDrive[] }) {
               >
                 {/* Drive title */}
                 <div className="flex items-center justify-center mb-6">
-                  <div className="bg-card border border-border rounded-2xl px-6 py-3 shadow-md flex items-center gap-3">
+                  <div className="bg-card border border-border rounded-lg px-6 py-3 shadow-md flex items-center gap-3">
                     <div className="w-2 h-2 rounded-full bg-brand animate-pulse shrink-0" />
                     <h3 className="text-base md:text-lg font-bold text-foreground">
                       <span className="text-brand">{group.images[0]?.title}</span>
@@ -94,7 +94,7 @@ export default function DriveCarousel({ drives }: { drives: HomeDrive[] }) {
                 <div className="grid grid-cols-4 grid-rows-2 gap-2 md:gap-4 h-70 md:h-105">
                   {/* Image 1 — large (spans 2 cols, 2 rows) */}
                   {group.images[0] && (
-                    <div className="col-span-2 row-span-2 rounded-2xl overflow-hidden relative group/img shadow-lg">
+                    <div className="col-span-2 row-span-2 rounded-lg overflow-hidden relative group/img shadow-lg">
                       <Image
                         src={group.images[0].imageUrl}
                         alt={group.images[0].title}
@@ -107,7 +107,7 @@ export default function DriveCarousel({ drives }: { drives: HomeDrive[] }) {
                   )}
                   {/* Image 2 — top right */}
                   {group.images[1] && (
-                    <div className="col-span-1 row-span-1 rounded-2xl overflow-hidden relative group/img shadow-lg">
+                    <div className="col-span-1 row-span-1 rounded-lg overflow-hidden relative group/img shadow-lg">
                       <Image
                         src={group.images[1].imageUrl}
                         alt={group.images[1].title}
@@ -120,7 +120,7 @@ export default function DriveCarousel({ drives }: { drives: HomeDrive[] }) {
                   )}
                   {/* Image 3 — top far-right */}
                   {group.images[2] && (
-                    <div className="col-span-1 row-span-1 rounded-2xl overflow-hidden relative group/img shadow-lg">
+                    <div className="col-span-1 row-span-1 rounded-lg overflow-hidden relative group/img shadow-lg">
                       <Image
                         src={group.images[2].imageUrl}
                         alt={group.images[2].title}
@@ -133,7 +133,7 @@ export default function DriveCarousel({ drives }: { drives: HomeDrive[] }) {
                   )}
                   {/* Image 4 — bottom right (spans 2 cols) */}
                   {group.images[3] && (
-                    <div className="col-span-2 row-span-1 rounded-2xl overflow-hidden relative group/img shadow-lg">
+                    <div className="col-span-2 row-span-1 rounded-lg overflow-hidden relative group/img shadow-lg">
                       <Image
                         src={group.images[3].imageUrl}
                         alt={group.images[3].title}

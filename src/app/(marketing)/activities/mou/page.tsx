@@ -177,7 +177,7 @@ export default function StrategicAlliances() {
                         </div>
 
                         <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center bg-card rounded-2xl md:rounded-3xl p-5 md:p-10 border border-border shadow-[var(--shadow-md)]">
-                            <div className="relative group rounded-xl md:rounded-2xl overflow-hidden h-52 sm:h-64 md:h-80">
+                            <div className="relative group rounded-lg overflow-hidden h-52 sm:h-64 md:h-80">
                                 <Image
                                     alt="TCS Computer Examination Center at RGI"
                                     className="object-cover group-hover:scale-105 transition-transform duration-700"
@@ -185,12 +185,12 @@ export default function StrategicAlliances() {
                                     fill
                                     sizes="(max-width: 1024px) 100vw, 50vw"
                                 />
-                                <div className="absolute bottom-3 right-3 md:bottom-4 md:right-4 bg-background/90 backdrop-blur-md p-2.5 md:p-3 rounded-xl border border-border shadow-sm">
+                                <div className="absolute bottom-3 right-3 md:bottom-4 md:right-4 bg-background/90 backdrop-blur-md p-2.5 md:p-3 rounded-lg border border-border shadow-sm">
                                     <Server className="text-brand w-6 h-6 md:w-8 md:h-8" />
                                 </div>
                             </div>
                             <div className="space-y-4 md:space-y-6">
-                                <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-brand/10 text-brand font-semibold text-xs md:text-sm">
+                                <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-brand/10 text-brand font-semibold text-xs md:text-sm">
                                     <Building2 className="w-4 h-4" />
                                     Corporate Giant TCS
                                 </span>
@@ -204,19 +204,19 @@ export default function StrategicAlliances() {
                                     national and state-level exams.
                                 </p>
                                 <div className="grid grid-cols-2 gap-3 pt-2">
-                                    <div className="flex flex-col p-3.5 md:p-4 bg-muted rounded-xl border border-border/50">
+                                    <div className="flex flex-col p-3.5 md:p-4 bg-muted rounded-lg border border-border/50">
                                         <span className="font-bold text-foreground">AIEEE / JEE</span>
                                         <span className="text-xs text-muted-foreground">National Level</span>
                                     </div>
-                                    <div className="flex flex-col p-3.5 md:p-4 bg-muted rounded-xl border border-border/50">
+                                    <div className="flex flex-col p-3.5 md:p-4 bg-muted rounded-lg border border-border/50">
                                         <span className="font-bold text-foreground">GATE</span>
                                         <span className="text-xs text-muted-foreground">PG Engineering</span>
                                     </div>
-                                    <div className="flex flex-col p-3.5 md:p-4 bg-muted rounded-xl border border-border/50">
+                                    <div className="flex flex-col p-3.5 md:p-4 bg-muted rounded-lg border border-border/50">
                                         <span className="font-bold text-foreground">IBPS</span>
                                         <span className="text-xs text-muted-foreground">Banking Sector</span>
                                     </div>
-                                    <div className="flex flex-col p-3.5 md:p-4 bg-muted rounded-xl border border-border/50">
+                                    <div className="flex flex-col p-3.5 md:p-4 bg-muted rounded-lg border border-border/50">
                                         <span className="font-bold text-foreground">Patwari</span>
                                         <span className="text-xs text-muted-foreground">State Govt.</span>
                                     </div>
@@ -248,9 +248,9 @@ export default function StrategicAlliances() {
                                     return (
                                         <div
                                             key={i}
-                                            className="bg-card rounded-xl md:rounded-2xl p-5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 hover:-translate-y-0.5 flex flex-col group"
+                                            className="bg-card rounded-lg p-5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 hover:-translate-y-0.5 flex flex-col group"
                                         >
-                                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-brand/10 flex items-center justify-center mb-4 group-hover:bg-brand/20 transition-colors shrink-0">
+                                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-brand/10 flex items-center justify-center mb-4 group-hover:bg-brand/20 transition-colors shrink-0">
                                                 <Icon className="w-5 h-5 md:w-6 md:h-6 text-brand" />
                                             </div>
                                             <h3 className="text-base md:text-lg font-bold text-foreground mb-1">{mou.name}</h3>
@@ -285,7 +285,7 @@ export default function StrategicAlliances() {
 
                                         <div className="space-y-4 md:space-y-6">
                                             <div className="flex items-start gap-3 md:gap-4">
-                                                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-brand/20 flex items-center justify-center shrink-0">
+                                                <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-brand/20 flex items-center justify-center shrink-0">
                                                     <Wrench className="w-5 h-5 md:w-6 md:h-6 text-brand" />
                                                 </div>
                                                 <div>
@@ -299,7 +299,7 @@ export default function StrategicAlliances() {
                                                 </div>
                                             </div>
                                             <div className="flex items-start gap-3 md:gap-4">
-                                                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-brand/20 flex items-center justify-center shrink-0">
+                                                <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-brand/20 flex items-center justify-center shrink-0">
                                                     <Award className="w-5 h-5 md:w-6 md:h-6 text-brand" />
                                                 </div>
                                                 <div>
@@ -313,7 +313,7 @@ export default function StrategicAlliances() {
                                                 </div>
                                             </div>
                                             <div className="flex items-start gap-3 md:gap-4">
-                                                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-brand/20 flex items-center justify-center shrink-0">
+                                                <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-brand/20 flex items-center justify-center shrink-0">
                                                     <TrendingUp className="w-5 h-5 md:w-6 md:h-6 text-brand" />
                                                 </div>
                                                 <div>
@@ -330,7 +330,7 @@ export default function StrategicAlliances() {
                                     </div>
                                 </div>
                                 <div className="relative order-1 lg:order-2">
-                                    <div className="rounded-2xl md:rounded-3xl overflow-hidden relative h-56 sm:h-72 md:h-[500px]">
+                                    <div className="rounded-lg overflow-hidden relative h-56 sm:h-72 md:h-[500px]">
                                         <Image
                                             className="object-cover"
                                             alt="Students benefiting from corporate partnerships"
@@ -346,7 +346,7 @@ export default function StrategicAlliances() {
 
                     {/* CTA Section */}
                     <section className="max-w-7xl mx-auto px-5 md:px-8 lg:px-20 py-14 md:py-28">
-                        <div className="bg-brand rounded-2xl md:rounded-[2rem] p-6 md:p-16 relative overflow-hidden">
+                        <div className="bg-brand rounded-lg p-6 md:p-16 relative overflow-hidden">
                             <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
                             <div className="absolute -bottom-20 -left-20 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
 

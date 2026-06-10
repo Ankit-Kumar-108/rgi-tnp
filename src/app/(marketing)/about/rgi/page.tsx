@@ -280,14 +280,14 @@ export default function RGIProfile() {
               {/* Image Grid */}
               <div className="grid grid-cols-2 gap-3 md:gap-4">
                 <div className="space-y-3 md:space-y-4">
-                  <div className="rounded-2xl overflow-hidden h-44 md:h-56 relative group">
+                  <div className="rounded-lg overflow-hidden h-44 md:h-56 relative group">
                     <img
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                       alt="Modern campus building"
                       src="/images/collegeP.png"
                     />
                   </div>
-                  <div className="rounded-2xl overflow-hidden h-52 md:h-72 relative group">
+                  <div className="rounded-lg overflow-hidden h-52 md:h-72 relative group">
                     <img
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                       alt="Students in a lab"
@@ -296,14 +296,14 @@ export default function RGIProfile() {
                   </div>
                 </div>
                 <div className="space-y-3 md:space-y-4 pt-8">
-                  <div className="rounded-2xl overflow-hidden h-52 md:h-72 relative group">
+                  <div className="rounded-lg overflow-hidden h-52 md:h-72 relative group">
                     <img
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                       alt="Library study area"
                       src="/images/library.png"
                     />
                   </div>
-                  <div className="rounded-2xl overflow-hidden h-44 md:h-56 relative group bg-brand flex items-center justify-center p-6 text-center">
+                  <div className="rounded-lg overflow-hidden h-44 md:h-56 relative group bg-brand flex items-center justify-center p-6 text-center">
                     <div>
                       <div className="text-4xl md:text-5xl font-black text-white mb-2">
                         20+
@@ -335,10 +335,10 @@ export default function RGIProfile() {
 
               <div className="grid md:grid-cols-2 gap-6 md:gap-8">
                 {/* Vision */}
-                <div className="bg-card rounded-3xl p-8 md:p-10 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 relative overflow-hidden">
+                <div className="bg-card rounded-xl p-8 md:p-10 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-40 h-40 bg-brand/5 blur-3xl rounded-full"></div>
                   <div className="relative z-10">
-                    <div className="w-14 h-14 rounded-2xl bg-brand/10 flex items-center justify-center mb-6">
+                    <div className="w-14 h-14 rounded-lg bg-brand/10 flex items-center justify-center mb-6">
                       <Eye className="w-7 h-7 text-brand" />
                     </div>
                     <h3 className="text-2xl font-black text-foreground mb-4">
@@ -355,10 +355,10 @@ export default function RGIProfile() {
                 </div>
 
                 {/* Mission */}
-                <div className="bg-card rounded-3xl p-8 md:p-10 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 relative overflow-hidden">
+                <div className="bg-card rounded-xl p-8 md:p-10 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 relative overflow-hidden">
                   <div className="absolute bottom-0 left-0 w-40 h-40 bg-brand/5 blur-3xl rounded-full"></div>
                   <div className="relative z-10">
-                    <div className="w-14 h-14 rounded-2xl bg-brand/10 flex items-center justify-center mb-6">
+                    <div className="w-14 h-14 rounded-lg bg-brand/10 flex items-center justify-center mb-6">
                       <Target className="w-7 h-7 text-brand" />
                     </div>
                     <h3 className="text-2xl font-black text-foreground mb-4">
@@ -437,7 +437,7 @@ export default function RGIProfile() {
                         }`}
                       >
                         <div
-                          className={`bg-card rounded-2xl p-6 md:p-8 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 hover:-translate-y-0.5 ${
+                          className={`bg-card rounded-lg p-6 md:p-8 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 hover:-translate-y-0.5 ${
                             isLeft ? "md:mr-10" : "md:ml-10"
                           }`}
                         >
@@ -489,7 +489,7 @@ export default function RGIProfile() {
                   return (
                     <div
                       key={i}
-                      className={`relative rounded-2xl md:rounded-3xl overflow-hidden group cursor-pointer ${inst.span}`}
+                      className={`relative rounded-lg md:rounded-xl overflow-hidden group cursor-pointer ${inst.span}`}
                     >
                       <img
                         className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
@@ -569,17 +569,17 @@ export default function RGIProfile() {
               {/* Right: Images */}
               <div className="grid grid-cols-2 gap-3 md:gap-4">
                 <img
-                  className="rounded-2xl h-48 md:h-64 w-full object-cover shadow-lg"
+                  className="rounded-lg h-48 md:h-64 w-full object-cover shadow-lg"
                   alt="Modern campus library with natural light"
                   src="/images/Library.png"
                 />
                 <img
-                  className="rounded-2xl h-48 md:h-64 w-full object-cover shadow-lg mt-8"
+                  className="rounded-lg h-48 md:h-64 w-full object-cover shadow-lg mt-8"
                   alt="Lecture hall with stadium seating"
                   src="/images/seminar.png"
                 />
                 <img
-                  className="rounded-2xl h-48 md:h-64 w-full object-cover shadow-lg col-span-2"
+                  className="rounded-lg h-48 md:h-64 w-full object-cover shadow-lg col-span-2"
                   alt="Students working on a group project on campus"
                   src="/images/project.png"
                 />
@@ -621,9 +621,9 @@ export default function RGIProfile() {
                 ].map((item, i) => (
                   <div
                     key={i}
-                    className="bg-card rounded-2xl p-6 md:p-8 text-center border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 hover:-translate-y-0.5"
+                    className="bg-card rounded-lg p-6 md:p-8 text-center border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 hover:-translate-y-0.5"
                   >
-                    <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-brand/10 flex items-center justify-center mx-auto mb-4">
+                    <div className="w-14 h-14 md:w-16 md:h-16 rounded-lg bg-brand/10 flex items-center justify-center mx-auto mb-4">
                       <Trophy className="w-7 h-7 md:w-8 md:h-8 text-brand" />
                     </div>
                     <h3 className="text-lg md:text-xl font-black text-foreground mb-1">
@@ -640,7 +640,7 @@ export default function RGIProfile() {
 
           {/* CTA BANNER */}
           <section className="max-w-7xl mx-auto px-4 md:px-8 lg:px-20 py-20 md:py-28">
-            <div className="bg-brand rounded-3xl md:rounded-[2rem] p-8 md:p-16 relative overflow-hidden">
+            <div className="bg-brand rounded-xl p-8 md:p-16 relative overflow-hidden">
               {/* Decorative */}
               <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
               <div className="absolute -bottom-20 -left-20 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>

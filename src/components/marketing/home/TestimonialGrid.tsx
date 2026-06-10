@@ -24,7 +24,7 @@ export default function TestimonialGrid({ testimonials }: { testimonials: Testim
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
           {testimonials.map((testimonial) => (
-            <div key={testimonial.id} className="bg-card p-6 md:p-10 rounded-2xl md:rounded-3xl shadow-[var(--shadow-sm)] border border-border hover:shadow-[var(--shadow-md)] transition-shadow duration-300 flex flex-col items-center text-center group">
+            <div key={testimonial.id} className="bg-card p-6 md:p-10 rounded-lg md:rounded-xl shadow-[var(--shadow-sm)] border border-border hover:shadow-[var(--shadow-md)] transition-shadow duration-300 flex flex-col items-center text-center group">
               <div className="w-20 h-20 md:w-32 md:h-32 rounded-full mb-4 md:mb-6 ring-4 ring-brand/10 group-hover:ring-brand/20 transition-all relative overflow-hidden">
                 <Image src={testimonial.profileImageUrl || "https://lh3.googleusercontent.com/aida-public/AB6AXuD-4qpQG9rSHLujKoHhrbgWRAg81sFBu41MDA54QQ14Y6yYxoww19N7Hs6lybLRgvZCg5yNw-06wJ8p2GwAuZrN9ytupLwK1aRZSm47WIYXx5ld9vONPYIsuhD5KGlStRJhFuJTFHl_Hc-t-2CxveYwpsep0lUKrYPz6ghsEv9_r2NE8H2tzkba6XLY91OoOHMGHGA4iF6n7TtSxX_Dr3zeJ206-8b6lxuPWVgO5R0mihIiXboKj1OEPXe_2qH9vxxFdK4gE9e5YQ"} alt="Alumni testimonial" fill className="object-cover" sizes="128px" />
               </div>

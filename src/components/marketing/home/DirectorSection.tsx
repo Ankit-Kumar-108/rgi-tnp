@@ -6,7 +6,7 @@ export default function DirectorSection() {
     <>
       {/* Director's Section */}
       <section className="section-y px-4 md:px-8 lg:px-20 max-w-7xl mx-auto" id="about">
-        <div className="bg-card rounded-2xl md:rounded-3xl shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] overflow-hidden border border-border transition-shadow duration-300">
+        <div className="bg-card rounded-lg md:rounded-xl shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] overflow-hidden border border-border transition-shadow duration-300">
           <div className="flex flex-col lg:flex-row">
             <div className="lg:w-1/3 aspect-square lg:aspect-auto relative">
               <Image
@@ -34,7 +34,7 @@ export default function DirectorSection() {
 
       {/* Deputy Director's Section */}
       <section className="pb-16 md:pb-24 px-4 md:px-8 lg:px-20 max-w-7xl mx-auto">
-        <div className="bg-card rounded-2xl md:rounded-3xl shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] overflow-hidden border border-border transition-shadow duration-300">
+        <div className="bg-card rounded-lg md:rounded-xl shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] overflow-hidden border border-border transition-shadow duration-300">
           <div className="flex flex-col lg:flex-row">
             <div className="lg:w-1/3 aspect-square lg:aspect-auto relative">
               <Image

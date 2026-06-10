@@ -208,7 +208,7 @@ export default function TrainingPlacementAbout() {
                         key={i}
                         className="py-3.5 md:py-6 px-2.5 md:px-8 flex items-center gap-2 md:gap-4"
                       >
-                        <div className="w-10 h-10 rounded-xl bg-brand/20 flex items-center justify-center shrink-0 hidden md:flex">
+                        <div className="w-10 h-10 rounded-lg bg-brand/20 flex items-center justify-center shrink-0 hidden md:flex">
                           <Icon className="w-5 h-5 text-brand" />
                         </div>
                         <div>
@@ -274,7 +274,7 @@ export default function TrainingPlacementAbout() {
 
               {/* Image + CTA Card */}
               <div className="space-y-4">
-                <div className="rounded-2xl md:rounded-3xl overflow-hidden relative h-56 sm:h-72 md:h-96 group">
+                <div className="rounded-lg overflow-hidden relative h-56 sm:h-72 md:h-96 group">
                   <Image
                     className="object-cover group-hover:scale-105 transition-transform duration-700"
                     alt="T&P Conference hall at RGI"
@@ -283,7 +283,7 @@ export default function TrainingPlacementAbout() {
                     sizes="(max-width: 1024px) 100vw, 50vw"
                   />
                 </div>
-                <div className="bg-brand rounded-2xl p-6 md:p-8 relative overflow-hidden">
+                <div className="bg-brand rounded-lg p-6 md:p-8 relative overflow-hidden">
                   <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
                   <div className="relative z-10">
                     <h4 className="text-lg font-bold text-white mb-2">
@@ -294,7 +294,7 @@ export default function TrainingPlacementAbout() {
                       talent from 7 specialized institutions.
                     </p>
                     <Link href="/recruiters/register">
-                      <button className="w-full bg-white text-brand py-3 rounded-xl font-bold text-sm hover:bg-white/90 transition-colors cursor-pointer">
+                      <button className="w-full bg-white text-brand py-3 rounded-lg font-bold text-sm hover:bg-white/90 transition-colors cursor-pointer">
                         Register as Recruiter
                       </button>
                     </Link>
@@ -325,7 +325,7 @@ export default function TrainingPlacementAbout() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
                 {/* Director */}
-                <div className="bg-card rounded-2xl md:rounded-3xl overflow-hidden border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
+                <div className="bg-card rounded-lg overflow-hidden border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
                   <div className="relative h-56 sm:h-72 md:h-80 overflow-hidden">
                     <Image
                       className="object-cover object-top group-hover:scale-105 transition-transform duration-700"
@@ -334,6 +334,7 @@ export default function TrainingPlacementAbout() {
                       fill
                       sizes="(max-width: 768px) 100vw, 50vw"
                       referrerPolicy="no-referrer"
+                      unoptimized={true}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
                     <div className="absolute bottom-4 left-6">
@@ -364,7 +365,7 @@ export default function TrainingPlacementAbout() {
                 </div>
 
                 {/* Deputy Director */}
-                <div className="bg-card rounded-2xl md:rounded-3xl overflow-hidden border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
+                <div className="bg-card rounded-lg overflow-hidden border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
                   <div className="relative h-56 sm:h-72 md:h-80 overflow-hidden">
                     <Image
                       className="object-cover object-top group-hover:scale-105 transition-transform duration-700"
@@ -428,9 +429,9 @@ export default function TrainingPlacementAbout() {
                 return (
                   <div
                     key={i}
-                    className="bg-card rounded-xl md:rounded-2xl p-5 md:p-8 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 hover:-translate-y-0.5 group"
+                    className="bg-card rounded-lg p-5 md:p-8 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 hover:-translate-y-0.5 group"
                   >
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-brand/10 flex items-center justify-center mb-4 md:mb-5 group-hover:bg-brand/20 transition-colors">
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-brand/10 flex items-center justify-center mb-4 md:mb-5 group-hover:bg-brand/20 transition-colors">
                       <Icon className="w-5 h-5 md:w-6 md:h-6 text-brand" />
                     </div>
                     <h3 className="text-base md:text-lg font-bold text-foreground mb-1.5 md:mb-2">
@@ -468,7 +469,7 @@ export default function TrainingPlacementAbout() {
                 {highlights.map((item, i) => (
                   <div
                     key={i}
-                    className="bg-card rounded-xl md:rounded-2xl p-3.5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 hover:-translate-y-0.5 text-center group"
+                    className="bg-card rounded-lg p-3.5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 hover:-translate-y-0.5 text-center group"
                   >
                     <div className="text-lg sm:text-2xl md:text-3xl font-black text-brand mb-1.5 md:mb-2 group-hover:scale-110 transition-transform">
                       {item.package}
@@ -542,7 +543,7 @@ export default function TrainingPlacementAbout() {
                   {techPartners.map((partner, i) => (
                     <div
                       key={i}
-                      className="flex items-start gap-4 bg-card rounded-xl p-4 md:p-5 border border-border shadow-[var(--shadow-xs)] hover:shadow-[var(--shadow-sm)] transition-all group"
+                      className="flex items-start gap-4 bg-card rounded-lg p-4 md:p-5 border border-border shadow-[var(--shadow-xs)] hover:shadow-[var(--shadow-sm)] transition-all group"
                     >
                       <div className="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
                         <Handshake className="w-5 h-5 text-brand" />
@@ -612,12 +613,12 @@ export default function TrainingPlacementAbout() {
                   return (
                     <div
                       key={i}
-                      className="bg-card rounded-xl md:rounded-2xl p-5 md:p-8 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 hover:-translate-y-0.5 relative group"
+                      className="bg-card rounded-lg p-5 md:p-8 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 hover:-translate-y-0.5 relative group"
                     >
                       <div className="text-5xl md:text-6xl font-black text-brand/10 absolute top-4 right-5 group-hover:text-brand/20 transition-colors">
                         {item.step}
                       </div>
-                      <div className="w-12 h-12 rounded-xl bg-brand/10 flex items-center justify-center mb-5 group-hover:bg-brand/20 transition-colors">
+                      <div className="w-12 h-12 rounded-lg bg-brand/10 flex items-center justify-center mb-5 group-hover:bg-brand/20 transition-colors">
                         <Icon className="w-6 h-6 text-brand" />
                       </div>
                       <h3 className="text-lg font-bold text-foreground mb-2">
@@ -672,14 +673,14 @@ export default function TrainingPlacementAbout() {
 
               {/* Image + Contact Card */}
               <div className="space-y-4">
-                <div className="rounded-2xl md:rounded-3xl overflow-hidden relative h-48 sm:h-64 md:h-80 group">
+                <div className="rounded-lg overflow-hidden relative h-48 sm:h-64 md:h-80 group">
                   <img
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     alt="Career counseling session at RGI"
                     src="/images/tnp.png"
                   />
                 </div>
-                <div className="bg-card rounded-2xl p-6 md:p-8 border border-border shadow-[var(--shadow-sm)]">
+                <div className="bg-card rounded-lg p-6 md:p-8 border border-border shadow-[var(--shadow-sm)]">
                   <h4 className="font-bold text-foreground mb-4 flex items-center gap-2">
                     <Phone className="w-4 h-4 text-brand" />
                     Contact T&P Cell
@@ -707,7 +708,7 @@ export default function TrainingPlacementAbout() {
 
           {/* CTA BANNER */}
           <section className="max-w-7xl mx-auto px-5 md:px-8 lg:px-20 pb-14 md:pb-28">
-            <div className="bg-brand rounded-2xl md:rounded-[2rem] p-6 md:p-16 relative overflow-hidden">
+            <div className="bg-brand rounded-lg p-6 md:p-16 relative overflow-hidden">
               {/* Decorative */}
               <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
               <div className="absolute -bottom-20 -left-20 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>

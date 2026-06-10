@@ -43,7 +43,7 @@ export default function VolunteerGrid({ volunteers }: { volunteers: VolunteerDat
         {volunteers.length === 0 ? (
           <>
             {/* <!-- Card 1 --> */}
-            <div className="bg-card rounded-xl hover:shadow-[var(--shadow-lg)] border overflow-hidden border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
+            <div className="bg-card rounded-lg hover:shadow-[var(--shadow-lg)] border overflow-hidden border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
               <div className="aspect-2.5/3 relative">
                 <Image src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwfoJsfJpSlw13cw9oHHcBFpUmlThTV4dahXFh0Qj0CAh37D3VkPF5Vy1WZ84fBrK27NKLkXJe9RdG7AK2_YVd56NxRE4WEisDxlGzpaHsjKPTDR4U181mIlvvE1U5v6IWNlaG_DgTioYwka5jHwh_pve2IGBpiChT2QMrlz4k151kkJSQh6DP0UchBMNC4_S69_b1AMPjNTlMUv9w1e1pD9_ibxhXkKedP9XEQnEHpH6UEZbIhd1RaiUAIFn7iUNBNm1Piuq4rA" alt="Female staff member profile" className="object-cover object-top transition-transform" fill sizes="(max-width: 768px) 50vw, 25vw" />
               </div>
@@ -53,7 +53,7 @@ export default function VolunteerGrid({ volunteers }: { volunteers: VolunteerDat
               </div>
             </div>
             {/* <!-- Card 2 --> */}
-            <div className="bg-card rounded-xl overflow-hidden border hover:shadow-[var(--shadow-lg)] border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
+            <div className="bg-card rounded-lg overflow-hidden border hover:shadow-[var(--shadow-lg)] border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
               <div className="aspect-2.5/3 relative">
                 <Image src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlBGcrKwosCrkAFG1qE2hMewRAhTS-EYKa7SX5VzKmhlBmcIztS0GsQ0_Rgz9VISZXklQKDWvsxaR_LvJAkVsHULlHlXfyZ4nWerTDPLdIe3qjX8LxGmJ3zuGiOPazUvP0C2eJvz1M6jzY3GQqrki-7wjTCNTNln4d3_JSSh3Es0CreOhKnzrPJfaIyqQ8jMSk_X8uCLGzJoYfiYyXC4HpIGJ7IJ-ERWVMjRjgv78yuEYpx2COfNFV579HNLl8x406i5IuTeIzAA" alt="Male staff member profile" className="object-cover object-top transition-transform" fill sizes="(max-width: 768px) 50vw, 25vw" />
               </div>
@@ -63,7 +63,7 @@ export default function VolunteerGrid({ volunteers }: { volunteers: VolunteerDat
               </div>
             </div>
             {/* <!-- Card 3 --> */}
-            <div className="bg-card rounded-xl hover:shadow-[var(--shadow-lg)] overflow-hidden border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
+            <div className="bg-card rounded-lg hover:shadow-[var(--shadow-lg)] overflow-hidden border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
               <div className="aspect-2.5/3 relative">
                 <Image src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvMtr2p2ngRt9hK1Jn6FrV4XHZlxx9MzK655JpTskmWj_hS4QAP6MX1VA4MFE8Po0VpwOr8M6vd2CZaeq3Da1fYO-6cMzMVaSOKbqJaXyP-O3kiQo3iYP7wqUb7DB_j3HahZcUqeW8hCdtz_hdJPm_ocN6cwLxwCbPVw2mnl-cwSyCjX8jq6bXiu_yHsaYt6HTLHOztoOuHm-Lym8KraBLLFh8MDKLUuBBxjG9xv1dbyZvYdy2Mqj-_EohWc67WEV4fgoYMBFSSQ" alt="Female student volunteer" className="object-cover object-top transition-transform" fill sizes="(max-width: 768px) 50vw, 25vw" />
               </div>
@@ -73,7 +73,7 @@ export default function VolunteerGrid({ volunteers }: { volunteers: VolunteerDat
               </div>
             </div>
             {/* <!-- Card 4 --> */}
-            <div className="bg-card rounded-xl hover:shadow-[var(--shadow-lg)] overflow-hidden border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
+            <div className="bg-card rounded-lg hover:shadow-[var(--shadow-lg)] overflow-hidden border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300">
               <div className="aspect-2.5/3 relative">
                 <Image src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcieaOwaB_8kavE_tydgpoKCMmW8zgXo46rbL1ABkBG2Xl4Ugae-0S9ZfXIhXGD86rFKMPXpNiw_XsXOlrp4KlaL87K1DgrihXRXIQqxow3qW_fXec3xCOiOGV8TeBp5dhzAlRguHWBBmJJj2xqUdmMvJ_VwzkhQoYKarT-AjNU_9KDusbNsiA6i9S1dt0RwqUepiImzSPwAq8IzU1sXLpDl88wppHQdcrIsM3jwFOxaA3PtZXtNmtclNuTgVmxZeNOH_yFkBJFA" alt="Male student volunteer" className="object-cover object-top transition-transform" fill sizes="(max-width: 768px) 50vw, 25vw" />
               </div>
@@ -89,7 +89,7 @@ export default function VolunteerGrid({ volunteers }: { volunteers: VolunteerDat
               <div
                 key={volunteer.id}
                 id={volunteer.id}
-                className="bg-card relative rounded-xl hover:shadow-[var(--shadow-lg)] border overflow-hidden border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 group">
+                className="bg-card relative rounded-lg hover:shadow-[var(--shadow-lg)] border overflow-hidden border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-all duration-300 group">
                 <div className="aspect-2.5/3 relative">
                   <Image src={volunteer.student.profileImageUrl} alt={volunteer.student.name} className="object-cover object-top transition-transform" fill sizes="(max-width: 768px) 50vw, 25vw" />
                 </div>
