@@ -1,4 +1,5 @@
 export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
 import { NextResponse, NextRequest } from "next/server";
 import { alumniLoginSchema } from "@/lib/validations/alumni";
 import { getDb } from "@/lib/db";

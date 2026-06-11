@@ -1,4 +1,5 @@
 export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { recruiterRegistrationSchema } from "@/lib/validations/recruiter";
 import { hashPassword } from "@/lib/auth-utils";

@@ -1,4 +1,5 @@
-export const runtime = "edge"; // Required for Cloudflare D1
+export const runtime = "edge";
+export const dynamic = 'force-dynamic'; // Required for Cloudflare D1
 
 import { NextResponse, NextRequest } from "next/server";
 import { getDb } from "@/lib/db";

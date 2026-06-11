@@ -1,4 +1,5 @@
 export const runtime = "edge";
+export const dynamic = 'force-dynamic';
 import { NextResponse, NextRequest } from "next/server";
 import { getDb } from "@/lib/db";
 import { deleteMultipleFromR2 } from "@/lib/r2-delete";

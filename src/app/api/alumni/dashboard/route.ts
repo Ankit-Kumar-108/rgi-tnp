@@ -1,4 +1,5 @@
 export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
@@ -97,21 +98,21 @@ export async function GET(req: NextRequest) {
         if (!branches.has(alumniData.branch)) {
           return false;
         }
-        
+
         // Batch check
         const alumniBatchNum = extractBatchNumber(alumniData.batch);
         const minBatchNum = extractBatchNumber(drive.minBatch);
         const maxBatchNum = extractBatchNumber(drive.maxBatch);
-        if (!isNaN(alumniBatchNum) && !isNaN(minBatchNum) && !isNaN(maxBatchNum) && 
-            (alumniBatchNum < minBatchNum || alumniBatchNum > maxBatchNum)) {
+        if (!isNaN(alumniBatchNum) && !isNaN(minBatchNum) && !isNaN(maxBatchNum) &&
+          (alumniBatchNum < minBatchNum || alumniBatchNum > maxBatchNum)) {
           return false;
         }
-        
+
         // CGPA check
         if (!meetsCgpaCriteria(alumniData.cgpa, drive.minCGPA)) {
           return false;
         }
-        
+
         // Gender check
         if (drive.genderPreference !== "Both" && alumniData.gender !== drive.genderPreference) {
           return false;
@@ -124,9 +125,9 @@ export async function GET(req: NextRequest) {
         isRegistered: d.registrations.length > 0,
         registrations: undefined,
       }));
-    
+
     const registeredDriveIds = registrations.map((r: any) => r.driveId);
-    
+
     const formattedArchivedDrives = archivedDrives.map((d: any) => ({
       ...d,
       isRegistered: registeredDriveIds.includes(d.id),

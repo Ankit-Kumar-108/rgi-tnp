@@ -1,4 +1,5 @@
 export const runtime = "edge";
+export const dynamic = 'force-dynamic';
 import { getDb } from "@/lib/db";
 
 export async function GET(req: Request) {
