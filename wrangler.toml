@@ -1,7 +1,18 @@
 name = "rgi-tnp"
-compatibility_date = "2024-11-18"
-compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = ".vercel/output/static"
+main = ".open-next/worker.js"
+compatibility_date = "2026-06-13"
+compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[observability]
+enabled = true
+
+[[services]]
+binding = "WORKER_SELF_REFERENCE"
+service = "rgi-tnp"
 
 [[d1_databases]]
 binding = "DB"

@@ -18,7 +18,7 @@ import {
   fetchHomeVolunteers,
 } from "@/lib/home-data";
 
-export const runtime = "edge";
+export const dynamic = "force-dynamic";
 
 function LoadingSection({ height = "300px" }) {
   return (

@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "pages:build": "next-on-pages",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "upload": "opennextjs-cloudflare build && opennextjs-cloudflare upload",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "db:generate": "prisma generate",
     "db:migrate:local": "wrangler d1 migrations apply placement-db --local",
     "db:migrate:remote": "wrangler d1 migrations apply placement-db --remote"
@@ -22,7 +25,7 @@
     "jose": "^6.2.2",
     "lucide-react": "^0.577.0",
     "motion": "^12.38.0",
-    "next": "15.5.2",
+    "next": "15.5.18",
     "next-themes": "^0.4.6",
     "nextjs-toploader": "^3.9.17",
     "qrcode": "^1.5.4",
@@ -35,8 +38,8 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@cloudflare/next-on-pages": "^1.13.16",
     "@cloudflare/workers-types": "^4.20260317.1",
+    "@opennextjs/cloudflare": "^1.19.11",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

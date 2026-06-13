@@ -1,4 +1,3 @@
-export const runtime = "edge";
 export const dynamic = 'force-dynamic'; // Required for Cloudflare D1
 
 import { NextResponse, NextRequest } from "next/server";

@@ -1,3 +1,5 @@
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+
 export interface R2UploadResult {
   url: string;
   key: string;
@@ -5,8 +7,12 @@ export interface R2UploadResult {
 
 export const getR2Bucket = async (): Promise<R2Bucket> => {
   if (process.env.NODE_ENV === "production") {
-    const { getRequestContext } = await import("@cloudflare/next-on-pages");
-    const { env } = getRequestContext() as { env: CloudflareEnv };
+    const { env } = getCloudflareContext();
+
+    if (!env.BUCKET) {
+      throw new Error("Cloudflare R2 binding BUCKET is not configured");
+    }
+
     return env.BUCKET;
   }
   

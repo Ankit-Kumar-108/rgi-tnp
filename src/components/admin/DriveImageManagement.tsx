@@ -1,6 +1,4 @@
 "use client";
-export const runtime = "edge";
-
 import { useState, useEffect, useCallback, useRef } from "react";
 import { toast } from "sonner";
 import { uploadFileToR2 } from "@/lib/upload-r2";

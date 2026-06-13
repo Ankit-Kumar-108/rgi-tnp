@@ -1,4 +1,4 @@
-import { getOptionalRequestContext } from "@cloudflare/next-on-pages";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 export function runInBackground(task: Promise<unknown>, label: string) {
   const wrappedTask = task.catch((error) => {
@@ -6,10 +6,10 @@ export function runInBackground(task: Promise<unknown>, label: string) {
   });
 
   try {
-    const requestContext = getOptionalRequestContext();
+    const { ctx } = getCloudflareContext();
 
-    if (requestContext?.ctx) {
-      requestContext.ctx.waitUntil(wrappedTask);
+    if (ctx) {
+      ctx.waitUntil(wrappedTask);
       return;
     }
   } catch {

@@ -1,13 +1,15 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 import type { NextConfig } from "next";
+
+initOpenNextCloudflareForDev();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const nextConfig: NextConfig = {
   outputFileTracingRoot: __dirname,
-  // Required for @cloudflare/next-on-pages static asset serving
   skipTrailingSlashRedirect: true,
   skipMiddlewareUrlNormalize: true,
   images: {
@@ -40,13 +42,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default (async () => {
-  if (process.env.NODE_ENV === "development") {
-    const { setupDevPlatform } = await import(
-      "@cloudflare/next-on-pages/next-dev"
-    );
-    setupDevPlatform();
-  }
-
-  return nextConfig;
-})();
+export default nextConfig;
