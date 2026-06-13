@@ -14,22 +14,22 @@ import {
   verifyUploadPermissionToken,
 } from "@/lib/upload-auth";
 
-// Check for required environment variables
-const requiredEnv = ["R2_END_POINT", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_BUCKET_NAME", "R2_PUBLIC_URL"];
-const missingEnv = requiredEnv.filter(name => !process.env[name]);
-
-if (missingEnv.length > 0) {
-    console.warn(`Missing R2 Environment Variables: ${missingEnv.join(", ")}`);
+// Lazy-initialized S3 client — process.env is NOT available at module
+// load time on Cloudflare Workers, so we must defer construction.
+let _s3Client: S3Client | null = null;
+function getS3Client(): S3Client {
+  if (!_s3Client) {
+    _s3Client = new S3Client({
+      region: "auto",
+      endpoint: process.env.R2_END_POINT!,
+      credentials: {
+        accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+      },
+    });
+  }
+  return _s3Client;
 }
-
-const s3Client = new S3Client({
-  region: "auto",
-  endpoint: process.env.R2_END_POINT!,
-  credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
-  },
-});
 
 function sanitizeFilename(filename: string) {
   const rawName = filename.split(/[\\/]/).pop() || "file";
@@ -178,7 +178,7 @@ export async function POST(req: NextRequest) {
       ContentType: contentType,
     });
 
-    const presignedUrl = await getSignedUrl(s3Client, command, {
+    const presignedUrl = await getSignedUrl(getS3Client(), command, {
       expiresIn: 300,
     });
     const publicUrl = `${process.env.R2_PUBLIC_URL}/${key}`;
