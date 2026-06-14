@@ -6,7 +6,7 @@ import { getToken } from "@/lib/auth-client";
 import { CheckCircle2, XCircle, Loader2, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 
-type Status = "loading" | "success" | "already" | "error" | "no-token";
+type Status = "loading" | "success" | "already" | "error" | "no-token" | "not-logged-in";
 
 function MarkAttendanceContent() {
   const searchParams = useSearchParams();
@@ -16,6 +16,7 @@ function MarkAttendanceContent() {
   const [status, setStatus] = useState<Status>("loading");
   const [driveName, setDriveName] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [isExternal, setIsExternal] = useState(false);
 
   useEffect(() => {
     // If there's no token in the URL, something is wrong
@@ -25,12 +26,16 @@ function MarkAttendanceContent() {
     }
 
     // Check if student is logged in (either internal or external)
-    const studentToken = getToken("student") || getToken("external_student");
+    const internalToken = getToken("student");
+    const externalToken = getToken("external_student");
+    const studentToken = internalToken || externalToken;
+
+    if (externalToken && !internalToken) {
+      setIsExternal(true);
+    }
 
     if (!studentToken) {
-      // Not logged in → send them to login, then bring them back here
-      const returnUrl = `/mark-attendance?token=${attendanceToken}`;
-      router.push(`/students/login?redirect=${encodeURIComponent(returnUrl)}`);
+      setStatus("not-logged-in");
       return;
     }
 
@@ -95,7 +100,7 @@ function MarkAttendanceContent() {
             <p className="text-base text-muted-foreground mt-2">
               You&apos;re marked present for <span className="font-bold text-brand">{driveName}</span>
             </p>
-            <Link href="/students/dashboard"
+            <Link href={isExternal ? "/external-students/dashboard" : "/students/dashboard"}
               className="inline-block mt-6 px-6 py-2.5 bg-brand text-white rounded-full font-bold text-sm hover:opacity-90 transition-opacity">
               Go to Dashboard
             </Link>
@@ -112,7 +117,7 @@ function MarkAttendanceContent() {
             <p className="text-base text-muted-foreground mt-2">
               Your attendance for <span className="font-bold text-brand">{driveName}</span> was already recorded.
             </p>
-            <Link href="/students/dashboard"
+            <Link href={isExternal ? "/external-students/dashboard" : "/students/dashboard"}
               className="inline-block mt-6 px-6 py-2.5 bg-brand text-white rounded-full font-bold text-sm hover:opacity-90 transition-opacity">
               Go to Dashboard
             </Link>
@@ -127,10 +132,37 @@ function MarkAttendanceContent() {
             </div>
             <h1 className="text-2xl font-black text-foreground">Oops!</h1>
             <p className="text-base text-muted-foreground mt-2">{errorMessage}</p>
-            <Link href="/students/dashboard"
+            <Link href={isExternal ? "/external-students/dashboard" : "/students/dashboard"}
               className="inline-block mt-6 px-6 py-2.5 bg-muted text-foreground rounded-full font-bold text-sm hover:opacity-90 transition-opacity">
               Go to Dashboard
             </Link>
+          </>
+        )}
+
+        {/* NOT LOGGED IN */}
+        {status === "not-logged-in" && (
+          <>
+            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
+              <AlertTriangle className="w-10 h-10 text-indigo-600" />
+            </div>
+            <h1 className="text-2xl font-black text-foreground">Login Required</h1>
+            <p className="text-base text-muted-foreground mt-2 mb-6">
+              Please login to your respective portal to mark your attendance.
+            </p>
+            <div className="flex flex-col gap-3">
+              <Link
+                href={`/students/login?redirect=${encodeURIComponent("/mark-attendance?token=" + attendanceToken)}`}
+                className="w-full px-6 py-3 bg-brand text-white rounded-xl font-bold text-sm hover:opacity-90 transition-opacity"
+              >
+                Login as RGI Student
+              </Link>
+              <Link
+                href={`/external-students/login?redirect=${encodeURIComponent("/mark-attendance?token=" + attendanceToken)}`}
+                className="w-full px-6 py-3 bg-card border-2 border-brand text-brand rounded-xl font-bold text-sm hover:bg-brand/5 transition-colors"
+              >
+                Login as External Student
+              </Link>
+            </div>
           </>
         )}
 

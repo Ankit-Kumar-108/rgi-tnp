@@ -18,10 +18,10 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1018.0",
     "@aws-sdk/s3-request-presigner": "^3.1018.0",
-    "@prisma/adapter-d1": "^6.4.1",
-    "@prisma/client": "^6.4.1",
+    "@paralleldrive/cuid2": "^3.3.0",
     "@types/qrcode": "^1.5.6",
     "clsx": "^2.1.1",
+    "drizzle-orm": "^0.45.2",
     "jose": "^6.2.2",
     "lucide-react": "^0.577.0",
     "motion": "^12.38.0",
@@ -45,11 +45,12 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.27",
+    "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "^15.5.2",
     "postcss": "^8.5.8",
-    "prisma": "^6.4.1",
     "tailwindcss": "^4.2.2",
+    "ts-morph": "^28.0.0",
     "typescript": "^5",
     "wrangler": "^4.96.0"
   }

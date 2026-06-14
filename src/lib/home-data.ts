@@ -85,7 +85,7 @@ export async function fetchHomeMemories(limit = 6) {
       imageUrl: m.imageUrl,
       title: m.title,
       uploaderName: m.student?.name || m.alumni?.name || "Anonymous",
-      createdAt: m.createdAt.toISOString(),
+      createdAt: m.createdAt instanceof Date ? m.createdAt.toISOString() : new Date(m.createdAt).toISOString(),
     }));
   } catch (error) {
     console.error("Home memories error:", error);
@@ -114,14 +114,14 @@ export async function fetchHomeVolunteers(limit?: number) {
     });
     
     return volunteers
-      .filter((v: any) => v.student !== null)
+      .filter((v: any) => !!v.student)
       .map((v: any) => ({
         id: v.id,
         designation: v.designation,
         student: {
-          name: v.student.name,
-          profileImageUrl: v.student.profileImageUrl || "https://lh3.googleusercontent.com/aida-public/AB6AXuD-4qpQG9rSHLujKoHhrbgWRAg81sFBu41MDA54QQ14Y6yYxoww19N7Hs6lybLRgvZCg5yNw-06wJ8p2GwAuZrN9ytupLwK1aRZSm47WIYXx5ld9vONPYIsuhD5KGlStRJhFuJTFHl_Hc-t-2CxveYwpsep0lUKrYPz6ghsEv9_r2NE8H2tzkba6XLY91OoOHMGHGA4iF6n7TtSxX_Dr3zeJ206-8b6lxuPWVgO5R0mihIiXboKj1OEPXe_2qH9vxxFdK4gE9e5YQ",
-          linkedinUrl: v.student.linkedinUrl,
+          name: v.student?.name || "Unknown",
+          profileImageUrl: v.student?.profileImageUrl || "https://lh3.googleusercontent.com/aida-public/AB6AXuD-4qpQG9rSHLujKoHhrbgWRAg81sFBu41MDA54QQ14Y6yYxoww19N7Hs6lybLRgvZCg5yNw-06wJ8p2GwAuZrN9ytupLwK1aRZSm47WIYXx5ld9vONPYIsuhD5KGlStRJhFuJTFHl_Hc-t-2CxveYwpsep0lUKrYPz6ghsEv9_r2NE8H2tzkba6XLY91OoOHMGHGA4iF6n7TtSxX_Dr3zeJ206-8b6lxuPWVgO5R0mihIiXboKj1OEPXe_2qH9vxxFdK4gE9e5YQ",
+          linkedinUrl: v.student?.linkedinUrl,
         }
       }));
   } catch (error) {

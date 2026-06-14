@@ -1,6 +1,6 @@
 name = "rgi-tnp"
 main = ".open-next/worker.js"
-compatibility_date = "2026-06-13"
+compatibility_date = "2026-06-05"
 compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
 
 [assets]
@@ -22,3 +22,7 @@ database_id = "ce5c387a-ca67-4ff6-aca0-7ff20892695b"
 [[r2_buckets]]
 binding = "BUCKET"
 bucket_name = "placement-assets"
+
+[[kv_namespaces]]
+binding = "IMAGES"
+id = "2cfdb84a0d6d42bdbc3b14a2285ebbf6"

@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
-import { Prisma } from "@prisma/client";
+// import { Prisma } from "@prisma/client";
 import { getDb } from "@/lib/db";
 import { rejectionEmailTemplate } from "@/lib/email-templates";
 import { shortlistedEmailTemplate } from "@/lib/email-templates";
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const db = getDb();
 
     // Explicitly type the query to help the compiler
-    const query: Prisma.DriveRegistrationFindManyArgs = {
+    const query: any = {
       where: { driveId: id },
       take: limit,
       skip: skip,

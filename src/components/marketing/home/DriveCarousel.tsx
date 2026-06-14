@@ -28,7 +28,7 @@ export default function DriveCarousel({ drives }: { drives: HomeDrive[] }) {
   const [currentGroupIndex, setCurrentGroupIndex] = useState(0);
 
   const driveGroups: DriveGroup[] = drives
-    .filter((d) => d.driveImages.length > 0)
+    .filter((d) => d.driveImages && d.driveImages.length > 0)
     .map((d) => ({ driveId: d.id, title: d.title, images: d.driveImages }));
 
   useEffect(() => {
