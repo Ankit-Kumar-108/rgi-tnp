@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { getToken } from "@/lib/auth-client";
+import { isLoggedIn } from "@/lib/auth-client";
 import { CheckCircle2, XCircle, Loader2, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 
@@ -26,15 +26,15 @@ function MarkAttendanceContent() {
     }
 
     // Check if student is logged in (either internal or external)
-    const internalToken = getToken("student");
-    const externalToken = getToken("external_student");
-    const studentToken = internalToken || externalToken;
+    const isInternalLoggedIn = isLoggedIn("student");
+    const isExternalLoggedIn = isLoggedIn("external_student");
+    const isStudentLoggedIn = isInternalLoggedIn || isExternalLoggedIn;
 
-    if (externalToken && !internalToken) {
+    if (isExternalLoggedIn && !isInternalLoggedIn) {
       setIsExternal(true);
     }
 
-    if (!studentToken) {
+    if (!isStudentLoggedIn) {
       setStatus("not-logged-in");
       return;
     }
@@ -46,7 +46,6 @@ function MarkAttendanceContent() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${studentToken}`,
           },
           body: JSON.stringify({ attendanceToken }),
         });
