@@ -55,7 +55,6 @@ jobs:
             JWT_SECRET
             R2_ACCESS_KEY_ID
             R2_SECRET_ACCESS_KEY
-            BREVO_API_KEY
             GMAIL_CLIENT_ID
             GMAIL_CLIENT_SECRET
             GMAIL_REFRESH_TOKEN
@@ -64,7 +63,6 @@ jobs:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
           GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
           GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
           GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
