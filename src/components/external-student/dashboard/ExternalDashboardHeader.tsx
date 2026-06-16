@@ -1,9 +1,9 @@
 import React from "react";
 import { LogOut, MessageSquareShare, ChevronRight, UserRoundPen } from "lucide-react";
 import NotificationBell from "@/components/ui/NotificationBell";
-import ProfileCompletionForm from "./ProfileCompletionForm";
+import ExternalProfileCompletionForm from "./ExternalProfileCompletionForm";
 
-interface DashboardHeaderProps {
+interface ExternalDashboardHeaderProps {
   showProfileForm: boolean;
   setShowProfileForm: (val: boolean) => void;
   isProfileIncomplete: boolean;
@@ -13,7 +13,7 @@ interface DashboardHeaderProps {
   fetchDashboard: () => void;
 }
 
-export default function DashboardHeader({
+export default function ExternalDashboardHeader({
   showProfileForm,
   setShowProfileForm,
   isProfileIncomplete,
@@ -21,7 +21,7 @@ export default function DashboardHeader({
   handleLogout,
   student,
   fetchDashboard,
-}: DashboardHeaderProps) {
+}: ExternalDashboardHeaderProps) {
   return (
     <>
       <section className="hidden md:flex pt-4 md:pt-8 flex-col md:flex-row justify-between md:items-end gap-4">
@@ -50,7 +50,7 @@ export default function DashboardHeader({
           >
             <LogOut className="size-4" /> Logout
           </button>
-          <NotificationBell role="student" />
+          <NotificationBell role="external_student" />
         </div>
       </section>
       <section className="md:hidden flex flex-col gap-2 w-full">
@@ -97,7 +97,7 @@ export default function DashboardHeader({
           </button>
 
           <div className="md:hidden">
-            <ProfileCompletionForm
+            <ExternalProfileCompletionForm
               student={student}
               showProfileForm={showProfileForm}
               setShowProfileForm={setShowProfileForm}
@@ -123,7 +123,7 @@ export default function DashboardHeader({
 
         {/* Notification bell as its own pill row */}
         <div className="rounded-lg size-4 border border-border bg-card overflow-hidden">
-          <NotificationBell role="student" />
+          <NotificationBell role="external_student" />
         </div>
       </section>
     </>

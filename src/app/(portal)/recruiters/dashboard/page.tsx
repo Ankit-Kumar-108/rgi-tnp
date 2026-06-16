@@ -251,17 +251,10 @@ export default function RecruiterDashboard() {
               </h1>
               {user?.company && <p className="text-sm text-muted-foreground mt-1">{user.company}</p>}
             </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <NotificationBell role="recruiter" />
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2.5 text-destructive rounded-full text-sm font-bold border border-border bg-destructive/20 hover:text-red-500 hover:border-red-500/30 transition-all"
-              >
-                <LogOut className="w-4 h-4" /> Logout
-              </button>
+            <div className="hidden md:flex flex-wrap items-center gap-3">
               <button
                 onClick={() => setShowFeedbackModal(true)}
-                className="inline-flex items-center gap-2 text-sm font-bold text-foreground hover:bg-muted transition-colors border border-border px-4 py-2.5 rounded-full bg-card shadow-sm cursor-pointer"
+                className="inline-flex items-center gap-2 text-sm font-bold text-foreground hover:bg-muted transition-colors border border-border px-4 py-2.5 rounded-lg bg-card shadow-sm cursor-pointer"
               >
                 <MessageSquareShare className="w-4 h-4" />
                 Share Feedback
@@ -273,10 +266,73 @@ export default function RecruiterDashboard() {
                   setFormMsg(null);
                   setShowForm(true);
                 }}
-                className="bg-brand text-white font-bold px-6 py-2.5 rounded-full flex items-center gap-2 hover:opacity-90 transition-opacity shadow-[var(--shadow-brand)] text-sm"
+                className="bg-brand text-white font-bold px-6 py-2.5 rounded-lg flex items-center gap-2 hover:opacity-90 transition-opacity shadow-[var(--shadow-brand)] text-sm"
               >
                 <Plus className="w-4 h-4" /> Submit Drive Request
               </button>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 bg-destructive/10 text-destructive px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-destructive/20 transition-all shadow-sm border border-destructive/10"
+              >
+                <LogOut className="w-4 h-4" /> Logout
+              </button>
+              <NotificationBell role="recruiter" />
+            </div>
+          </section>
+
+          {/* Mobile Actions */}
+          <section className="md:hidden flex flex-col gap-2 w-full mt-4">
+            <div className="rounded-lg border border-border bg-card overflow-hidden">
+              <button
+                onClick={() => {
+                  setEditDriveId(null);
+                  setForm({ companyName: user?.company || "", roleName: "", jobDescription: "", ctc: "", eligibleBranches: "", minCGPA: 0, minBatch: "", maxBatch: "", course: "B.Tech", driveDate: "", driveType: "Closed", jobType: "Full Time", genderPreference: "Both", duration: "", interviewProcess: "", allowAlumni: false });
+                  setFormMsg(null);
+                  setShowForm(true);
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-muted/50 transition-colors border-b border-border"
+              >
+                <span className="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
+                  <Plus className="w-4 h-4" />
+                </span>
+                <span className="flex-1 min-w-0">
+                  <span className="block text-sm font-medium text-foreground leading-tight">Submit Drive Request</span>
+                  <span className="block text-xs text-muted-foreground mt-0.5">Post a new job or internship</span>
+                </span>
+                <ChevronRight className="w-4 h-4 text-muted-foreground/50 shrink-0" />
+              </button>
+
+              <button
+                onClick={() => setShowFeedbackModal(true)}
+                className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-muted/50 transition-colors border-b border-border"
+              >
+                <span className="w-9 h-9 rounded-xl bg-violet-50 text-violet-700 flex items-center justify-center shrink-0">
+                  <MessageSquareShare className="w-4 h-4" />
+                </span>
+                <span className="flex-1 min-w-0">
+                  <span className="block text-sm font-medium text-foreground leading-tight">Share feedback</span>
+                  <span className="block text-xs text-muted-foreground mt-0.5">Rate your experience</span>
+                </span>
+                <ChevronRight className="w-4 h-4 text-muted-foreground/50 shrink-0" />
+              </button>
+
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-muted/50 transition-colors"
+              >
+                <span className="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center shrink-0">
+                  <LogOut className="w-4 h-4" />
+                </span>
+                <span className="flex-1 min-w-0">
+                  <span className="block text-sm font-medium text-red-600 leading-tight">Log out</span>
+                  <span className="block text-xs text-muted-foreground mt-0.5">Sign out of your account</span>
+                </span>
+                <ChevronRight className="w-4 h-4 text-muted-foreground/50 shrink-0" />
+              </button>
+            </div>
+
+            <div className="rounded-2xl border border-border bg-card overflow-hidden">
+              <NotificationBell role="recruiter" />
             </div>
           </section>
 

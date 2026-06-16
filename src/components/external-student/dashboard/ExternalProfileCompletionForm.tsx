@@ -1,22 +1,21 @@
 import React, { useState } from "react";
 import { AlertTriangle, ChevronRight, FileText, Loader2 } from "lucide-react";
 import { getToken } from "@/lib/auth-client";
-import { Student } from "@/types";
 
-interface ProfileCompletionFormProps {
+interface ExternalProfileCompletionFormProps {
   student: any;
   showProfileForm: boolean;
   setShowProfileForm: (val: boolean) => void;
   fetchDashboard: () => void;
 }
 
-export default function ProfileCompletionForm({
+export default function ExternalProfileCompletionForm({
   student,
   showProfileForm,
   setShowProfileForm,
   fetchDashboard,
-}: ProfileCompletionFormProps) {
-  const isProfileIncomplete = student && (!student.tenthPercentage || !student.twelfthPercentage || !student.resumeUrl);
+}: ExternalProfileCompletionFormProps) {
+  const isProfileIncomplete = student && (!student.tenthPercentage || !student.cgpa || !student.resumeUrl);
 
   const [submittingProfile, setSubmittingProfile] = useState(false);
   const [profileMsg, setProfileMsg] = useState<{ msg: string; ok: boolean } | null>(null);
@@ -34,11 +33,11 @@ export default function ProfileCompletionForm({
     setSubmittingProfile(true);
     setProfileMsg(null);
     try {
-      const token = getToken("student");
-      const res = await fetch("/api/student/update-profile", {
+      const token = getToken("external_student");
+      const res = await fetch("/api/external/update-profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify(profileForm),
+        body: JSON.stringify({ profileImageUrl: student?.profileImageUrl, ...profileForm }),
       });
       const d = (await res.json()) as any;
       setProfileMsg({ msg: d.message, ok: d.success });

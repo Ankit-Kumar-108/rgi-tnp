@@ -35,7 +35,8 @@ import {
   Upload,
   AlertTriangle,
   CalendarDays,
-  Clock
+  Clock,
+  UserRoundPen
 } from "lucide-react";
 import Nav from "@/components/layout/nav/nav";
 import Footer from "@/components/layout/footer/footer";
@@ -47,6 +48,9 @@ import { DriveRegistration, Memory, PlacementDrive, Student } from "@/types";
 import { uploadFileToR2 } from "@/lib/upload-r2";
 import NotificationBell from "@/components/ui/NotificationBell";
 import dynamic from "next/dynamic";
+import AlumniDashboardHeader from "@/components/alumni/dashboard/AlumniDashboardHeader";
+import AlumniProfileCompletionForm from "@/components/alumni/dashboard/AlumniProfileCompletionForm";
+import AlumniDashboardOverview from "@/components/alumni/dashboard/AlumniDashboardOverview";
 
 const JobDetailsModal = dynamic(
   () => import("@/components/forms/studentApplyModal/modal"),
@@ -106,18 +110,7 @@ export default function AlumniDashboard() {
   const profileImageRef = React.useRef<HTMLInputElement>(null);
 
 
-  // Profile Form
-  const [profileForm, setProfileForm] = useState({
-    currentCompany: "",
-    jobTitle: "",
-    city: "",
-    country: "",
-    linkedInUrl: "",
-    phoneNumber: "",
-    about: "",
-  });
-  const [submittingProfile, setSubmittingProfile] = useState(false);
-  const [profileMsg, setProfileMsg] = useState<{ msg: string; ok: boolean } | null>(null);
+  // Profile Form State
   const [showProfileForm, setShowProfileForm] = useState(false);
   const [isDeleting, setIsDeleting] = useState<string | null>()
 
@@ -137,17 +130,6 @@ export default function AlumniDashboard() {
       const d = (await res.json()) as any;
       if (d.success) {
         setData(d);
-        if (d.alumni) {
-          setProfileForm({
-            currentCompany: d.alumni.currentCompany || "",
-            jobTitle: d.alumni.jobTitle || "",
-            city: d.alumni.city || "",
-            country: d.alumni.country || "",
-            linkedInUrl: d.alumni.linkedInUrl || "",
-            phoneNumber: d.alumni.phoneNumber || "",
-            about: d.alumni.about || "",
-          });
-        }
       } else {
         setFetchError("Failed to load dashboard data.");
         toast.error("Failed to load dashboard data.");
@@ -263,35 +245,6 @@ export default function AlumniDashboard() {
 
   const toggleFbTag = (tag: string) => {
     setFbSelectedTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]);
-  };
-
-  const handleSubmitProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmittingProfile(true);
-    setProfileMsg(null);
-    try {
-      const token = getToken("alumni");
-      const res = await fetch("/api/alumni/profile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify(profileForm),
-      });
-      const d = (await res.json()) as any;
-      setProfileMsg({ msg: d.message, ok: d.success });
-      if (d.success) {
-        toast.success("Profile updated successfully!");
-        fetchDashboard();
-        setTimeout(() => setShowProfileForm(false), 2000);
-      } else {
-        toast.error(d.message || "Failed to update profile");
-      }
-    } catch (error) {
-      const errorMsg = "Failed to update profile. Please try again.";
-      setProfileMsg({ msg: errorMsg, ok: false });
-      toast.error(errorMsg);
-    } finally {
-      setSubmittingProfile(false);
-    }
   };
 
   const handleProfileImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -513,31 +466,18 @@ export default function AlumniDashboard() {
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand/10 text-brand text-xs font-bold uppercase tracking-widest mb-0">
             <GraduationCap className="w-4 h-4" /> Alumni
           </div>
-          <section className="pt-4 md:pt-8 flex flex-col md:flex-row justify-between md:items-end gap-4">
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                onClick={() => setShowReferralModal(true)}
-                className="inline-flex items-center gap-2 text-sm font-bold text-primary-foreground hover:opacity-90 transition-opacity border border-transparent px-4 py-2.5 rounded-2xl bg-brand shadow-md"
-              >
-                <Send className="w-4 h-4" />
-                Post a Referral
-              </button>
-              <button
-                onClick={() => setShowFeedbackModal(true)}
-                className="inline-flex items-center gap-2 text-sm font-bold text-foreground hover:bg-muted transition-colors border border-border px-4 py-2.5 rounded-2xl bg-card shadow-sm"
-              >
-                <MessageSquareShare className="w-4 h-4" />
-                Share Feedback
-              </button>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 bg-destructive/10 text-destructive px-5 py-2.5 rounded-2xl text-sm font-bold hover:bg-destructive/20 transition-all shadow-sm border border-destructive/10"
-              >
-                <LogOut className="size-4" /> Logout
-              </button>
-              <NotificationBell role="alumni" />
-            </div>
-          </section>
+          <div className="hidden md:flex">
+          <AlumniDashboardHeader
+            alumni={alumni}
+            showProfileForm={showProfileForm}
+            setShowProfileForm={setShowProfileForm}
+            isProfileIncomplete={isProfileIncomplete}
+            setShowFeedbackModal={setShowFeedbackModal}
+            setShowReferralModal={setShowReferralModal}
+            handleLogout={handleLogout}
+            fetchDashboard={fetchDashboard}
+          />
+          </div>
 
           {/* Loader State */}
           {loading && (
@@ -546,296 +486,41 @@ export default function AlumniDashboard() {
             </div>
           )}
 
-          {/* Hero Section */}
+          {/* Hero Section & Profile Form */}
           {!loading && !fetchError && (
-          <section className="w-full z-40">
-            <div className="flex flex-col items-center justify-between gap-6 mt-2">
-              {alumni && (
-                <div className="w-full relative group">
-                  <div className="absolute -top-12 -left-12 w-48 h-48 md:w-64 md:h-64 bg-brand/10 rounded-full blur-3xl -z-10 animate-pulse"></div>
-                  <div className="absolute top-24 -right-12 w-32 h-32 md:w-48 md:h-48 bg-foreground/5 rounded-full blur-3xl -z-10"></div>
-
-                  <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-6 md:p-10 lg:p-12 shadow-[var(--shadow-md)] border border-border/60 flex flex-col md:flex-row gap-8 items-center md:items-start relative overflow-hidden transition-shadow duration-300 hover:shadow-[var(--shadow-lg)]">
-
-                    <div className="absolute top-0 right-0 w-24 h-24 md:w-40 md:h-40 bg-gradient-to-bl from-brand/10 via-transparent to-transparent rounded-bl-[3rem] md:rounded-bl-[6rem]"></div>
-
-                    <div
-                      onClick={() => !profileUploading && profileImageRef.current?.click()}
-                      className="relative shrink-0 cursor-pointer group/avatar"
-                    >
-                      <div className="w-32 h-32 md:w-44 lg:w-52 md:h-44 lg:h-52 rounded-full p-1 md:p-2 bg-gradient-to-tr from-brand to-brand/50 transition-transform duration-500 group-hover/avatar:scale-105">
-                        <div className="w-full h-full rounded-full border-[3px] md:border-[5px] border-background overflow-hidden bg-muted flex items-center justify-center relative">
-                          {alumni?.profileImageUrl ? (
-                            <img
-                              alt="Alumni Portrait"
-                              className="w-full h-full object-cover object-top"
-                              src={alumni.profileImageUrl}
-                            />
-                          ) : (
-                            <span className="text-4xl md:text-5xl font-black text-muted-foreground/40 uppercase leading-none">
-                              {alumni?.name?.charAt(0)}
-                            </span>
-                          )}
-
-                          {/* Camera Hover Overlay */}
-                          <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300">
-                            <Camera className="w-6 h-6 mb-1 text-white animate-pulse" />
-                            <span className="text-[10px] uppercase font-bold tracking-wider">Change Image</span>
-                          </div>
-
-                          {/* Loading Overlay */}
-                          {profileUploading && (
-                            <div className="absolute inset-0 bg-black/75 flex items-center justify-center">
-                              <Loader2 className="w-6 h-6 text-brand animate-spin" />
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Hidden Input */}
-                      <input
-                        type="file"
-                        ref={profileImageRef}
-                        onChange={handleProfileImageUpload}
-                        accept="image/*"
-                        className="hidden"
-                        disabled={profileUploading}
-                      />
-
-                      <div className="absolute bottom-1 md:bottom-2 right-1 md:right-4 bg-background rounded-full shadow-md">
-                        {alumni?.isVerified ? (
-                          <BadgeCheck className="w-7 h-7 md:w-10 md:h-10 text-green-500" />
-                        ) : (
-                          <BadgeAlert className="w-7 h-7 md:w-10 md:h-10 text-destructive/80" />
-                        )}
-                      </div>
-                    </div>
-
-
-                    <div className="flex-1 space-y-6 md:space-y-8 w-full text-center md:text-left">
-                      <div className="space-y-2 md:space-y-3">
-                        <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-foreground tracking-tight leading-tight">
-                          {alumni?.name}
-                        </h1>
-                        <p className="text-sm md:text-lg font-bold text-brand uppercase tracking-widest bg-brand/5 inline-block px-4 py-1 rounded-full">
-                          {alumni?.course}
-                        </p>
-                      </div>
-
-                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-6 md:gap-y-0 md:pt-6 border-t border-border/50 pt-6">
-                        <div className="px-2 md:pr-6 md:border-r border-border/50 text-left">
-                          <p className="text-xs md:text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Current Role</p>
-                          <p className="text-sm md:text-lg font-extrabold text-foreground leading-snug truncate">{alumni?.jobTitle || "N/A"}</p>
-                        </div>
-                        <div className="px-2 md:px-6 md:border-r border-border/50 text-left">
-                          <p className="text-xs md:text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Company</p>
-                          <p className="text-sm md:text-lg font-extrabold text-foreground leading-snug truncate">{alumni?.currentCompany || "N/A"}</p>
-                        </div>
-                        <div className="px-2 md:px-6 md:border-r border-border/50 text-left text-left">
-                          <p className="text-xs md:text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">City</p>
-                          <p className="text-sm md:text-lg font-extrabold text-foreground leading-snug truncate">{alumni?.city || "N/ A"}</p>
-                        </div>
-                        <div className="px-2 md:pl-6 text-left">
-                          <p className="text-xs md:text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Country</p>
-                          <p className="text-sm md:text-lg font-extrabold text-foreground leading-snug truncate">{alumni?.country || "N/A"}</p>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-                        {alumni?.linkedInUrl && (
-                          <a
-                            href={alumni.linkedInUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 bg-[#0077b5] text-white hover:bg-[#0077b5]/90 px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md"
-                          >
-                            <Linkedin className="w-4 h-4" />
-                            <span className="hidden xs:inline">LinkedIn Profile</span>
-                            <span className="xs:hidden">LinkedIn</span>
-                          </a>
-                        )}
-                        <button
-                          onClick={() => setShowProfileForm(!showProfileForm)}
-                          className="relative flex items-center gap-2 text-sm font-bold border border-border bg-background hover:bg-muted px-5 py-2.5 rounded-xl transition-all"
-                        >
-                          {showProfileForm ? "Close Form" : "Update Profile"}
-                          <ChevronRight className={`w-4 h-4 transition-transform duration-300 ${showProfileForm ? "rotate-90" : ""}`} />
-                          {!showProfileForm && isProfileIncomplete && (
-                            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shadow-sm" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </section>
-          )}
-          {/* Profile Form (Full Screen Overlay) */}
-          {showProfileForm && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6">
-              {/* Backdrop */}
-              <div
-                className="absolute w-full h-[120%] bg-background/60 backdrop-blur-xl animate-in fade-in duration-300"
-                onClick={() => setShowProfileForm(false)}
+            <div className="flex flex-col gap-6">
+              <AlumniDashboardOverview
+                alumni={alumni}
+                profileUploading={profileUploading}
+                profileImageRef={profileImageRef}
+                handleProfileImageUpload={handleProfileImageUpload}
+                showProfileForm={showProfileForm}
+                setShowProfileForm={setShowProfileForm}
+                isProfileIncomplete={isProfileIncomplete}
               />
-
-              {/* Modal Container */}
-              <section className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-card rounded-[2.5rem] p-6 md:p-10 shadow-2xl border border-brand/20 animate-in zoom-in-95 duration-300">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6 border-b border-border/50">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-brand/10 rounded-2xl text-brand shadow-inner">
-                      <GraduationCap className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h2 className="text-xl md:text-2xl font-black text-foreground tracking-tight">Professional Profile</h2>
-                      <p className="text-xs md:text-sm text-muted-foreground font-medium">Update your career details for the RGI community.</p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowProfileForm(false)}
-                    className="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground hover:text-foreground"
-                  >
-                    <X className="size-7" />
-                  </button>
-                </div>
-
-                <form onSubmit={handleSubmitProfile} className="space-y-8">
-                  <div className="space-y-3 text-left">
-                    <label htmlFor="about" className="text-xs md:text-xs font-black uppercase tracking-widest text-brand ml-1 flex items-center gap-2">
-                      <div className="w-1 h-1 bg-brand rounded-full" /> Tell Us About Your Journey
-                    </label>
-                    <div className="relative group">
-                      <textarea
-                        id="about"
-                        value={profileForm.about}
-                        onChange={(e) => setProfileForm({ ...profileForm, about: e.target.value })}
-                        className="w-full bg-muted/50 px-6 py-5 rounded-[1.5rem] border border-transparent focus:border-brand/30 focus:bg-background transition-all text-sm outline-none text-foreground resize-none leading-relaxed shadow-sm group-hover:shadow-md"
-                        placeholder="E.g. Transitioned from Frontend to Full-stack, currently leading a team at Microsoft..."
-                        rows={4}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
-                    <div className="space-y-2">
-                      <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Current Company (Optional)</label>
-                      <div className="relative group">
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-background rounded-lg border border-border group-focus-within:border-brand/50 transition-colors">
-                          <Briefcase className="w-3.5 h-3.5 text-muted-foreground" />
-                        </div>
-                        <input
-                          value={profileForm.currentCompany}
-                          onChange={(e) => setProfileForm({ ...profileForm, currentCompany: e.target.value })}
-                          className="w-full bg-muted/50 pl-14 pr-5 py-4 rounded-2xl border border-transparent focus:border-brand/30 focus:bg-background transition-all text-sm outline-none text-foreground font-bold"
-                          placeholder="e.g. Google"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Job Title (Optional)</label>
-                      <div className="relative group">
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-background rounded-lg border border-border group-focus-within:border-brand/50 transition-colors">
-                          <TrendingUp className="w-3.5 h-3.5 text-muted-foreground" />
-                        </div>
-                        <input
-                          value={profileForm.jobTitle}
-                          onChange={(e) => setProfileForm({ ...profileForm, jobTitle: e.target.value })}
-                          className="w-full bg-muted/50 pl-14 pr-5 py-4 rounded-2xl border border-transparent focus:border-brand/30 focus:bg-background transition-all text-sm outline-none text-foreground font-bold"
-                          placeholder="e.g. Software Engineer"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">LinkedIn Profile</label>
-                      <div className="relative group">
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-[#0077b5]/10 rounded-lg border border-[#0077b5]/20">
-                          <Linkedin className="w-3.5 h-3.5 text-[#0077b5]" />
-                        </div>
-                        <input
-                          value={profileForm.linkedInUrl}
-                          onChange={(e) => setProfileForm({ ...profileForm, linkedInUrl: e.target.value })}
-                          className="w-full bg-muted/50 pl-14 pr-5 py-4 rounded-2xl border border-transparent focus:border-brand/30 focus:bg-background transition-all text-sm outline-none text-foreground font-bold"
-                          placeholder="linkedin.com/in/yourname"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Location (Current City)</label>
-                      <div className="relative group">
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-background rounded-lg border border-border">
-                          <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
-                        </div>
-                        <input
-                          required
-                          value={profileForm.city}
-                          onChange={(e) => setProfileForm({ ...profileForm, city: e.target.value })}
-                          className="w-full bg-muted/50 pl-14 pr-5 py-4 rounded-2xl border border-transparent focus:border-brand/30 focus:bg-background transition-all text-sm outline-none text-foreground font-bold"
-                          placeholder="e.g. Bhopal"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Country</label>
-                      <input
-                        required
-                        value={profileForm.country}
-                        onChange={(e) => setProfileForm({ ...profileForm, country: e.target.value })}
-                        className="w-full bg-muted/50 px-6 py-4 rounded-2xl border border-transparent focus:border-brand/30 focus:bg-background transition-all text-sm outline-none text-foreground font-bold"
-                        placeholder="e.g. India"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">Phone Number (Private)</label>
-                      <div className="relative group">
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 p-1.5 bg-background rounded-lg border border-border">
-                          <Phone className="w-3.5 h-3.5 text-muted-foreground" />
-                        </div>
-                        <input
-                          value={profileForm.phoneNumber}
-                          onChange={(e) => setProfileForm({ ...profileForm, phoneNumber: e.target.value })}
-                          className="w-full bg-muted/50 pl-14 pr-5 py-4 rounded-2xl border border-transparent focus:border-brand/30 focus:bg-background transition-all text-sm outline-none text-foreground font-bold"
-                          placeholder="+91 XXXXX XXXXX"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {profileMsg && (
-                    <div className={`p-4 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-left-2 ${profileMsg.ok ? "bg-green-500/10 text-green-600 border border-green-500/20" : "bg-destructive/10 text-destructive border border-destructive/20"}`}>
-                      {profileMsg.ok ? <CheckCircle className="w-4 h-4" /> : <BadgeAlert className="w-4 h-4" />}
-                      <p className="text-xs md:text-sm font-bold">{profileMsg.msg}</p>
-                    </div>
-                  )}
-
-                  <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-border/50">
-                    <button
-                      type="submit"
-                      disabled={submittingProfile}
-                      className="flex-1 bg-brand text-primary-foreground px-8 py-4 rounded-full font-black hover:opacity-90 transition-opacity shadow-[var(--shadow-brand)] disabled:opacity-50 flex items-center justify-center gap-3"
-                    >
-                      {submittingProfile ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle className="w-5 h-5" />}
-                      <span className="tracking-tight uppercase text-xs md:text-sm">Save Profile changes</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowProfileForm(false)}
-                      className="bg-muted text-foreground px-8 py-4 rounded-full font-bold hover:bg-muted/80 transition-all uppercase text-xs md:text-sm tracking-widest"
-                    >
-                      Discard
-                    </button>
-                  </div>
-                </form>
-              </section>
+              <div className="hidden md:block">
+                <AlumniProfileCompletionForm
+                  alumni={alumni}
+                  showProfileForm={showProfileForm}
+                  setShowProfileForm={setShowProfileForm}
+                  fetchDashboard={fetchDashboard}
+                />
+              </div>
             </div>
           )}
+
+          <div className="md:hidden">
+          <AlumniDashboardHeader
+            alumni={alumni}
+            showProfileForm={showProfileForm}
+            setShowProfileForm={setShowProfileForm}
+            isProfileIncomplete={isProfileIncomplete}
+            setShowFeedbackModal={setShowFeedbackModal}
+            setShowReferralModal={setShowReferralModal}
+            handleLogout={handleLogout}
+            fetchDashboard={fetchDashboard}
+          />
+          </div>
 
           {/* Stats */}
           {!loading && !fetchError && (

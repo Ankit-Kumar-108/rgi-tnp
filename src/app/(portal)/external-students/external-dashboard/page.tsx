@@ -11,28 +11,23 @@ import {
   XCircle,
   CalendarDays,
   FileText,
-  Upload,
   Loader2,
-  BadgeCheck,
-  BadgeAlert,
   LogOut,
   RefreshCw,
   ChevronRight,
-  Linkedin,
-  Github,
   MessageSquareShare,
-  Camera,
 } from "lucide-react";
 import Nav from "@/components/layout/nav/nav";
 import Footer from "@/components/layout/footer/footer";
 import { useAuth } from "@/hooks/useAuth";
 import { getToken, logout } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
-import { uploadFileToR2 } from "@/lib/upload-r2";
 import { PlacementDrive } from "@/types";
 import { toast } from "sonner";
-import NotificationBell from "@/components/ui/NotificationBell";
 import { meetsCgpaCriteria } from "@/lib/cgpa-utils";
+import ExternalDashboardHeader from "@/components/external-student/dashboard/ExternalDashboardHeader";
+import ExternalProfileCompletionForm from "@/components/external-student/dashboard/ExternalProfileCompletionForm";
+import ExternalDashboardOverview from "@/components/external-student/dashboard/ExternalDashboardOverview";
 
 // Lazy load heavy modal components — only loaded when user interacts
 const JobDetailsModal = dynamic(
@@ -40,7 +35,7 @@ const JobDetailsModal = dynamic(
   { ssr: false }
 );
 const FeedbackComp = dynamic(
-  () => import("@/app/(portal)/students/feedback/feedbakComp"), 
+  () => import("@/app/(portal)/students/feedback/feedbakComp"),
   { ssr: false }
 );
 
@@ -56,16 +51,6 @@ export default function ExternalStudentDashboard() {
 
   // Complete Profile Form
   const [showProfileForm, setShowProfileForm] = useState(false);
-  const [submittingProfile, setSubmittingProfile] = useState(false);
-  const [profileMsg, setProfileMsg] = useState<{ msg: string; ok: boolean } | null>(null);
-  const [profileForm, setProfileForm] = useState({
-    tenthPercentage: "",
-    twelfthPercentage: "",
-    cgpa: "",
-    activeBacklog: "0",
-    linkedinUrl: "",
-    githubUrl: "",
-  });
   useEffect(() => {
     if (!authenticated) return;
     fetchDashboard();
@@ -138,16 +123,6 @@ export default function ExternalStudentDashboard() {
       const d = (await res.json()) as any;
       if (d.success) {
         setData(d);
-        if (d.student) {
-          setProfileForm({
-            tenthPercentage: d.student.tenthPercentage?.toString() || "",
-            twelfthPercentage: d.student.twelfthPercentage?.toString() || "",
-            cgpa: d.student.cgpa?.toString() || "",
-            activeBacklog: d.student.activeBacklog?.toString() || "0",
-            linkedinUrl: d.student.linkedinUrl || "",
-            githubUrl: d.student.githubUrl || "",
-          });
-        }
       }
       else setFetchError(d.message || "Failed to load dashboard");
     } catch (err) {
@@ -158,95 +133,8 @@ export default function ExternalStudentDashboard() {
     }
   };
 
-  const handleSubmitProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmittingProfile(true);
-    setProfileMsg(null);
-    try {
-      const token = getToken("external_student");
-      const res = await fetch("/api/external/update-profile", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ profileImageUrl: data?.student?.profileImageUrl, ...profileForm }),
-      });
-      const d = (await res.json()) as any;
-      setProfileMsg({ msg: d.message, ok: d.success });
-      if (d.success) {
-        fetchDashboard();
-        setTimeout(() => setShowProfileForm(false), 2000);
-      }
-    } catch {
-      setProfileMsg({ msg: "Update failed", ok: false });
-    } finally {
-      setSubmittingProfile(false);
-    }
-  };
-
   const [selectedDrive, setSelectedDrive] = useState<PlacementDrive | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [resumeUploading, setResumeUploading] = useState(false);
-  const [profileUploading, setProfileUploading] = useState(false);
-  const profileImageRef = React.useRef<HTMLInputElement>(null);
-
-  const handleResumeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files?.[0]) return;
-    try {
-      setResumeUploading(true);
-      const url = await uploadFileToR2(e.target.files[0], "resumes", {
-        role: "external_student",
-      });
-      const token = getToken("external_student");
-      const res = await fetch("/api/external/update-profile", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ profileImageUrl: student?.profileImageUrl, resumeUrl: url }),
-      });
-      const d = await res.json() as any;
-      if (d.success) {
-        toast.success("Resume updated successfully!");
-        fetchDashboard();
-      } else {
-        throw new Error(d.message);
-      }
-    } catch (err: any) {
-      console.error(err);
-      toast.error("Resume upload failed: " + err.message);
-    } finally {
-      setResumeUploading(false);
-      // Reset input to allow same file to be selected again
-      e.target.value = "";
-    }
-  };
-
-  const handleProfileImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    try {
-      setProfileUploading(true);
-      const url = await uploadFileToR2(file, "profiles", { role: "external_student" });
-      const token = getToken("external_student");
-      const res = await fetch("/api/external/update-profile", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ profileImageUrl: url }),
-      });
-      const d = await res.json() as any;
-      if (d.success) {
-        toast.success("Profile image updated successfully!");
-        fetchDashboard();
-      } else {
-        throw new Error(d.message);
-      }
-    } catch (err: any) {
-      console.error(err);
-      toast.error("Profile image upload failed: " + err.message);
-    } finally {
-      setProfileUploading(false);
-      // Reset input to allow same file to be selected again
-      e.target.value = "";
-    }
-  };
 
   if (authLoading || !authenticated) {
     return (
@@ -265,39 +153,6 @@ export default function ExternalStudentDashboard() {
   return (
     <>
       <Nav />
-      {/* Complete Profile Prompt */}
-      {isProfileIncomplete && !showProfileForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-sm p-4">
-          <div className="w-full max-w-xl rounded-3xl border border-border bg-card/95 shadow-2xl overflow-hidden animate-in zoom-in-95 fade-in duration-300">
-            <div className="p-6 md:p-7">
-              <div className="flex items-start gap-4">
-                <div className="shrink-0 rounded-2xl bg-brand/10 text-brand p-3">
-                  <AlertTriangle className="w-6 h-6" />
-                </div>
-                <div className="space-y-2">
-                  <h2 className="text-xl md:text-2xl font-black tracking-tight text-foreground">
-                    Complete Your Profile
-                  </h2>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Please add your 10th, 12th/Diploma, and resume details to unlock drive applications and improve your recruiter visibility. GitHub and LinkedIn are optional
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:justify-end">
-                <button
-                  type="button"
-                  onClick={() => setShowProfileForm(true)}
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-brand text-primary-foreground px-5 py-2.5 text-sm font-bold hover:bg-brand/90 transition-colors"
-                >
-                  Complete Profile
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
       {selectedDrive && (
         <JobDetailsModal
           role="external_student"
@@ -319,112 +174,28 @@ export default function ExternalStudentDashboard() {
 
         <main className="p-6 md:p-10 max-w-7xl mx-auto space-y-10">
 
-          {/* Main Welcome Header */}
-          <section className="pt-4 md:pt-8 flex flex-col md:flex-row justify-between md:items-end gap-4">
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                onClick={() => setShowFeedbackModal(true)}
-                className="inline-flex items-center gap-2 text-sm font-bold text-foreground hover:bg-muted transition-colors border border-border px-4 py-2.5 rounded-2xl bg-card shadow-sm"
-              >
-                <MessageSquareShare className="w-4 h-4" />
-                Share Feedback
-              </button>
-              <button
-                onClick={() => setShowProfileForm(!showProfileForm)}
-                className="relative inline-flex items-center gap-2 text-sm font-bold text-brand hover:text-brand/80 transition-colors border border-brand/20 px-4 py-2.5 rounded-2xl bg-brand/5 hover:bg-brand/10"
-              >
-                {showProfileForm ? "Cancel Edit" : "Update Profile"}
-                <ChevronRight className={`w-4 h-4 transition-transform ${showProfileForm ? "rotate-90" : ""}`} />
-                {!showProfileForm && isProfileIncomplete && (
-                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shadow-sm" />
-                )}
-              </button>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 bg-destructive/10 text-destructive px-5 py-2.5 rounded-2xl text-sm font-bold hover:bg-destructive/20 transition-all shadow-sm border border-destructive/10"
-              >
-                <LogOut className="size-4" /> Logout
-              </button>
-              <NotificationBell role="external_student" />
-            </div>
-          </section>
+          {/* Header for desktop */}
+          <div className="hidden md:flex">
+            <ExternalDashboardHeader 
+              student={student}
+              fetchDashboard={fetchDashboard}
+              showProfileForm={showProfileForm}
+              setShowProfileForm={setShowProfileForm}
+              isProfileIncomplete={isProfileIncomplete || false}
+              setShowFeedbackModal={setShowFeedbackModal}
+              handleLogout={handleLogout}
+            />
+          </div>
 
           {/* Complete Profile Form (Collapsible) */}
-          {showProfileForm && (
-            <section className="bg-card rounded-2xl p-6 shadow-xl border-2 border-brand/20 animate-in fade-in slide-in-from-top-4 duration-300">
-              <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
-                <div className="p-2 bg-brand/10 rounded-lg text-brand"><FileText className="w-5 h-5" /></div>
-                Academic &amp; Professional Details
-              </h2>
-              <form onSubmit={handleSubmitProfile} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">10th Percentage</label>
-                    <input type="number" step="0.01" min="10" max="100"
-                    required
-                      value={profileForm.tenthPercentage} onChange={(e) => setProfileForm({ ...profileForm, tenthPercentage: e.target.value })}
-                      className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
-                      placeholder="e.g. 85.50" />
-                  </div>
-                  {student.course === "Diploma" ?(``):(
-                    <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">12th Percentage/ Diploma</label>
-                    <input type="number" step="0.01" min="0" max="100"
-                      value={profileForm.twelfthPercentage} onChange={(e) => setProfileForm({ ...profileForm, twelfthPercentage: e.target.value })}
-                      className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
-                      placeholder="e.g. 78.30" />
-                  </div>
-                  )}
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Graduation CGPA (Out of 10)</label>
-                    <input type="number" step="0.01" min="0" max="10"
-                      value={profileForm.cgpa} onChange={(e) => setProfileForm({ ...profileForm, cgpa: e.target.value })}
-                      className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
-                      placeholder="e.g. 8.5" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Active Backlogs</label>
-                    <input type="number" min="0" max="20"
-                      value={profileForm.activeBacklog} onChange={(e) => setProfileForm({ ...profileForm, activeBacklog: e.target.value })}
-                      className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
-                      placeholder="0" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">LinkedIn URL(Optional)</label>
-                    <div className="relative">
-                      <Linkedin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <input value={profileForm.linkedinUrl} onChange={(e) => setProfileForm({ ...profileForm, linkedinUrl: e.target.value })}
-                        className="w-full bg-muted pl-11 pr-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
-                        placeholder="https://linkedin.com/in/..." />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">GitHub URL(Optional)</label>
-                    <div className="relative">
-                      <Github className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <input value={profileForm.githubUrl} onChange={(e) => setProfileForm({ ...profileForm, githubUrl: e.target.value })}
-                        className="w-full bg-muted pl-11 pr-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
-                        placeholder="https://github.com/..." />
-                    </div>
-                  </div>
-                </div>
-                {profileMsg && <p className={`text-sm font-medium ${profileMsg.ok ? "text-green-600" : "text-red-500"}`}>{profileMsg.msg}</p>}
-                <div className="flex gap-4">
-                  <button type="submit" disabled={submittingProfile}
-                    className="bg-brand text-primary-foreground px-8 py-3.5 rounded-full font-bold hover:opacity-90 transition-opacity shadow-[var(--shadow-brand)] disabled:opacity-50 flex items-center gap-2"
-                  >
-                    {submittingProfile ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                    Save <span className="hidden sm:block"></span>
-                  </button>
-                  <button type="button" onClick={() => setShowProfileForm(false)}
-                    className="bg-muted text-foreground px-8 py-3.5 rounded-xl font-bold hover:bg-muted/80 transition-colors"
-                  >
-                    Discard
-                  </button>
-                </div>
-              </form>
-            </section>
-          )}
+          <div className="hidden md:block">
+            <ExternalProfileCompletionForm 
+              student={student}
+              showProfileForm={showProfileForm}
+              setShowProfileForm={setShowProfileForm}
+              fetchDashboard={fetchDashboard}
+            />
+          </div>
 
           {loading ? (
             <div className="flex justify-center py-20">
@@ -435,131 +206,25 @@ export default function ExternalStudentDashboard() {
               <p className="text-destructive font-bold text-lg">{fetchError}</p>
               <button
                 onClick={() => { setLoading(true); fetchDashboard(); }}
-                className="flex items-center gap-2 px-6 py-3 bg-brand text-primary-foreground rounded-xl font-bold text-sm hover:bg-brand/90 transition-all"
+                className="flex items-center gap-2 px-6 py-3 bg-brand text-primary-foreground rounded-lg font-bold text-sm hover:bg-brand/90 transition-all"
               >
                 <RefreshCw className="w-4 h-4" /> Retry
               </button>
             </div>
           ) : (
             <>
-              {/* Academic Profile Card */}
-              <section className="relative">
-                <div className="absolute -top-12 -left-12 w-64 h-64 bg-brand/10 rounded-full blur-3xl -z-10"></div>
-                <div className="absolute top-24 -right-12 w-48 h-48 bg-foreground/5 rounded-full blur-3xl -z-10"></div>
-
-                <div className="bg-card rounded-2xl p-6 md:p-8 shadow-sm border border-border flex flex-col md:flex-row gap-8 md:items-center relative overflow-hidden group hover:shadow-xl transition-shadow duration-500">
-
-                  {/* Decorative Gradient Accent */}
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-bl from-brand/10 to-transparent rounded-bl-[5rem]"></div>
-
-                  {/* Avatar Section */}
-                  <div 
-                    onClick={() => !profileUploading && profileImageRef.current?.click()}
-                    className="relative shrink-0 mx-auto md:mx-0 cursor-pointer group/avatar"
-                  >
-                    <div className="w-32 h-32 md:w-48 md:h-48 rounded-full p-1 md:p-2 bg-linear-to-tr from-brand to-brand/40 transition-transform duration-500 group-hover/avatar:scale-105">
-                      <div className="w-full h-full rounded-full border-2 md:border-4 border-background overflow-hidden bg-muted relative">
-                        {student?.profileImageUrl ? (
-                          <img
-                            alt="Student Portrait"
-                            className="w-full h-full object-cover object-top"
-                            src={student.profileImageUrl}
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-4xl font-black text-muted-foreground uppercase">
-                            {student?.name?.charAt(0)}
-                          </div>
-                        )}
-
-                        {/* Camera Hover Overlay */}
-                        <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300">
-                          <Camera className="w-6 h-6 mb-1 text-white animate-pulse" />
-                          <span className="text-[10px] uppercase font-bold tracking-wider">Change Image</span>
-                        </div>
-
-                        {/* Loading Overlay */}
-                        {profileUploading && (
-                          <div className="absolute inset-0 bg-black/75 flex items-center justify-center">
-                            <Loader2 className="w-6 h-6 text-brand animate-spin" />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Hidden Input */}
-                    <input 
-                      type="file" 
-                      ref={profileImageRef} 
-                      onChange={handleProfileImageUpload} 
-                      accept="image/*" 
-                      className="hidden" 
-                      disabled={profileUploading}
-                    />
-
-                    {/* Verified Badge */}
-                    <div className="absolute bottom-4 bg-background right-0 md:right-4 size-10 rounded-full flex shrink-0 items-center justify-center shadow-lg">
-                      {student?.isVerified ? (
-                        <BadgeCheck className="size-7 md:size-10 text-green-500" />
-                      ) : (
-                        <BadgeAlert className="size-7 md:size-10 text-red-500" />
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Info Section */}
-                  <div className="flex-1 space-y-6 text-center md:text-left">
-                    <div className="space-y-2">
-                      <p className="text-brand font-bold text-xs uppercase tracking-[0.3em]">
-                        Institutional Identity
-                      </p>
-                      <h2 className="text-3xl md:text-5xl font-black text-foreground tracking-tighter leading-none">
-                        {student?.name}
-                      </h2>
-                      <p className="text-lg md:text-xl font-medium text-muted-foreground tracking-tight flex items-center justify-center md:justify-start gap-2">
-                        <Building2 className="w-5 h-5" /> {student?.collegeName || "External Institute"}
-                      </p>
-                    </div>
-
-                    {/* Horizontal Grid Stats */}
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-0 pt-6 border-t border-border">
-                      <div className="md:pr-6 md:border-r border-border">
-                        <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Graduation CGPA</p>
-                        <p className="text-xl md:text-2xl font-bold text-brand">{student?.cgpa ? `${Number(student.cgpa).toFixed(2)}` : "N/A"}</p>
-                      </div>
-                      <div className="md:px-6 md:border-r border-border">
-                        <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Branch</p>
-                        <p className="text-md md:text-lg font-bold text-foreground leading-tight truncate">{student?.branch || "N/A"}</p>
-                      </div>
-                      <div className="md:px-6 md:border-r border-border">
-                        <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Batch</p>
-                        <p className="text-xl md:text-2xl font-bold text-foreground">{student?.batch || "N/A"}</p>
-                      </div>
-                      <div className="md:pl-6">
-                        <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-1">Course</p>
-                        <p className="text-xl md:text-2xl font-bold text-foreground">{student?.course}</p>
-                      </div>
-                    </div>
-
-                    {/* Resume Actions */}
-                    <div className="pt-6 flex flex-wrap items-center justify-center md:justify-start gap-3">
-                      {student?.resumeUrl ? (
-                        <a href={student.resumeUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-brand/10 text-brand rounded-xl font-bold hover:bg-brand/20 transition-colors text-sm">
-                          <FileText className="w-4 h-4" /> View Resume
-                        </a>
-                      ) : (
-                        <span className="inline-flex items-center gap-2 px-4 py-2 bg-muted text-muted-foreground rounded-xl font-bold text-sm">
-                          <FileText className="w-4 h-4" /> No Resume
-                        </span>
-                      )}
-                      <label className="flex items-center gap-2 px-4 py-2 bg-muted text-foreground rounded-xl text-sm font-bold hover:bg-muted/80 transition-all cursor-pointer border border-border/50">
-                        {resumeUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                        {resumeUploading ? "Uploading..." : "Update Resume"}
-                        <input type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={handleResumeUpload} disabled={resumeUploading} />
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </section>
+              <ExternalDashboardOverview
+                student={student}
+                drivesLength={drives.length}
+                registrationsLength={registrations.length}
+                loading={loading}
+                fetchDashboard={fetchDashboard}
+                showProfileForm={showProfileForm}
+                setShowProfileForm={setShowProfileForm}
+                isProfileIncomplete={isProfileIncomplete || false}
+                setShowFeedbackModal={setShowFeedbackModal}
+                handleLogout={handleLogout}
+              />
 
               {/* Email Verification Banner (Conditional) */}
               {!student?.isVerified && (
