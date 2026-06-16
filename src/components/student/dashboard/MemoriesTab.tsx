@@ -122,7 +122,7 @@ export default function MemoriesTab({ memories, fetchDashboard }: MemoriesTabPro
     <>
       {isMemModalOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-card w-full max-w-md rounded-2xl p-6 shadow-2xl border border-border space-y-6 animate-in zoom-in-95 duration-300">
+          <div className="bg-card w-full max-w-md rounded-lg p-6 shadow-2xl border border-border space-y-6 animate-in zoom-in-95 duration-300">
             <div className="text-center space-y-2">
               <h3 className="text-2xl font-black text-foreground tracking-tight">Create Memory</h3>
               <p className="text-sm text-muted-foreground">Share this special moment from your journey</p>
@@ -131,7 +131,7 @@ export default function MemoriesTab({ memories, fetchDashboard }: MemoriesTabPro
             {memPreviews.length > 0 && (
               <div className="grid grid-cols-2 gap-3 max-h-75 overflow-y-auto p-1 scrollbar-hide">
                 {memPreviews.map((preview, idx) => (
-                  <div key={idx} className="relative aspect-square rounded-2xl overflow-hidden border-2 border-brand/20 bg-muted group">
+                  <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border-2 border-brand/20 bg-muted group">
                     <img src={preview} alt={`Preview ${idx}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                     <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
@@ -147,7 +147,7 @@ export default function MemoriesTab({ memories, fetchDashboard }: MemoriesTabPro
                   value={memBatchTitle}
                   onChange={(e) => setMemBatchTitle(e.target.value)}
                   placeholder="e.g. Campus Farewell..."
-                  className="w-full bg-muted px-6 py-4 rounded-2xl border-none focus:ring-2 focus:ring-brand outline-none text-foreground font-medium transition-all"
+                  className="w-full bg-muted px-6 py-4 rounded-lg border-none focus:ring-2 focus:ring-brand outline-none text-foreground font-medium transition-all"
                 />
                 <p className="text-xs text-muted-foreground ml-1">This title will be applied to all {selectedMemFiles.length} images.</p>
               </div>
@@ -155,14 +155,14 @@ export default function MemoriesTab({ memories, fetchDashboard }: MemoriesTabPro
               <div className="flex gap-3">
                 <button
                   onClick={() => { setIsMemModalOpen(false); setSelectedMemFiles([]); setMemPreviews([]); }}
-                  className="flex-1 bg-muted text-foreground px-6 py-4 rounded-xl font-bold hover:bg-muted/80 transition-all text-sm"
+                  className="flex-1 bg-muted text-foreground px-6 py-4 rounded-lg font-bold hover:bg-muted/80 transition-all text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={startMemoryUpload}
                   disabled={memUploading}
-                  className="flex-2 bg-brand text-white px-6 py-4 rounded-xl font-bold hover:bg-brand/90 transition-all text-sm disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2 shadow-[var(--shadow-brand)]"
+                  className="flex-2 bg-brand text-white px-6 py-4 rounded-lg font-bold hover:bg-brand/90 transition-all text-sm disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2 shadow-[var(--shadow-brand)]"
                 >
                   {memUploading ? (
                     <>
@@ -188,21 +188,21 @@ export default function MemoriesTab({ memories, fetchDashboard }: MemoriesTabPro
             <Camera className="w-5 h-5 text-brand" />
             My Memories
           </h2>
-          <label className="flex items-center gap-2 px-4 py-2 bg-brand/10 text-brand rounded-xl text-xs font-bold hover:bg-brand/20 transition-all cursor-pointer">
+          <label className="flex items-center gap-2 px-4 py-2 bg-brand/10 text-brand rounded-lg text-xs font-bold hover:bg-brand/20 transition-all cursor-pointer">
             {memUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
             {memUploading ? "Uploading..." : "Upload Memory"}
             <input type="file" accept="image/*" multiple className="hidden" onChange={handleMemoryUpload} disabled={memUploading} />
           </label>
         </div>
         {memories.length === 0 ? (
-          <div className="bg-card rounded-2xl border border-border p-8 text-center text-muted-foreground">
+          <div className="bg-card rounded-lg border border-border p-8 text-center text-muted-foreground">
             <Camera className="w-12 h-12 mx-auto mb-3 opacity-30" />
             <p className="font-medium">No memories uploaded yet</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {memories.map((m: any) => (
-              <div key={m.id} className="bg-card rounded-2xl border border-border overflow-hidden">
+              <div key={m.id} className="bg-card rounded-lg border border-border overflow-hidden">
                 <div className="aspect-square bg-muted flex items-center justify-center object-top">
                   <img src={m.imageUrl} alt="Memory" loading="lazy" className="w-full h-full object-cover" />
                 </div>

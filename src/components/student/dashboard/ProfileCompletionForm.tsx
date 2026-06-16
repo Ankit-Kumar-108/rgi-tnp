@@ -58,10 +58,10 @@ export default function ProfileCompletionForm({
       {/* Complete Profile Prompt */}
       {isProfileIncomplete && !showProfileForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-sm p-4">
-          <div className="w-full max-w-xl rounded-3xl border border-border bg-card/95 shadow-2xl overflow-hidden animate-in zoom-in-95 fade-in duration-300">
+          <div className="w-full max-w-xl rounded-xl border border-border bg-card/95 shadow-2xl overflow-hidden animate-in zoom-in-95 fade-in duration-300">
             <div className="p-6 md:p-7">
               <div className="flex items-start gap-4">
-                <div className="shrink-0 rounded-2xl bg-brand/10 text-brand p-3">
+                <div className="shrink-0 rounded-lg bg-brand/10 text-brand p-3">
                   <AlertTriangle className="w-6 h-6" />
                 </div>
                 <div className="space-y-2">
@@ -78,7 +78,7 @@ export default function ProfileCompletionForm({
                 <button
                   type="button"
                   onClick={() => setShowProfileForm(true)}
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-brand text-primary-foreground px-5 py-2.5 text-sm font-bold hover:bg-brand/90 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand text-primary-foreground px-5 py-2.5 text-sm font-bold hover:bg-brand/90 transition-colors"
                 >
                   Complete Profile
                   <ChevronRight className="w-4 h-4" />
@@ -91,7 +91,7 @@ export default function ProfileCompletionForm({
 
       {/* Complete Profile Form (Collapsible) */}
       {showProfileForm && (
-        <section className="bg-card rounded-2xl p-6 shadow-xl border-2 border-brand/20 animate-in fade-in slide-in-from-top-4 duration-300">
+        <section className="bg-card rounded-lg p-6 md:shadow-xl border-2 border-brand/20 animate-in fade-in slide-in-from-top-4 duration-300">
           <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
             <div className="p-2 bg-brand/10 rounded-lg text-brand"><FileText className="w-5 h-5" /></div>
             Academic &amp; Professional Details
@@ -103,7 +103,7 @@ export default function ProfileCompletionForm({
                 <input type="number" step="0.01" min="10" max="100"
                   required
                   value={profileForm.tenthPercentage} onChange={(e) => setProfileForm({ ...profileForm, tenthPercentage: e.target.value })}
-                  className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
+                  className="w-full bg-muted px-5 py-3.5 rounded-lg border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
                   placeholder="e.g. 85.50" />
               </div>
               {student?.course === "Diploma" ? null : (
@@ -111,7 +111,7 @@ export default function ProfileCompletionForm({
                   <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">12th Percentage/ Diploma</label>
                   <input type="number" step="0.01" min="0" max="100"
                     value={profileForm.twelfthPercentage} onChange={(e) => setProfileForm({ ...profileForm, twelfthPercentage: e.target.value })}
-                    className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
+                    className="w-full bg-muted px-5 py-3.5 rounded-lg border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
                     placeholder="e.g. 78.30" />
                 </div>
               )}
@@ -119,7 +119,7 @@ export default function ProfileCompletionForm({
                 <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Graduation CGPA (Out of 10)</label>
                 <input type="number" step="0.01" min="0" max="10"
                   value={profileForm.cgpa} onChange={(e) => setProfileForm({ ...profileForm, cgpa: e.target.value })}
-                  className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
+                  className="w-full bg-muted px-5 py-3.5 rounded-lg border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
                   placeholder="e.g. 8.25" />
               </div>
               <div className="space-y-2">
@@ -127,40 +127,43 @@ export default function ProfileCompletionForm({
                 <input type="number" min="0"
                   required
                   value={profileForm.activeBacklog} onChange={(e) => setProfileForm({ ...profileForm, activeBacklog: e.target.value })}
-                  className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
+                  className="w-full bg-muted px-5 py-3.5 rounded-lg border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
                   placeholder="0" />
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">LinkedIn Profile</label>
                 <input type="url"
                   value={profileForm.linkedinUrl} onChange={(e) => setProfileForm({ ...profileForm, linkedinUrl: e.target.value })}
-                  className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
+                  className="w-full bg-muted px-5 py-3.5 rounded-lg border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
                   placeholder="https://linkedin.com/in/..." />
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">GitHub Profile</label>
                 <input type="url"
                   value={profileForm.githubUrl} onChange={(e) => setProfileForm({ ...profileForm, githubUrl: e.target.value })}
-                  className="w-full bg-muted px-5 py-3.5 rounded-2xl border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
+                  className="w-full bg-muted px-5 py-3.5 rounded-lg border-none focus:ring-2 focus:ring-brand transition-all text-sm outline-none text-foreground"
                   placeholder="https://github.com/..." />
               </div>
             </div>
 
             {profileMsg && (
-              <div className={`p-4 rounded-xl text-sm font-bold flex items-center gap-2 ${profileMsg.ok ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-600"}`}>
+              <div className={`p-4 rounded-lg text-sm font-bold flex items-center gap-2 ${profileMsg.ok ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-600"}`}>
                 <AlertTriangle className="w-4 h-4" />
                 {profileMsg.msg}
               </div>
             )}
 
-            <div className="flex justify-end pt-4 border-t border-border">
+            <div className="flex justify-end pt-4 border-t border-border gap-2">
+              <button onClick={() => setShowProfileForm(false)} className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand text-primary-foreground px-5 py-2.5 text-sm font-bold hover:bg-brand/90 transition-colors">
+                  Cancel
+                </button>
               <button
                 type="submit"
                 disabled={submittingProfile}
-                className="bg-brand text-primary-foreground px-8 py-3.5 rounded-xl font-bold hover:bg-brand/90 transition-all flex items-center gap-2 disabled:opacity-50 shadow-[var(--shadow-brand)]"
+                className="bg-brand text-primary-foreground px-8 py-3.5 rounded-lg font-bold hover:bg-brand/90 transition-all flex items-center gap-2 disabled:opacity-50 shadow-[var(--shadow-brand)]"
               >
                 {submittingProfile ? <Loader2 className="w-4 h-4 animate-spin" /> : <ChevronRight className="w-4 h-4" />}
-                {submittingProfile ? "Saving..." : "Save Academic Details"}
+                {submittingProfile ? "Saving..." : "Save"}
               </button>
             </div>
           </form>

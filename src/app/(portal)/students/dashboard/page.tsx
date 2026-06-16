@@ -131,7 +131,7 @@ export default function StudentDashboard() {
           // 2. Make this a clickable button so they can still read the job details
           <button
             onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
-            className="inline-flex items-center gap-1.5 text-green-600 bg-green-500/10 hover:bg-green-500/20 px-4 py-2.5 rounded-xl text-xs font-bold transition-all"
+            className="inline-flex items-center gap-1.5 text-green-600 bg-green-500/10 hover:bg-green-500/20 px-4 py-2.5 rounded-lg text-xs font-bold transition-all"
           >
             <CheckCircle className="w-4 h-4" /> View Details
           </button>
@@ -184,10 +184,10 @@ export default function StudentDashboard() {
       {/* Complete Profile Prompt */}
       {isProfileIncomplete && !showProfileForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-sm p-4">
-          <div className="w-full max-w-xl rounded-3xl border border-border bg-card/95 shadow-2xl overflow-hidden animate-in zoom-in-95 fade-in duration-300">
+          <div className="w-full max-w-xl rounded-xl border border-border bg-card/95 shadow-2xl overflow-hidden animate-in zoom-in-95 fade-in duration-300">
             <div className="p-6 md:p-7">
               <div className="flex items-start gap-4">
-                <div className="shrink-0 rounded-2xl bg-brand/10 text-brand p-3">
+                <div className="shrink-0 rounded-lg bg-brand/10 text-brand p-3">
                   <AlertTriangle className="w-6 h-6" />
                 </div>
                 <div className="space-y-2">
@@ -204,7 +204,7 @@ export default function StudentDashboard() {
                 <button
                   type="button"
                   onClick={() => setShowProfileForm(true)}
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-brand text-primary-foreground px-5 py-2.5 text-sm font-bold hover:bg-brand/90 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand text-primary-foreground px-5 py-2.5 text-sm font-bold hover:bg-brand/90 transition-colors"
                 >
                   Complete Profile
                   <ChevronRight className="w-4 h-4" />
@@ -234,22 +234,28 @@ export default function StudentDashboard() {
         <div className="fixed top-1/2 left-0 w-64 h-64 bg-brand/5 rounded-full blur-[100px] -z-10" />
 
         <main className="p-6 md:p-10 max-w-7xl mx-auto space-y-10">
-          {/* Header */}
+          {/* Header for desktop */}
+          <div className="hidden md:flex">
           <DashboardHeader 
+            student={student}
+            fetchDashboard={fetchDashboard}
             showProfileForm={showProfileForm}
             setShowProfileForm={setShowProfileForm}
             isProfileIncomplete={isProfileIncomplete || false}
             setShowFeedbackModal={setShowFeedbackModal}
             handleLogout={handleLogout}
           />
+          </div>
 
           {/* Complete Profile Form (Collapsible) */}
+          <div className="hidden md:block">
           <ProfileCompletionForm 
             student={student}
             showProfileForm={showProfileForm}
             setShowProfileForm={setShowProfileForm}
             fetchDashboard={fetchDashboard}
           />
+          </div>
 
           {loading ? (
             <div className="flex justify-center py-20">
@@ -260,7 +266,7 @@ export default function StudentDashboard() {
               <p className="text-destructive font-bold text-lg">{fetchError}</p>
               <button
                 onClick={() => { mutateDashboard(); }}
-                className="flex items-center gap-2 px-6 py-3 bg-brand text-primary-foreground rounded-xl font-bold text-sm hover:bg-brand/90 transition-all"
+                className="flex items-center gap-2 px-6 py-3 bg-brand text-primary-foreground rounded-lg font-bold text-sm hover:bg-brand/90 transition-all"
               >
                 <RefreshCw className="w-4 h-4" /> Retry
               </button>
@@ -273,6 +279,11 @@ export default function StudentDashboard() {
                 registrationsLength={registrations.length}
                 loading={loading}
                 fetchDashboard={fetchDashboard}
+                showProfileForm={showProfileForm}
+                setShowProfileForm={setShowProfileForm}
+                isProfileIncomplete={isProfileIncomplete || false}
+                setShowFeedbackModal={setShowFeedbackModal}
+                handleLogout={handleLogout}
               />
 
               {/* Upcoming Drives */}
@@ -301,7 +312,7 @@ export default function StudentDashboard() {
                     </div>
                     <button
                       onClick={() => { mutateDashboard(); }}
-                      className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-brand/10 text-brand rounded-xl font-bold text-sm hover:bg-brand/20 transition-colors"
+                      className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-brand/10 text-brand rounded-lg font-bold text-sm hover:bg-brand/20 transition-colors"
                     >
                       <RefreshCw className="w-4 h-4" /> Check Again
                     </button>
@@ -313,10 +324,10 @@ export default function StudentDashboard() {
                       {drives.map((drive: any) => {
                         const { actionElement } = getEligibilityData(drive, student);
                         return (
-                          <div key={drive.id} className="bg-card border border-border rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-brand/30 transition-all space-y-4 group">
+                          <div key={drive.id} className="bg-card border border-border rounded-lg p-5 shadow-sm hover:shadow-md hover:border-brand/30 transition-all space-y-4 group">
                             <div className="flex items-start justify-between">
                               <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
+                                <div className="w-10 h-10 bg-brand/10 rounded-lg flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
                                   <Building2 className="w-5 h-5 text-brand" />
                                 </div>
                                 <div className="min-w-0">
@@ -349,7 +360,7 @@ export default function StudentDashboard() {
                     </div>
 
                     {/* DESKTOP VIEW: Professional Table */}
-                    <div className="hidden md:block bg-card rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+                    <div className="hidden md:block bg-card rounded-lg border border-border shadow-sm hover:shadow-md transition-shadow overflow-hidden">
                       <table className="w-full">
                         <thead>
                           <tr className="bg-linear-to-r from-muted/50 to-muted/30 border-b border-border">
@@ -368,7 +379,7 @@ export default function StudentDashboard() {
                               <tr key={drive.id} className="hover:bg-muted/20 transition-colors group">
                                 <td className="px-6 py-4">
                                   <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
+                                    <div className="w-10 h-10 bg-brand/10 rounded-lg flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
                                       <Building2 className="w-5 h-5 text-brand" />
                                     </div>
                                     <span className="font-bold text-foreground">{drive.companyName}</span>
@@ -431,7 +442,7 @@ export default function StudentDashboard() {
                     {/* MOBILE VIEW: Cards */}
                     <div className="grid grid-cols-1 gap-4 md:hidden">
                       {registrations.map((reg: any) => (
-                        <div key={reg.id} className="bg-card border border-border rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-brand/30 transition-all space-y-4 group">
+                        <div key={reg.id} className="bg-card border border-border rounded-lg p-5 shadow-sm hover:shadow-md hover:border-brand/30 transition-all space-y-4 group">
                           <div className="flex justify-between items-start gap-3">
                             <div className="min-w-0 flex-1">
                               <h3 className="font-bold text-foreground leading-tight truncate">{reg.drive?.companyName}</h3>
@@ -475,7 +486,7 @@ export default function StudentDashboard() {
                     </div>
 
                     {/* DESKTOP VIEW: Professional Table */}
-                    <div className="hidden md:block bg-card rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+                    <div className="hidden md:block bg-card rounded-lg border border-border shadow-sm hover:shadow-md transition-shadow overflow-hidden">
                       <div className="overflow-x-auto">
                         <table className="w-full">
                           <thead>
@@ -492,7 +503,7 @@ export default function StudentDashboard() {
                               <tr key={reg.id} className="hover:bg-muted/20 transition-colors group">
                                 <td className="px-6 py-4">
                                   <div className="flex items-center gap-3 group">
-                                    <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
+                                    <div className="w-10 h-10 bg-brand/10 rounded-lg flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
                                       <Briefcase className="w-5 h-5 text-brand" />
                                     </div>
                                     <div className="min-w-0">
@@ -555,7 +566,7 @@ export default function StudentDashboard() {
                   {/* MOBILE VIEW: Compact List */}
                   <div className="grid grid-cols-1 gap-3 md:hidden">
                     {archivedDrives.map((drive: any) => (
-                      <div key={drive.id} className="bg-card/50 border border-border rounded-xl p-4 flex justify-between items-center">
+                      <div key={drive.id} className="bg-card/50 border border-border rounded-lg p-4 flex justify-between items-center">
                         <div className="space-y-1">
                           <h3 className="text-sm font-bold text-foreground truncate max-w-37.5">
                             {drive.companyName}
@@ -580,7 +591,7 @@ export default function StudentDashboard() {
                   </div>
 
                   {/* DESKTOP VIEW: Clean Table */}
-                  <div className="hidden md:block bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+                  <div className="hidden md:block bg-card rounded-lg border border-border shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>

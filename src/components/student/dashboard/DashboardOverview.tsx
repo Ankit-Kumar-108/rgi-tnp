@@ -3,6 +3,7 @@ import { BadgeCheck, BadgeAlert, Briefcase, CheckCircle, Camera, FileText, Loade
 import { toast } from "sonner";
 import { getToken } from "@/lib/auth-client";
 import { uploadFileToR2 } from "@/lib/upload-r2";
+import DashboardHeader from "./DashboardHeader";
 
 interface DashboardOverviewProps {
   student: any;
@@ -10,6 +11,12 @@ interface DashboardOverviewProps {
   registrationsLength: number;
   loading: boolean;
   fetchDashboard: () => void;
+  showProfileForm: boolean;
+  setShowProfileForm: (value: boolean) => void;
+  isProfileIncomplete?: boolean;
+  setShowFeedbackModal: (value: boolean) => void;
+  handleLogout: () => void;
+  
 }
 
 export default function DashboardOverview({
@@ -18,6 +25,11 @@ export default function DashboardOverview({
   registrationsLength,
   loading,
   fetchDashboard,
+  showProfileForm,
+  setShowProfileForm,
+  isProfileIncomplete,
+  setShowFeedbackModal,
+  handleLogout,
 }: DashboardOverviewProps) {
   const [resumeUploading, setResumeUploading] = useState(false);
   const [profileUploading, setProfileUploading] = useState(false);
@@ -91,7 +103,7 @@ export default function DashboardOverview({
             <div className="absolute -top-12 -left-12 size-64 bg-brand/10 rounded-full blur-3xl -z-10"></div>
             <div className="absolute top-24 -right-12 size-48 bg-foreground/5 rounded-full blur-3xl -z-10"></div>
 
-            <div className="bg-card rounded-2xl p-6 md:p-8 shadow-[var(--shadow-sm)] border border-border flex flex-col md:flex-row gap-8 md:items-center relative overflow-hidden group hover:shadow-[var(--shadow-md)] transition-shadow duration-300">
+            <div className="bg-card rounded-lg p-6 md:p-8 shadow-[var(--shadow-sm)] border border-border flex flex-col md:flex-row gap-8 md:items-center relative overflow-hidden group hover:shadow-[var(--shadow-md)] transition-shadow duration-300">
               {/* Decorative Gradient Accent */}
               <div className="absolute top-0 right-0 size-32 bg-linear-to-bl from-brand/10 to-transparent rounded-bl-[5rem]"></div>
 
@@ -187,15 +199,15 @@ export default function DashboardOverview({
                 {/* Resume Actions */}
                 <div className="pt-6 flex flex-wrap items-center gap-3 justify-center md:justify-start">
                   {student?.resumeUrl ? (
-                    <a href={student.resumeUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-brand/10 text-brand rounded-xl font-bold hover:bg-brand/20 transition-colors text-sm">
+                    <a href={student.resumeUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-brand/10 text-brand rounded-lg font-bold hover:bg-brand/20 transition-colors text-sm">
                       <FileText className="w-4 h-4" /> View Resume
                     </a>
                   ) : (
-                    <span className="inline-flex items-center gap-2 px-4 py-2 bg-muted text-muted-foreground rounded-xl font-bold text-sm">
+                    <span className="inline-flex items-center gap-2 px-4 py-2 bg-muted text-muted-foreground rounded-lg font-bold text-sm">
                       <FileText className="w-4 h-4" /> No Resume
                     </span>
                   )}
-                  <label className="flex items-center gap-2 px-4 py-2 bg-muted text-foreground rounded-xl text-sm font-bold hover:bg-muted/80 transition-all cursor-pointer">
+                  <label className="flex items-center gap-2 px-4 py-2 bg-muted text-foreground rounded-lg text-sm font-bold hover:bg-muted/80 transition-all cursor-pointer">
                     {resumeUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                     {resumeUploading ? "Uploading..." : "Update Resume"}
                     <input type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={handleResumeUpload} disabled={resumeUploading} />
@@ -204,6 +216,19 @@ export default function DashboardOverview({
               </div>
             </div>
           </section>
+
+          {/* Header for mobile */}
+          <div className="flex md:hidden">
+            <DashboardHeader 
+              student={student}
+              fetchDashboard={fetchDashboard}
+              showProfileForm={showProfileForm}
+              setShowProfileForm={setShowProfileForm}
+              isProfileIncomplete={isProfileIncomplete || false}
+              setShowFeedbackModal={setShowFeedbackModal}
+              handleLogout={handleLogout}
+            />
+          </div>
         </div>
       </section>
 
@@ -211,9 +236,9 @@ export default function DashboardOverview({
       {!loading && student && (
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           {/* Stat Card: Eligible Drives */}
-          <div className="bg-card rounded-2xl p-5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
+          <div className="bg-card rounded-lg p-5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
             <div className="flex items-start justify-between mb-4">
-              <div className="w-11 h-11 bg-brand/10 rounded-xl flex items-center justify-center">
+              <div className="w-11 h-11 bg-brand/10 rounded-lg flex items-center justify-center">
                 <Briefcase className="w-5 h-5 text-brand" />
               </div>
             </div>
@@ -222,9 +247,9 @@ export default function DashboardOverview({
           </div>
 
           {/* Stat Card: Registrations */}
-          <div className="bg-card rounded-2xl p-5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
+          <div className="bg-card rounded-lg p-5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
             <div className="flex items-start justify-between mb-4">
-              <div className="w-11 h-11 bg-brand/10 rounded-xl flex items-center justify-center">
+              <div className="w-11 h-11 bg-brand/10 rounded-lg flex items-center justify-center">
                 <CheckCircle className="w-5 h-5 text-brand" />
               </div>
             </div>
