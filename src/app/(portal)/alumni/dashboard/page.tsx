@@ -411,10 +411,10 @@ export default function AlumniDashboard() {
       {/* Complete Profile Prompt */}
       {isProfileIncomplete && !showProfileForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-sm p-4">
-          <div className="w-full max-w-xl rounded-3xl border border-border bg-card/95 shadow-2xl overflow-hidden animate-in zoom-in-95 fade-in duration-300">
+          <div className="w-full max-w-xl rounded-lg border border-border bg-card/95 shadow-2xl overflow-hidden animate-in zoom-in-95 fade-in duration-300">
             <div className="p-6 md:p-7">
               <div className="flex items-start gap-4">
-                <div className="shrink-0 rounded-2xl bg-brand/10 text-brand p-3">
+                <div className="shrink-0 rounded-lg bg-brand/10 text-brand p-3">
                   <AlertTriangle className="w-6 h-6" />
                 </div>
                 <div className="space-y-2">
@@ -431,7 +431,7 @@ export default function AlumniDashboard() {
                 <button
                   type="button"
                   onClick={() => setShowProfileForm(true)}
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-brand text-primary-foreground px-5 py-2.5 text-sm font-bold hover:bg-brand/90 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand text-primary-foreground px-5 py-2.5 text-sm font-bold hover:bg-brand/90 transition-colors"
                 >
                   Complete Profile
                   <ChevronRight className="w-4 h-4" />
@@ -457,7 +457,7 @@ export default function AlumniDashboard() {
         />
       )}
       {/* body */}
-      <div className="bg-background text-foreground antialiased font-sans min-h-screen mt-15 overflow-hidden">
+      <div className="relative bg-background text-foreground antialiased font-sans min-h-screen mt-15 overflow-hidden">
         <div className="fixed bottom-0 right-0 w-96 h-96 bg-brand/5 rounded-full blur-[120px] -z-10" />
         <div className="fixed top-1/2 left-0 w-64 h-64 bg-brand/5 rounded-full blur-[100px] -z-10" />
 
@@ -531,9 +531,9 @@ export default function AlumniDashboard() {
           {!loading && !fetchError && (
             <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Stat Card: Total Referrals */}
-              <div className="bg-card rounded-2xl p-6 md:p-8 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
+              <div className="bg-card rounded-lg p-6 md:p-8 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
                 <div className="flex items-start justify-between mb-6">
-                  <div className="w-12 h-12 bg-brand/10 rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center">
                     <UserPlus className="w-6 h-6 text-brand" />
                   </div>
                 </div>
@@ -542,9 +542,9 @@ export default function AlumniDashboard() {
               </div>
 
               {/* Stat Card: Approved Referrals */}
-              <div className="bg-card rounded-2xl p-6 md:p-8 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
+              <div className="bg-card rounded-lg p-6 md:p-8 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
                 <div className="flex items-start justify-between mb-6">
-                  <div className="w-12 h-12 bg-brand/10 rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center">
                     <Briefcase className="w-6 h-6 text-brand" />
                   </div>
                 </div>
@@ -553,9 +553,9 @@ export default function AlumniDashboard() {
               </div>
 
               {/* Stat Card: Pending Review */}
-              <div className="bg-card rounded-2xl p-6 md:p-8 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
+              <div className="bg-card rounded-lg p-6 md:p-8 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
                 <div className="flex items-start justify-between mb-6">
-                  <div className="w-12 h-12 bg-brand/10 rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center">
                     <TrendingUp className="w-6 h-6 text-brand" />
                   </div>
                 </div>
@@ -592,7 +592,7 @@ export default function AlumniDashboard() {
                   </div>
                   <button
                     onClick={() => { fetchDashboard(); }}
-                    className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-brand/10 text-brand rounded-xl font-bold text-sm hover:bg-brand/20 transition-colors"
+                    className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-brand/10 text-brand rounded-lg font-bold text-sm hover:bg-brand/20 transition-colors"
                   >
                     <RefreshCw className="w-4 h-4" /> Check Again
                   </button>
@@ -602,10 +602,10 @@ export default function AlumniDashboard() {
                   {/* MOBILE VIEW: Grid of Cards */}
                   <div className="grid grid-cols-1 gap-4 md:hidden">
                     {drives.map((drive: any) => (
-                      <div key={drive.id} className="bg-card border border-border rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-brand/30 transition-all space-y-4 group">
+                      <div key={drive.id} className="bg-card border border-border rounded-lg p-5 shadow-sm hover:shadow-md hover:border-brand/30 transition-all space-y-4 group">
                         <div className="flex items-start justify-between">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
+                            <div className="w-10 h-10 bg-brand/10 rounded-lg flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
                               <Building2 className="w-5 h-5 text-brand" />
                             </div>
                             <div className="min-w-0">
@@ -633,14 +633,14 @@ export default function AlumniDashboard() {
                           {drive.isRegistered ? (
                             <button
                               onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
-                              className="inline-flex items-center gap-1.5 text-green-600 bg-green-500/10 hover:bg-green-500/20 px-4 py-2 rounded-xl text-xs font-bold transition-all"
+                              className="inline-flex items-center gap-1.5 text-green-600 bg-green-500/10 hover:bg-green-500/20 px-4 py-2 rounded-lg text-xs font-bold transition-all"
                             >
                               <CheckCircle className="w-4 h-4" /> View Details
                             </button>
                           ) : (
                             <button
                               onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
-                              className="shrink-0 text-xs font-bold px-4 py-2 rounded-xl bg-brand text-white hover:bg-brand/90 transition-all shadow-md shadow-brand/25"
+                              className="shrink-0 text-xs font-bold px-4 py-2 rounded-lg bg-brand text-white hover:bg-brand/90 transition-all shadow-md shadow-brand/25"
                             >
                               View Details
                             </button>
@@ -651,7 +651,7 @@ export default function AlumniDashboard() {
                   </div>
 
                   {/* DESKTOP VIEW: Professional Table */}
-                  <div className="hidden md:block bg-card rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+                  <div className="hidden md:block bg-card rounded-lg border border-border shadow-sm hover:shadow-md transition-shadow overflow-hidden">
                     <table className="w-full">
                       <thead>
                         <tr className="bg-gradient-to-r from-muted/50 to-muted/30 border-b border-border">
@@ -668,7 +668,7 @@ export default function AlumniDashboard() {
                           <tr key={drive.id} className="hover:bg-muted/20 transition-colors group">
                             <td className="px-6 py-4">
                               <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
+                                <div className="w-10 h-10 bg-brand/10 rounded-lg flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
                                   <Building2 className="w-5 h-5 text-brand" />
                                 </div>
                                 <span className="font-bold text-foreground">{drive.companyName}</span>
@@ -692,14 +692,14 @@ export default function AlumniDashboard() {
                               {drive.isRegistered ? (
                                 <button
                                   onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
-                                  className="inline-flex items-center gap-1.5 text-green-600 bg-green-500/10 hover:bg-green-500/20 px-4 py-2 rounded-xl text-xs font-bold transition-all"
+                                  className="inline-flex items-center gap-1.5 text-green-600 bg-green-500/10 hover:bg-green-500/20 px-4 py-2 rounded-lg text-xs font-bold transition-all"
                                 >
                                   <CheckCircle className="w-4 h-4" /> View Details
                                 </button>
                               ) : (
                                 <button
                                   onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
-                                  className="shrink-0 text-xs font-bold px-4 py-2 rounded-xl bg-brand text-white hover:bg-brand/90 transition-all shadow-md shadow-brand/25"
+                                  className="shrink-0 text-xs font-bold px-4 py-2 rounded-lg bg-brand text-white hover:bg-brand/90 transition-all shadow-md shadow-brand/25"
                                 >
                                   View Details
                                 </button>
@@ -746,7 +746,7 @@ export default function AlumniDashboard() {
                   {/* MOBILE VIEW: Cards */}
                   <div className="grid grid-cols-1 gap-4 md:hidden">
                     {registrations.map((reg: any) => (
-                      <div key={reg.id} className="bg-card border border-border rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-brand/30 transition-all space-y-4 group">
+                      <div key={reg.id} className="bg-card border border-border rounded-lg p-5 shadow-sm hover:shadow-md hover:border-brand/30 transition-all space-y-4 group">
                         <div className="flex justify-between items-start gap-3">
                           <div className="min-w-0 flex-1">
                             <h3 className="font-bold text-foreground leading-tight truncate">{reg.drive?.companyName}</h3>
@@ -790,7 +790,7 @@ export default function AlumniDashboard() {
                   </div>
 
                   {/* DESKTOP VIEW: Professional Table */}
-                  <div className="hidden md:block bg-card rounded-2xl border border-border shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+                  <div className="hidden md:block bg-card rounded-lg border border-border shadow-sm hover:shadow-md transition-shadow overflow-hidden">
                     <div className="overflow-x-auto">
                       <table className="w-full">
                         <thead>
@@ -807,7 +807,7 @@ export default function AlumniDashboard() {
                             <tr key={reg.id} className="hover:bg-muted/20 transition-colors group">
                               <td className="px-6 py-4">
                                 <div className="flex items-center gap-3 group">
-                                  <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
+                                  <div className="w-10 h-10 bg-brand/10 rounded-lg flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
                                     <Briefcase className="w-5 h-5 text-brand" />
                                   </div>
                                   <div className="min-w-0">
@@ -871,7 +871,7 @@ export default function AlumniDashboard() {
               {/* MOBILE VIEW: Compact List */}
               <div className="grid grid-cols-1 gap-3 md:hidden">
                 {archivedDrives.map((drive: any) => (
-                  <div key={drive.id} className="bg-card/50 border border-border rounded-xl p-4 flex justify-between items-center">
+                  <div key={drive.id} className="bg-card/50 border border-border rounded-lg p-4 flex justify-between items-center">
                     <div className="space-y-1">
                       <h3 className="text-sm font-bold text-foreground truncate max-w-[15rem]">
                         {drive.companyName}
@@ -896,7 +896,7 @@ export default function AlumniDashboard() {
               </div>
 
               {/* DESKTOP VIEW: Compact Table */}
-              <div className="hidden md:block bg-card/50 rounded-2xl border border-border overflow-hidden">
+              <div className="hidden md:block bg-card/50 rounded-lg border border-border overflow-hidden">
                 <table className="w-full">
                   <tbody className="divide-y divide-border/40">
                     {archivedDrives.map((drive: any) => (
@@ -931,7 +931,7 @@ export default function AlumniDashboard() {
               <p className="text-destructive font-bold text-lg">{fetchError}</p>
               <button
                 onClick={() => { setLoading(true); fetchDashboard(); }}
-                className="flex items-center gap-2 px-6 py-3 bg-brand text-primary-foreground rounded-xl font-bold text-sm hover:bg-brand/90 transition-all"
+                className="flex items-center gap-2 px-6 py-3 bg-brand text-primary-foreground rounded-lg font-bold text-sm hover:bg-brand/90 transition-all"
               >
                 <RefreshCw className="w-4 h-4" /> Retry
               </button>
@@ -950,7 +950,7 @@ export default function AlumniDashboard() {
                     {/* Header */}
                     <div className="flex items-center justify-between p-6 md:p-8 border-b border-border bg-muted/10">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-brand text-primary-foreground rounded-2xl flex items-center justify-center shadow-lg">
+                        <div className="w-12 h-12 bg-brand text-primary-foreground rounded-lg flex items-center justify-center shadow-lg">
                           <Send className="w-6 h-6" />
                         </div>
                         <div>
@@ -968,7 +968,7 @@ export default function AlumniDashboard() {
                         
                         {/* Validation Messages */}
                         {refMsg && (
-                          <div className={`p-5 rounded-2xl flex items-start gap-3 border ${refMsg.ok
+                          <div className={`p-5 rounded-lg flex items-start gap-3 border ${refMsg.ok
                             ? "bg-green-500/10 border-green-500/20 text-green-600"
                             : "bg-destructive/10 border-destructive/20 text-destructive"
                             }`}>
@@ -990,7 +990,7 @@ export default function AlumniDashboard() {
                           {/* Left Column */}
                           <div className="space-y-6">
                             {/* Bento 1: Basics */}
-                            <div className="bg-surface border border-border rounded-2xl p-6 shadow-sm space-y-5">
+                            <div className="bg-surface border border-border rounded-lg p-6 shadow-sm space-y-5">
                               <div className="flex items-center gap-2 mb-2">
                                 <Building2 className="w-4 h-4 text-brand" />
                                 <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">Role Basics</h3>
@@ -1000,20 +1000,20 @@ export default function AlumniDashboard() {
                                 <div className="space-y-2">
                                   <label className="text-xs font-bold text-muted-foreground uppercase">Company Name *</label>
                                   <input required value={refForm.companyName} onChange={(e) => setRefForm({ ...refForm, companyName: e.target.value })}
-                                    className="w-full bg-background border border-border px-4 py-3 rounded-xl focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all text-sm font-medium"
+                                    className="w-full bg-background border border-border px-4 py-3 rounded-lg focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all text-sm font-medium"
                                     placeholder="e.g. Google" />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                   <div className="space-y-2">
                                     <label className="text-xs font-bold text-muted-foreground uppercase">Role/Position *</label>
                                     <input required value={refForm.position} onChange={(e) => setRefForm({ ...refForm, position: e.target.value })}
-                                      className="w-full bg-background border border-border px-4 py-3 rounded-xl focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all text-sm font-medium"
+                                      className="w-full bg-background border border-border px-4 py-3 rounded-lg focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all text-sm font-medium"
                                       placeholder="SDE Intern" />
                                   </div>
                                   <div className="space-y-2">
                                     <label className="text-xs font-bold text-muted-foreground uppercase">Job Type *</label>
                                     <select required value={refForm.jobType} onChange={(e) => setRefForm({ ...refForm, jobType: e.target.value })}
-                                      className="w-full bg-background border border-border px-4 py-3 rounded-xl focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all text-sm font-medium cursor-pointer">
+                                      className="w-full bg-background border border-border px-4 py-3 rounded-lg focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all text-sm font-medium cursor-pointer">
                                       <option value="">Select Type</option>
                                       <option value="Full-time">Full-time</option>
                                       <option value="Part-time">Part-time</option>
@@ -1025,20 +1025,20 @@ export default function AlumniDashboard() {
                                 <div className="space-y-2">
                                   <label className="text-xs font-bold text-muted-foreground uppercase">Location</label>
                                   <input value={refForm.location} onChange={(e) => setRefForm({ ...refForm, location: e.target.value })}
-                                    className="w-full bg-background border border-border px-4 py-3 rounded-xl focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all text-sm font-medium"
+                                    className="w-full bg-background border border-border px-4 py-3 rounded-lg focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all text-sm font-medium"
                                     placeholder="Bangalore, India" />
                                 </div>
                               </div>
                             </div>
 
                             {/* Bento 2: Job Description */}
-                            <div className="bg-surface border border-border rounded-2xl p-6 shadow-sm space-y-4">
+                            <div className="bg-surface border border-border rounded-lg p-6 shadow-sm space-y-4">
                               <div className="flex items-center gap-2 mb-2">
                                 <FileText className="w-4 h-4 text-brand" />
                                 <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">Job Description *</h3>
                               </div>
                               <textarea required value={refForm.description} onChange={(e) => setRefForm({ ...refForm, description: e.target.value })} rows={5}
-                                className="w-full bg-background border border-border px-4 py-3 rounded-xl focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all text-sm font-medium resize-y min-h-[120px] custom-scrollbar"
+                                className="w-full bg-background border border-border px-4 py-3 rounded-lg focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all text-sm font-medium resize-y min-h-[120px] custom-scrollbar"
                                 placeholder="Details about responsibilities, tech stack, day-to-day tasks..." />
                             </div>
                           </div>
@@ -1046,7 +1046,7 @@ export default function AlumniDashboard() {
                           {/* Right Column */}
                           <div className="space-y-6">
                             {/* Bento 3: Eligibility */}
-                            <div className="bg-surface border border-border rounded-2xl p-6 shadow-sm space-y-4">
+                            <div className="bg-surface border border-border rounded-lg p-6 shadow-sm space-y-4">
                               <div className="flex items-center gap-2 mb-2">
                                 <Users className="w-4 h-4 text-brand" />
                                 <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">Eligibility</h3>
@@ -1055,26 +1055,26 @@ export default function AlumniDashboard() {
                                 <div className="space-y-2">
                                   <label className="text-xs font-bold text-muted-foreground uppercase">Min CGPA</label>
                                   <input type="number" step="0.01" value={refForm.minCGPA} onChange={(e) => setRefForm({ ...refForm, minCGPA: e.target.value })}
-                                    className="w-full bg-background border border-border px-4 py-3 rounded-xl focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all text-sm font-medium"
+                                    className="w-full bg-background border border-border px-4 py-3 rounded-lg focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all text-sm font-medium"
                                     placeholder="e.g. 7.5" />
                                 </div>
                                 <div className="space-y-2">
                                   <label className="text-xs font-bold text-muted-foreground uppercase">Experience</label>
                                   <input value={refForm.experience} onChange={(e) => setRefForm({ ...refForm, experience: e.target.value })}
-                                    className="w-full bg-background border border-border px-4 py-3 rounded-xl focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all text-sm font-medium"
+                                    className="w-full bg-background border border-border px-4 py-3 rounded-lg focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all text-sm font-medium"
                                     placeholder="e.g. 0-2 yrs" />
                                 </div>
                                 <div className="space-y-2 col-span-2">
                                   <label className="text-xs font-bold text-muted-foreground uppercase">Eligible Batches</label>
                                   <input value={refForm.batchEligible} onChange={(e) => setRefForm({ ...refForm, batchEligible: e.target.value })}
-                                    className="w-full bg-background border border-border px-4 py-3 rounded-xl focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all text-sm font-medium"
+                                    className="w-full bg-background border border-border px-4 py-3 rounded-lg focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all text-sm font-medium"
                                     placeholder="e.g. 2024, 2025" />
                                 </div>
                               </div>
                             </div>
 
                             {/* Bento 4: Application Links */}
-                            <div className="bg-surface border border-border rounded-2xl p-6 shadow-sm space-y-4">
+                            <div className="bg-surface border border-border rounded-lg p-6 shadow-sm space-y-4">
                               <div className="flex items-center gap-2 mb-2">
                                 <Link2 className="w-4 h-4 text-brand" />
                                 <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">Application Flow</h3>
@@ -1083,25 +1083,25 @@ export default function AlumniDashboard() {
                                 <div className="space-y-2">
                                   <label className="text-xs font-bold text-muted-foreground uppercase">Referral Code</label>
                                   <input value={refForm.referralCode} onChange={(e) => setRefForm({ ...refForm, referralCode: e.target.value })}
-                                    className="w-full bg-background border border-border px-4 py-3 rounded-xl focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all text-sm font-medium"
+                                    className="w-full bg-background border border-border px-4 py-3 rounded-lg focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all text-sm font-medium"
                                     placeholder="e.g. EMP405" />
                                 </div>
                                 <div className="space-y-2">
                                   <label className="text-xs font-bold text-muted-foreground uppercase">Deadline</label>
                                   <input type="date" value={refForm.deadline} onChange={(e) => setRefForm({ ...refForm, deadline: e.target.value })}
-                                    className="w-full bg-background border border-border px-4 py-3 rounded-xl focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all text-sm font-medium" />
+                                    className="w-full bg-background border border-border px-4 py-3 rounded-lg focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all text-sm font-medium" />
                                 </div>
                               </div>
                               <div className="space-y-2">
                                 <label className="text-xs font-bold text-muted-foreground uppercase">Referral Link (Optional)</label>
                                 <input value={refForm.refrerralLink} onChange={(e) => setRefForm({ ...refForm, refrerralLink: e.target.value })}
-                                  className="w-full bg-background border border-border px-4 py-3 rounded-xl focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all text-sm font-medium"
+                                  className="w-full bg-background border border-border px-4 py-3 rounded-lg focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all text-sm font-medium"
                                   placeholder="https://..." />
                               </div>
                               <div className="space-y-2">
                                 <label className="text-xs font-bold text-muted-foreground uppercase">Apply Link / Email *</label>
                                 <input required value={refForm.applyLink} onChange={(e) => setRefForm({ ...refForm, applyLink: e.target.value })}
-                                  className="w-full bg-background border border-brand/50 px-4 py-3 rounded-xl focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all text-sm font-medium"
+                                  className="w-full bg-background border border-brand/50 px-4 py-3 rounded-lg focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all text-sm font-medium"
                                   placeholder="https://careers.google.com/..." />
                               </div>
                             </div>
@@ -1111,7 +1111,7 @@ export default function AlumniDashboard() {
                         {/* Footer Action */}
                         <div className="pt-4 mt-6 border-t border-border flex items-center justify-end">
                           <button type="submit" disabled={submittingRef}
-                            className="w-full md:w-auto bg-foreground hover:bg-foreground/90 disabled:bg-muted disabled:text-muted-foreground text-background px-8 py-4 rounded-xl font-black text-sm transition-all flex items-center justify-center gap-2 shadow-lg disabled:shadow-none"
+                            className="w-full md:w-auto bg-foreground hover:bg-foreground/90 disabled:bg-muted disabled:text-muted-foreground text-background px-8 py-4 rounded-lg font-black text-sm transition-all flex items-center justify-center gap-2 shadow-lg disabled:shadow-none"
                           >
                             {submittingRef ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                             {submittingRef ? "Submitting..." : "Submit Referral"}
@@ -1129,7 +1129,7 @@ export default function AlumniDashboard() {
                   <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setShowFeedbackModal(false)} />
                   <div className="relative w-full max-w-xl animate-in zoom-in-95 duration-300">
                     {fbSubmitted ? (
-                      <div className="bg-card border border-border rounded-[2rem] p-6 md:p-12 text-center shadow-xl w-full max-w-md mx-auto relative overflow-hidden">
+                      <div className="bg-card border border-border rounded-lg p-6 md:p-12 text-center shadow-xl w-full max-w-md mx-auto relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-bl-full -z-10 blur-xl" />
                         <div className="absolute bottom-0 left-0 w-32 h-32 bg-brand/10 rounded-tr-full -z-10 blur-xl" />
                         <div className="inline-flex items-center justify-center w-20 h-20 md:w-24 md:h-24 rounded-full bg-green-500/10 mx-auto mb-6">
@@ -1141,7 +1141,7 @@ export default function AlumniDashboard() {
                         </p>
                       </div>
                     ) : (
-                      <div className="bg-card rounded-[2rem] border border-border shadow-2xl w-full max-w-xl mx-auto max-h-[90vh] md:max-h-[85vh] flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-300 relative overflow-hidden">
+                      <div className="bg-card rounded-lg border border-border shadow-2xl w-full max-w-xl mx-auto max-h-[90vh] md:max-h-[85vh] flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-300 relative overflow-hidden">
                         {/* Decorative Blur */}
                         <div className="absolute top-0 right-0 w-64 h-64 bg-brand/5 rounded-full blur-3xl -z-10 pointer-events-none" />
 
@@ -1165,7 +1165,7 @@ export default function AlumniDashboard() {
                         <div className="p-5 md:p-6 space-y-5 overflow-y-auto custom-scrollbar flex-1">
                           
                           {/* Rating Bento */}
-                          <div className="bg-surface border border-border rounded-2xl p-4 md:p-5 shadow-sm relative overflow-hidden">
+                          <div className="bg-surface border border-border rounded-lg p-4 md:p-5 shadow-sm relative overflow-hidden">
                             <label className="block text-xs font-bold uppercase tracking-widest text-muted-foreground mb-4">
                               1. How was your experience? *
                             </label>
@@ -1174,7 +1174,7 @@ export default function AlumniDashboard() {
                                 <button
                                   key={e.val}
                                   onClick={() => setFbRating(e.val)}
-                                  className={`flex flex-col items-center justify-center gap-2 py-3 md:py-4 rounded-xl transition-all duration-300 ${
+                                  className={`flex flex-col items-center justify-center gap-2 py-3 md:py-4 rounded-lg transition-all duration-300 ${
                                     fbRating === e.val 
                                       ? "bg-brand/10 border border-brand/30 shadow-inner scale-[1.02] ring-2 ring-brand/20 ring-offset-1 ring-offset-background" 
                                       : "hover:bg-muted border border-transparent grayscale hover:grayscale-0 opacity-60 hover:opacity-100 hover:scale-105"
@@ -1188,7 +1188,7 @@ export default function AlumniDashboard() {
                           </div>
 
                           {/* Tags Bento */}
-                          <div className="bg-surface border border-border rounded-2xl p-4 md:p-5 shadow-sm">
+                          <div className="bg-surface border border-border rounded-lg p-4 md:p-5 shadow-sm">
                             <label className="block text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">
                               2. What is this regarding? <span className="normal-case tracking-normal opacity-70">(Optional)</span>
                             </label>
@@ -1199,7 +1199,7 @@ export default function AlumniDashboard() {
                                   <button
                                     key={tag}
                                     onClick={() => toggleFbTag(tag)}
-                                    className={`px-3 md:px-4 py-2 rounded-xl text-[11px] md:text-xs font-bold transition-all border flex items-center gap-1.5 ${
+                                    className={`px-3 md:px-4 py-2 rounded-lg text-[11px] md:text-xs font-bold transition-all border flex items-center gap-1.5 ${
                                       active 
                                         ? "bg-foreground text-background border-foreground shadow-sm scale-105" 
                                         : "bg-background text-muted-foreground border-border hover:border-foreground/30 hover:bg-muted hover:text-foreground"
@@ -1214,7 +1214,7 @@ export default function AlumniDashboard() {
                           </div>
 
                           {/* Textarea Bento */}
-                          <div className="bg-surface border border-border rounded-2xl p-4 md:p-5 shadow-sm">
+                          <div className="bg-surface border border-border rounded-lg p-4 md:p-5 shadow-sm">
                             <label className="block text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">
                               3. Any additional thoughts?
                             </label>
@@ -1222,7 +1222,7 @@ export default function AlumniDashboard() {
                               value={fbContent}
                               onChange={(e) => setFbContent(e.target.value)}
                               placeholder="Tell us how we can better support our alumni network..."
-                              className="w-full bg-background border border-border rounded-xl px-4 py-3.5 text-sm text-foreground focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all resize-y min-h-[90px] md:min-h-[120px] placeholder:text-muted-foreground/50 custom-scrollbar leading-relaxed"
+                              className="w-full bg-background border border-border rounded-lg px-4 py-3.5 text-sm text-foreground focus:ring-2 focus:ring-brand focus:border-brand outline-none transition-all resize-y min-h-[90px] md:min-h-[120px] placeholder:text-muted-foreground/50 custom-scrollbar leading-relaxed"
                             />
                           </div>
 
@@ -1233,7 +1233,7 @@ export default function AlumniDashboard() {
                           <button
                             onClick={handleSubmitFeedback}
                             disabled={submittingFb || fbRating === 0 || (!fbContent.trim() && fbSelectedTags.length === 0)}
-                            className="w-full bg-foreground hover:bg-foreground/90 disabled:bg-muted disabled:text-muted-foreground text-background py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black text-sm md:text-base transition-all flex items-center justify-center gap-2 shadow-lg disabled:shadow-none active:scale-[0.98] disabled:active:scale-100"
+                            className="w-full bg-foreground hover:bg-foreground/90 disabled:bg-muted disabled:text-muted-foreground text-background py-3.5 md:py-4 rounded-lg font-black text-sm md:text-base transition-all flex items-center justify-center gap-2 shadow-lg disabled:shadow-none active:scale-[0.98] disabled:active:scale-100"
                           >
                             {submittingFb ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                             {submittingFb ? "Submitting..." : "Send Feedback"}
@@ -1249,7 +1249,7 @@ export default function AlumniDashboard() {
 
           {isMemModalOpen && (
             <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
-              <div className="bg-card w-full max-w-md rounded-2xl p-6 shadow-2xl border border-border space-y-6 animate-in zoom-in-95 duration-300">
+              <div className="bg-card w-full max-w-md rounded-lg p-6 shadow-2xl border border-border space-y-6 animate-in zoom-in-95 duration-300">
                 <div className="text-center space-y-2">
                   <h3 className="text-2xl font-black text-foreground tracking-tight">Create Memory</h3>
                   <p className="text-sm text-muted-foreground">Share this special moment from your journey</p>
@@ -1258,7 +1258,7 @@ export default function AlumniDashboard() {
                 {memPreviews.length > 0 && (
                   <div className="grid grid-cols-2 gap-3 max-h-75 overflow-y-auto p-1 scrollbar-hide">
                     {memPreviews.map((preview, idx) => (
-                      <div key={idx} className="relative aspect-square rounded-2xl overflow-hidden border-2 border-brand/20 bg-muted group">
+                      <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border-2 border-brand/20 bg-muted group">
                         <img src={preview} alt={`Preview ${idx}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                         <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
@@ -1274,7 +1274,7 @@ export default function AlumniDashboard() {
                       value={memBatchTitle}
                       onChange={(e) => setMemBatchTitle(e.target.value)}
                       placeholder="e.g. Campus Farewell..."
-                      className="w-full bg-muted px-6 py-4 rounded-2xl border-transparent focus:border-brand border focus:ring-2 focus:ring-brand outline-none text-foreground font-medium transition-all"
+                      className="w-full bg-muted px-6 py-4 rounded-lg border-transparent focus:border-brand border focus:ring-2 focus:ring-brand outline-none text-foreground font-medium transition-all"
                     />
                     <p className="text-xs text-muted-foreground ml-1">This title will be applied to all {selectedMemFiles.length} images.</p>
                   </div>
@@ -1282,14 +1282,14 @@ export default function AlumniDashboard() {
                   <div className="flex gap-3">
                     <button
                       onClick={() => { setIsMemModalOpen(false); setSelectedMemFiles([]); setMemPreviews([]); }}
-                      className="flex-1 bg-muted text-foreground px-6 py-4 rounded-xl font-bold hover:bg-muted/80 transition-all text-sm"
+                      className="flex-1 bg-muted text-foreground px-6 py-4 rounded-lg font-bold hover:bg-muted/80 transition-all text-sm"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={startMemoryUpload}
                       disabled={memUploading}
-                      className="flex-2 bg-brand text-white px-6 py-4 rounded-xl font-bold hover:bg-brand/90 transition-all text-sm disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2 shadow-[var(--shadow-brand)]"
+                      className="flex-2 bg-brand text-white px-6 py-4 rounded-lg font-bold hover:bg-brand/90 transition-all text-sm disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2 shadow-[var(--shadow-brand)]"
                     >
                       {memUploading ? (
                         <>
@@ -1348,21 +1348,21 @@ export default function AlumniDashboard() {
                 <Camera className="w-5 h-5 text-brand" />
                 My Memories
               </h2>
-              <label className="flex items-center gap-2 px-4 py-2 bg-brand/10 text-brand rounded-xl text-xs font-bold hover:bg-brand/20 transition-all cursor-pointer">
+              <label className="flex items-center gap-2 px-4 py-2 bg-brand/10 text-brand rounded-lg text-xs font-bold hover:bg-brand/20 transition-all cursor-pointer">
                 {memUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                 {memUploading ? "Uploading..." : "Upload Memory"}
                 <input type="file" accept="image/*" multiple className="hidden" onChange={handleMemoryUpload} disabled={memUploading} />
               </label>
             </div>
             {memories.length === 0 ? (
-              <div className="bg-card rounded-2xl border border-border p-8 text-center text-muted-foreground">
+              <div className="bg-card rounded-lg border border-border p-8 text-center text-muted-foreground">
                 <Camera className="w-12 h-12 mx-auto mb-3 opacity-30" />
                 <p className="font-medium">No memories uploaded yet</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {memories.map((m: any) => (
-                  <div key={m.id} className="bg-card rounded-2xl border border-border overflow-hidden">
+                  <div key={m.id} className="bg-card rounded-lg border border-border overflow-hidden">
                     <div className="aspect-square bg-muted flex items-center justify-center object-top">
                       <img src={m.imageUrl} alt="Memory" loading="lazy" className="w-full h-full object-cover" />
 

@@ -167,7 +167,7 @@ export default function AlumniDiscovery() {
             <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-background/80 backdrop-blur-md overflow-y-auto">
 
               {/* Alumni Profile Modal Container */}
-              <main className="relative w-full max-w-4xl bg-card rounded-lg sm:rounded-xl md:rounded-[2rem] shadow-2xl overflow-hidden flex flex-col border border-border my-4">
+              <main className="relative w-full max-w-4xl bg-card rounded-lg sm:rounded-lg md:rounded-[2rem] shadow-2xl overflow-hidden flex flex-col border border-border my-4">
 
                 {/* Main Content Area */}
                 <div className="flex-1 flex flex-col max-h-[95vh] sm:max-h-[90vh] overflow-y-auto custom-scrollbar">
@@ -248,7 +248,7 @@ export default function AlumniDiscovery() {
                       {/* Academic Background */}
                       <section className="space-y-4 sm:space-y-6">
                         <h2 className="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-muted-foreground">Academic Background</h2>
-                        <div className="bg-muted/30 rounded-lg sm:rounded-xl p-4 sm:p-6 flex gap-3 sm:gap-4 items-start sm:items-center border border-border/50 group hover:border-brand/30 transition-colors">
+                        <div className="bg-muted/30 rounded-lg sm:rounded-lg p-4 sm:p-6 flex gap-3 sm:gap-4 items-start sm:items-center border border-border/50 group hover:border-brand/30 transition-colors">
                           <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-lg bg-brand/10 text-brand flex items-center justify-center shrink-0">
                             <BookOpen className="w-5 h-5 sm:w-6 sm:h-6" />
                           </div>
@@ -282,7 +282,7 @@ export default function AlumniDiscovery() {
                       {/* Connect Button */}
                       <button
                         onClick={rout}
-                        className="w-full sm:w-auto px-6 sm:px-10 py-3 sm:py-4 bg-[#0077b5] text-white rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm shadow-xl shadow-blue-500/20 transition-all flex items-center justify-center gap-2 sm:gap-3 group hover:shadow-2xl"
+                        className="w-full sm:w-auto px-6 sm:px-10 py-3 sm:py-4 bg-[#0077b5] text-white rounded-lg sm:rounded-lg font-bold text-xs sm:text-sm shadow-xl shadow-blue-500/20 transition-all flex items-center justify-center gap-2 sm:gap-3 group hover:shadow-2xl"
                       >
                         Connect on LinkedIn
                         <Send className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
@@ -456,10 +456,10 @@ export default function AlumniDiscovery() {
                       setIsModalOpen(!isModalOpen)
                       setSelectedAlumni(alumni)
                     }}
-                    className="group relative flex flex-col bg-card p-2 sm:p-3 md:p-4 rounded-xl md:rounded-none md:rounded-tr-3xl md:rounded-bl-3xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-border/40 hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] hover:border-brand/20 transition-all duration-500 cursor-pointer overflow-hidden"
+                    className="group relative flex flex-col bg-card p-2 sm:p-3 md:p-4 rounded-lg md:rounded-none md:rounded-tr-3xl md:rounded-bl-3xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-border/40 hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] hover:border-brand/20 transition-all duration-500 cursor-pointer overflow-hidden"
                   >
                     {/* Profile Image */}
-                    <div className="relative mb-5 rounded-lg md:rounded-xl overflow-hidden bg-muted aspect-square">
+                    <div className="relative mb-5 rounded-lg md:rounded-lg overflow-hidden bg-muted aspect-square">
                       <img
                         alt={`${alumni.name} profile portrait`}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"

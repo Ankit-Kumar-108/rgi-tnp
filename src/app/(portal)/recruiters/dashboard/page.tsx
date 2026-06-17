@@ -242,7 +242,7 @@ export default function RecruiterDashboard() {
           )}
           {/* Header */}
           <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div className="flex justify-center items-between w-full">
+            <div className="flex justify-center items-start md:flex-wrap-none w-full md:w-auto">
               <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand/10 text-brand text-xs font-bold uppercase tracking-widest mb-2">
                 <Briefcase className="w-4 h-4" /> Recruiter
@@ -252,7 +252,7 @@ export default function RecruiterDashboard() {
               </h1>
               {user?.company && <p className="text-sm text-muted-foreground mt-1">{user.company}</p>}
               </div>
-              <div className=" md:hidden flex items-center justify-end ml-auto">
+              <div className=" md:hidden flex items-center justify-end ml-auto mt-5">
                 <NotificationBell role="recruiter" />
               </div>
             </div>

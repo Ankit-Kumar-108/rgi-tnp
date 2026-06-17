@@ -84,7 +84,7 @@ export default function ExternalStudentDashboard() {
         actionElement: (
           <button
             onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
-            className="inline-flex items-center gap-1.5 text-green-600 bg-green-500/10 hover:bg-green-500/20 px-4 py-2.5 rounded-xl text-xs font-bold transition-all"
+            className="inline-flex items-center gap-1.5 text-green-600 bg-green-500/10 hover:bg-green-500/20 px-4 py-2.5 rounded-lg text-xs font-bold transition-all"
           >
             <CheckCircle className="w-4 h-4" /> View Details
           </button>
@@ -107,7 +107,7 @@ export default function ExternalStudentDashboard() {
       actionElement: (
         <button
           onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
-          className="bg-brand text-white px-5 py-2 rounded-xl text-xs font-bold hover:bg-brand/90 transition-all"
+          className="bg-brand text-white px-5 py-2 rounded-lg text-xs font-bold hover:bg-brand/90 transition-all"
         >
           Register
         </button>
@@ -238,7 +238,7 @@ export default function ExternalStudentDashboard() {
 
               {/* Email Verification Banner (Conditional) */}
               {!student?.isVerified && (
-                <section className="bg-yellow-500/10 border border-yellow-500/20 rounded-2xl p-5 flex items-center gap-4">
+                <section className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-5 flex items-center gap-4">
                   <AlertTriangle className="w-8 h-8 text-yellow-500 shrink-0" />
                   <div>
                     <p className="font-bold text-yellow-600">Action Required: Verify Email</p>
@@ -255,7 +255,7 @@ export default function ExternalStudentDashboard() {
                 </h2>
 
                 {drives.length === 0 ? (
-                  <div className="bg-card rounded-2xl border border-border p-8 text-center text-muted-foreground">
+                  <div className="bg-card rounded-lg border border-border p-8 text-center text-muted-foreground">
                     <Briefcase className="w-12 h-12 mx-auto mb-3 opacity-30" />
                     <p className="font-medium">No eligible drives available right now</p>
                   </div>
@@ -266,10 +266,10 @@ export default function ExternalStudentDashboard() {
                       {drives.map((drive: any) => {
                         const { actionElement } = getEligibilityData(drive, student);
                         return (
-                          <div key={drive.id} className="bg-card border border-border rounded-2xl p-5 shadow-sm space-y-4">
+                          <div key={drive.id} className="bg-card border border-border rounded-lg p-5 shadow-sm space-y-4">
                             <div className="flex items-start justify-between">
                               <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center shrink-0">
+                                <div className="w-10 h-10 bg-brand/10 rounded-lg flex items-center justify-center shrink-0">
                                   <Building2 className="w-5 h-5 text-brand" />
                                 </div>
                                 <div>
@@ -302,7 +302,7 @@ export default function ExternalStudentDashboard() {
                     </div>
 
                     {/* DESKTOP VIEW: Standard Table (Hidden on small screens) */}
-                    <div className="hidden md:block bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+                    <div className="hidden md:block bg-card rounded-lg border border-border shadow-sm overflow-hidden">
                       <table className="w-full text-sm">
                         <thead className="bg-muted/50 border-b border-border">
                           <tr className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
@@ -354,7 +354,7 @@ export default function ExternalStudentDashboard() {
                 </h2>
 
                 {registrations.length === 0 ? (
-                  <div className="bg-card rounded-2xl border border-border p-8 text-center text-muted-foreground">
+                  <div className="bg-card rounded-lg border border-border p-8 text-center text-muted-foreground">
                     <p className="font-medium">No registrations yet</p>
                     <p className="text-xs mt-1">Register for a drive from the list above</p>
                   </div>
@@ -363,7 +363,7 @@ export default function ExternalStudentDashboard() {
                     {/* MOBILE VIEW: Cards */}
                     <div className="grid grid-cols-1 gap-4 md:hidden">
                       {registrations.map((reg: any) => (
-                        <div key={reg.id} className="bg-card border border-border rounded-2xl p-5 shadow-sm space-y-4">
+                        <div key={reg.id} className="bg-card border border-border rounded-lg p-5 shadow-sm space-y-4">
                           <div className="flex justify-between items-start">
                             <div>
                               <h3 className="font-bold text-foreground leading-tight">{reg.drive?.companyName}</h3>
@@ -410,7 +410,7 @@ export default function ExternalStudentDashboard() {
                     </div>
 
                     {/* DESKTOP VIEW: Table */}
-                    <div className="hidden md:block bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+                    <div className="hidden md:block bg-card rounded-lg border border-border shadow-sm overflow-hidden">
                       <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left">
                           <thead>
@@ -480,7 +480,7 @@ export default function ExternalStudentDashboard() {
                   {/* MOBILE VIEW: Compact List */}
                   <div className="grid grid-cols-1 gap-3 md:hidden">
                     {archivedDrives.map((drive: any) => (
-                      <div key={drive.id} className="bg-card/50 border border-border rounded-xl p-4 flex justify-between items-center">
+                      <div key={drive.id} className="bg-card/50 border border-border rounded-lg p-4 flex justify-between items-center">
                         <div className="space-y-1">
                           <h3 className="text-sm font-bold text-foreground truncate max-w-37.5">
                             {drive.companyName}
@@ -505,7 +505,7 @@ export default function ExternalStudentDashboard() {
                   </div>
 
                   {/* DESKTOP VIEW: Clean Table */}
-                  <div className="hidden md:block bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+                  <div className="hidden md:block bg-card rounded-lg border border-border shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>

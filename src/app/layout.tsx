@@ -16,7 +16,7 @@ const lexend = Lexend({
 });
 
 export const metadata: Metadata = {
-  title: "RGI Training & Placement | Radharaman Group of Institutes",
+  title: "RGI Training & Placement",
   description: "Empowering the next generation of professional leaders through industry-aligned training and strategic excellence.",
 };
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { AlertTriangle, ChevronRight, FileText, Loader2 } from "lucide-react";
+import { AlertTriangle, ChevronRight, FileText, Loader2, X } from "lucide-react";
 import { getToken } from "@/lib/auth-client";
 import { Student } from "@/types";
 
@@ -91,10 +91,12 @@ export default function ProfileCompletionForm({
 
       {/* Complete Profile Form (Collapsible) */}
       {showProfileForm && (
-        <section className="bg-card rounded-lg p-6 md:shadow-xl border-2 border-brand/20 animate-in fade-in slide-in-from-top-4 duration-300">
-          <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
-            <div className="p-2 bg-brand/10 rounded-lg text-brand"><FileText className="w-5 h-5" /></div>
-            Academic &amp; Professional Details
+        <section className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-sm p-4 ">
+          <div className="w-full max-w-2xl rounded-lg border border-border bg-card/95 shadow-2xl overflow-hidden animate-in zoom-in-95 fade-in duration-300 p-5">
+          <h2 className="text-xl font-bold text-foreground mb-6 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2"><div className="p-2 bg-brand/10 rounded-lg text-brand"><FileText className="w-5 h-5" /></div>
+            Academic Details</div>
+            <div className="cursor-pointer p-1 hover:bg-red-600/20 rounded-full" onClick={()=>setShowProfileForm(false)}><X className="w-5 h-5" /></div>
           </h2>
           <form onSubmit={handleSubmitProfile} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -167,6 +169,7 @@ export default function ProfileCompletionForm({
               </button>
             </div>
           </form>
+          </div>
         </section>
       )}
     </>
