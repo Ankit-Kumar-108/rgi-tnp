@@ -5,6 +5,46 @@ interface SendEmailOptions {
   html: string;
   from?: string;
 }
+
+// ── OAuth Token Cache ──────────────────────────────────────────────────
+// Gmail access tokens last ~3600s. We cache and reuse them within a
+// Worker invocation to avoid one round-trip per email (~300ms saved each).
+let cachedToken: { token: string; expiresAt: number } | null = null;
+
+async function getAccessToken(clientId: string, clientSecret: string, refreshToken: string): Promise<{ token: string | null; error?: string }> {
+  // Return cached token if still valid (with 60s safety buffer)
+  if (cachedToken && Date.now() < cachedToken.expiresAt) {
+    return { token: cachedToken.token };
+  }
+
+  const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: clientId,
+      client_secret: clientSecret,
+      refresh_token: refreshToken,
+      grant_type: "refresh_token",
+    }),
+  });
+
+  if (!tokenResponse.ok) {
+    const errorText = await tokenResponse.text();
+    console.error("[EMAIL] Failed to get Gmail access token:", errorText);
+    return { token: null, error: `Auth Error: ${tokenResponse.status}` };
+  }
+
+  const { access_token, expires_in } = await tokenResponse.json() as { access_token: string; expires_in: number };
+  
+  // Cache for (expires_in - 60) seconds — typically ~3540s
+  cachedToken = {
+    token: access_token,
+    expiresAt: Date.now() + ((expires_in || 3600) - 60) * 1000,
+  };
+
+  return { token: access_token };
+}
+
 export async function sendEmail({ to, subject, html, from }: SendEmailOptions): Promise<{ success: boolean; error?: string }> {
   const validate = validateEmail(to)
   if (!validate.valid) {
@@ -22,25 +62,11 @@ export async function sendEmail({ to, subject, html, from }: SendEmailOptions): 
   }
 
   try {
-    // 1. Get fresh access token via OAuth 2.0
-    const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
-        refresh_token: REFRESH_TOKEN,
-        grant_type: "refresh_token",
-      }),
-    });
-
-    if (!tokenResponse.ok) {
-      const errorText = await tokenResponse.text();
-      console.error("[EMAIL] Failed to get Gmail access token:", errorText);
-      return { success: false, error: `Auth Error: ${tokenResponse.status}` };
+    // 1. Get access token (cached — avoids redundant OAuth round-trips)
+    const { token: access_token, error: tokenError } = await getAccessToken(CLIENT_ID, CLIENT_SECRET, REFRESH_TOKEN);
+    if (!access_token) {
+      return { success: false, error: tokenError };
     }
-
-    const { access_token } = await tokenResponse.json() as { access_token: string };
 
     // 2. Construct the email in RFC 2822 format (MIME)
     const senderEmail = from || GMAIL_USER;

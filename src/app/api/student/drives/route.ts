@@ -5,6 +5,7 @@ import { driveRegistrationTemplate } from "@/lib/email-templates";
 import { NotificationService } from "@/lib/notification-service";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
 import { formatCgpaCriteria, meetsCgpaCriteria } from "@/lib/cgpa-utils";
+import { runInBackground } from "@/lib/background";
 
 
 
@@ -101,14 +102,22 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Register
-    await db.driveRegistration.create({
-      data: { driveId, studentId: studentData.id },
-    });
-
-    // Send Drive Registration Confirmation Email 
+    // Register (with unique constraint safety net for concurrent requests)
     try {
-      await NotificationService.notifyUser({
+      await db.driveRegistration.create({
+        data: { driveId, studentId: studentData.id },
+      });
+    } catch (createError: any) {
+      // Unique constraint violation = concurrent duplicate registration
+      if (String(createError).includes("UNIQUE constraint failed") || String(createError).includes("unique")) {
+        return NextResponse.json({ success: false, message: "Already registered for this drive" }, { status: 409 });
+      }
+      throw createError; // Re-throw non-duplicate errors
+    }
+
+    // Fire-and-forget: send email + in-app notification in background
+    runInBackground(
+      NotificationService.notifyUser({
         email: {
           to: studentData.email,
           subject: `Registered for ${drive.companyName} Drive`,
@@ -133,13 +142,11 @@ export async function POST(req: NextRequest) {
           id: studentData.id,
           type: "student",
         }
-      })
-      return NextResponse.json({ success: true, message: "Registered for the drive, confirmation email sent" }, { status: 200 });
+      }),
+      "student-drive-registration-email"
+    );
 
-    } catch (emailError) {
-      console.error("Failed to send drive registration email:", emailError);
-      return NextResponse.json({ success: false, message: "Registered for the drive, but failed to send confirmation email" }, { status: 500 });
-    }
+    return NextResponse.json({ success: true, message: "Registered for the drive" }, { status: 200 });
   } catch (error) {
     console.error("Drive Registration Error:", error);
     return NextResponse.json({ success: false, message: "Registration failed" }, { status: 500 });

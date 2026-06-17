@@ -6,6 +6,7 @@ import { rejectionEmailTemplate } from "@/lib/email-templates";
 import { shortlistedEmailTemplate } from "@/lib/email-templates";
 import { offerSelectionEmailTemplate } from "@/lib/email-templates";
 import { NotificationService } from "@/lib/notification-service";
+import {runInBackground} from "@/lib/background";
 
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -134,7 +135,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       );
     }
 
-    // Update all registrations with the new status
+    // Update all registrations with the new status (synchronous — this is fast)
     await db.driveRegistration.updateMany({
       where: {
         id: { in: registrationIds },
@@ -143,285 +144,148 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       data: { status }
     });
 
-    // Send emails to all updated registrations if status is "selected"
-    if (status.toLowerCase() === "selected") {
-      try {
-        // Fetch all updated registrations with their data
-        const updatedRegistrations = await db.driveRegistration.findMany({
-          where: {
-            id: { in: registrationIds }
-          },
-          select: {
-            id: true,
-            drive: {
-              select: {
-                companyName: true,
-                roleName: true,
-                ctc: true,
-                id: true
-              }
-            },
-            student: {
-              select: {
-                name: true,
-                email: true,
-                id: true
-              }
-            },
-            externalStudent: {
-              select: {
-                name: true,
-                email: true,
-                id: true
-              }
-            },
-            alumni: {
-              select: {
-                name: true,
-                personalEmail: true,
-                id: true
-              }
-            }
-          }
+    // Return immediately — emails send in background via Cloudflare waitUntil
+    // This prevents 30s timeout when sending to 500+ students
+    runInBackground(
+      sendBulkStatusEmails(db, registrationIds, status.toLowerCase()),
+      `bulk-${status}-emails`
+    );
 
-        });
-
-        // Send emails to all selected students in PARALLEL (not sequential)
-        const emailPromises = updatedRegistrations
-          .filter(reg => {
-            const studentData = reg.student || reg.externalStudent || (reg.alumni ? { ...reg.alumni, email: reg.alumni.personalEmail } : null);
-            return studentData?.email && studentData?.name && reg.drive?.companyName && reg.drive?.roleName && reg.drive?.ctc;
-          })
-          .map(async (reg) => {
-            const studentData = reg.student || reg.externalStudent || (reg.alumni ? { ...reg.alumni, email: reg.alumni.personalEmail } : null);
-            await NotificationService.notifyUser({
-              email: {
-                to: studentData!.email,
-                subject: `Selected for next round for ${reg.drive!.companyName} Campus Drive`,
-                html: offerSelectionEmailTemplate(
-                  studentData!.name,
-                  reg.drive!.roleName,
-                  reg.drive!.companyName,
-                  reg.drive!.ctc,
-                  reg.drive!.roleName,
-                ),
-                template: "offerSelectionTemplate",
-                approvalType: "participants_selection",
-                approvalId: reg.drive.id,
-                actionType: "selected for the next round",
-              },
-              inApp:{
-                type: "participant_selection",
-                title: "You're Selected For the next round!",
-                message: `Selected for the next round at ${reg.drive!.companyName} drive`,
-              },
-              triggeredBy: "system",
-              recipient: {
-                id: studentData!.id,
-                type: reg.student ? "student" : reg.externalStudent ? "external_student" : "alumni"
-              }
-      }).catch(emailError => {
-        console.error(`Failed to send email to ${studentData!.email}:`, {
-          error: emailError instanceof Error ? emailError.message : String(emailError),
-          stack: emailError instanceof Error ? emailError.stack : null
-        });
-      });
-    });
-
-    // Wait for all emails to send (parallel, not sequential)
-    if (emailPromises.length > 0) {
-      await Promise.all(emailPromises);
-    }
-
-  } catch (emailError) {
-    console.error("Error processing selection emails:", emailError);
+    return NextResponse.json({ success: true, message: `Status updated to ${status}` });
+  } catch (err) {
+    console.error("Update participant error:", err);
+    return NextResponse.json({ success: false, message: "Failed to update status" }, { status: 500 });
   }
 }
 
-if (status.toLowerCase() === "rejected") {
+/**
+ * Background email sending with chunked processing.
+ * Processes emails in batches of 10 to respect Cloudflare free-tier subrequest limits.
+ * Each email = 2 subrequests (OAuth token [cached] + Gmail send) + 2 DB writes (emailLog + notification).
+ */
+async function sendBulkStatusEmails(db: any, registrationIds: string[], status: string) {
   try {
-    // Fetch all updated registrations with their data
     const updatedRegistrations = await db.driveRegistration.findMany({
-      where: {
-        id: { in: registrationIds }
-      },
+      where: { id: { in: registrationIds } },
       select: {
         id: true,
         drive: {
           select: {
             companyName: true,
             roleName: true,
-            id: true
+            ctc: true,
+            id: true,
           }
         },
         student: {
-          select: {
-            name: true,
-            email: true,
-            id: true
-          }
+          select: { name: true, email: true, id: true }
         },
         externalStudent: {
-          select: {
-            name: true,
-            email: true,
-            id: true
-          }
+          select: { name: true, email: true, id: true }
         },
         alumni: {
-          select: {
-            name: true,
-            personalEmail: true,
-            id: true
-          }
+          select: { name: true, personalEmail: true, id: true }
         }
       }
-
     });
 
-    // Send emails to all rejected students in PARALLEL (not sequential)
-    const emailPromises = updatedRegistrations
-      .filter(reg => {
+    // Build email tasks
+    const emailTasks = updatedRegistrations
+      .map((reg: any) => {
         const studentData = reg.student || reg.externalStudent || (reg.alumni ? { ...reg.alumni, email: reg.alumni.personalEmail } : null);
-        return studentData?.email && studentData?.name && reg.drive?.companyName && reg.drive?.roleName;
-      })
-      .map(async (reg) => {
-        const studentData = reg.student || reg.externalStudent || (reg.alumni ? { ...reg.alumni, email: reg.alumni.personalEmail } : null);
-        await NotificationService.notifyUser({
-          email: {
-            to: studentData!.email,
-            subject: `Update on ${reg.drive!.companyName} Campus Drive application`,
-            html: rejectionEmailTemplate(
-              studentData!.name,
-              reg.drive!.roleName,
-              reg.drive!.companyName
-            ),
+        if (!studentData?.email || !studentData?.name || !reg.drive?.companyName || !reg.drive?.roleName) return null;
+
+        const recipientType = reg.student ? "student" : reg.externalStudent ? "external_student" : "alumni";
+
+        let emailConfig: { subject: string; html: string; template: string; actionType: string };
+        let inAppConfig: { type: string; title: string; message: string } | undefined;
+
+        if (status === "selected") {
+          emailConfig = {
+            subject: `Selected for next round for ${reg.drive.companyName} Campus Drive`,
+            html: offerSelectionEmailTemplate(studentData.name, reg.drive.roleName, reg.drive.companyName, reg.drive.ctc, reg.drive.roleName),
+            template: "offerSelectionTemplate",
+            actionType: "selected for the next round",
+          };
+          inAppConfig = {
+            type: "participant_selection",
+            title: "You're Selected For the next round!",
+            message: `Selected for the next round at ${reg.drive.companyName} drive`,
+          };
+        } else if (status === "rejected") {
+          emailConfig = {
+            subject: `Update on ${reg.drive.companyName} Campus Drive application`,
+            html: rejectionEmailTemplate(studentData.name, reg.drive.roleName, reg.drive.companyName),
             template: "rejectionEmailTemplate",
-            approvalId: reg.drive.id,
-            approvalType: "participant_rejection",
-            actionType: "rejected"
-          },
-          inApp: {
+            actionType: "rejected",
+          };
+          inAppConfig = {
             type: "participant_rejection",
             title: "Application Status Update",
-            message: `Your application for ${reg.drive!.companyName} has been updated`,
-          },
-          triggeredBy: "system",
-          recipient: {
-            id: studentData!.id,
-            type: reg.student ? "student" : reg.externalStudent ? "external_student" : "alumni"
-          }
-        }).catch(emailError => {
-          console.error(`Failed to send email to ${studentData!.email}:`, {
-            error: emailError instanceof Error ? emailError.message : String(emailError),
-            stack: emailError instanceof Error ? emailError.stack : null
-          });
-        });
-      });
-
-    // Wait for all emails to send (parallel, not sequential)
-    if (emailPromises.length > 0) {
-      await Promise.all(emailPromises);
-    }
-
-  } catch (emailError) {
-    console.error("Error processing rejection emails:", emailError);
-  }
-}
-
-if (status.toLowerCase() === "shortlisted") {
-  try {
-    // Fetch all updated registrations with their data
-    const updatedRegistrations = await db.driveRegistration.findMany({
-      where: {
-        id: { in: registrationIds }
-      },
-      select: {
-        id: true,
-        drive: {
-          select: {
-            companyName: true,
-            roleName: true,
-            id: true,
-          }
-        },
-        student: {
-          select: {
-            name: true,
-            email: true,
-            id: true
-          }
-        },
-        externalStudent: {
-          select: {
-            name: true,
-            email: true,
-            id: true
-          }
-        },
-        alumni: {
-          select: {
-            name: true,
-            personalEmail: true,
-            id: true
-          }
-        }
-      }
-
-    });
-
-    // Send emails to all shortlisted students in PARALLEL (not sequential)
-    const emailPromises = updatedRegistrations
-      .filter(reg => {
-        const studentData = reg.student || reg.externalStudent || (reg.alumni ? { ...reg.alumni, email: reg.alumni.personalEmail } : null);
-        return studentData?.email && studentData?.name && reg.drive?.companyName && reg.drive?.roleName;
-      })
-      .map(reg => {
-        const studentData = reg.student || reg.externalStudent || (reg.alumni ? { ...reg.alumni, email: reg.alumni.personalEmail } : null);
-        return NotificationService.notifyUser({
-          email: {
-            to: studentData!.email,
-            subject: `Shortlisted for ${reg.drive!.companyName} Campus Drive`,
+            message: `Your application for ${reg.drive.companyName} has been updated`,
+          };
+        } else if (status === "shortlisted") {
+          emailConfig = {
+            subject: `Shortlisted for ${reg.drive.companyName} Campus Drive`,
             html: shortlistedEmailTemplate(
-              studentData!.name,
-              reg.drive!.roleName,
-              reg.drive!.companyName,
-              `${new Date().toLocaleDateString()} in 10 Minutes`,
-              "RGI Seminar Hall",
-              "Robin Samul (TPO)",
+              studentData.name, reg.drive.roleName, reg.drive.companyName,
+              `${new Date().toLocaleDateString()} in 10 Minutes`, "RGI Seminar Hall", "Robin Samul (TPO)"
             ),
             template: "shortlisted",
-            approvalType: "drive",
-            approvalId: reg.drive!.id,
-            actionType: "shortlisted"
-          },
-          triggeredBy: "admin",
-          recipient: {
-            id: studentData!.id,
-            type: reg.student ? "student" : reg.externalStudent ? "external_student" : "alumni"
-          }
-        }).catch(emailError => {
-          console.error(`Failed to send email to ${studentData!.email}:`, {
-            error: emailError instanceof Error ? emailError.message : String(emailError),
-            stack: emailError instanceof Error ? emailError.stack : null
-          });
-        });
-      });
+            actionType: "shortlisted",
+          };
+        } else {
+          return null;
+        }
 
-    // Wait for all emails to send (parallel, not sequential)
-    if (emailPromises.length > 0) {
-      await Promise.all(emailPromises);
+        return {
+          studentData,
+          recipientType,
+          driveId: reg.drive.id,
+          emailConfig: emailConfig!,
+          inAppConfig,
+        };
+      })
+      .filter(Boolean) as Array<{
+        studentData: { email: string; name: string; id: string };
+        recipientType: "student" | "external_student" | "alumni";
+        driveId: string;
+        emailConfig: { subject: string; html: string; template: string; actionType: string };
+        inAppConfig?: { type: string; title: string; message: string };
+      }>;
+
+    // Process in chunks of 10 to respect Cloudflare free-tier limits
+    // (10 emails × 2 subrequests = 20, plus DB writes stays well under 50)
+    const CHUNK_SIZE = 10;
+    for (let i = 0; i < emailTasks.length; i += CHUNK_SIZE) {
+      const chunk = emailTasks.slice(i, i + CHUNK_SIZE);
+      await Promise.allSettled(
+        chunk.map(task =>
+          NotificationService.notifyUser({
+            email: {
+              to: task.studentData.email,
+              subject: task.emailConfig.subject,
+              html: task.emailConfig.html,
+              template: task.emailConfig.template,
+              approvalType: `participant_${task.emailConfig.actionType}`,
+              approvalId: task.driveId,
+              actionType: task.emailConfig.actionType,
+            },
+            inApp: task.inAppConfig,
+            triggeredBy: "admin",
+            recipient: {
+              id: task.studentData.id,
+              type: task.recipientType,
+            },
+          }).catch(err => {
+            console.error(`[BulkEmail] Failed for ${task.studentData.email}:`, err instanceof Error ? err.message : String(err));
+          })
+        )
+      );
     }
 
-  } catch (emailError) {
-    console.error("Error processing shortlisted emails:", emailError);
+    console.log(`[BulkEmail] Completed sending ${emailTasks.length} ${status} emails in ${Math.ceil(emailTasks.length / CHUNK_SIZE)} chunks`);
+  } catch (error) {
+    console.error(`[BulkEmail] Fatal error in background ${status} email task:`, error);
   }
-}
-
-
-return NextResponse.json({ success: true, message: `Status updated to ${status}` });
-  } catch (err) {
-  console.error("Update participant error:", err);
-  return NextResponse.json({ success: false, message: "Failed to update status" }, { status: 500 });
-}
 }

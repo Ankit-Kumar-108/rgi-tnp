@@ -45,19 +45,28 @@ export async function GET(req: NextRequest) {
         course: true,
         jobType: true,
         allowAlumni: true,
-        _count: { select: { registrations: true } },
       },
       orderBy: { driveDate: "desc" },
     });
 
-    // Parallel fetch: count applicants for each drive efficiently
-    const registrationCounts = await Promise.all(
-      drives.map(drive =>
-        db.driveRegistration.count({
-          where: { driveId: drive.id }
-        })
-      )
-    );
+    // Single GROUP BY query instead of N separate count() calls
+    const driveIds = drives.map((d: any) => d.id);
+    const countMap = new Map<string, number>();
+    if (driveIds.length > 0) {
+      try {
+        const placeholders = driveIds.map(() => '?').join(',');
+        const countRows: any[] = await db.$queryRaw`SELECT "driveId", COUNT(*) as cnt FROM "DriveRegistration" WHERE "driveId" IN (${placeholders}) GROUP BY "driveId"`;
+        for (const row of countRows) {
+          countMap.set(row.driveId, Number(row.cnt));
+        }
+      } catch {
+        // Fallback: use individual count queries if raw SQL fails
+        const counts = await Promise.all(
+          drives.map((drive: any) => db.driveRegistration.count({ where: { driveId: drive.id } }))
+        );
+        drives.forEach((d: any, i: number) => countMap.set(d.id, counts[i]));
+      }
+    }
 
     // Get detailed registrations only for first drive (paginated)
     let applicants: any[] = [];
@@ -166,11 +175,12 @@ export async function GET(req: NextRequest) {
       course: d.course,
       jobType: d.jobType,
       allowAlumni: d.allowAlumni,
-      registrationCount: registrationCounts[idx],
+      registrationCount: countMap.get(d.id) || 0,
       applicants: d.applicants
     }));
 
-    const totalApplicants = registrationCounts.reduce((sum, count) => sum + count, 0);
+    let totalApplicants = 0;
+    countMap.forEach(count => { totalApplicants += count; });
 
     return NextResponse.json({
       success: true,

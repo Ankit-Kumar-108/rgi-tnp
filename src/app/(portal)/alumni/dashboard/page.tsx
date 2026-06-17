@@ -479,6 +479,11 @@ export default function AlumniDashboard() {
           />
           </div>
 
+          {/* Notification bell */}
+        <div className="mt-2 w-full md:hidden flex justify-end ">
+          <NotificationBell role="alumni" />
+        </div>
+
           {/* Loader State */}
           {loading && (
             <div className="flex justify-center py-20">

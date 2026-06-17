@@ -234,7 +234,7 @@ export default function RecruiterDashboard() {
               <p className="text-destructive font-bold text-lg">{fetchError}</p>
               <button
                 onClick={() => mutateDash()}
-                className="flex items-center gap-2 px-6 py-3 bg-brand text-primary-foreground rounded-xl font-bold text-sm hover:bg-brand/90 transition-all"
+                className="flex items-center gap-2 px-6 py-3 bg-brand text-primary-foreground rounded-lg font-bold text-sm hover:bg-brand/90 transition-all"
               >
                 <RefreshCw className="w-4 h-4" /> Retry
               </button>
@@ -242,14 +242,19 @@ export default function RecruiterDashboard() {
           )}
           {/* Header */}
           <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
+            <div className="flex justify-center items-between w-full">
+              <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand/10 text-brand text-xs font-bold uppercase tracking-widest mb-2">
                 <Briefcase className="w-4 h-4" /> Recruiter
               </div>
-              <h1 className="text-3xl font-black tracking-tight text-foreground">
+              <h1 className="text-lg md:text-2xl font-black tracking-tight text-foreground">
                 Welcome, <span className="text-brand">{user?.name || "Recruiter"}</span>
               </h1>
               {user?.company && <p className="text-sm text-muted-foreground mt-1">{user.company}</p>}
+              </div>
+              <div className=" md:hidden flex items-center justify-end ml-auto">
+                <NotificationBell role="recruiter" />
+              </div>
             </div>
             <div className="hidden md:flex flex-wrap items-center gap-3">
               <button
@@ -292,7 +297,7 @@ export default function RecruiterDashboard() {
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-muted/50 transition-colors border-b border-border"
               >
-                <span className="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
+                <span className="w-9 h-9 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
                   <Plus className="w-4 h-4" />
                 </span>
                 <span className="flex-1 min-w-0">
@@ -306,7 +311,7 @@ export default function RecruiterDashboard() {
                 onClick={() => setShowFeedbackModal(true)}
                 className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-muted/50 transition-colors border-b border-border"
               >
-                <span className="w-9 h-9 rounded-xl bg-violet-50 text-violet-700 flex items-center justify-center shrink-0">
+                <span className="w-9 h-9 rounded-lg bg-violet-50 text-violet-700 flex items-center justify-center shrink-0">
                   <MessageSquareShare className="w-4 h-4" />
                 </span>
                 <span className="flex-1 min-w-0">
@@ -320,7 +325,7 @@ export default function RecruiterDashboard() {
                 onClick={handleLogout}
                 className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-muted/50 transition-colors"
               >
-                <span className="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center shrink-0">
+                <span className="w-9 h-9 rounded-lg bg-red-50 text-red-600 flex items-center justify-center shrink-0">
                   <LogOut className="w-4 h-4" />
                 </span>
                 <span className="flex-1 min-w-0">
@@ -331,18 +336,15 @@ export default function RecruiterDashboard() {
               </button>
             </div>
 
-            <div className="rounded-2xl border border-border bg-card overflow-hidden">
-              <NotificationBell role="recruiter" />
-            </div>
           </section>
 
           {/* Stats */}
           {!loading && (
             <section className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
               {/* Total Drives */}
-              <div className="bg-card rounded-2xl p-5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
+              <div className="bg-card rounded-lg p-5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-11 h-11 bg-brand/10 rounded-xl flex items-center justify-center">
+                  <div className="w-11 h-11 bg-brand/10 rounded-lg flex items-center justify-center">
                     <Briefcase className="w-5 h-5 text-brand" />
                   </div>
                 </div>
@@ -351,9 +353,9 @@ export default function RecruiterDashboard() {
               </div>
 
               {/* Active Drives */}
-              <div className="bg-card rounded-2xl p-5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
+              <div className="bg-card rounded-lg p-5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-11 h-11 bg-brand/10 rounded-xl flex items-center justify-center">
+                  <div className="w-11 h-11 bg-brand/10 rounded-lg flex items-center justify-center">
                     <CheckCircle className="w-5 h-5 text-brand" />
                   </div>
                 </div>
@@ -362,9 +364,9 @@ export default function RecruiterDashboard() {
               </div>
 
               {/* Pending Drives */}
-              <div className="bg-card rounded-2xl p-5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
+              <div className="bg-card rounded-lg p-5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-11 h-11 bg-brand/10 rounded-xl flex items-center justify-center">
+                  <div className="w-11 h-11 bg-brand/10 rounded-lg flex items-center justify-center">
                     <Clock className="w-5 h-5 text-brand" />
                   </div>
                 </div>
@@ -373,9 +375,9 @@ export default function RecruiterDashboard() {
               </div>
 
               {/* Total Applicants */}
-              <div className="bg-card rounded-2xl p-5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
+              <div className="bg-card rounded-lg p-5 md:p-6 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 group">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-11 h-11 bg-brand/10 rounded-xl flex items-center justify-center">
+                  <div className="w-11 h-11 bg-brand/10 rounded-lg flex items-center justify-center">
                     <Users className="w-5 h-5 text-brand" />
                   </div>
                 </div>
@@ -388,12 +390,12 @@ export default function RecruiterDashboard() {
           {/* Drive Form Modal */}
           {showForm && (
             <div className="fixed inset-0  w-full h-full z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 xl:p-6 transition-all duration-300" onClick={() => setShowForm(false)}>
-              <div className="bg-card rounded-2xl border border-border shadow-2xl max-w-4xl w-full flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200 overflow-hidden" onClick={(e) => e.stopPropagation()}>
-                
+              <div className="bg-card rounded-lg border border-border shadow-2xl max-w-4xl w-full flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+
                 {/* Modal Header (Fixed) */}
                 <div className="bg-muted/30 border-b border-border px-6 py-5 flex items-center justify-between sticky top-0 z-10">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center text-brand">
+                    <div className="w-10 h-10 bg-brand/10 rounded-lg flex items-center justify-center text-brand">
                       {editDriveId ? <Edit className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
                     </div>
                     <div>
@@ -401,7 +403,7 @@ export default function RecruiterDashboard() {
                       <p className="text-xs text-muted-foreground font-medium mt-0.5">Fill out the requirements for your recruitment drive.</p>
                     </div>
                   </div>
-                  <button onClick={() => setShowForm(false)} className="text-muted-foreground hover:text-foreground bg-muted hover:bg-muted/80 p-2 rounded-xl transition-all">
+                  <button onClick={() => setShowForm(false)} className="text-muted-foreground hover:text-foreground bg-muted hover:bg-muted/80 p-2 rounded-lg transition-all">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
@@ -409,29 +411,29 @@ export default function RecruiterDashboard() {
                 {/* Modal Body (Scrollable) */}
                 <div className="overflow-y-auto p-6 md:p-8 custom-scrollbar bg-card">
                   <form id="drive-form" onSubmit={handleSubmitDrive} className="space-y-10">
-                    
+
                     {/* Section 1: Basic Role Details */}
                     <div className="space-y-6">
                       <div className="flex items-center gap-2 border-b border-border pb-2">
                         <Building2 className="w-4 h-4 text-brand" />
                         <h4 className="text-sm font-bold uppercase tracking-wider text-foreground">Basic Role Details</h4>
                       </div>
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                           <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Company Name</label>
                           <input required value={form.companyName} onChange={(e) => setForm({ ...form, companyName: e.target.value })}
-                            className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
+                            className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
                         </div>
                         <div>
                           <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Role / Designation</label>
                           <input required value={form.roleName} onChange={(e) => setForm({ ...form, roleName: e.target.value })}
-                            className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" placeholder="e.g. Software Engineer" />
+                            className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" placeholder="e.g. Software Engineer" />
                         </div>
                         <div>
                           <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Job Type</label>
                           <select required value={form.jobType} onChange={(e) => setForm({ ...form, jobType: e.target.value })}
-                            className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all appearance-none cursor-pointer">
+                            className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all appearance-none cursor-pointer">
                             <option value="Full Time">Full Time</option>
                             <option value="Internship with PPO">Internship with PPO</option>
                             <option value="Internship">Internship</option>
@@ -443,10 +445,10 @@ export default function RecruiterDashboard() {
                           <div className="relative">
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"><DollarSign className="w-4 h-4" /></div>
                             <input required value={form.ctc} onChange={(e) => setForm({ ...form, ctc: e.target.value })}
-                              className="w-full bg-surface/50 border border-border rounded-xl pl-10 pr-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" placeholder="e.g. 7 LPA or 20k/month" />
+                              className="w-full bg-surface/50 border border-border rounded-lg pl-10 pr-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" placeholder="e.g. 7 LPA or 20k/month" />
                           </div>
                         </div>
-                        
+
                         {(form.jobType === "Internship" || form.jobType === "Full Time with Bond" || form.jobType === "Internship with PPO") && (
                           <div className="md:col-span-2">
                             <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">
@@ -454,7 +456,7 @@ export default function RecruiterDashboard() {
                             </label>
                             <input required value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })}
                               placeholder={form.jobType === "Internship" || form.jobType === "Internship with PPO" ? "e.g., 6 months" : "e.g., 2 years"}
-                              className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
+                              className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
                           </div>
                         )}
                       </div>
@@ -466,7 +468,7 @@ export default function RecruiterDashboard() {
                         <GraduationCap className="w-4 h-4 text-brand" />
                         <h4 className="text-sm font-bold uppercase tracking-wider text-foreground">Candidate Requirements</h4>
                       </div>
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
                         {/* Course */}
                         <div className="md:col-span-2">
@@ -483,7 +485,7 @@ export default function RecruiterDashboard() {
                                     const updated = arr.includes(c) ? arr.filter((x) => x !== c) : [...arr, c];
                                     setForm({ ...form, course: updated.join(",") });
                                   }}
-                                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${isSelected ? "bg-brand text-primary-foreground border-brand shadow-sm" : "bg-surface/50 border-border text-muted-foreground hover:border-brand/50 hover:bg-surface"}`}
+                                  className={`px-4 py-2 rounded-lg text-xs font-bold transition-all border ${isSelected ? "bg-brand text-primary-foreground border-brand shadow-sm" : "bg-surface/50 border-border text-muted-foreground hover:border-brand/50 hover:bg-surface"}`}
                                 >
                                   {c === "All" ? "All Courses" : c}
                                 </button>
@@ -495,7 +497,7 @@ export default function RecruiterDashboard() {
                         {/* Branches*/}
                         <div className="md:col-span-2">
                           <label className="block text-xs font-bold uppercase tracking-wider mb-3 text-muted-foreground">Eligible Branches</label>
-                          <div className="flex flex-wrap gap-2.5 bg-surface/30 p-4 rounded-xl border border-border/50">
+                          <div className="flex flex-wrap gap-2.5 bg-surface/30 p-4 rounded-lg border border-border/50">
                             <button type="button"
                               onClick={() => {
                                 const allSelected = BRANCHES.every(b => form.eligibleBranches.includes(b));
@@ -521,12 +523,12 @@ export default function RecruiterDashboard() {
                           <div>
                             <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Min Batch (From)</label>
                             <input required value={form.minBatch} onChange={(e) => setForm({ ...form, minBatch: e.target.value })}
-                              placeholder="e.g. 2021" className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
+                              placeholder="e.g. 2021" className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
                           </div>
                           <div>
                             <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Max Batch (To)</label>
                             <input required value={form.maxBatch} onChange={(e) => setForm({ ...form, maxBatch: e.target.value })}
-                              placeholder="e.g. 2025" className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
+                              placeholder="e.g. 2025" className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
                           </div>
                         </div>
 
@@ -535,12 +537,12 @@ export default function RecruiterDashboard() {
                             <label htmlFor="minCGPA" className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Min CGPA Required</label>
                             <input id="minCGPA" required type="number" step="0.1" min="0" max="10" value={form.minCGPA.toString()}
                               onChange={(e) => { const val = parseFloat(e.target.value); setForm({ ...form, minCGPA: isNaN(val) ? 0 : val }); }}
-                              className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all font-mono" />
+                              className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all font-mono" />
                           </div>
                           <div>
                             <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Eligible Gender</label>
                             <select required value={form.genderPreference} onChange={(e) => setForm({ ...form, genderPreference: e.target.value })}
-                              className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all cursor-pointer">
+                              className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all cursor-pointer">
                               <option value="Both">All Genders</option>
                               <option value="Male">Male Only</option>
                               <option value="Female">Female Only</option>
@@ -549,7 +551,7 @@ export default function RecruiterDashboard() {
                         </div>
 
                         <div className="md:col-span-2">
-                          <label className="flex items-start gap-3 p-4 border border-brand/20 bg-brand/5 rounded-xl cursor-pointer group hover:bg-brand/10 transition-colors">
+                          <label className="flex items-start gap-3 p-4 border border-brand/20 bg-brand/5 rounded-lg cursor-pointer group hover:bg-brand/10 transition-colors">
                             <input type="checkbox" checked={form.allowAlumni || false} onChange={(e) => setForm({ ...form, allowAlumni: e.target.checked })}
                               className="mt-1 w-5 h-5 text-brand focus:ring-brand border-border rounded cursor-pointer" />
                             <div>
@@ -578,7 +580,7 @@ export default function RecruiterDashboard() {
                           <div className="relative">
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"><Calendar className="w-4 h-4" /></div>
                             <input required type="date" value={form.driveDate} onChange={(e) => setForm({ ...form, driveDate: e.target.value })}
-                              className="w-full bg-surface/50 border border-border rounded-xl pl-10 pr-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all cursor-pointer" />
+                              className="w-full bg-surface/50 border border-border rounded-lg pl-10 pr-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all cursor-pointer" />
                           </div>
                         </div>
                         <div>
@@ -586,24 +588,24 @@ export default function RecruiterDashboard() {
                           <div className="flex gap-2">
                             {["Closed", "Open", "Pool"].map((t) => (
                               <button key={t} type="button" onClick={() => setForm({ ...form, driveType: t })}
-                                className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all border ${form.driveType === t ? "bg-brand text-primary-foreground border-brand shadow-md" : "bg-surface/50 border-border text-muted-foreground hover:bg-surface hover:border-brand/50"}`}
+                                className={`flex-1 py-3 rounded-lg text-xs font-bold transition-all border ${form.driveType === t ? "bg-brand text-primary-foreground border-brand shadow-md" : "bg-surface/50 border-border text-muted-foreground hover:bg-surface hover:border-brand/50"}`}
                               >{t}</button>
                             ))}
                           </div>
                         </div>
-                        
+
                         <div className="md:col-span-2">
                           <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Detailed Job Description</label>
                           <textarea required value={form.jobDescription} onChange={(e) => setForm({ ...form, jobDescription: e.target.value })} rows={5}
                             placeholder="Describe the roles, responsibilities, and expected skills..."
-                            className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all resize-y custom-scrollbar" />
+                            className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all resize-y custom-scrollbar" />
                         </div>
-                        
+
                         <div className="md:col-span-2">
                           <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Interview Process & Rounds</label>
                           <textarea value={form.interviewProcess} onChange={(e) => setForm({ ...form, interviewProcess: e.target.value })} rows={3}
                             placeholder="e.g. 1. Online Aptitude Test (60 mins) &#10;2. Group Discussion &#10;3. Technical Round &#10;4. HR Round"
-                            className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all resize-y custom-scrollbar" />
+                            className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all resize-y custom-scrollbar" />
                         </div>
                       </div>
                     </div>
@@ -621,11 +623,11 @@ export default function RecruiterDashboard() {
                     )}
                   </div>
                   <div className="flex gap-3 w-full md:w-auto">
-                    <button type="button" onClick={() => setShowForm(false)} className="px-6 py-2.5 rounded-xl text-sm font-bold text-muted-foreground hover:bg-muted transition-colors border border-border bg-card w-full md:w-auto">
+                    <button type="button" onClick={() => setShowForm(false)} className="px-6 py-2.5 rounded-lg text-sm font-bold text-muted-foreground hover:bg-muted transition-colors border border-border bg-card w-full md:w-auto">
                       Cancel
                     </button>
                     <button form="drive-form" type="submit" disabled={submitting}
-                      className="px-8 py-2.5 bg-brand text-primary-foreground rounded-xl text-sm font-bold hover:bg-brand/90 transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full md:w-auto"
+                      className="px-8 py-2.5 bg-brand text-primary-foreground rounded-lg text-sm font-bold hover:bg-brand/90 transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full md:w-auto"
                     >
                       {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : editDriveId ? <Edit className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                       {submitting ? (editDriveId ? "Updating..." : "Submitting...") : (editDriveId ? "Update Drive Details" : "Submit Request")}
@@ -643,13 +645,13 @@ export default function RecruiterDashboard() {
             {loading ? (
               <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-brand" /></div>
             ) : drives.length === 0 ? (
-              <div className="bg-card rounded-2xl border border-border p-8 text-center text-muted-foreground">
+              <div className="bg-card rounded-lg border border-border p-8 text-center text-muted-foreground">
                 <Briefcase className="w-12 h-12 mx-auto mb-3 opacity-30" />
                 <p className="font-medium">No drives submitted yet</p>
                 <p className="text-xs mt-1">Submit a drive request to get started</p>
               </div>
             ) : (
-              <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+              <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
@@ -747,7 +749,7 @@ export default function RecruiterDashboard() {
               onClick={() => setSelectedDrive(null)}
             >
               <div
-                className="bg-card rounded-2xl border border-border shadow-2xl w-full max-w-[95vw] xl:max-w-7xl max-h-[92vh] overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200"
+                className="bg-card rounded-lg border border-border shadow-2xl w-full max-w-[95vw] xl:max-w-7xl max-h-[92vh] overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200"
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Top Fixed Control Area (Header + Search combined to prevent scroll layout bugs) */}
@@ -769,7 +771,7 @@ export default function RecruiterDashboard() {
                     </div>
                     <button
                       onClick={() => setSelectedDrive(null)}
-                      className="text-muted-foreground hover:text-foreground hover:bg-muted p-2 rounded-xl transition-all"
+                      className="text-muted-foreground hover:text-foreground hover:bg-muted p-2 rounded-lg transition-all"
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -783,7 +785,7 @@ export default function RecruiterDashboard() {
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Search by name, college, branch..."
-                        className="w-full pl-10 pr-4 py-2 bg-muted/40 hover:bg-muted/60 focus:bg-background border border-border rounded-xl text-sm text-foreground outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition-all placeholder:text-muted-foreground/70"
+                        className="w-full pl-10 pr-4 py-2 bg-muted/40 hover:bg-muted/60 focus:bg-background border border-border rounded-lg text-sm text-foreground outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition-all placeholder:text-muted-foreground/70"
                       />
                     </div>
                   </div>
@@ -806,7 +808,7 @@ export default function RecruiterDashboard() {
                             .map((a: any) => (
                               <div
                                 key={a.id}
-                                className="bg-card flex flex-col md:flex-row md:items-center justify-between gap-4 rounded-xl border border-border p-4 hover:border-brand/40 hover:bg-muted/5 shadow-sm transition-all hover:shadow-md"
+                                className="bg-card flex flex-col md:flex-row md:items-center justify-between gap-4 rounded-lg border border-border p-4 hover:border-brand/40 hover:bg-muted/5 shadow-sm transition-all hover:shadow-md"
                               >
                                 {/* 1. Profile / Identity Column */}
                                 <div className="flex items-center gap-3.5 min-w-50">

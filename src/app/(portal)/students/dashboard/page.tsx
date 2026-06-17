@@ -2,9 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { 
-  Briefcase, CalendarDays, CheckCircle, ChevronRight, Loader2, 
-  XCircle, AlertTriangle, Clock, RefreshCw, Building2, FileText
+import {
+  Briefcase, CalendarDays, CheckCircle, ChevronRight, Loader2,
+  XCircle, AlertTriangle, Clock, RefreshCw, Building2, FileText,
+  GraduationCap
 } from "lucide-react";
 import DashboardHeader from "@/components/student/dashboard/DashboardHeader";
 import ProfileCompletionForm from "@/components/student/dashboard/ProfileCompletionForm";
@@ -21,6 +22,7 @@ import useSWR from "swr";
 import { fetchWithRetry } from "@/lib/fetch-utils";
 import { PlacementDrive } from "@/types";
 import { meetsCgpaCriteria } from "@/lib/cgpa-utils";
+import NotificationBell from "@/components/ui/NotificationBell";
 
 // Lazy load heavy modal components — only loaded when user interacts
 const JobDetailsModal = dynamic(
@@ -235,26 +237,34 @@ export default function StudentDashboard() {
 
         <main className="p-6 md:p-10 max-w-7xl mx-auto space-y-10">
           {/* Header for desktop */}
+           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand/10 text-brand text-xs font-bold uppercase tracking-widest mb-0">
+            <GraduationCap className="w-4 h-4" /> Student
+          </div>
           <div className="hidden md:flex">
-          <DashboardHeader 
-            student={student}
-            fetchDashboard={fetchDashboard}
-            showProfileForm={showProfileForm}
-            setShowProfileForm={setShowProfileForm}
-            isProfileIncomplete={isProfileIncomplete || false}
-            setShowFeedbackModal={setShowFeedbackModal}
-            handleLogout={handleLogout}
-          />
+            <DashboardHeader
+              student={student}
+              fetchDashboard={fetchDashboard}
+              showProfileForm={showProfileForm}
+              setShowProfileForm={setShowProfileForm}
+              isProfileIncomplete={isProfileIncomplete || false}
+              setShowFeedbackModal={setShowFeedbackModal}
+              handleLogout={handleLogout}
+            />
+          </div>
+
+          {/* Notification bell */}
+          <div className="mt-2 md:hidden w-full flex items-center justify-end">
+            <NotificationBell role="student" />
           </div>
 
           {/* Complete Profile Form (Collapsible) */}
           <div className="hidden md:block">
-          <ProfileCompletionForm 
-            student={student}
-            showProfileForm={showProfileForm}
-            setShowProfileForm={setShowProfileForm}
-            fetchDashboard={fetchDashboard}
-          />
+            <ProfileCompletionForm
+              student={student}
+              showProfileForm={showProfileForm}
+              setShowProfileForm={setShowProfileForm}
+              fetchDashboard={fetchDashboard}
+            />
           </div>
 
           {loading ? (

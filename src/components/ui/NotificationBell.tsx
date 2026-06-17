@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Bell, Check, Clock, Trash2, Loader2, ArrowRight } from "lucide-react";
-import { getToken } from "@/lib/auth-client";
+import { isLoggedIn } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 
 interface NotificationItem {
@@ -15,11 +15,11 @@ interface NotificationItem {
   createdAt: string;
 }
 
-interface NotificationBell {
+interface NotificationBellProps {
   role: "student" | "external_student" | "alumni" | "recruiter"
 }
 
-export default function NotificationBell({role}: NotificationBell) {
+export default function NotificationBell({role}: NotificationBellProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -27,8 +27,8 @@ export default function NotificationBell({role}: NotificationBell) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  // Verify if student token exists
-  const token = typeof window !== "undefined" ? getToken(role) : null;
+  // Check if the user is logged in (cookie-based auth)
+  const authenticated = typeof window !== "undefined" ? isLoggedIn(role) : false;
 
   // Map the role to the correct API endpoint folder. 
   // 'external_student' token maps to the '/api/external/...' route.
@@ -36,10 +36,10 @@ export default function NotificationBell({role}: NotificationBell) {
   const apiEndpoint= `/api/${apiFolder}/notifications`;
 
   const fetchNotifications = async () => {
-    if (!token) return;
+    if (!authenticated) return;
     try {
       const response = await fetch(`${apiEndpoint}?limit=5`, {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
       });
       const data = await response.json() as {
         success: boolean;
@@ -57,12 +57,12 @@ export default function NotificationBell({role}: NotificationBell) {
 
   // Poll for new notifications every 45 seconds if logged in
   useEffect(() => {
-    if (token) {
+    if (authenticated) {
       fetchNotifications();
       const interval = setInterval(fetchNotifications, 45000);
       return () => clearInterval(interval);
     }
-  }, [token]);
+  }, [authenticated]);
 
   // Click outside to close dropdown
   useEffect(() => {
@@ -76,7 +76,7 @@ export default function NotificationBell({role}: NotificationBell) {
   }, []);
 
   const handleMarkAsRead = async (id: string, link: string | null) => {
-    if (!token) return;
+    if (!authenticated) return;
     try {
       // Optimistic update
       setNotifications((prev) =>
@@ -86,9 +86,9 @@ export default function NotificationBell({role}: NotificationBell) {
 
       await fetch(`${apiEndpoint}`, {
         method: "PATCH",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ notificationId: id }),
       });
@@ -103,7 +103,7 @@ export default function NotificationBell({role}: NotificationBell) {
   };
 
   const handleMarkAllAsRead = async () => {
-    if (!token || unreadCount === 0) return;
+    if (!authenticated || unreadCount === 0) return;
     setLoading(true);
     try {
       // Optimistic update
@@ -112,9 +112,9 @@ export default function NotificationBell({role}: NotificationBell) {
 
       await fetch(`${apiEndpoint}`, {
         method: "PATCH",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ all: true }),
       });
@@ -125,7 +125,7 @@ export default function NotificationBell({role}: NotificationBell) {
     }
   };
 
-  if (!token) return null;
+  if (!authenticated) return null;
 
   return (
     <div className="relative" ref={dropdownRef}>

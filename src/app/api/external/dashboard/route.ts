@@ -5,6 +5,7 @@ import { driveRegistrationTemplate } from "@/lib/email-templates";
 import { NotificationService } from "@/lib/notification-service";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
 import { formatCgpaCriteria, meetsCgpaCriteria } from "@/lib/cgpa-utils";
+import { runInBackground } from "@/lib/background";
 
 export async function GET(req: NextRequest) {
   try {
@@ -157,9 +158,10 @@ export async function POST(req: NextRequest) {
     await db.driveRegistration.create({
       data: { driveId: body.driveId, externalStudentId: ext.id },
     });
-    // Send Drive Registration Confirmation Email 
-    try {
-      await NotificationService.notifyUser({
+
+    // Fire-and-forget: send email + in-app notification in background
+    runInBackground(
+      NotificationService.notifyUser({
         email: {
           to: student.email,
           subject: `Registered for ${drive.companyName} Drive`,
@@ -179,13 +181,11 @@ export async function POST(req: NextRequest) {
           id: student.id,
           type: "external_student",
         }
-      })
-      return NextResponse.json({ success: true, message: "Registered for the drive, confirmation email sent" }, { status: 200 });
+      }),
+      "external-student-drive-registration-email"
+    );
 
-    } catch (emailError) {
-      console.error("Failed to send drive registration email:", emailError);
-      return NextResponse.json({ success: false, message: "Registered for the drive, but failed to send confirmation email" }, { status: 500 });
-    }
+    return NextResponse.json({ success: true, message: "Registered for the drive" }, { status: 200 });
   } catch (error) {
     console.error("External Registration Error:", error);
     return NextResponse.json({ success: false, message: "Registration failed" }, { status: 500 });

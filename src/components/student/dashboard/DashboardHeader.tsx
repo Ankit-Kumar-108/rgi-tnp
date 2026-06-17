@@ -120,11 +120,6 @@ export default function DashboardHeader({
             <ChevronRight className="w-4 h-4 text-muted-foreground/50 shrink-0" />
           </button>
         </div>
-
-        {/* Notification bell as its own pill row */}
-        <div className="rounded-lg size-4 border border-border bg-card overflow-hidden">
-          <NotificationBell role="student" />
-        </div>
       </section>
     </>
   );

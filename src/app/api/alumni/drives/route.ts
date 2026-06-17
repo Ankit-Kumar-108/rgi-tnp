@@ -6,6 +6,7 @@ import { NotificationService } from "@/lib/notification-service";
 import { driveRegistrationTemplate } from "@/lib/email-templates";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
 import { formatCgpaCriteria, meetsCgpaCriteria } from "@/lib/cgpa-utils";
+import { runInBackground } from "@/lib/background";
 
 // Same token extraction pattern as your student/drives/route.ts
 
@@ -61,14 +62,13 @@ export async function GET(req: NextRequest) {
           where: { alumniId: alumniData.id },
           select: { id: true },
         },
-        _count: { select: { registrations: true } },
       },
       orderBy: { driveDate: "desc" },
     });
 
     //  Filter drives by alumni's branch/course eligibility
     //    and add isRegistered flag
-    const eligibleDrives = drives
+    const filteredDrives = drives
       .filter((drive) => {
         // Course check
         if (drive.course !== "All" && !drive.course.includes(alumniData.course)) {
@@ -100,13 +100,21 @@ export async function GET(req: NextRequest) {
         }
 
         return true;
-      })
-      .map((drive) => ({
+      });
+
+    const registrationCounts = await Promise.all(
+      filteredDrives.map(drive =>
+        db.driveRegistration.count({
+          where: { driveId: drive.id }
+        })
+      )
+    );
+
+    const eligibleDrives = filteredDrives.map((drive, idx) => ({
         ...drive,
         isRegistered: drive.registrations.length > 0,
-        registrationCount: drive._count.registrations,
+        registrationCount: registrationCounts[idx],
         registrations: undefined,
-        _count: undefined,
       }));
 
     return NextResponse.json({
@@ -231,10 +239,9 @@ export async function POST(req: NextRequest) {
       data: { driveId, alumniId: alumniData.id },
     });
 
-    // Send notification
-    //  Same notification pattern as student drives registration
-    try {
-      await NotificationService.notifyUser({
+    // Fire-and-forget: send email + in-app notification in background
+    runInBackground(
+      NotificationService.notifyUser({
         email: {
           to: alumniData.personalEmail,
           subject: `Registered for ${drive.companyName} Drive`,
@@ -259,19 +266,14 @@ export async function POST(req: NextRequest) {
           id: alumniData.id,
           type: "alumni",
         },
-      });
+      }),
+      "alumni-drive-registration-email"
+    );
 
-      return NextResponse.json({
-        success: true,
-        message: "Registered for the drive, confirmation email sent",
-      });
-    } catch (emailError) {
-      console.error("Failed to send alumni drive registration email:", emailError);
-      return NextResponse.json({
-        success: true,
-        message: "Registered for the drive, but email notification failed",
-      });
-    }
+    return NextResponse.json({
+      success: true,
+      message: "Registered for the drive",
+    });
   } catch (error) {
     console.error("Alumni Drive Registration Error:", error);
     return NextResponse.json(

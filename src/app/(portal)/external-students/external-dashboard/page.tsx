@@ -16,6 +16,7 @@ import {
   RefreshCw,
   ChevronRight,
   MessageSquareShare,
+  GraduationCap,
 } from "lucide-react";
 import Nav from "@/components/layout/nav/nav";
 import Footer from "@/components/layout/footer/footer";
@@ -28,6 +29,7 @@ import { meetsCgpaCriteria } from "@/lib/cgpa-utils";
 import ExternalDashboardHeader from "@/components/external-student/dashboard/ExternalDashboardHeader";
 import ExternalProfileCompletionForm from "@/components/external-student/dashboard/ExternalProfileCompletionForm";
 import ExternalDashboardOverview from "@/components/external-student/dashboard/ExternalDashboardOverview";
+import NotificationBell from "@/components/ui/NotificationBell";
 
 // Lazy load heavy modal components — only loaded when user interacts
 const JobDetailsModal = dynamic(
@@ -175,6 +177,9 @@ export default function ExternalStudentDashboard() {
         <main className="p-6 md:p-10 max-w-7xl mx-auto space-y-10">
 
           {/* Header for desktop */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand/10 text-brand text-xs font-bold uppercase tracking-widest mb-0">
+            <GraduationCap className="w-4 h-4" /> External Student
+          </div>
           <div className="hidden md:flex">
             <ExternalDashboardHeader 
               student={student}
@@ -186,6 +191,11 @@ export default function ExternalStudentDashboard() {
               handleLogout={handleLogout}
             />
           </div>
+
+          {/* Notification bell as its own pill row */}
+        <div className="md:hidden w-full mt-3 flex justify-end items-center">
+          <NotificationBell role="external_student" />
+        </div>
 
           {/* Complete Profile Form (Collapsible) */}
           <div className="hidden md:block">

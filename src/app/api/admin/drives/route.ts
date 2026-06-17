@@ -32,18 +32,35 @@ export async function GET(req: NextRequest) {
         skip: skip,
         include: {
           recruiter: { select: { name: true, company: true } },
-          _count: { select: { registrations: true } },
         },
         orderBy: { driveDate: "desc" },
       }),
       db.placementDrive.count({ where })
     ]);
 
+    // Single GROUP BY query instead of N separate count() calls
+    const driveIds = drives.map((d: any) => d.id);
+    const countMap = new Map<string, number>();
+    if (driveIds.length > 0) {
+      try {
+        const placeholders = driveIds.map(() => '?').join(',');
+        const countRows: any[] = await db.$queryRaw`SELECT "driveId", COUNT(*) as cnt FROM "DriveRegistration" WHERE "driveId" IN (${placeholders}) GROUP BY "driveId"`;
+        for (const row of countRows) {
+          countMap.set(row.driveId, Number(row.cnt));
+        }
+      } catch {
+        // Fallback: use individual count queries if raw SQL fails
+        const counts = await Promise.all(
+          drives.map((drive: any) => db.driveRegistration.count({ where: { driveId: drive.id } }))
+        );
+        drives.forEach((d: any, i: number) => countMap.set(d.id, counts[i]));
+      }
+    }
+
     // 4. Format the response
     const formatted = drives.map((d: any) => ({
       ...d,
-      registrationCount: d._count.registrations,
-      _count: undefined,
+      registrationCount: countMap.get(d.id) || 0,
     }));
 
     return NextResponse.json({ 
