@@ -42,13 +42,13 @@ export default function DriveImagesAdminPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push("/admin/dashboard")}
-              className="w-10 h-10 bg-muted rounded-xl flex items-center justify-center hover:bg-muted/80 transition-colors cursor-pointer"
+              className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center hover:bg-muted/80 transition-colors cursor-pointer"
               aria-label="Back to dashboard"
             >
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </button>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-brand/10 rounded-lg flex items-center justify-center">
                 <Shield className="w-5 h-5 text-brand" />
               </div>
               <div className="flex gap-3">

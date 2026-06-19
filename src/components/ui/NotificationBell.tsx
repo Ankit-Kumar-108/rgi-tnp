@@ -135,7 +135,7 @@ export default function NotificationBell({role}: NotificationBellProps) {
           setIsOpen(!isOpen);
           if (!isOpen) fetchNotifications();
         }}
-        className="relative p-2.5 rounded-xl bg-muted hover:bg-accent text-muted-foreground border border-border transition-all duration-200 shadow-sm"
+        className="relative p-2.5 rounded-lg bg-muted hover:bg-accent text-muted-foreground border border-border transition-all duration-200 shadow-sm"
         aria-label="Toggle notifications"
       >
         <Bell className="w-5 h-5 transition-transform duration-300 hover:rotate-12" />
@@ -148,7 +148,7 @@ export default function NotificationBell({role}: NotificationBellProps) {
 
       {/* Dropdown glassmorphism feed */}
       {isOpen && (
-        <div className="absolute right-0 mt-3.5 w-80 md:w-96 bg-card/95 backdrop-blur-xl border border-border shadow-2xl rounded-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-200 origin-top-right">
+        <div className="absolute right-0 mt-3.5 w-80 md:w-96 bg-card/95 backdrop-blur-xl border border-border shadow-2xl rounded-lg z-50 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-200 origin-top-right">
           {/* Header */}
           <div className="px-5 py-4 border-b border-border flex items-center justify-between">
             <div>

@@ -414,12 +414,12 @@ export default function AdminApprovalsPage() {
       {/* Drive Edit Modal */}
       {showDriveEditForm && (
         <div className="fixed inset-0 w-full h-full z-60 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 xl:p-6 transition-all duration-300" onClick={closeDriveEdit}>
-          <div className="bg-card rounded-2xl border border-border shadow-2xl max-w-4xl w-full flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-card rounded-lg border border-border shadow-2xl max-w-4xl w-full flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200 overflow-hidden" onClick={(e) => e.stopPropagation()}>
             
             {/* Modal Header (Fixed) */}
             <div className="bg-muted/30 border-b border-border px-6 py-5 flex items-center justify-between sticky top-0 z-10">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center text-brand">
+                <div className="w-10 h-10 bg-brand/10 rounded-lg flex items-center justify-center text-brand">
                   <Edit className="w-5 h-5" />
                 </div>
                 <div>
@@ -427,7 +427,7 @@ export default function AdminApprovalsPage() {
                   <p className="text-xs text-muted-foreground font-medium mt-0.5">Modify the requirements for the recruitment drive.</p>
                 </div>
               </div>
-              <button onClick={closeDriveEdit} className="text-muted-foreground hover:text-foreground bg-muted hover:bg-muted/80 p-2 rounded-xl transition-all">
+              <button onClick={closeDriveEdit} className="text-muted-foreground hover:text-foreground bg-muted hover:bg-muted/80 p-2 rounded-lg transition-all">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -447,17 +447,17 @@ export default function AdminApprovalsPage() {
                     <div>
                       <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Company Name</label>
                       <input required value={driveForm.companyName} onChange={(e) => setDriveForm({ ...driveForm, companyName: e.target.value })}
-                        className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
+                        className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
                     </div>
                     <div>
                       <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Role / Designation</label>
                       <input required value={driveForm.roleName} onChange={(e) => setDriveForm({ ...driveForm, roleName: e.target.value })}
-                        className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" placeholder="e.g. Software Engineer" />
+                        className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" placeholder="e.g. Software Engineer" />
                     </div>
                     <div>
                       <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Job Type</label>
                       <select required value={driveForm.jobType} onChange={(e) => setDriveForm({ ...driveForm, jobType: e.target.value })}
-                        className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all appearance-none cursor-pointer">
+                        className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all appearance-none cursor-pointer">
                         <option value="Full Time">Full Time</option>
                         <option value="Internship with PPO">Internship with PPO</option>
                         <option value="Internship">Internship</option>
@@ -469,7 +469,7 @@ export default function AdminApprovalsPage() {
                       <div className="relative">
                         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"><DollarSign className="w-4 h-4" /></div>
                         <input required value={driveForm.ctc} onChange={(e) => setDriveForm({ ...driveForm, ctc: e.target.value })}
-                          className="w-full bg-surface/50 border border-border rounded-xl pl-10 pr-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" placeholder="e.g. 7 LPA or 20k/month" />
+                          className="w-full bg-surface/50 border border-border rounded-lg pl-10 pr-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" placeholder="e.g. 7 LPA or 20k/month" />
                       </div>
                     </div>
                     
@@ -480,7 +480,7 @@ export default function AdminApprovalsPage() {
                         </label>
                         <input required value={driveForm.duration} onChange={(e) => setDriveForm({ ...driveForm, duration: e.target.value })}
                           placeholder={driveForm.jobType === "Internship" || driveForm.jobType === "Internship with PPO" ? "e.g., 6 months" : "e.g., 2 years"}
-                          className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
+                          className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
                       </div>
                     )}
                   </div>
@@ -509,7 +509,7 @@ export default function AdminApprovalsPage() {
                                 const updated = arr.includes(c) ? arr.filter((x) => x !== c) : [...arr, c];
                                 setDriveForm({ ...driveForm, course: updated.join(",") });
                               }}
-                              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${isSelected ? "bg-brand text-primary-foreground border-brand shadow-sm" : "bg-surface/50 border-border text-muted-foreground hover:border-brand/50 hover:bg-surface"}`}
+                              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all border ${isSelected ? "bg-brand text-primary-foreground border-brand shadow-sm" : "bg-surface/50 border-border text-muted-foreground hover:border-brand/50 hover:bg-surface"}`}
                             >
                               {c === "All" ? "All Courses" : c}
                             </button>
@@ -521,7 +521,7 @@ export default function AdminApprovalsPage() {
                     {/* Branches*/}
                     <div className="md:col-span-2">
                       <label className="block text-xs font-bold uppercase tracking-wider mb-3 text-muted-foreground">Eligible Branches</label>
-                      <div className="flex flex-wrap gap-2.5 bg-surface/30 p-4 rounded-xl border border-border/50">
+                      <div className="flex flex-wrap gap-2.5 bg-surface/30 p-4 rounded-lg border border-border/50">
                         <button type="button"
                           onClick={() => {
                             const allSelected = BRANCHES.every(b => driveForm.eligibleBranches.includes(b));
@@ -547,12 +547,12 @@ export default function AdminApprovalsPage() {
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Min Batch (From)</label>
                         <input required value={driveForm.minBatch} onChange={(e) => setDriveForm({ ...driveForm, minBatch: e.target.value })}
-                          placeholder="e.g. 2021" className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
+                          placeholder="e.g. 2021" className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
                       </div>
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Max Batch (To)</label>
                         <input required value={driveForm.maxBatch} onChange={(e) => setDriveForm({ ...driveForm, maxBatch: e.target.value })}
-                          placeholder="e.g. 2025" className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
+                          placeholder="e.g. 2025" className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
                       </div>
                     </div>
 
@@ -561,12 +561,12 @@ export default function AdminApprovalsPage() {
                         <label htmlFor="minCGPA" className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Min CGPA Required</label>
                         <input id="minCGPA" required type="number" step="0.1" min="0" max="10" value={driveForm.minCGPA.toString()}
                           onChange={(e) => { const val = parseFloat(e.target.value); setDriveForm({ ...driveForm, minCGPA: isNaN(val) ? 0 : val }); }}
-                          className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all font-mono" />
+                          className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all font-mono" />
                       </div>
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Eligible Gender</label>
                         <select required value={driveForm.genderPreference} onChange={(e) => setDriveForm({ ...driveForm, genderPreference: e.target.value })}
-                          className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all cursor-pointer">
+                          className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all cursor-pointer">
                           <option value="Both">All Genders</option>
                           <option value="Male">Male Only</option>
                           <option value="Female">Female Only</option>
@@ -575,7 +575,7 @@ export default function AdminApprovalsPage() {
                     </div>
 
                     <div className="md:col-span-2">
-                      <label className="flex items-start gap-3 p-4 border border-brand/20 bg-brand/5 rounded-xl cursor-pointer group hover:bg-brand/10 transition-colors">
+                      <label className="flex items-start gap-3 p-4 border border-brand/20 bg-brand/5 rounded-lg cursor-pointer group hover:bg-brand/10 transition-colors">
                         <input type="checkbox" checked={driveForm.allowAlumni || false} onChange={(e) => setDriveForm({ ...driveForm, allowAlumni: e.target.checked })}
                           className="mt-1 w-5 h-5 text-brand focus:ring-brand border-border rounded cursor-pointer" />
                         <div>
@@ -604,7 +604,7 @@ export default function AdminApprovalsPage() {
                       <div className="relative">
                         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"><Calendar className="w-4 h-4" /></div>
                         <input required type="date" value={driveForm.driveDate} onChange={(e) => setDriveForm({ ...driveForm, driveDate: e.target.value })}
-                          className="w-full bg-surface/50 border border-border rounded-xl pl-10 pr-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all cursor-pointer" />
+                          className="w-full bg-surface/50 border border-border rounded-lg pl-10 pr-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all cursor-pointer" />
                       </div>
                     </div>
                     <div>
@@ -612,7 +612,7 @@ export default function AdminApprovalsPage() {
                       <div className="flex gap-2">
                         {["Closed", "Open", "Pool"].map((t) => (
                           <button key={t} type="button" onClick={() => setDriveForm({ ...driveForm, driveType: t })}
-                            className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all border ${driveForm.driveType === t ? "bg-brand text-primary-foreground border-brand shadow-md" : "bg-surface/50 border-border text-muted-foreground hover:bg-surface hover:border-brand/50"}`}
+                            className={`flex-1 py-3 rounded-lg text-xs font-bold transition-all border ${driveForm.driveType === t ? "bg-brand text-primary-foreground border-brand shadow-md" : "bg-surface/50 border-border text-muted-foreground hover:bg-surface hover:border-brand/50"}`}
                           >{t}</button>
                         ))}
                       </div>
@@ -622,14 +622,14 @@ export default function AdminApprovalsPage() {
                       <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Detailed Job Description</label>
                       <textarea required value={driveForm.jobDescription} onChange={(e) => setDriveForm({ ...driveForm, jobDescription: e.target.value })} rows={5}
                         placeholder="Describe the roles, responsibilities, and expected skills..."
-                        className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all resize-y custom-scrollbar" />
+                        className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all resize-y custom-scrollbar" />
                     </div>
                     
                     <div className="md:col-span-2">
                       <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Interview Process & Rounds</label>
                       <textarea value={driveForm.interviewProcess || ""} onChange={(e) => setDriveForm({ ...driveForm, interviewProcess: e.target.value })} rows={3}
                         placeholder="e.g. 1. Online Aptitude Test (60 mins) &#10;2. Group Discussion &#10;3. Technical Round &#10;4. HR Round"
-                        className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all resize-y custom-scrollbar" />
+                        className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all resize-y custom-scrollbar" />
                     </div>
                   </div>
                 </div>
@@ -647,11 +647,11 @@ export default function AdminApprovalsPage() {
                 )}
               </div>
               <div className="flex gap-3 w-full md:w-auto">
-                <button type="button" onClick={closeDriveEdit} className="px-6 py-2.5 rounded-xl text-sm font-bold text-muted-foreground hover:bg-muted transition-colors border border-border bg-card w-full md:w-auto">
+                <button type="button" onClick={closeDriveEdit} className="px-6 py-2.5 rounded-lg text-sm font-bold text-muted-foreground hover:bg-muted transition-colors border border-border bg-card w-full md:w-auto">
                   Cancel
                 </button>
                 <button form="drive-form" type="submit" disabled={submittingDriveEdit}
-                  className="px-8 py-2.5 bg-brand text-primary-foreground rounded-xl text-sm font-bold hover:bg-brand/90 transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full md:w-auto"
+                  className="px-8 py-2.5 bg-brand text-primary-foreground rounded-lg text-sm font-bold hover:bg-brand/90 transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full md:w-auto"
                 >
                   {submittingDriveEdit ? <Loader2 className="w-4 h-4 animate-spin" /> : <Edit className="w-4 h-4" />}
                   {submittingDriveEdit ? "Updating..." : "Update Drive Details"}
@@ -670,7 +670,7 @@ export default function AdminApprovalsPage() {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-brand/10 rounded-lg sm:rounded-xl flex items-center justify-center">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-brand/10 rounded-lg sm:rounded-lg flex items-center justify-center">
               <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-brand" />
             </div>
             <h1 className="text-base sm:text-lg font-bold tracking-tight text-foreground">Queue</h1>
@@ -682,7 +682,7 @@ export default function AdminApprovalsPage() {
                 <button
                     onClick={() => handleBulkAction("approve")}
                     disabled={bulkActionLoading !== null}
-                    className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-green-500 text-white rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-green-600 transition-all shadow-md shadow-green-500/10 disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-green-500 text-white rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold hover:bg-green-600 transition-all shadow-md shadow-green-500/10 disabled:opacity-50"
                   >
                     {bulkActionLoading === "approve" ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />}
                     <span className="hidden xs:inline">Approve All</span>
@@ -691,7 +691,7 @@ export default function AdminApprovalsPage() {
                   <button
                     onClick={() => handleBulkAction("reject")}
                     disabled={bulkActionLoading !== null}
-                    className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-white border border-border text-red-500 rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-red-50 transition-all disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-white border border-border text-red-500 rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold hover:bg-red-50 transition-all disabled:opacity-50"
                   >
                     {bulkActionLoading === "reject" ? <Loader2 className="w-3 h-3 animate-spin" /> : <XCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5" />}
                     <span className="hidden xs:inline">Delete All</span>
@@ -722,7 +722,7 @@ export default function AdminApprovalsPage() {
               <button
                 key={tab.key}
                 onClick={() => { handleChangeTab(tab.key) }}
-                className={`relative flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-3 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${activeTab === tab.key
+                className={`relative flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-3 rounded-lg sm:rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${activeTab === tab.key
                     ? "bg-brand text-white shadow-[var(--shadow-brand)]"
                     : "bg-card border border-border text-muted-foreground hover:bg-accent"
                   }`}
@@ -745,12 +745,12 @@ export default function AdminApprovalsPage() {
 
         {/* Memories Sub-Tabs */}
         {activeTab === "memories" && (
-            <div className="flex items-center gap-1.5 mb-6 bg-card p-1 rounded-xl sm:rounded-2xl border border-border w-fit">
+            <div className="flex items-center gap-1.5 mb-6 bg-card p-1 rounded-lg sm:rounded-lg border border-border w-fit">
               {SUBTABS.map((sub) => (
                 <button
                   key={sub.key}
                   onClick={() => setActiveSubTab(sub.key)}
-                  className={`flex items-center gap-1.5 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold transition-all ${activeSubTab === sub.key
+                  className={`flex items-center gap-1.5 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold transition-all ${activeSubTab === sub.key
                       ? "bg-muted text-brand"
                       : "text-muted-foreground hover:text-muted-foreground"
                     }`}
@@ -764,7 +764,7 @@ export default function AdminApprovalsPage() {
 
         {/* Feedback Sub-Tabs */}
         {activeTab === "feedback" && (
-            <div className="flex items-center gap-1.5 mb-6 bg-card p-1 rounded-xl sm:rounded-2xl border border-border w-fit">
+            <div className="flex items-center gap-1.5 mb-6 bg-card p-1 rounded-lg sm:rounded-lg border border-border w-fit">
               {FEEDBACKTABS.map((feedbackTab) => (
                 <button
                   key={feedbackTab.key}
@@ -774,7 +774,7 @@ export default function AdminApprovalsPage() {
                     setItems([]);
                     setHasMore(true);
                   }}
-                  className={`flex items-center gap-1.5 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold transition-all ${activeFeedbackSubTab === feedbackTab.key
+                  className={`flex items-center gap-1.5 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold transition-all ${activeFeedbackSubTab === feedbackTab.key
                       ? "bg-muted text-brand"
                       : "text-muted-foreground hover:text-muted-foreground"
                     }`}
@@ -788,7 +788,7 @@ export default function AdminApprovalsPage() {
 
         {/* Unverified Email Sub-Tabs */}
         {activeTab === "unverified" && (
-            <div className="flex items-center gap-1.5 mb-6 bg-card p-1 rounded-xl sm:rounded-2xl border border-border w-fit">
+            <div className="flex items-center gap-1.5 mb-6 bg-card p-1 rounded-lg sm:rounded-lg border border-border w-fit">
               {UNVERIFIEDTABS.map((unverTab) => (
                 <button
                   key={unverTab.key}
@@ -798,7 +798,7 @@ export default function AdminApprovalsPage() {
                     setItems([]);
                     setHasMore(true);
                   }}
-                  className={`flex items-center gap-1.5 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold transition-all ${activeUnverifiedSubTab === unverTab.key
+                  className={`flex items-center gap-1.5 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold transition-all ${activeUnverifiedSubTab === unverTab.key
                       ? "bg-muted text-brand"
                       : "text-muted-foreground hover:text-muted-foreground"
                     }`}
@@ -816,7 +816,7 @@ export default function AdminApprovalsPage() {
             <p className="text-xs sm:text-sm font-bold text-muted-foreground">Loading...</p>
           </div>
         ) : displayedItems.length === 0 ? (
-          <div className="text-center py-20 sm:py-32 bg-card rounded-2xl sm:rounded-3xl border-2 border-dashed border-border">
+          <div className="text-center py-20 sm:py-32 bg-card rounded-lg sm:rounded-3xl border-2 border-dashed border-border">
             <Check className="w-8 h-8 sm:w-10 sm:h-10 text-card-foreground/60 mx-auto mb-4" />
             <h3 className="text-lg sm:text-xl font-bold text-foreground">Clear!</h3>
             <p className="text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-2">No pending items here.</p>
@@ -838,7 +838,7 @@ export default function AdminApprovalsPage() {
                     {activeTab === "memories" && (
                         <div 
                         onClick={() => setViewItem(item)}
-                        className="group relative aspect-square bg-muted rounded-lg sm:rounded-2xl overflow-hidden cursor-pointer border border-border shadow-sm hover:shadow-md transition-all bg-top">
+                        className="group relative aspect-square bg-muted rounded-lg sm:rounded-lg overflow-hidden cursor-pointer border border-border shadow-sm hover:shadow-md transition-all bg-top">
                             <img 
                               src={item.imageUrl} 
                               alt="Memory" 
@@ -882,7 +882,7 @@ export default function AdminApprovalsPage() {
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
           
           <div
-            className="relative bg-white rounded-2xl sm:rounded-3xl shadow-2xl max-w-4xl w-full overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col md:flex-row max-h-[90vh]"
+            className="relative bg-white rounded-lg sm:rounded-3xl shadow-2xl max-w-4xl w-full overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col md:flex-row max-h-[90vh]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Content - Media */}
@@ -913,7 +913,7 @@ export default function AdminApprovalsPage() {
                 </div>
                 <button
                   onClick={() => setViewItem(null)}
-                  className="hidden md:flex p-2 rounded-xl hover:bg-muted text-muted-foreground hover:text-foreground transition-all"
+                  className="hidden md:flex p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-all"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -921,7 +921,7 @@ export default function AdminApprovalsPage() {
 
               <div className="flex-1 overflow-y-auto space-y-4 sm:space-y-6 pr-1 scrollbar-thin">
                 {activeTab === "memories" && (
-                    <div className="bg-muted p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-100">
+                    <div className="bg-muted p-3 sm:p-4 rounded-lg sm:rounded-lg border border-slate-100">
                         <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3">Uploader</p>
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white border border-border shadow-sm flex items-center justify-center font-bold text-brand overflow-hidden shrink-0 bg-top">
@@ -966,7 +966,7 @@ export default function AdminApprovalsPage() {
                     <button
                         onClick={() => handleAction(viewItem.id, "approve")}
                         disabled={actionLoading === viewItem.id}
-                        className="flex-1 bg-brand text-white py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold hover:bg-brand/90 transition-all flex items-center justify-center gap-2 shadow-[var(--shadow-brand)] disabled:opacity-50"
+                        className="flex-1 bg-brand text-white py-3 sm:py-4 rounded-lg sm:rounded-lg font-bold hover:bg-brand/90 transition-all flex items-center justify-center gap-2 shadow-[var(--shadow-brand)] disabled:opacity-50"
                     >
                         {actionLoading === viewItem.id ? <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" /> : <Check className="w-4 h-4 sm:w-5 sm:h-5" />}
                         Approve
@@ -976,7 +976,7 @@ export default function AdminApprovalsPage() {
                 <button
                   onClick={() => handleAction(viewItem.id, "reject")}
                   disabled={actionLoading === viewItem.id}
-                  className="px-4 sm:px-6 bg-white border border-border text-red-500 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold hover:bg-red-50 transition-all flex items-center justify-center gap-2"
+                  className="px-4 sm:px-6 bg-white border border-border text-red-500 py-3 sm:py-4 rounded-lg sm:rounded-lg font-bold hover:bg-red-50 transition-all flex items-center justify-center gap-2"
                 >
                   <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span className="hidden xs:inline">{activeTab === "memories" ? "Delete" : "Reject"}</span>
@@ -1031,12 +1031,12 @@ function DriveRequestCard({
       : [];
 
     return (
-        <div className="bg-card rounded-xl sm:rounded-2xl border border-border shadow-sm hover:shadow-md transition-all duration-300">
+        <div className="bg-card rounded-lg sm:rounded-lg border border-border shadow-sm hover:shadow-md transition-all duration-300">
             <div className="p-4 sm:p-5 space-y-3 sm:space-y-4">
                 {/* Header with Company and Role */}
                 <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3 flex-1 min-w-0">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-brand/10 rounded-lg sm:rounded-xl flex items-center justify-center text-brand border border-brand/20 shrink-0">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-brand/10 rounded-lg sm:rounded-lg flex items-center justify-center text-brand border border-brand/20 shrink-0">
                             <Briefcase className="w-5 h-5 sm:w-6 sm:h-6" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -1120,12 +1120,12 @@ function DriveRequestCard({
 
 function ReferralCard({ item, onAction, loading }: { item: any, onAction: any, loading: string | null }) {
     return (
-        <div className="bg-card rounded-2xl sm:rounded-3xl border border-border shadow-sm hover:shadow-md transition-all overflow-hidden">
+        <div className="bg-card rounded-lg sm:rounded-3xl border border-border shadow-sm hover:shadow-md transition-all overflow-hidden">
             <div className="p-4 sm:p-6">
                 {/* Header */}
                 <div className="flex items-start justify-between mb-4 sm:mb-6">
                     <div className="flex items-center gap-3 sm:gap-4">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-lg sm:rounded-2xl flex items-center justify-center text-brand border border-brand/80">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-lg sm:rounded-lg flex items-center justify-center text-brand border border-brand/80">
                             <Users className="w-5 h-5 sm:w-6 sm:h-6" />
                         </div>
                         <div>
@@ -1209,7 +1209,7 @@ function ReferralCard({ item, onAction, loading }: { item: any, onAction: any, l
                 {/* Description */}
                 <div className="mb-4 sm:mb-6">
                     <p className="text-[8px] sm:text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Description</p>
-                    <div className="p-3 sm:p-4 bg-muted rounded-xl sm:rounded-2xl border border-slate-100 font-medium text-muted-foreground text-xs sm:text-xs leading-relaxed">
+                    <div className="p-3 sm:p-4 bg-muted rounded-lg sm:rounded-lg border border-slate-100 font-medium text-muted-foreground text-xs sm:text-xs leading-relaxed">
                         {item.description}
                     </div>
                 </div>
@@ -1217,13 +1217,13 @@ function ReferralCard({ item, onAction, loading }: { item: any, onAction: any, l
                 {/* Links */}
                 <div className="flex flex-col gap-2 mb-4 sm:mb-6">
                     {item.applyLink && (
-                        <a href={item.applyLink} target="_blank" className="p-3 sm:p-4 bg-muted rounded-xl sm:rounded-2xl border border-slate-100 flex items-center gap-2 text-brand text-xs sm:text-xs font-bold hover:bg-muted transition-colors">
+                        <a href={item.applyLink} target="_blank" className="p-3 sm:p-4 bg-muted rounded-lg sm:rounded-lg border border-slate-100 flex items-center gap-2 text-brand text-xs sm:text-xs font-bold hover:bg-muted transition-colors">
                             <LinkIcon className="w-3.5 h-3.5 shrink-0" />
                             <span className="truncate">Apply Link: {item.applyLink}</span>
                         </a>
                     )}
                     {item.refrerralLink && (
-                        <a href={item.refrerralLink} target="_blank" className="p-3 sm:p-4 bg-muted rounded-xl sm:rounded-2xl border border-slate-100 flex items-center gap-2 text-muted-foreground text-xs sm:text-xs font-bold hover:bg-muted transition-colors">
+                        <a href={item.refrerralLink} target="_blank" className="p-3 sm:p-4 bg-muted rounded-lg sm:rounded-lg border border-slate-100 flex items-center gap-2 text-muted-foreground text-xs sm:text-xs font-bold hover:bg-muted transition-colors">
                             <LinkIcon className="w-3.5 h-3.5 shrink-0" />
                             <span className="truncate">Referral Link: {item.refrerralLink}</span>
                         </a>
@@ -1235,7 +1235,7 @@ function ReferralCard({ item, onAction, loading }: { item: any, onAction: any, l
                     <button 
                         onClick={() => onAction(item.id, "approve")}
                         disabled={loading === item.id}
-                        className="flex-1 py-2 sm:py-3 bg-brand text-primary-foreground rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-brand/80 transition-all flex items-center justify-center gap-2 shadow-md shadow-brand/10 disabled:opacity-50"
+                        className="flex-1 py-2 sm:py-3 bg-brand text-primary-foreground rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold hover:bg-brand/80 transition-all flex items-center justify-center gap-2 shadow-md shadow-brand/10 disabled:opacity-50"
                     >
                         {loading === item.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
                         Publish
@@ -1243,7 +1243,7 @@ function ReferralCard({ item, onAction, loading }: { item: any, onAction: any, l
                     <button 
                         onClick={() => onAction(item.id, "reject")}
                         disabled={loading === item.id}
-                        className="flex-1 py-2 sm:py-3 bg-card border border-border text-muted-foreground rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-destructive/10 hover:text-destructive transition-all disabled:opacity-50"
+                        className="flex-1 py-2 sm:py-3 bg-card border border-border text-muted-foreground rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold hover:bg-destructive/10 hover:text-destructive transition-all disabled:opacity-50"
                     >
                         Reject
                     </button>
@@ -1255,10 +1255,10 @@ function ReferralCard({ item, onAction, loading }: { item: any, onAction: any, l
 
 function ExternalScreeningCard({ item, onAction, loading }: { item: any, onAction: any, loading: string | null }) {
     return (
-        <div className="bg-white rounded-2xl sm:rounded-3xl border border-border shadow-sm hover:shadow-md transition-all overflow-hidden font-medium">
+        <div className="bg-white rounded-lg sm:rounded-3xl border border-border shadow-sm hover:shadow-md transition-all overflow-hidden font-medium">
             <div className="p-4 sm:p-6">
                 <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl bg-muted border border-border overflow-hidden shrink-0 bg-top">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg sm:rounded-lg bg-muted border border-border overflow-hidden shrink-0 bg-top">
                         {item.profileImageUrl ? (
                             <img src={item.profileImageUrl} loading="lazy" className="w-full h-full object-cover" />
                         ) : (
@@ -1295,7 +1295,7 @@ function ExternalScreeningCard({ item, onAction, loading }: { item: any, onActio
                     </div>
                 </div>
 
-                <div className="space-y-2.5 p-3 sm:p-4 bg-muted rounded-xl sm:rounded-2xl mb-4 sm:mb-6 border border-slate-100 text-xs sm:text-xs text-muted-foreground break-words">
+                <div className="space-y-2.5 p-3 sm:p-4 bg-muted rounded-lg sm:rounded-lg mb-4 sm:mb-6 border border-slate-100 text-xs sm:text-xs text-muted-foreground break-words">
                     <div className="flex items-center gap-2">
                         <Mail className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                         <span className="truncate">{item.email}</span>
@@ -1320,14 +1320,14 @@ function ExternalScreeningCard({ item, onAction, loading }: { item: any, onActio
                     <button 
                     onClick={() => onAction(item.id, "approve")}
                     disabled={loading === item.id}
-                    className="flex-1 py-2.5 sm:py-3.5 bg-orange-500 text-white rounded-xl sm:rounded-2xl text-xs sm:text-xs font-bold hover:bg-orange-600 transition-all shadow-md shadow-orange-500/10 disabled:opacity-50 flex items-center justify-center gap-4">
+                    className="flex-1 py-2.5 sm:py-3.5 bg-orange-500 text-white rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold hover:bg-orange-600 transition-all shadow-md shadow-orange-500/10 disabled:opacity-50 flex items-center justify-center gap-4">
                         {loading === item.id ? <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5 sm:size-5" />}
                         Approve
                     </button>
                     <button 
                     onClick={() => onAction(item.id, "reject")}
                     disabled={loading === item.id}
-                    className="px-3 sm:px-4 py-2.5 sm:py-3.5 bg-white border border-border text-muted-foreground rounded-xl sm:rounded-2xl text-xs sm:text-xs font-bold hover:text-red-500 hover:border-red-100 transition-all disabled:opacity-50">
+                    className="px-3 sm:px-4 py-2.5 sm:py-3.5 bg-white border border-border text-muted-foreground rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold hover:text-red-500 hover:border-red-100 transition-all disabled:opacity-50">
                         <Trash2 className="w-3.5 h-3.5 sm:size-5" />
                     </button>
                 </div>
@@ -1366,10 +1366,10 @@ function FeedbackCard({ item, onAction, loading, feedbackType }: { item: any, on
     };
 
     return (
-        <div className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-border shadow-sm hover:shadow-md transition-all">
+        <div className="bg-white p-4 sm:p-6 rounded-lg sm:rounded-3xl border border-border shadow-sm hover:shadow-md transition-all">
             <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3 sm:gap-4">
-                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-2xl flex items-center justify-center border ${getColor()}`}>
+                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-lg flex items-center justify-center border ${getColor()}`}>
                         {getIcon()}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -1393,7 +1393,7 @@ function FeedbackCard({ item, onAction, loading, feedbackType }: { item: any, on
                         ))}
                     </div>
                 </div>
-                <div className="p-3 sm:p-4 bg-muted rounded-xl sm:rounded-2xl border border-slate-100">
+                <div className="p-3 sm:p-4 bg-muted rounded-lg sm:rounded-lg border border-slate-100">
                     <p className="text-xs sm:text-xs text-muted-foreground line-clamp-3 leading-relaxed">
                         {item.content}
                     </p>
@@ -1408,14 +1408,14 @@ function FeedbackCard({ item, onAction, loading, feedbackType }: { item: any, on
                 <button 
                 onClick={() => onAction(item.id, "approve")}
                 disabled={loading === item.id}
-                className="flex-1 py-2 sm:py-3 bg-brand text-white rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-brand/90 transition-all flex items-center justify-center gap-2 shadow-md shadow-brand/10 disabled:opacity-50">
+                className="flex-1 py-2 sm:py-3 bg-brand text-white rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold hover:bg-brand/90 transition-all flex items-center justify-center gap-2 shadow-md shadow-brand/10 disabled:opacity-50">
                      {loading === item.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
                      Approve
                 </button>
                 <button 
                 onClick={() => onAction(item.id, "reject")}
                 disabled={loading === item.id}
-                className="flex-1 py-2 sm:py-3 bg-white border border-border text-muted-foreground rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-red-50 hover:text-red-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+                className="flex-1 py-2 sm:py-3 bg-white border border-border text-muted-foreground rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold hover:bg-red-50 hover:text-red-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50">
                     Reject
                 </button>
             </div>
@@ -1425,10 +1425,10 @@ function FeedbackCard({ item, onAction, loading, feedbackType }: { item: any, on
 
 function VolunteerCard({ item, onAction, loading }: { item: any, onAction: any, loading: string | null }) {
     return (
-        <div className="bg-card rounded-2xl sm:rounded-3xl border border-border shadow-sm hover:shadow-md transition-all overflow-hidden font-medium">
+        <div className="bg-card rounded-lg sm:rounded-3xl border border-border shadow-sm hover:shadow-md transition-all overflow-hidden font-medium">
             <div className="p-4 sm:p-6">
                 <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl bg-surface border border-border overflow-hidden shrink-0 bg-top">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg sm:rounded-lg bg-surface border border-border overflow-hidden shrink-0 bg-top">
                         <img
                             src={item.student?.profileImageUrl || ""}
                             alt={item.student?.name}
@@ -1461,7 +1461,7 @@ function VolunteerCard({ item, onAction, loading }: { item: any, onAction: any, 
                     </div>
                 </div>
 
-                <div className="space-y-2.5 p-3 sm:p-4 bg-muted rounded-xl sm:rounded-2xl mb-4 sm:mb-6 border border-slate-100 text-xs sm:text-xs text-muted-foreground break-words">
+                <div className="space-y-2.5 p-3 sm:p-4 bg-muted rounded-lg sm:rounded-lg mb-4 sm:mb-6 border border-slate-100 text-xs sm:text-xs text-muted-foreground break-words">
                     <div className="flex items-center gap-2">
                         <Mail className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                         <span className="truncate">{item.student?.email}</span>
@@ -1480,7 +1480,7 @@ function VolunteerCard({ item, onAction, loading }: { item: any, onAction: any, 
                     <button
                         onClick={() => onAction(item.id, "approve")}
                         disabled={loading === item.id}
-                        className="flex-1 py-2.5 sm:py-3.5 bg-brand text-white rounded-xl sm:rounded-2xl text-xs sm:text-xs font-bold hover:bg-brand/90 transition-all shadow-md shadow-brand/10 disabled:opacity-50 flex items-center justify-center gap-2"
+                        className="flex-1 py-2.5 sm:py-3.5 bg-brand text-white rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold hover:bg-brand/90 transition-all shadow-md shadow-brand/10 disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                         {loading === item.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
                         Approve
@@ -1488,7 +1488,7 @@ function VolunteerCard({ item, onAction, loading }: { item: any, onAction: any, 
                     <button
                         onClick={() => onAction(item.id, "reject")}
                         disabled={loading === item.id}
-                        className="px-3 sm:px-4 py-2.5 sm:py-3.5 bg-card border border-border text-muted-foreground rounded-xl sm:rounded-2xl text-xs sm:text-xs font-bold hover:text-destructive hover:border-destructive/30 transition-all disabled:opacity-50"
+                        className="px-3 sm:px-4 py-2.5 sm:py-3.5 bg-card border border-border text-muted-foreground rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold hover:text-destructive hover:border-destructive/30 transition-all disabled:opacity-50"
                     >
                         <Trash2 className="w-3.5 h-3.5 sm:size-5" />
                     </button>
@@ -1520,10 +1520,10 @@ function UnverifiedEmailCard({ item, onAction, loading, userType }: { item: any,
     };
 
     return (
-        <div className="bg-white rounded-2xl sm:rounded-3xl border border-border shadow-sm hover:shadow-md transition-all overflow-hidden font-medium">
+        <div className="bg-white rounded-lg sm:rounded-3xl border border-border shadow-sm hover:shadow-md transition-all overflow-hidden font-medium">
             <div className="p-4 sm:p-6">
                 <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl bg-muted border border-border overflow-hidden shrink-0 bg-top">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg sm:rounded-lg bg-muted border border-border overflow-hidden shrink-0 bg-top">
                         {item.profileImageUrl ? (
                             <img src={item.profileImageUrl} loading="lazy" className="w-full h-full object-cover" />
                         ) : (
@@ -1560,7 +1560,7 @@ function UnverifiedEmailCard({ item, onAction, loading, userType }: { item: any,
                     </div>
                 </div>
 
-                <div className="space-y-2.5 p-3 sm:p-4 bg-red-50 rounded-xl sm:rounded-2xl mb-4 sm:mb-6 border border-red-100 text-xs sm:text-xs text-red-600 break-words">
+                <div className="space-y-2.5 p-3 sm:p-4 bg-red-50 rounded-lg sm:rounded-lg mb-4 sm:mb-6 border border-red-100 text-xs sm:text-xs text-red-600 break-words">
                     <div className="flex items-center gap-2">
                         <Mail className="w-4 h-4 text-red-400 shrink-0" />
                         <span className="truncate">{getEmail()}</span>
@@ -1585,14 +1585,14 @@ function UnverifiedEmailCard({ item, onAction, loading, userType }: { item: any,
                     <button 
                     onClick={() => onAction(item.id, "approve")}
                     disabled={loading === item.id}
-                    className="flex-1 py-2.5 sm:py-3.5 bg-brand text-white rounded-xl sm:rounded-2xl text-xs sm:text-xs font-bold hover:bg-brand/90 transition-all shadow-md shadow-brand/10 disabled:opacity-50 flex items-center justify-center gap-2">
+                    className="flex-1 py-2.5 sm:py-3.5 bg-brand text-white rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold hover:bg-brand/90 transition-all shadow-md shadow-brand/10 disabled:opacity-50 flex items-center justify-center gap-2">
                         {loading === item.id ? <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
                         <span>Approve</span>
                     </button>
                     <button 
                     onClick={() => onAction(item.id, "reject")}
                     disabled={loading === item.id}
-                    className="flex-1 py-2.5 sm:py-3.5 bg-white border border-border text-muted-foreground rounded-xl sm:rounded-2xl text-xs sm:text-xs font-bold hover:text-red-500 hover:border-red-100 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+                    className="flex-1 py-2.5 sm:py-3.5 bg-white border border-border text-muted-foreground rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold hover:text-red-500 hover:border-red-100 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
                         <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         <span>Delete</span>
                     </button>

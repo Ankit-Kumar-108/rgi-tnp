@@ -262,7 +262,7 @@ export const volunteer = sqliteTable("Volunteer", {
   designation: text("designation").notNull().default("Volunteer"),
   isVerified: integer("isVerified", { mode: "boolean" }).notNull().default(false),
   assignedBy: text("assignedBy"),
-  assignedAt: integer("assignedAt", { mode: "timestamp" }),
+  assignedAt: text("assignedAt"),
   verificationNotes: text("verificationNotes"),
   isActive: integer("isActive", { mode: "boolean" }).notNull().default(true),
   createdAt: now(),

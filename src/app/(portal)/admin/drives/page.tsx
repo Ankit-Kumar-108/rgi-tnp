@@ -166,12 +166,12 @@ export default function AdminDrivesPage() {
       {/* Drive Edit Modal */}
       {showForm && (
         <div className="fixed inset-0 w-full h-full z-60 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 xl:p-6 transition-all duration-300" onClick={() => setShowForm(false)}>
-          <div className="bg-card rounded-2xl border border-border shadow-2xl max-w-4xl w-full flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-card rounded-lg border border-border shadow-2xl max-w-4xl w-full flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200 overflow-hidden" onClick={(e) => e.stopPropagation()}>
             
             {/* Modal Header (Fixed) */}
             <div className="bg-muted/30 border-b border-border px-6 py-5 flex items-center justify-between sticky top-0 z-10">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center text-brand">
+                <div className="w-10 h-10 bg-brand/10 rounded-lg flex items-center justify-center text-brand">
                   <Edit className="w-5 h-5" />
                 </div>
                 <div>
@@ -179,7 +179,7 @@ export default function AdminDrivesPage() {
                   <p className="text-xs text-muted-foreground font-medium mt-0.5">Modify the requirements for the recruitment drive.</p>
                 </div>
               </div>
-              <button onClick={() => setShowForm(false)} className="text-muted-foreground hover:text-foreground bg-muted hover:bg-muted/80 p-2 rounded-xl transition-all">
+              <button onClick={() => setShowForm(false)} className="text-muted-foreground hover:text-foreground bg-muted hover:bg-muted/80 p-2 rounded-lg transition-all">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -199,17 +199,17 @@ export default function AdminDrivesPage() {
                     <div>
                       <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Company Name</label>
                       <input required value={form.companyName} onChange={(e) => setForm({ ...form, companyName: e.target.value })}
-                        className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
+                        className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
                     </div>
                     <div>
                       <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Role / Designation</label>
                       <input required value={form.roleName} onChange={(e) => setForm({ ...form, roleName: e.target.value })}
-                        className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" placeholder="e.g. Software Engineer" />
+                        className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" placeholder="e.g. Software Engineer" />
                     </div>
                     <div>
                       <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Job Type</label>
                       <select required value={form.jobType} onChange={(e) => setForm({ ...form, jobType: e.target.value })}
-                        className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all appearance-none cursor-pointer">
+                        className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all appearance-none cursor-pointer">
                         <option value="Full Time">Full Time</option>
                         <option value="Internship with PPO">Internship with PPO</option>
                         <option value="Internship">Internship</option>
@@ -221,7 +221,7 @@ export default function AdminDrivesPage() {
                       <div className="relative">
                         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"><DollarSign className="w-4 h-4" /></div>
                         <input required value={form.ctc} onChange={(e) => setForm({ ...form, ctc: e.target.value })}
-                          className="w-full bg-surface/50 border border-border rounded-xl pl-10 pr-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" placeholder="e.g. 7 LPA or 20k/month" />
+                          className="w-full bg-surface/50 border border-border rounded-lg pl-10 pr-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" placeholder="e.g. 7 LPA or 20k/month" />
                       </div>
                     </div>
                     
@@ -232,7 +232,7 @@ export default function AdminDrivesPage() {
                         </label>
                         <input required value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })}
                           placeholder={form.jobType === "Internship" || form.jobType === "Internship with PPO" ? "e.g., 6 months" : "e.g., 2 years"}
-                          className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
+                          className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
                       </div>
                     )}
                   </div>
@@ -261,7 +261,7 @@ export default function AdminDrivesPage() {
                                 const updated = arr.includes(c) ? arr.filter((x) => x !== c) : [...arr, c];
                                 setForm({ ...form, course: updated.join(",") });
                               }}
-                              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${isSelected ? "bg-brand text-primary-foreground border-brand shadow-sm" : "bg-surface/50 border-border text-muted-foreground hover:border-brand/50 hover:bg-surface"}`}
+                              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all border ${isSelected ? "bg-brand text-primary-foreground border-brand shadow-sm" : "bg-surface/50 border-border text-muted-foreground hover:border-brand/50 hover:bg-surface"}`}
                             >
                               {c === "All" ? "All Courses" : c}
                             </button>
@@ -273,7 +273,7 @@ export default function AdminDrivesPage() {
                     {/* Branches*/}
                     <div className="md:col-span-2">
                       <label className="block text-xs font-bold uppercase tracking-wider mb-3 text-muted-foreground">Eligible Branches</label>
-                      <div className="flex flex-wrap gap-2.5 bg-surface/30 p-4 rounded-xl border border-border/50">
+                      <div className="flex flex-wrap gap-2.5 bg-surface/30 p-4 rounded-lg border border-border/50">
                         <button type="button"
                           onClick={() => {
                             const allSelected = BRANCHES.every(b => form.eligibleBranches.includes(b));
@@ -299,12 +299,12 @@ export default function AdminDrivesPage() {
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Min Batch (From)</label>
                         <input required value={form.minBatch} onChange={(e) => setForm({ ...form, minBatch: e.target.value })}
-                          placeholder="e.g. 2021" className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
+                          placeholder="e.g. 2021" className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
                       </div>
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Max Batch (To)</label>
                         <input required value={form.maxBatch} onChange={(e) => setForm({ ...form, maxBatch: e.target.value })}
-                          placeholder="e.g. 2025" className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
+                          placeholder="e.g. 2025" className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all" />
                       </div>
                     </div>
 
@@ -313,12 +313,12 @@ export default function AdminDrivesPage() {
                         <label htmlFor="minCGPA" className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Min CGPA Required</label>
                         <input id="minCGPA" required type="number" step="0.1" min="0" max="10" value={form.minCGPA.toString()}
                           onChange={(e) => { const val = parseFloat(e.target.value); setForm({ ...form, minCGPA: isNaN(val) ? 0 : val }); }}
-                          className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all font-mono" />
+                          className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all font-mono" />
                       </div>
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Eligible Gender</label>
                         <select required value={form.genderPreference} onChange={(e) => setForm({ ...form, genderPreference: e.target.value })}
-                          className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all cursor-pointer">
+                          className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all cursor-pointer">
                           <option value="Both">All Genders</option>
                           <option value="Male">Male Only</option>
                           <option value="Female">Female Only</option>
@@ -327,7 +327,7 @@ export default function AdminDrivesPage() {
                     </div>
 
                     <div className="md:col-span-2">
-                      <label className="flex items-start gap-3 p-4 border border-brand/20 bg-brand/5 rounded-xl cursor-pointer group hover:bg-brand/10 transition-colors">
+                      <label className="flex items-start gap-3 p-4 border border-brand/20 bg-brand/5 rounded-lg cursor-pointer group hover:bg-brand/10 transition-colors">
                         <input type="checkbox" checked={form.allowAlumni || false} onChange={(e) => setForm({ ...form, allowAlumni: e.target.checked })}
                           className="mt-1 w-5 h-5 text-brand focus:ring-brand border-border rounded cursor-pointer" />
                         <div>
@@ -356,7 +356,7 @@ export default function AdminDrivesPage() {
                       <div className="relative">
                         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"><Calendar className="w-4 h-4" /></div>
                         <input required type="date" value={form.driveDate} onChange={(e) => setForm({ ...form, driveDate: e.target.value })}
-                          className="w-full bg-surface/50 border border-border rounded-xl pl-10 pr-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all cursor-pointer" />
+                          className="w-full bg-surface/50 border border-border rounded-lg pl-10 pr-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all cursor-pointer" />
                       </div>
                     </div>
                     <div>
@@ -364,7 +364,7 @@ export default function AdminDrivesPage() {
                       <div className="flex gap-2">
                         {["Closed", "Open", "Pool"].map((t) => (
                           <button key={t} type="button" onClick={() => setForm({ ...form, driveType: t })}
-                            className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all border ${form.driveType === t ? "bg-brand text-primary-foreground border-brand shadow-md" : "bg-surface/50 border-border text-muted-foreground hover:bg-surface hover:border-brand/50"}`}
+                            className={`flex-1 py-3 rounded-lg text-xs font-bold transition-all border ${form.driveType === t ? "bg-brand text-primary-foreground border-brand shadow-md" : "bg-surface/50 border-border text-muted-foreground hover:bg-surface hover:border-brand/50"}`}
                           >{t}</button>
                         ))}
                       </div>
@@ -374,14 +374,14 @@ export default function AdminDrivesPage() {
                       <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Detailed Job Description</label>
                       <textarea required value={form.jobDescription} onChange={(e) => setForm({ ...form, jobDescription: e.target.value })} rows={5}
                         placeholder="Describe the roles, responsibilities, and expected skills..."
-                        className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all resize-y custom-scrollbar" />
+                        className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all resize-y custom-scrollbar" />
                     </div>
                     
                     <div className="md:col-span-2">
                       <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-muted-foreground">Interview Process & Rounds</label>
                       <textarea value={form.interviewProcess} onChange={(e) => setForm({ ...form, interviewProcess: e.target.value })} rows={3}
                         placeholder="e.g. 1. Online Aptitude Test (60 mins) &#10;2. Group Discussion &#10;3. Technical Round &#10;4. HR Round"
-                        className="w-full bg-surface/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all resize-y custom-scrollbar" />
+                        className="w-full bg-surface/50 border border-border rounded-lg px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-brand/30 focus:border-brand outline-none transition-all resize-y custom-scrollbar" />
                     </div>
                   </div>
                 </div>
@@ -399,11 +399,11 @@ export default function AdminDrivesPage() {
                 )}
               </div>
               <div className="flex gap-3 w-full md:w-auto">
-                <button type="button" onClick={() => setShowForm(false)} className="px-6 py-2.5 rounded-xl text-sm font-bold text-muted-foreground hover:bg-muted transition-colors border border-border bg-card w-full md:w-auto">
+                <button type="button" onClick={() => setShowForm(false)} className="px-6 py-2.5 rounded-lg text-sm font-bold text-muted-foreground hover:bg-muted transition-colors border border-border bg-card w-full md:w-auto">
                   Cancel
                 </button>
                 <button form="drive-form" type="submit" disabled={submitting}
-                  className="px-8 py-2.5 bg-brand text-primary-foreground rounded-xl text-sm font-bold hover:bg-brand/90 transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full md:w-auto"
+                  className="px-8 py-2.5 bg-brand text-primary-foreground rounded-lg text-sm font-bold hover:bg-brand/90 transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full md:w-auto"
                 >
                   {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Edit className="w-4 h-4" />}
                   {submitting ? "Updating..." : "Update Drive Details"}
@@ -422,7 +422,7 @@ export default function AdminDrivesPage() {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-brand/10 rounded-lg flex items-center justify-center">
               <Shield className="w-5 h-5 text-brand" />
             </div>
             <h1 className="text-lg font-black text-foreground tracking-tight">
@@ -435,29 +435,29 @@ export default function AdminDrivesPage() {
       <main className="max-w-7xl mx-auto px-6 py-8">
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-card p-5 rounded-2xl border border-border shadow-sm">
-            <div className="w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center mb-3">
+          <div className="bg-card p-5 rounded-lg border border-border shadow-sm">
+            <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center mb-3">
               <Briefcase className="w-5 h-5 text-green-500" />
             </div>
             <p className="text-2xl font-black text-foreground">{drives.filter(d => d.status === "active").length}</p>
             <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mt-1">Active</p>
           </div>
-          <div className="bg-card p-5 rounded-2xl border border-border shadow-sm">
-            <div className="w-10 h-10 bg-yellow-500/10 rounded-xl flex items-center justify-center mb-3">
+          <div className="bg-card p-5 rounded-lg border border-border shadow-sm">
+            <div className="w-10 h-10 bg-yellow-500/10 rounded-lg flex items-center justify-center mb-3">
               <Calendar className="w-5 h-5 text-yellow-500" />
             </div>
             <p className="text-2xl font-black text-foreground">{drives.filter(d => d.status === "pending").length}</p>
             <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mt-1">Pending</p>
           </div>
-          <div className="bg-card p-5 rounded-2xl border border-border shadow-sm">
-            <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center mb-3">
+          <div className="bg-card p-5 rounded-lg border border-border shadow-sm">
+            <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center mb-3">
               <BarChart3 className="w-5 h-5 text-blue-500" />
             </div>
             <p className="text-2xl font-black text-foreground">{drives.filter(d => d.status === "completed").length}</p>
             <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mt-1">Completed</p>
           </div>
-          <div className="bg-card p-5 rounded-2xl border border-border shadow-sm">
-            <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center mb-3">
+          <div className="bg-card p-5 rounded-lg border border-border shadow-sm">
+            <div className="w-10 h-10 bg-brand/10 rounded-lg flex items-center justify-center mb-3">
               <Users className="w-5 h-5 text-brand" />
             </div>
             <p className="text-2xl font-black text-foreground">{drives.reduce((sum, d) => sum + (d.registrationCount || 0), 0)}</p>
@@ -482,11 +482,11 @@ export default function AdminDrivesPage() {
                 {drives.map((drive: any, index: number) => {
 
                   const isLastElement = index === drives.length - 1;
-                  const statusConfig: Record<string, { gradient: string; dot: string; label: string; bg: string }> = {
-                    active: { gradient: "from-emerald-500/20 via-emerald-500/5 to-transparent", dot: "bg-emerald-500", label: "Active", bg: "bg-emerald-500/10 text-emerald-600" },
-                    pending: { gradient: "from-amber-500/20 via-amber-500/5 to-transparent", dot: "bg-amber-500", label: "Pending", bg: "bg-amber-500/10 text-amber-600" },
-                    completed: { gradient: "from-blue-500/20 via-blue-500/5 to-transparent", dot: "bg-blue-500", label: "Completed", bg: "bg-blue-500/10 text-blue-600" },
-                    rejected: { gradient: "from-red-500/20 via-red-500/5 to-transparent", dot: "bg-red-500", label: "Rejected", bg: "bg-red-500/10 text-red-500" },
+                  const statusConfig: Record<string, { dot: string; label: string; bg: string }> = {
+                    active: { dot: "bg-emerald-500", label: "Active", bg: "bg-emerald-500/10 text-emerald-600" },
+                    pending: { dot: "bg-amber-500", label: "Pending", bg: "bg-amber-500/10 text-amber-600" },
+                    completed: { dot: "bg-blue-500", label: "Completed", bg: "bg-blue-500/10 text-blue-600" },
+                    rejected: { dot: "bg-red-500", label: "Rejected", bg: "bg-red-500/10 text-red-500" },
                   };
                   const sc = statusConfig[drive.status] || statusConfig.pending;
 
@@ -494,10 +494,10 @@ export default function AdminDrivesPage() {
                     <div
                       key={drive.id}
                       ref={isLastElement ? lastDriveElementRef : null}
-                      className={`group relative overflow-hidden rounded-2xl border border-border/60  bg-card/80 backdrop-blur-sm transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:hover:shadow-[0_8px_30px_rgb(0,0,0,0.3)] hover:-translate-y-1`}
+                      className={`group relative overflow-hidden rounded-lg border border-border/60  bg-card/80 backdrop-blur-sm transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:hover:shadow-[0_8px_30px_rgb(0,0,0,0.3)] hover:-translate-y-1`}
                     >
                       {/* Subtle gradient glow at top */}
-                      <div className={`absolute inset-x-0 top-0 h-24 bg-gradient-to-b ${sc.gradient} pointer-events-none`} />
+                      <div className={`absolute inset-x-0 top-0 h-full bg-brand/5 pointer-events-none`} />
 
                       <div className="relative p-5 flex flex-col gap-4">
                         {/* Top row: Avatar + Company + Status */}
@@ -506,10 +506,10 @@ export default function AdminDrivesPage() {
                             <img
                               src={drive.companyLogoUrl}
                               alt={drive.companyName}
-                              className="w-11 h-11 rounded-xl object-cover border border-border/50 shadow-sm flex-shrink-0"
+                              className="w-11 h-11 rounded-lg object-cover border border-border/50 shadow-sm flex-shrink-0"
                             />
                           ) : (
-                            <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-linear-to-br from-brand/20 to-brand/5 text-brand font-black text-lg border border-brand/10 shadow-sm shrink-0">
+                            <div className="w-11 h-11 rounded-lg flex items-center justify-center bg-linear-to-br from-brand/20 to-brand/5 text-brand font-black text-lg border border-brand/10 shadow-sm shrink-0">
                               {drive.companyName?.[0]?.toUpperCase() || "?"}
                             </div>
                           )}
@@ -562,7 +562,7 @@ export default function AdminDrivesPage() {
                           <div className="flex items-center gap-1">
                             <button
                               onClick={() => setViewDrive(drive)}
-                              className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200"
+                              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200"
                               title="View Details"
                             >
                               <Eye className="w-4 h-4" />
@@ -591,7 +591,7 @@ export default function AdminDrivesPage() {
                                 setFormMsg(null);
                                 setShowForm(true);
                               }}
-                              className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200"
+                              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200"
                               title="Edit Drive"
                             >
                               <Edit className="w-4 h-4" />
@@ -600,7 +600,7 @@ export default function AdminDrivesPage() {
                               <button
                                 onClick={() => handleAction(drive.id, "close")}
                                 disabled={actionLoading === drive.id}
-                                className="p-2 rounded-xl text-red-400 hover:text-red-500 hover:bg-red-500/10 transition-all duration-200 disabled:opacity-40"
+                                className="p-2 rounded-lg text-red-400 hover:text-red-500 hover:bg-red-500/10 transition-all duration-200 disabled:opacity-40"
                                 title="Close Drive"
                               >
                                 {actionLoading === drive.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
@@ -610,7 +610,7 @@ export default function AdminDrivesPage() {
                               <button
                                 onClick={() => handleAction(drive.id, "reopen")}
                                 disabled={actionLoading === drive.id}
-                                className="p-2 rounded-xl text-emerald-400 hover:text-emerald-500 hover:bg-emerald-500/10 transition-all duration-200 disabled:opacity-40"
+                                className="p-2 rounded-lg text-emerald-400 hover:text-emerald-500 hover:bg-emerald-500/10 transition-all duration-200 disabled:opacity-40"
                                 title="Reopen Drive"
                               >
                                 {actionLoading === drive.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
@@ -623,7 +623,7 @@ export default function AdminDrivesPage() {
                                 }
                               }}
                               disabled={actionLoading === drive.id}
-                              className="p-2 rounded-xl text-muted-foreground/60 hover:text-red-500 hover:bg-red-500/10 transition-all duration-200 disabled:opacity-40"
+                              className="p-2 rounded-lg text-muted-foreground/60 hover:text-red-500 hover:bg-red-500/10 transition-all duration-200 disabled:opacity-40"
                               title="Archive / Delete Drive"
                             >
                               <Trash2 className="w-4 h-4" />

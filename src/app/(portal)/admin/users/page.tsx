@@ -382,7 +382,7 @@ export default function AdminUsersPage() {
           </div>
           {/* Bulk action bar (Responsive: drops to new line on mobile) */}
           {selectedIds.size > 0 && (
-            <div className="flex items-center gap-2 h-11 px-3 bg-brand/5 border border-brand/20 rounded-xl animate-in fade-in slide-in-from-bottom-2 duration-200 w-full sm:w-auto order-3 sm:order-0 overflow-x-auto no-scrollbar">
+            <div className="flex items-center gap-2 h-11 px-3 bg-brand/5 border border-brand/20 rounded-lg animate-in fade-in slide-in-from-bottom-2 duration-200 w-full sm:w-auto order-3 sm:order-0 overflow-x-auto no-scrollbar">
               <span className="text-xs font-bold text-brand mr-1 shrink-0">{selectedIds.size} selected</span>
               <div className="h-4 w-px bg-border shrink-0" />
 
@@ -423,7 +423,7 @@ export default function AdminUsersPage() {
               setShowCompose(true);
               setComposeData(prev => ({ ...prev, to: getTabData(activeTab)[0]?.tabData ?? activeTab }));
             }}
-            className="group bg-brand text-white px-4.5 py-2 rounded-lg md:rounded-xl text-xs font-bold shadow-lg shadow-brand/25 transition-all duration-300 flex items-center gap-2 cursor-pointer"
+            className="group bg-brand text-white px-4.5 py-2 rounded-lg md:rounded-lg text-xs font-bold shadow-lg shadow-brand/25 transition-all duration-300 flex items-center gap-2 cursor-pointer"
           >
             <Send className="group-hover:translate-x-2 group-hover:-translate-y-2 transition-all duration-300 size-5" />
             <span className="hidden md:flex">Compose Broadcast</span>
@@ -437,7 +437,7 @@ export default function AdminUsersPage() {
         <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
           {TABS.map((tab) => (
             <button key={tab.key} onClick={() => handleTabChange(tab.key)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${activeTab === tab.key
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold whitespace-nowrap transition-all ${activeTab === tab.key
                 ? "bg-brand text-white shadow-(--shadow-brand)"
                 : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-brand/40"
                 }`}>
@@ -453,7 +453,7 @@ export default function AdminUsersPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
             <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by name, email, or enrollment..."
-              className="w-full h-10 pl-10 pr-4 bg-card border border-border rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-brand focus:border-brand transition-all" />
+              className="w-full h-10 pl-10 pr-4 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-brand focus:border-brand transition-all" />
             {search && (
               <button type="button" onClick={() => { setSearch(""); setSubmittedSearch(""); setPage(1); setUsers([]); }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
@@ -465,7 +465,7 @@ export default function AdminUsersPage() {
           {(activeTab === "student" || activeTab === "external") && (
             <div className="relative">
               <select value={branch} onChange={handleBranchChange}
-                className="h-10 pl-4 pr-10 bg-card border border-border rounded-xl text-sm appearance-none focus:outline-none focus:ring-1 focus:ring-brand cursor-pointer">
+                className="h-10 pl-4 pr-10 bg-card border border-border rounded-lg text-sm appearance-none focus:outline-none focus:ring-1 focus:ring-brand cursor-pointer">
                 {BRANCHES.map((b) => <option key={b} value={b}>{b}</option>)}
               </select>
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
@@ -480,7 +480,7 @@ export default function AdminUsersPage() {
                 setPage(1);
                 setUsers([]);
               }}
-              className={`h-10 px-4 rounded-xl text-sm font-bold whitespace-nowrap transition-all border ${passoutOnly
+              className={`h-10 px-4 rounded-lg text-sm font-bold whitespace-nowrap transition-all border ${passoutOnly
                 ? "bg-amber-500 text-white border-amber-500"
                 : "bg-card border-border text-muted-foreground hover:border-amber-400"
                 }`}
@@ -489,7 +489,7 @@ export default function AdminUsersPage() {
             </button>
           )}
 
-          <button type="submit" className="h-10 px-5 bg-brand text-white rounded-xl text-sm font-bold hover:bg-brand/90 transition-all shrink-0">
+          <button type="submit" className="h-10 px-5 bg-brand text-white rounded-lg text-sm font-bold hover:bg-brand/90 transition-all shrink-0">
             Search
           </button>
         </form>
@@ -508,7 +508,7 @@ export default function AdminUsersPage() {
               ) : (
                 <>
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center text-brand">
+                    <div className="w-10 h-10 bg-brand/10 rounded-lg flex items-center justify-center text-brand">
                       <Send className="w-5 h-5" />
                     </div>
                     <div>
@@ -518,7 +518,7 @@ export default function AdminUsersPage() {
                   </div>
 
                   {sendError && (
-                    <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs rounded-xl flex items-center gap-2">
+                    <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs rounded-lg flex items-center gap-2">
                       <AlertTriangle className="w-4 h-4 shrink-0" />
                       <span>{sendError}</span>
                     </div>
@@ -531,7 +531,7 @@ export default function AdminUsersPage() {
                         <select
                           value={composeData.to}
                           onChange={(e) => setComposeData({ ...composeData, to: e.target.value, course: "", branch: "" })}
-                          className="w-full appearance-none bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 pr-10 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand transition-all"
+                          className="w-full appearance-none bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-3 pr-10 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand transition-all"
                         >
                           <option value={getTabData(activeTab)[0]?.tabData ?? activeTab}>
                             All {TABS.find(t => t.key === activeTab)?.label}
@@ -549,7 +549,7 @@ export default function AdminUsersPage() {
                             <select
                               value={composeData.course}
                               onChange={(e) => setComposeData({ ...composeData, course: e.target.value })}
-                              className="w-full appearance-none bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 pr-10 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand transition-all"
+                              className="w-full appearance-none bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-3 pr-10 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand transition-all"
                             >
                               <option value="">All Courses</option>
                               {COURSES.map((c) => (
@@ -565,7 +565,7 @@ export default function AdminUsersPage() {
                             <select
                               value={composeData.branch}
                               onChange={(e) => setComposeData({ ...composeData, branch: e.target.value })}
-                              className="w-full appearance-none bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 pr-10 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand transition-all"
+                              className="w-full appearance-none bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-3 pr-10 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand transition-all"
                             >
                               <option value="">All Branches</option>
                               {BRANCHES.filter(b => b !== "All Branches").map((b) => (
@@ -584,7 +584,7 @@ export default function AdminUsersPage() {
                         type="text"
                         value={composeData.subject}
                         onChange={(e) => setComposeData({ ...composeData, subject: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand transition-all"
+                        className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand transition-all"
                         placeholder="Opportunity update, urgent notice, event alert..."
                       />
                     </div>
@@ -594,7 +594,7 @@ export default function AdminUsersPage() {
                       <textarea
                         value={composeData.message}
                         onChange={(e) => setComposeData({ ...composeData, message: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand transition-all"
+                        className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand transition-all"
                         rows={5}
                         placeholder="Write the clear details of your notice here..."
                       />
@@ -635,14 +635,14 @@ export default function AdminUsersPage() {
                     <div className="flex gap-4 pt-2">
                       <button
                         onClick={() => setShowCompose(false)}
-                        className="flex-1 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 py-3 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-all duration-150"
+                        className="flex-1 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 py-3 rounded-lg font-bold hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-all duration-150"
                       >
                         Cancel
                       </button>
                       <button
                         onClick={handleSendBroadcast}
                         disabled={sending || !composeData.subject || !composeData.message}
-                        className="flex-1 bg-brand hover:bg-brand/90 text-white py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-brand/25 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-40"
+                        className="flex-1 bg-brand hover:bg-brand/90 text-white py-3 rounded-lg font-bold hover:shadow-lg hover:shadow-brand/25 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-40"
                       >
                         {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                         {sending ? "Triggering..." : "Send Broadcast"}
@@ -669,7 +669,7 @@ export default function AdminUsersPage() {
             >
               {/* Header */}
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center
+                <div className="w-10 h-10 bg-amber-500/10 rounded-lg flex items-center
                         justify-center text-amber-500">
                   <GraduationCap className="w-5 h-5" />
                 </div>
@@ -685,7 +685,7 @@ export default function AdminUsersPage() {
 
               {/* Warning */}
               <div className="mb-5 p-3 bg-amber-500/10 border border-amber-500/20
-                      text-amber-700 dark:text-amber-300 text-xs rounded-xl
+                      text-amber-700 dark:text-amber-300 text-xs rounded-lg
                       flex items-start gap-2">
                 <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
                 <div>
@@ -724,7 +724,7 @@ export default function AdminUsersPage() {
                         value={transferCompany}
                         onChange={(e) => setTransferCompany(e.target.value)}
                         className="w-full bg-slate-50 dark:bg-slate-800/40 border
-                           border-slate-200 dark:border-slate-800 rounded-xl
+                           border-slate-200 dark:border-slate-800 rounded-lg
                            px-4 py-2.5 text-sm focus:outline-none focus:ring-2
                            focus:ring-amber-500 transition-all"
                         placeholder="e.g., TCS, Infosys, Google..."
@@ -738,7 +738,7 @@ export default function AdminUsersPage() {
                         value={transferJobTitle}
                         onChange={(e) => setTransferJobTitle(e.target.value)}
                         className="w-full bg-slate-50 dark:bg-slate-800/40 border
-                           border-slate-200 dark:border-slate-800 rounded-xl
+                           border-slate-200 dark:border-slate-800 rounded-lg
                            px-4 py-2.5 text-sm focus:outline-none focus:ring-2
                            focus:ring-amber-500 transition-all"
                         placeholder="e.g., Software Engineer, Analyst..."
@@ -758,7 +758,7 @@ export default function AdminUsersPage() {
                     setTransferJobTitle("");
                   }}
                   className="flex-1 border border-slate-200 dark:border-slate-800
-                     text-slate-700 dark:text-slate-300 py-3 rounded-xl
+                     text-slate-700 dark:text-slate-300 py-3 rounded-lg
                      font-bold hover:bg-slate-50 dark:hover:bg-slate-800/40
                      transition-all"
                 >
@@ -768,7 +768,7 @@ export default function AdminUsersPage() {
                   onClick={handleTransfer}
                   disabled={transferLoading || (hasPlacement && !transferCompany)}
                   className="flex-1 bg-amber-500 hover:bg-amber-600 text-white py-3
-                     rounded-xl font-bold hover:shadow-lg hover:shadow-amber-500/25
+                     rounded-lg font-bold hover:shadow-lg hover:shadow-amber-500/25
                      transition-all flex items-center justify-center gap-2
                      disabled:opacity-40"
                 >
@@ -805,7 +805,7 @@ export default function AdminUsersPage() {
           {loading && page === 1 ? (
             <div className="space-y-3">
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="bg-card border border-border rounded-xl p-5 animate-pulse">
+                <div key={i} className="bg-card border border-border rounded-lg p-5 animate-pulse">
                   <div className="flex gap-4">
                     <div className="w-12 h-12 rounded-full bg-muted" />
                     <div className="flex-1 space-y-2">
@@ -817,7 +817,7 @@ export default function AdminUsersPage() {
               ))}
             </div>
           ) : users.length === 0 ? (
-            <div className="bg-card rounded-xl border border-border p-12 text-center">
+            <div className="bg-card rounded-lg border border-border p-12 text-center">
               <Users className="w-10 h-10 mx-auto mb-3 text-muted-foreground/30" />
               <p className="font-bold text-foreground text-sm">No users found</p>
               <p className="text-xs text-muted-foreground mt-1">Try adjusting your search or branch filter.</p>
@@ -839,7 +839,7 @@ export default function AdminUsersPage() {
                 return (
                   <div key={user.id} ref={isLast ? lastUserRef : null}
                     onClick={e => { const t = (e.target as HTMLElement).tagName; if (t !== "INPUT" && t !== "A" && t !== "BUTTON") toggleSelection(user.id); }}
-                    className={`group bg-card border rounded-xl px-5 py-4 transition-all cursor-pointer select-none
+                    className={`group bg-card border rounded-lg px-5 py-4 transition-all cursor-pointer select-none
                       ${isSelected ? "border-brand ring-1 ring-brand/20 bg-brand/15" : "border-border hover:border-border/80 hover:shadow-sm"}`}>
 
                     <div className="flex flex-col md:flex-row items-start gap-4">

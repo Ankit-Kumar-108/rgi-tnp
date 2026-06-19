@@ -106,7 +106,7 @@ export default function JobDetailsModal({
             }} />
 
             {/* Job Details Modal Container */}
-            <div className="relative w-full max-w-4xl max-h-[90vh] bg-card rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-brand/20">
+            <div className="relative w-full max-w-4xl max-h-[90vh] bg-card rounded-lg shadow-2xl flex flex-col overflow-hidden border border-brand/20">
 
                 {/* Close Button */}
                 <button onClick={onClose} className="absolute top-6 right-6 z-10 w-10 h-10 rounded-full flex items-center justify-center hover:bg-muted transition-colors active:scale-95 border border-transparent hover:border-border">
@@ -186,14 +186,14 @@ export default function JobDetailsModal({
                                     Eligibility Criteria
                                 </h4>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div className="p-5 rounded-2xl bg-muted/50 border border-border group hover:border-brand/30 transition-colors">
+                                    <div className="p-5 rounded-lg bg-muted/50 border border-border group hover:border-brand/30 transition-colors">
                                         <p className="text-xs font-bold text-brand uppercase tracking-wider mb-1">
                                             Academic Grade
                                         </p>
                                         <p className="text-lg font-bold text-foreground font-mono">CGPA: {formatCgpaCriteria(drive.minCGPA)}</p>
                                         <p className="text-xs text-muted-foreground mt-1">Minimum requirement to apply.</p>
                                     </div>
-                                    <div className="p-5 rounded-2xl bg-muted/50 border border-border group hover:border-brand/30 transition-colors">
+                                    <div className="p-5 rounded-lg bg-muted/50 border border-border group hover:border-brand/30 transition-colors">
                                         <p className="text-xs font-bold text-brand uppercase tracking-wider mb-1">
                                             Target Branches
                                         </p>
@@ -201,7 +201,7 @@ export default function JobDetailsModal({
                                             {drive.eligibleBranches.split(',').map(branch => branch.trim()).join(', ')}</p>
                                         <p className="text-xs text-muted-foreground mt-1">Eligible candidates only.</p>
                                     </div>
-                                    <div className="p-5 rounded-2xl bg-muted/50 border border-border group hover:border-brand/30 transition-colors sm:col-span-2">
+                                    <div className="p-5 rounded-lg bg-muted/50 border border-border group hover:border-brand/30 transition-colors sm:col-span-2">
                                         <p className="text-xs font-bold text-brand uppercase tracking-wider mb-3">
                                             Eligible Courses
                                         </p>
@@ -211,7 +211,7 @@ export default function JobDetailsModal({
                                         <p className="text-xs text-muted-foreground mt-1">Eligible candidates only.</p>
                                     </div>
                                     {drive.duration && (
-                                        <div className="p-5 rounded-2xl bg-blue-500/10 border border-blue-500/30 group hover:border-blue-500/50 transition-colors">
+                                        <div className="p-5 rounded-lg bg-blue-500/10 border border-blue-500/30 group hover:border-blue-500/50 transition-colors">
                                             <p className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-1">
                                                 {drive.jobType === "Internship" ? "Internship Duration" : "Bond/Contract Duration"}
                                             </p>
@@ -233,7 +233,7 @@ export default function JobDetailsModal({
                                 </h4>
                                 <div className="space-y-6">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-2xl bg-brand/10 flex items-center justify-center text-brand shrink-0">
+                                        <div className="w-12 h-12 rounded-lg bg-brand/10 flex items-center justify-center text-brand shrink-0">
                                             <CalendarDays className="w-5 h-5" />
                                         </div>
                                         <div>
@@ -244,7 +244,7 @@ export default function JobDetailsModal({
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-2xl bg-brand/10 flex items-center justify-center text-brand shrink-0">
+                                        <div className="w-12 h-12 rounded-lg bg-brand/10 flex items-center justify-center text-brand shrink-0">
                                             <Users className="w-5 h-5" />
                                         </div>
                                         <div>
@@ -255,7 +255,7 @@ export default function JobDetailsModal({
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-2xl bg-brand/10 flex items-center justify-center text-brand shrink-0">
+                                        <div className="w-12 h-12 rounded-lg bg-brand/10 flex items-center justify-center text-brand shrink-0">
                                             <MapPin className="w-5 h-5" />
                                         </div>
                                         <div>
@@ -309,7 +309,7 @@ export default function JobDetailsModal({
                             <button
                                 onClick={() => registerForDrive()}
                                 disabled={registering}
-                                className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-brand text-primary-foreground font-black shadow-lg shadow-brand/30 hover:shadow-brand/40 transition-all active:scale-95 flex items-center justify-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                                className="w-full sm:w-auto px-8 py-3.5 rounded-lg bg-brand text-primary-foreground font-black shadow-lg shadow-brand/30 hover:shadow-brand/40 transition-all active:scale-95 flex items-center justify-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed">
                                 {publicMode ?
                                     "Login to Apply"
                                     :

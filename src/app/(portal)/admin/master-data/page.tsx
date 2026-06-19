@@ -160,7 +160,7 @@ export default function AdminMasterDataPage() {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-brand/10 rounded-lg flex items-center justify-center">
               <Shield className="w-5 h-5 text-brand" />
             </div>
             <h1 className="text-lg font-black text-foreground tracking-tight">
@@ -173,8 +173,8 @@ export default function AdminMasterDataPage() {
       <main className="max-w-7xl mx-auto px-6 py-8">
         {/* Current Counts */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          <div className="bg-card p-6 rounded-2xl border border-border shadow-sm flex items-center gap-4">
-            <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center">
+          <div className="bg-card p-6 rounded-lg border border-border shadow-sm flex items-center gap-4">
+            <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center">
               <GraduationCap className="w-6 h-6 text-blue-500" />
             </div>
             <div>
@@ -186,8 +186,8 @@ export default function AdminMasterDataPage() {
               </p>
             </div>
           </div>
-          <div className="bg-card p-6 rounded-2xl border border-border shadow-sm flex items-center gap-4">
-            <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center">
+          <div className="bg-card p-6 rounded-lg border border-border shadow-sm flex items-center gap-4">
+            <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center">
               <UserCheck className="w-6 h-6 text-green-500" />
             </div>
             <div>
@@ -202,7 +202,7 @@ export default function AdminMasterDataPage() {
         </div>
 
         {/* Upload Section */}
-        <div className="bg-card rounded-2xl border border-border shadow-sm p-6">
+        <div className="bg-card rounded-lg border border-border shadow-sm p-6">
           <h2 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
             <Upload className="w-5 h-5 text-brand" />
             Upload CSV
@@ -212,7 +212,7 @@ export default function AdminMasterDataPage() {
           <div className="flex gap-3 mb-6">
             <button
               onClick={() => { setUploadType("student"); setPreview([]); setResult(null); }}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${uploadType === "student"
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold transition-all ${uploadType === "student"
                   ? "bg-brand text-white shadow-[var(--shadow-brand)]"
                   : "bg-muted border border-border text-muted-foreground hover:text-foreground"
                 }`}
@@ -222,7 +222,7 @@ export default function AdminMasterDataPage() {
             </button>
             <button
               onClick={() => { setUploadType("alumni"); setPreview([]); setResult(null); }}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${uploadType === "alumni"
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold transition-all ${uploadType === "alumni"
                   ? "bg-brand text-white shadow-[var(--shadow-brand)]"
                   : "bg-muted border border-border text-muted-foreground hover:text-foreground"
                 }`}
@@ -233,7 +233,7 @@ export default function AdminMasterDataPage() {
           </div>
 
           {/* CSV Format Hint */}
-          <div className="bg-muted/50 p-4 rounded-xl mb-6 border border-border/50">
+          <div className="bg-muted/50 p-4 rounded-lg mb-6 border border-border/50">
             <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Expected CSV Format</p>
             <code className="text-xs text-foreground font-mono">
               {uploadType === "student"
@@ -243,7 +243,7 @@ export default function AdminMasterDataPage() {
           </div>
 
           {/* File Input */}
-          <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-brand/50 transition-colors">
+          <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-brand/50 transition-colors">
             <FileText className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
             <p className="text-sm text-muted-foreground mb-3">
               Drop your CSV file here or click to browse
@@ -258,7 +258,7 @@ export default function AdminMasterDataPage() {
             />
             <label
               htmlFor="csv-upload"
-              className="bg-brand text-white px-6 py-2 rounded-xl text-sm font-bold hover:bg-brand/90 transition-all cursor-pointer"
+              className="bg-brand text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-brand/90 transition-all cursor-pointer"
             >
               Choose File
             </label>
@@ -274,13 +274,13 @@ export default function AdminMasterDataPage() {
                 <button
                   onClick={handleUpload}
                   disabled={uploading}
-                  className="bg-green-600 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-green-700 transition-all flex items-center gap-2 disabled:opacity-50"
+                  className="bg-green-600 text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-green-700 transition-all flex items-center gap-2 disabled:opacity-50"
                 >
                   {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                   {uploading ? "Uploading..." : "Upload Now"}
                 </button>
               </div>
-              <div className="overflow-x-auto max-h-64 overflow-y-auto rounded-xl border border-border">
+              <div className="overflow-x-auto max-h-64 overflow-y-auto rounded-lg border border-border">
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="bg-muted/50 border-b border-border sticky top-0">
@@ -312,7 +312,7 @@ export default function AdminMasterDataPage() {
 
           {/* Result */}
           {result && (
-            <div className={`mt-4 flex items-center gap-3 px-4 py-3 rounded-xl ${result.success
+            <div className={`mt-4 flex items-center gap-3 px-4 py-3 rounded-lg ${result.success
                 ? "bg-green-500/10 text-green-600"
                 : "bg-red-500/10 text-red-500"
               }`}>
@@ -323,7 +323,7 @@ export default function AdminMasterDataPage() {
         </div>
 
         {/* View Section */}
-        <div className="bg-card rounded-2xl border border-border shadow-sm p-6 mt-8">
+        <div className="bg-card rounded-lg border border-border shadow-sm p-6 mt-8">
           <h2 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
             <Database className="w-5 h-5 text-brand" />
             Uploaded Data
@@ -332,7 +332,7 @@ export default function AdminMasterDataPage() {
           <div className="flex gap-3 mb-6">
             <button
               onClick={() => { setActiveTab("student"); setViewPage(1); }}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === "student"
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === "student"
                   ? "bg-brand text-white shadow-[var(--shadow-brand)]"
                   : "bg-muted border border-border text-muted-foreground hover:text-foreground"
                 }`}
@@ -342,7 +342,7 @@ export default function AdminMasterDataPage() {
             </button>
             <button
               onClick={() => { setActiveTab("alumni"); setViewPage(1); }}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === "alumni"
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === "alumni"
                   ? "bg-brand text-white shadow-[var(--shadow-brand)]"
                   : "bg-muted border border-border text-muted-foreground hover:text-foreground"
                 }`}
@@ -352,7 +352,7 @@ export default function AdminMasterDataPage() {
             </button>
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-border mb-4">
+          <div className="overflow-x-auto rounded-lg border border-border mb-4">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-muted/50 border-b border-border">

@@ -50,7 +50,7 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-md mt-20 md:mt-30 mb-20">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-brand/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-brand/10 rounded-lg flex items-center justify-center mx-auto mb-4">
             <Shield className="w-8 h-8 text-brand" />
           </div>
           <h1 className="text-3xl font-black text-foreground tracking-tight">
@@ -65,7 +65,7 @@ export default function AdminLoginPage() {
         <div className="bg-card rounded-3xl border border-border shadow-lg p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="bg-destructive/10 text-destructive text-sm px-4 py-3 rounded-xl font-medium">
+              <div className="bg-destructive/10 text-destructive text-sm px-4 py-3 rounded-lg font-medium">
                 {error}
               </div>
             )}
@@ -78,7 +78,7 @@ export default function AdminLoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-surface border border-border rounded-xl focus:ring-2 focus:ring-brand focus:border-transparent p-3 text-foreground text-sm transition-all"
+                className="w-full bg-surface border border-border rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent p-3 text-foreground text-sm transition-all"
                 placeholder="admin@rgi.ac.in"
                 required
               />
@@ -93,7 +93,7 @@ export default function AdminLoginPage() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-surface border border-border rounded-xl focus:ring-2 focus:ring-brand focus:border-transparent p-3 pr-12 text-foreground text-sm transition-all"
+                  className="w-full bg-surface border border-border rounded-lg focus:ring-2 focus:ring-brand focus:border-transparent p-3 pr-12 text-foreground text-sm transition-all"
                   placeholder="••••••••"
                   required
                 />
@@ -110,7 +110,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-brand text-white py-3.5 rounded-xl font-bold hover:bg-brand/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-brand text-white py-3.5 rounded-lg font-bold hover:bg-brand/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>

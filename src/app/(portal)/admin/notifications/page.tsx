@@ -207,7 +207,7 @@ export default function AdminNotificationsPage() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#0F52BA]/10 rounded-xl flex items-center justify-center shadow-inner">
+              <div className="w-10 h-10 bg-[#0F52BA]/10 rounded-lg flex items-center justify-center shadow-inner">
                 <Shield className="w-5 h-5 text-[#0F52BA]" />
               </div>
               <div>
@@ -220,7 +220,7 @@ export default function AdminNotificationsPage() {
           </div>
           <button
             onClick={() => setShowCompose(true)}
-            className="bg-[#0F52BA] hover:bg-[#0D4196] text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-[#0F52BA]/25 transition-all duration-200 flex items-center gap-2"
+            className="bg-[#0F52BA] hover:bg-[#0D4196] text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-lg shadow-[#0F52BA]/25 transition-all duration-200 flex items-center gap-2"
           >
             <Send className="w-4 h-4" />
             Compose Broadcast
@@ -231,9 +231,9 @@ export default function AdminNotificationsPage() {
       <main className="max-w-7xl mx-auto px-6 py-8">
         {/* Metric Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white dark:bg-[#0D1527] rounded-2xl border border-slate-200 dark:border-slate-800/80 p-6 shadow-sm flex items-center gap-5 relative overflow-hidden group hover:shadow-md transition-all duration-200">
+          <div className="bg-white dark:bg-[#0D1527] rounded-lg border border-slate-200 dark:border-slate-800/80 p-6 shadow-sm flex items-center gap-5 relative overflow-hidden group hover:shadow-md transition-all duration-200">
             <div className="absolute top-0 right-0 w-24 h-24 bg-[#0F52BA]/5 rounded-bl-full pointer-events-none transition-all group-hover:scale-110"></div>
-            <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 flex-shrink-0">
+            <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 flex-shrink-0">
               <Mail className="w-6 h-6" />
             </div>
             <div>
@@ -243,9 +243,9 @@ export default function AdminNotificationsPage() {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-[#0D1527] rounded-2xl border border-slate-200 dark:border-slate-800/80 p-6 shadow-sm flex items-center gap-5 relative overflow-hidden group hover:shadow-md transition-all duration-200">
+          <div className="bg-white dark:bg-[#0D1527] rounded-lg border border-slate-200 dark:border-slate-800/80 p-6 shadow-sm flex items-center gap-5 relative overflow-hidden group hover:shadow-md transition-all duration-200">
             <div className="absolute top-0 right-0 w-24 h-24 bg-green-500/5 rounded-bl-full pointer-events-none transition-all group-hover:scale-110"></div>
-            <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center text-green-500 flex-shrink-0">
+            <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center text-green-500 flex-shrink-0">
               <CheckCircle className="w-6 h-6" />
             </div>
             <div>
@@ -255,9 +255,9 @@ export default function AdminNotificationsPage() {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-[#0D1527] rounded-2xl border border-slate-200 dark:border-slate-800/80 p-6 shadow-sm flex items-center gap-5 relative overflow-hidden group hover:shadow-md transition-all duration-200">
+          <div className="bg-white dark:bg-[#0D1527] rounded-lg border border-slate-200 dark:border-slate-800/80 p-6 shadow-sm flex items-center gap-5 relative overflow-hidden group hover:shadow-md transition-all duration-200">
             <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/5 rounded-bl-full pointer-events-none transition-all group-hover:scale-110"></div>
-            <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500 flex-shrink-0">
+            <div className="w-12 h-12 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500 flex-shrink-0">
               <AlertTriangle className="w-6 h-6" />
             </div>
             <div>
@@ -283,7 +283,7 @@ export default function AdminNotificationsPage() {
               ) : (
                 <>
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 bg-[#0F52BA]/10 rounded-xl flex items-center justify-center text-[#0F52BA]">
+                    <div className="w-10 h-10 bg-[#0F52BA]/10 rounded-lg flex items-center justify-center text-[#0F52BA]">
                       <Send className="w-5 h-5" />
                     </div>
                     <div>
@@ -293,7 +293,7 @@ export default function AdminNotificationsPage() {
                   </div>
 
                   {sendError && (
-                    <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs rounded-xl flex items-center gap-2">
+                    <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs rounded-lg flex items-center gap-2">
                       <AlertTriangle className="w-4 h-4 flex-shrink-0" />
                       <span>{sendError}</span>
                     </div>
@@ -306,7 +306,7 @@ export default function AdminNotificationsPage() {
                         <select
                           value={composeData.to}
                           onChange={(e) => setComposeData({ ...composeData, to: e.target.value })}
-                          className="w-full appearance-none bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 pr-10 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F52BA] transition-all"
+                          className="w-full appearance-none bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-3 pr-10 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-[#0F52BA] transition-all"
                         >
                           <option value="all_students">All Students</option>
                           <option value="cs_students">Computer Science & IT Branches</option>
@@ -326,7 +326,7 @@ export default function AdminNotificationsPage() {
                         type="text"
                         value={composeData.subject}
                         onChange={(e) => setComposeData({ ...composeData, subject: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0F52BA] transition-all"
+                        className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0F52BA] transition-all"
                         placeholder="Opportunity update, urgent notice, event alert..."
                       />
                     </div>
@@ -336,7 +336,7 @@ export default function AdminNotificationsPage() {
                       <textarea
                         value={composeData.message}
                         onChange={(e) => setComposeData({ ...composeData, message: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0F52BA] transition-all"
+                        className="w-full bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0F52BA] transition-all"
                         rows={5}
                         placeholder="Write the clear details of your notice here..."
                       />
@@ -377,14 +377,14 @@ export default function AdminNotificationsPage() {
                     <div className="flex gap-4 pt-2">
                       <button
                         onClick={() => setShowCompose(false)}
-                        className="flex-1 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 py-3 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-all duration-150"
+                        className="flex-1 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 py-3 rounded-lg font-bold hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-all duration-150"
                       >
                         Cancel
                       </button>
                       <button
                         onClick={handleSend}
                         disabled={sending || !composeData.subject || !composeData.message}
-                        className="flex-1 bg-[#0F52BA] hover:bg-[#0D4196] text-white py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-[#0F52BA]/25 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-40"
+                        className="flex-1 bg-[#0F52BA] hover:bg-[#0D4196] text-white py-3 rounded-lg font-bold hover:shadow-lg hover:shadow-[#0F52BA]/25 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-40"
                       >
                         {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                         {sending ? "Triggering..." : "Send Broadcast"}
@@ -398,7 +398,7 @@ export default function AdminNotificationsPage() {
         )}
 
         {/* Filters and Controls */}
-        <div className="bg-white dark:bg-[#0D1527] rounded-2xl border border-slate-200 dark:border-slate-800/80 p-5 shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
+        <div className="bg-white dark:bg-[#0D1527] rounded-lg border border-slate-200 dark:border-slate-800/80 p-5 shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
           <div className="relative w-full md:w-80">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
@@ -406,7 +406,7 @@ export default function AdminNotificationsPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by email or subject..."
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#0F52BA] transition-all"
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0F52BA] transition-all"
             />
           </div>
 
@@ -418,7 +418,7 @@ export default function AdminNotificationsPage() {
                   setStatusFilter(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="appearance-none bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F52BA]"
+                className="appearance-none bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2.5 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F52BA]"
               >
                 <option value="all">All Delivery Status</option>
                 <option value="sent">Sent Success</option>
@@ -434,7 +434,7 @@ export default function AdminNotificationsPage() {
                   setTypeFilter(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="appearance-none bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F52BA]"
+                className="appearance-none bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2.5 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F52BA]"
               >
                 <option value="all">All Notification Types</option>
                 <option value="placementOpportunityTemplate">Placement Drives</option>
@@ -467,7 +467,7 @@ export default function AdminNotificationsPage() {
               {logs.map((log) => (
                 <div key={log.id} className="px-6 py-5 hover:bg-slate-50/50 dark:hover:bg-slate-800/10 transition-colors duration-150 flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <div className="w-10 h-10 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
                       {getTemplateIcon(log.template)}
                     </div>
                     <div>

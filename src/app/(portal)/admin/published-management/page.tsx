@@ -176,7 +176,7 @@ export default function PublishedManagementPage() {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-lg sm:rounded-xl flex items-center justify-center">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-lg sm:rounded-lg flex items-center justify-center">
               <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
             </div>
             <h1 className="text-base sm:text-lg font-bold tracking-tight text-foreground flex gap-3">Published <span className="text-brand hidden sm:block">Management</span></h1>
@@ -188,7 +188,7 @@ export default function PublishedManagementPage() {
                 <button
                   onClick={() => handleBulkAction("unpublish")}
                   disabled={bulkActionLoading !== null}
-                  className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-orange-600 text-white rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-orange-700 transition-all shadow-md shadow-orange-600/10 disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-orange-600 text-white rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold hover:bg-orange-700 transition-all shadow-md shadow-orange-600/10 disabled:opacity-50"
                 >
                   {bulkActionLoading === "unpublish" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Archive className="w-3 h-3 sm:w-3.5 sm:h-3.5" />}
                   <span className="hidden xs:inline">Unpublish All</span>
@@ -197,7 +197,7 @@ export default function PublishedManagementPage() {
                 <button
                   onClick={() => handleBulkAction("delete")}
                   disabled={bulkActionLoading !== null}
-                  className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-card border border-border text-muted-foreground rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-destructive/10 hover:text-destructive transition-all disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-card border border-border text-muted-foreground rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold hover:bg-destructive/10 hover:text-destructive transition-all disabled:opacity-50"
                 >
                   {bulkActionLoading === "delete" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />}
                   <span className="hidden xs:inline">Delete All</span>
@@ -216,7 +216,7 @@ export default function PublishedManagementPage() {
             <button
               key={tab.key}
               onClick={() => { handleChangeTab(tab.key) }}
-              className={`flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-3 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${activeTab === tab.key
+              className={`flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-3 rounded-lg sm:rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${activeTab === tab.key
                 ? "bg-brand text-white shadow-[var(--shadow-brand)]"
                 : "bg-card border border-border text-muted-foreground hover:bg-accent"
               }`}
@@ -229,7 +229,7 @@ export default function PublishedManagementPage() {
 
         {/* Feedback Sub-Tabs */}
         {activeTab === "feedback" && (
-          <div className="flex items-center gap-1.5 mb-6 bg-card p-1 rounded-xl sm:rounded-2xl border border-border w-fit">
+          <div className="flex items-center gap-1.5 mb-6 bg-card p-1 rounded-lg sm:rounded-lg border border-border w-fit">
             {FEEDBACKTABS.map((feedbackTab) => (
               <button
                 key={feedbackTab.key}
@@ -239,7 +239,7 @@ export default function PublishedManagementPage() {
                   setItems([]);
                   setHasMore(true);
                 }}
-                className={`flex items-center gap-1.5 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold transition-all ${activeFeedbackSubTab === feedbackTab.key
+                className={`flex items-center gap-1.5 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold transition-all ${activeFeedbackSubTab === feedbackTab.key
                   ? "bg-muted text-brand"
                   : "text-muted-foreground hover:text-muted-foreground"
                 }`}
@@ -262,7 +262,7 @@ export default function PublishedManagementPage() {
             <p className="text-xs sm:text-sm font-bold text-muted-foreground">Loading...</p>
           </div>
         ) : items.length === 0 ? (
-          <div className="text-center py-20 sm:py-32 bg-card rounded-2xl sm:rounded-3xl border-2 border-dashed border-border">
+          <div className="text-center py-20 sm:py-32 bg-card rounded-lg sm:rounded-3xl border-2 border-dashed border-border">
             <Eye className="w-8 h-8 sm:w-10 sm:h-10 text-card-foreground/40 mx-auto mb-4" />
             <h3 className="text-lg sm:text-xl font-bold text-foreground">No published items</h3>
             <p className="text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-2">No published content here yet.</p>
@@ -278,7 +278,7 @@ export default function PublishedManagementPage() {
                   {activeTab === "memories" && (
                     <div
                       onClick={() => setViewItem(item)}
-                      className="group relative aspect-square bg-muted rounded-lg sm:rounded-2xl overflow-hidden cursor-pointer border border-border shadow-sm hover:shadow-md transition-all bg-top">
+                      className="group relative aspect-square bg-muted rounded-lg sm:rounded-lg overflow-hidden cursor-pointer border border-border shadow-sm hover:shadow-md transition-all bg-top">
                       <img
                         src={item.imageUrl}
                         alt="Memory"
@@ -325,7 +325,7 @@ export default function PublishedManagementPage() {
         >
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
           <div
-            className="relative bg-card rounded-2xl sm:rounded-3xl shadow-2xl max-w-4xl w-full overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col md:flex-row max-h-[90vh]"
+            className="relative bg-card rounded-lg sm:rounded-3xl shadow-2xl max-w-4xl w-full overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col md:flex-row max-h-[90vh]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="w-full md:w-2/3 max-h-[60vh] md:max-h-[80vh] bg-black/5 flex items-center justify-center overflow-hidden bg-top">
@@ -340,7 +340,7 @@ export default function PublishedManagementPage() {
                 <h2 className="text-lg sm:text-2xl font-bold text-foreground mb-4">{viewItem.title}</h2>
                 
                 {/* Uploader Info */}
-                <div className="bg-muted p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-border mb-4">
+                <div className="bg-muted p-3 sm:p-4 rounded-lg sm:rounded-lg border border-border mb-4">
                   <p className="text-xs sm:text-xs text-muted-foreground font-bold uppercase tracking-wide mb-2">Uploaded By</p>
                   <div className="flex items-center gap-3">
                     {viewItem.student?.profileImageUrl || viewItem.alumni?.profileImageUrl ? (
@@ -372,7 +372,7 @@ export default function PublishedManagementPage() {
                     handleAction(viewItem.id, "unpublish");
                   }}
                   disabled={actionLoading === viewItem.id}
-                  className="flex-1 py-2 sm:py-3 bg-orange-600 text-white rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-orange-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="flex-1 py-2 sm:py-3 bg-orange-600 text-white rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold hover:bg-orange-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {actionLoading === viewItem.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Archive className="w-3.5 h-3.5" />}
                   Unpublish
@@ -382,7 +382,7 @@ export default function PublishedManagementPage() {
                     handleAction(viewItem.id, "delete");
                   }}
                   disabled={actionLoading === viewItem.id}
-                  className="flex-1 py-2 sm:py-3 bg-destructive text-white rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-destructive/90 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="flex-1 py-2 sm:py-3 bg-destructive text-white rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold hover:bg-destructive/90 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {actionLoading === viewItem.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                   Delete
@@ -401,11 +401,11 @@ export default function PublishedManagementPage() {
         >
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
           <div
-            className="relative bg-card rounded-2xl sm:rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden animate-in zoom-in-95 duration-300 p-4 sm:p-8 max-h-[90vh] overflow-y-auto bg-top"
+            className="relative bg-card rounded-lg sm:rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden animate-in zoom-in-95 duration-300 p-4 sm:p-8 max-h-[90vh] overflow-y-auto bg-top"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-3 sm:gap-4 mb-6">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-50 rounded-lg sm:rounded-2xl flex items-center justify-center text-brand border border-brand/80">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-50 rounded-lg sm:rounded-lg flex items-center justify-center text-brand border border-brand/80">
                 <Users className="w-6 h-6 sm:w-8 sm:h-8" />
               </div>
               <div className="flex-1 min-w-0">
@@ -415,7 +415,7 @@ export default function PublishedManagementPage() {
             </div>
 
             {/* Alumni Info */}
-            <div className="bg-muted p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-border mb-4">
+            <div className="bg-muted p-3 sm:p-4 rounded-lg sm:rounded-lg border border-border mb-4">
               <p className="text-xs sm:text-xs text-muted-foreground font-bold uppercase tracking-wide mb-2">Posted By</p>
               <div className="flex items-center gap-3 bg-top">
                 {viewItem.alumni?.profileImageUrl && (
@@ -435,7 +435,7 @@ export default function PublishedManagementPage() {
 
             <div className="mb-4">
               <p className="text-xs sm:text-sm font-bold text-muted-foreground mb-2">Description</p>
-              <p className="text-xs sm:text-sm text-muted-foreground bg-muted p-3 sm:p-4 rounded-lg sm:rounded-xl border border-border leading-relaxed">
+              <p className="text-xs sm:text-sm text-muted-foreground bg-muted p-3 sm:p-4 rounded-lg sm:rounded-lg border border-border leading-relaxed">
                 {viewItem.description}
               </p>
             </div>
@@ -457,7 +457,7 @@ export default function PublishedManagementPage() {
               <button
                 onClick={() => handleAction(viewItem.id, "unpublish")}
                 disabled={actionLoading === viewItem.id}
-                className="flex-1 py-2 sm:py-3 bg-orange-500 text-white rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-orange-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                className="flex-1 py-2 sm:py-3 bg-orange-500 text-white rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold hover:bg-orange-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {actionLoading === viewItem.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Archive className="w-3.5 h-3.5" />}
                 Unpublish
@@ -465,7 +465,7 @@ export default function PublishedManagementPage() {
               <button
                 onClick={() => handleAction(viewItem.id, "delete")}
                 disabled={actionLoading === viewItem.id}
-                className="flex-1 py-2 sm:py-3 bg-red-500 text-white rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-red-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                className="flex-1 py-2 sm:py-3 bg-red-500 text-white rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold hover:bg-red-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {actionLoading === viewItem.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                 Delete
@@ -483,7 +483,7 @@ export default function PublishedManagementPage() {
         >
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
           <div
-            className="relative bg-card rounded-2xl sm:rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden animate-in zoom-in-95 duration-300 p-4 sm:p-8 max-h-[90vh] overflow-y-auto"
+            className="relative bg-card rounded-lg sm:rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden animate-in zoom-in-95 duration-300 p-4 sm:p-8 max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-6">
@@ -503,7 +503,7 @@ export default function PublishedManagementPage() {
             </div>
 
             {/* Author Info */}
-            <div className="bg-muted p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-border mb-4">
+            <div className="bg-muted p-3 sm:p-4 rounded-lg sm:rounded-lg border border-border mb-4">
               <p className="text-xs sm:text-xs text-muted-foreground font-bold uppercase tracking-wide mb-2">Author</p>
               <div className="flex items-center gap-3 bg-top">
                 {viewItem.student?.profileImageUrl || viewItem.alumni?.profileImageUrl || viewItem.recruiter?.profileImageUrl ? (
@@ -533,7 +533,7 @@ export default function PublishedManagementPage() {
 
             <div className="mb-4">
               <p className="text-xs sm:text-sm font-bold text-muted-foreground mb-2">Feedback</p>
-              <p className="text-xs sm:text-sm text-muted-foreground bg-muted p-3 sm:p-4 rounded-lg sm:rounded-xl border border-border leading-relaxed">
+              <p className="text-xs sm:text-sm text-muted-foreground bg-muted p-3 sm:p-4 rounded-lg sm:rounded-lg border border-border leading-relaxed">
                 {viewItem.content}
               </p>
             </div>
@@ -546,7 +546,7 @@ export default function PublishedManagementPage() {
               <button
                 onClick={() => handleAction(viewItem.id, "unpublish")}
                 disabled={actionLoading === viewItem.id}
-                className="flex-1 py-2 sm:py-3 bg-orange-500 text-white rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-orange-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                className="flex-1 py-2 sm:py-3 bg-orange-500 text-white rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold hover:bg-orange-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {actionLoading === viewItem.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Archive className="w-3.5 h-3.5" />}
                 Unpublish
@@ -554,7 +554,7 @@ export default function PublishedManagementPage() {
               <button
                 onClick={() => handleAction(viewItem.id, "delete")}
                 disabled={actionLoading === viewItem.id}
-                className="flex-1 py-2 sm:py-3 bg-red-500 text-white rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-red-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                className="flex-1 py-2 sm:py-3 bg-red-500 text-white rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold hover:bg-red-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {actionLoading === viewItem.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                 Delete
@@ -571,10 +571,10 @@ function ReferralCard({ item, onAction, loading, onViewItem }: { item: any, onAc
   return (
     <div 
       onClick={() => onViewItem(item)}
-      className="bg-card p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-border shadow-sm hover:shadow-md transition-all cursor-pointer group\">
+      className="bg-card p-4 sm:p-6 rounded-lg sm:rounded-3xl border border-border shadow-sm hover:shadow-md transition-all cursor-pointer group\">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3 sm:gap-4">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-lg sm:rounded-2xl flex items-center justify-center text-brand border border-brand/80">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-lg sm:rounded-lg flex items-center justify-center text-brand border border-brand/80">
             <Users className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
@@ -589,7 +589,7 @@ function ReferralCard({ item, onAction, loading, onViewItem }: { item: any, onAc
           <Briefcase className="w-3.5 h-3.5 font-bold" />
           <span className="text-xs sm:text-sm font-bold">{item.position}</span>
         </div>
-        <div className="p-3 sm:p-4 bg-muted rounded-xl sm:rounded-2xl border border-slate-100">
+        <div className="p-3 sm:p-4 bg-muted rounded-lg sm:rounded-lg border border-slate-100">
           <p className="text-xs sm:text-xs text-muted-foreground line-clamp-2 leading-relaxed">
             {item.description}
           </p>
@@ -597,7 +597,7 @@ function ReferralCard({ item, onAction, loading, onViewItem }: { item: any, onAc
       </div>
 
       {item.applyLink && (
-        <div className="mb-4 flex p-3 bg-muted rounded-xl sm:rounded-2xl border border-slate-100">
+        <div className="mb-4 flex p-3 bg-muted rounded-lg sm:rounded-lg border border-slate-100">
           <a href={item.applyLink} target="_blank" onClick={(e) => e.stopPropagation()} className="flex items-center gap-2 text-brand text-xs sm:text-xs font-bold uppercase tracking-widest hover:text-brand/80 transition-colors">
             <LinkIcon className="w-3 h-3" />
             Link
@@ -609,7 +609,7 @@ function ReferralCard({ item, onAction, loading, onViewItem }: { item: any, onAc
         <button
           onClick={(e) => { e.stopPropagation(); onAction(item.id, "unpublish"); }}
           disabled={loading === item.id}
-          className="flex-1 py-2 sm:py-3 bg-orange-500 text-white rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-orange-600 transition-all flex items-center justify-center gap-2 shadow-md shadow-orange-500/10 disabled:opacity-50"
+          className="flex-1 py-2 sm:py-3 bg-orange-500 text-white rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold hover:bg-orange-600 transition-all flex items-center justify-center gap-2 shadow-md shadow-orange-500/10 disabled:opacity-50"
         >
           {loading === item.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Archive className="w-3.5 h-3.5" />}
           Unpublish
@@ -617,7 +617,7 @@ function ReferralCard({ item, onAction, loading, onViewItem }: { item: any, onAc
         <button
           onClick={(e) => { e.stopPropagation(); onAction(item.id, "delete"); }}
           disabled={loading === item.id}
-          className="flex-1 py-2 sm:py-3 bg-red-500 text-white rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-red-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+          className="flex-1 py-2 sm:py-3 bg-red-500 text-white rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold hover:bg-red-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
         >
           {loading === item.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
           Delete
@@ -659,10 +659,10 @@ function FeedbackCard({ item, onAction, loading, feedbackType, onViewItem }: { i
   return (
     <div 
       onClick={() => onViewItem(item)}
-      className="bg-card p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-border shadow-sm hover:shadow-md transition-all cursor-pointer group\">
+      className="bg-card p-4 sm:p-6 rounded-lg sm:rounded-3xl border border-border shadow-sm hover:shadow-md transition-all cursor-pointer group\">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3 sm:gap-4">
-          <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-2xl flex items-center justify-center border ${getColor()}`}>
+          <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-lg flex items-center justify-center border ${getColor()}`}>
             {getIcon()}
           </div>
           <div className="flex-1 min-w-0">
@@ -686,7 +686,7 @@ function FeedbackCard({ item, onAction, loading, feedbackType, onViewItem }: { i
             ))}
           </div>
         </div>
-        <div className="p-3 sm:p-4 bg-muted rounded-xl sm:rounded-2xl border border-slate-100">
+        <div className="p-3 sm:p-4 bg-muted rounded-lg sm:rounded-lg border border-slate-100">
           <p className="text-xs sm:text-xs text-muted-foreground line-clamp-3 leading-relaxed">
             {item.content}
           </p>
@@ -701,7 +701,7 @@ function FeedbackCard({ item, onAction, loading, feedbackType, onViewItem }: { i
         <button
           onClick={(e) => { e.stopPropagation(); onAction(item.id, "unpublish"); }}
           disabled={loading === item.id}
-          className="flex-1 py-2 sm:py-3 bg-orange-500 text-white rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-orange-600 transition-all flex items-center justify-center gap-2 shadow-md shadow-orange-500/10 disabled:opacity-50"
+          className="flex-1 py-2 sm:py-3 bg-orange-500 text-white rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold hover:bg-orange-600 transition-all flex items-center justify-center gap-2 shadow-md shadow-orange-500/10 disabled:opacity-50"
         >
           {loading === item.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Archive className="w-3.5 h-3.5" />}
           Unpublish
@@ -709,7 +709,7 @@ function FeedbackCard({ item, onAction, loading, feedbackType, onViewItem }: { i
         <button
           onClick={(e) => { e.stopPropagation(); onAction(item.id, "delete"); }}
           disabled={loading === item.id}
-          className="flex-1 py-2 sm:py-3 bg-red-500 text-white rounded-lg sm:rounded-xl text-xs sm:text-xs font-bold hover:bg-red-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+          className="flex-1 py-2 sm:py-3 bg-red-500 text-white rounded-lg sm:rounded-lg text-xs sm:text-xs font-bold hover:bg-red-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
         >
           {loading === item.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
           Delete

@@ -162,7 +162,7 @@ export default function AdminDashboard() {
       <header className="fixed w-full top-0 z-50 bg-card/80 backdrop-blur-xl border-b border-border">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-brand/10 rounded-lg flex items-center justify-center">
               <Shield className="w-5 h-5 text-brand" />
             </div>
             <div>
@@ -203,7 +203,7 @@ export default function AdminDashboard() {
               <p className="text-destructive font-bold text-lg">{fetchError}</p>
               <button
                 onClick={() => { setLoading(true); const fetchStats = async () => { try { setFetchError(null); const res = await fetch("/api/admin/stats"); const data = (await res.json()) as { success: boolean; stats: Stats }; if (data.success) setStats(data.stats); else setFetchError("Failed to load"); } catch { setFetchError("Network error"); } finally { setLoading(false); } }; fetchStats(); }}
-                className="flex items-center gap-2 px-6 py-3 bg-brand text-primary-foreground rounded-xl font-bold text-sm hover:bg-brand/90 transition-all"
+                className="flex items-center gap-2 px-6 py-3 bg-brand text-primary-foreground rounded-lg font-bold text-sm hover:bg-brand/90 transition-all"
               >
                 <RefreshCw className="w-4 h-4" /> Retry
               </button>
@@ -213,9 +213,9 @@ export default function AdminDashboard() {
               {statCards.map((card) => (
                 <div
                   key={card.label}
-                  className="bg-card p-5 rounded-2xl border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow"
+                  className="bg-card p-5 rounded-lg border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow"
                 >
-                  <div className="w-10 h-10 bg-brand/10 rounded-xl flex items-center justify-center mb-3">
+                  <div className="w-10 h-10 bg-brand/10 rounded-lg flex items-center justify-center mb-3">
                     <card.icon className="w-5 h-5 text-brand" />
                   </div>
                   <p className={`text-2xl font-black ${card.highlight ? 'text-brand' : 'text-foreground'}`}>{card.value}</p>
@@ -236,10 +236,10 @@ export default function AdminDashboard() {
               <Link
                 key={section.title}
                 href={section.href}
-                className="bg-card p-6 rounded-2xl border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] hover:border-brand/30 transition-all group"
+                className="bg-card p-6 rounded-lg border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] hover:border-brand/30 transition-all group"
               >
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 bg-brand/10 rounded-xl flex items-center justify-center group-hover:bg-brand/20 transition-colors">
+                  <div className="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center group-hover:bg-brand/20 transition-colors">
                     <section.icon className="w-6 h-6 text-brand" />
                   </div>
                   {section.badge !== null && section.badge > 0 && (

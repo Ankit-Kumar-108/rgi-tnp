@@ -1,26 +1,67 @@
 import { drizzle } from "drizzle-orm/d1";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import * as schema from "./schema";
-import { eq, inArray, and, or, asc, desc, gte, lte, gt, lt, sql } from "drizzle-orm";
+import { eq, inArray, and, or, asc, desc, gte, lte, gt, lt, sql, getTableColumns } from "drizzle-orm";
+
+function serializeData(table: any, data: any): any {
+    if (!data || typeof data !== 'object') return data;
+    
+    const columns = getTableColumns(table);
+    const serialized: any = {};
+    
+    for (const [key, val] of Object.entries(data)) {
+        if (val === undefined) {
+            serialized[key] = val;
+            continue;
+        }
+        
+        const column = columns[key];
+        let mapped = val;
+        
+        // Try column's own mapToDriverValue first
+        if (column && column.mapToDriverValue) {
+            mapped = column.mapToDriverValue(val);
+        }
+        
+        // If the result is still a Date object (e.g. text columns don't convert Dates),
+        // convert it to an ISO string so D1 doesn't choke on the object type.
+        if (mapped instanceof Date) {
+            mapped = mapped.toISOString();
+        }
+        
+        serialized[key] = mapped;
+    }
+    
+    return serialized;
+}
 
 function buildWhere(table: any, whereObj: any): any {
     if (!whereObj) return undefined;
     const conditions: any[] = [];
+    const columns = getTableColumns(table);
     for (const [k, v] of Object.entries(whereObj)) {
+        const column = columns[k];
+        const serialize = (val: any) => {
+            let mapped = val;
+            if (column && column.mapToDriverValue && val !== undefined) mapped = column.mapToDriverValue(val);
+            if (mapped instanceof Date) mapped = mapped.toISOString();
+            return mapped;
+        };
+
         if (k === 'OR' && Array.isArray(v)) {
             conditions.push(or(...v.map(cond => buildWhere(table, cond))));
         } else if (k === 'AND' && Array.isArray(v)) {
             conditions.push(and(...v.map(cond => buildWhere(table, cond))));
         } else if (v !== null && typeof v === 'object' && !Array.isArray(v)) {
-            if ('in' in v) conditions.push(inArray(table[k], v.in as any[]));
-            if ('gte' in v) conditions.push(gte(table[k], v.gte));
-            if ('lte' in v) conditions.push(lte(table[k], v.lte));
-            if ('gt' in v) conditions.push(gt(table[k], v.gt));
-            if ('lt' in v) conditions.push(lt(table[k], v.lt));
-            if ('not' in v) conditions.push(sql`${table[k]} != ${v.not}`);
+            if ('in' in v) conditions.push(inArray(table[k], (v.in as any[]).map(serialize)));
+            if ('gte' in v) conditions.push(gte(table[k], serialize(v.gte)));
+            if ('lte' in v) conditions.push(lte(table[k], serialize(v.lte)));
+            if ('gt' in v) conditions.push(gt(table[k], serialize(v.gt)));
+            if ('lt' in v) conditions.push(lt(table[k], serialize(v.lt)));
+            if ('not' in v) conditions.push(sql`${table[k]} != ${serialize(v.not)}`);
             if ('contains' in v) conditions.push(sql`${table[k]} LIKE ${'%' + v.contains + '%'}`);
         } else {
-            conditions.push(eq(table[k], v));
+            conditions.push(eq(table[k], serialize(v)));
         }
     }
     if (conditions.length === 0) return undefined;
@@ -187,26 +228,30 @@ class PrismaModelProxy {
     }
 
     async create(args: any) {
-        const result = await this.db.insert(this.table).values(args.data).returning();
+        const serializedData = serializeData(this.table, args.data);
+        const result = await this.db.insert(this.table).values(serializedData).returning();
         return result[0];
     }
 
     async createMany(args: any) {
         const data = Array.isArray(args.data) ? args.data : [args.data];
         if (data.length === 0) return { count: 0 };
-        await this.db.insert(this.table).values(data);
+        const serializedData = data.map(d => serializeData(this.table, d));
+        await this.db.insert(this.table).values(serializedData);
         return { count: data.length };
     }
 
     async update(args: any) {
+        const serializedData = serializeData(this.table, args.data);
         const where = buildWhere(this.table, args.where);
-        const result = await this.db.update(this.table).set(args.data).where(where).returning();
+        const result = await this.db.update(this.table).set(serializedData).where(where).returning();
         return result[0];
     }
 
     async updateMany(args: any) {
+        const serializedData = serializeData(this.table, args.data);
         const where = buildWhere(this.table, args.where);
-        await this.db.update(this.table).set(args.data).where(where);
+        await this.db.update(this.table).set(serializedData).where(where);
         return { count: 1 };
     }
 

@@ -290,7 +290,7 @@ export default function DriveImageManagement() {
     <div className="space-y-10">
       {/* ── Header ── */}
       <div className="flex items-center gap-4">
-        <div className="w-12 h-12 bg-brand/10 rounded-2xl flex items-center justify-center shrink-0">
+        <div className="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center shrink-0">
           <Images className="w-6 h-6 text-brand" />
         </div>
         <div>
@@ -328,7 +328,7 @@ export default function DriveImageManagement() {
                 id="drive-selector"
                 value={selectedDrive}
                 onChange={(e) => setSelectedDrive(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand transition-all"
+                className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand transition-all"
               >
                 <option value="">— Choose a placement drive —</option>
                 {drives.map((drive) => (
@@ -360,7 +360,7 @@ export default function DriveImageManagement() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g., Successful Campus Drive of Google"
-                className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground text-sm font-medium placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand transition-all"
+                className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground text-sm font-medium placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand transition-all"
               />
             </div>
           </div>
@@ -375,7 +375,7 @@ export default function DriveImageManagement() {
                 <div key={index} className="relative group">
                   {slot.preview ? (
                     /* ── Filled slot ── */
-                    <div className="relative aspect-[4/3] rounded-2xl overflow-hidden border-2 border-brand/30 shadow-md">
+                    <div className="relative aspect-[4/3] rounded-lg overflow-hidden border-2 border-brand/30 shadow-md">
                       <img
                         src={slot.preview}
                         alt={`Slot ${index + 1}`}
@@ -406,9 +406,9 @@ export default function DriveImageManagement() {
                       htmlFor={`slot-input-${index}`}
                       onDragOver={(e) => e.preventDefault()}
                       onDrop={(e) => handleSlotDrop(index, e)}
-                      className="aspect-4/3 rounded-2xl border-2 border-dashed border-border hover:border-brand/50 bg-muted/30 hover:bg-brand/5 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all group/slot"
+                      className="aspect-4/3 rounded-lg border-2 border-dashed border-border hover:border-brand/50 bg-muted/30 hover:bg-brand/5 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all group/slot"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-brand/10 flex items-center justify-center group-hover/slot:bg-brand/20 transition-colors">
+                      <div className="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center group-hover/slot:bg-brand/20 transition-colors">
                         <ImagePlus className="w-5 h-5 text-brand" />
                       </div>
                       <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
@@ -458,7 +458,7 @@ export default function DriveImageManagement() {
               id="upload-images-btn"
               onClick={handleUpload}
               disabled={!canUpload || uploading}
-              className="flex-1 md:flex-none px-8 py-3 bg-gradient-to-r from-brand to-brand/80 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-brand/25 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+              className="flex-1 md:flex-none px-8 py-3 bg-gradient-to-r from-brand to-brand/80 text-white rounded-lg font-bold text-sm flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-brand/25 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
             >
               {uploading ? (
                 <>
@@ -478,7 +478,7 @@ export default function DriveImageManagement() {
               <button
                 type="button"
                 onClick={clearAllSlots}
-                className="px-4 py-3 rounded-xl border border-border text-muted-foreground text-sm font-medium hover:bg-muted/50 transition-colors cursor-pointer"
+                className="px-4 py-3 rounded-lg border border-border text-muted-foreground text-sm font-medium hover:bg-muted/50 transition-colors cursor-pointer"
               >
                 Clear All
               </button>
@@ -501,7 +501,7 @@ export default function DriveImageManagement() {
               setFilterDrive(e.target.value);
               setPage(1);
             }}
-            className="px-4 py-2 rounded-xl border border-border bg-background text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand/40 transition-all"
+            className="px-4 py-2 rounded-lg border border-border bg-background text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand/40 transition-all"
           >
             <option value="">All Drives</option>
             {drives.map((drive) => (
@@ -513,7 +513,7 @@ export default function DriveImageManagement() {
         </div>
 
         {images.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border bg-muted/20 py-16 flex flex-col items-center justify-center gap-3">
+          <div className="rounded-lg border border-dashed border-border bg-muted/20 py-16 flex flex-col items-center justify-center gap-3">
             <Images className="w-10 h-10 text-muted-foreground/40" />
             <p className="text-muted-foreground text-sm font-medium">
               No images found
@@ -525,7 +525,7 @@ export default function DriveImageManagement() {
               ([driveId, { drive, title: groupTitle, images: groupImages }]) => (
                 <div
                   key={driveId}
-                  className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                  className="rounded-lg border border-border bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow"
                 >
                   {/* Drive header */}
                   <div className="px-6 py-4 bg-muted/30 border-b border-border flex items-center justify-between">
@@ -550,7 +550,7 @@ export default function DriveImageManagement() {
                     {groupImages.map((image) => (
                       <div
                         key={image.id}
-                        className="relative group rounded-xl overflow-hidden aspect-4/3 bg-muted"
+                        className="relative group rounded-lg overflow-hidden aspect-4/3 bg-muted"
                       >
                         <img
                           src={image.imageUrl}
@@ -585,7 +585,7 @@ export default function DriveImageManagement() {
                 <button
                   onClick={() => setPage(Math.max(1, page - 1))}
                   disabled={page === 1}
-                  className="flex items-center gap-1 px-4 py-2 rounded-xl border border-border text-sm font-medium disabled:opacity-40 hover:bg-muted/50 transition-colors cursor-pointer"
+                  className="flex items-center gap-1 px-4 py-2 rounded-lg border border-border text-sm font-medium disabled:opacity-40 hover:bg-muted/50 transition-colors cursor-pointer"
                 >
                   <ChevronLeft className="w-4 h-4" />
                   Previous
@@ -596,7 +596,7 @@ export default function DriveImageManagement() {
                 <button
                   onClick={() => setPage(Math.min(totalPages, page + 1))}
                   disabled={page === totalPages}
-                  className="flex items-center gap-1 px-4 py-2 rounded-xl border border-border text-sm font-medium disabled:opacity-40 hover:bg-muted/50 transition-colors cursor-pointer"
+                  className="flex items-center gap-1 px-4 py-2 rounded-lg border border-border text-sm font-medium disabled:opacity-40 hover:bg-muted/50 transition-colors cursor-pointer"
                 >
                   Next
                   <ChevronRight className="w-4 h-4" />
