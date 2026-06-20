@@ -229,7 +229,7 @@ const EditorialCard = React.memo(({ data, type }: { data: FeedbackUnion, type: E
   }
 
   return (
-    <div className="group bg-card p-6 md:p-10 rounded-2xl md:rounded-none md:rounded-tr-3xl md:rounded-bl-3xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-border/40 hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] transition-all duration-500 relative">
+    <div className="group bg-card p-6 md:p-10 rounded-lg md:rounded-none md:rounded-tr-xl md:rounded-bl-3xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-border/40 hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] transition-all duration-500 relative">
       
       {/* Editorial Quote Mark */}
       <Quote className="absolute top-6 left-6 w-12 h-12 text-foreground/5 rotate-180 -z-0" />

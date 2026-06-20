@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { BadgeCheck } from "lucide-react";
+import { BadgeCheck, X } from "lucide-react";
 
 interface DriveImageData {
   id: string;
@@ -26,6 +26,8 @@ interface HomeDrive {
 
 export default function DriveCarousel({ drives }: { drives: HomeDrive[] }) {
   const [currentGroupIndex, setCurrentGroupIndex] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDrive, setSelectedDrive] = useState<string | null>(null);
 
   const driveGroups: DriveGroup[] = drives
     .filter((d) => d.driveImages && d.driveImages.length > 0)
@@ -102,7 +104,9 @@ export default function DriveCarousel({ drives }: { drives: HomeDrive[] }) {
                         fill
                         sizes="(max-width: 768px) 50vw, 25vw"
                       />
-                      <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
+                      <div
+                      onClick={() => {setIsModalOpen(!isModalOpen); setSelectedDrive(group.images[0].imageUrl || "");}}
+                      className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
                     </div>
                   )}
                   {/* Image 2 — top right */}
@@ -114,8 +118,10 @@ export default function DriveCarousel({ drives }: { drives: HomeDrive[] }) {
                         className="object-cover object-top group-hover/img:scale-105 transition-transform duration-700"
                         fill
                         sizes="(max-width: 768px) 25vw, 12.5vw"
-                      />
-                      <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
+                        />
+                      <div 
+                      onClick={() => {setIsModalOpen(!isModalOpen); setSelectedDrive(group.images[1].imageUrl || "");}}
+                      className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
                     </div>
                   )}
                   {/* Image 3 — top far-right */}
@@ -128,7 +134,9 @@ export default function DriveCarousel({ drives }: { drives: HomeDrive[] }) {
                         fill
                         sizes="(max-width: 768px) 25vw, 12.5vw"
                       />
-                      <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
+                      <div 
+                      onClick={() => {setIsModalOpen(!isModalOpen); setSelectedDrive(group.images[2].imageUrl || "");}}
+                      className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
                     </div>
                   )}
                   {/* Image 4 — bottom right (spans 2 cols) */}
@@ -141,7 +149,9 @@ export default function DriveCarousel({ drives }: { drives: HomeDrive[] }) {
                         fill
                         sizes="(max-width: 768px) 50vw, 25vw"
                       />
-                      <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
+                      <div 
+                      onClick={() => {setIsModalOpen(!isModalOpen); setSelectedDrive(group.images[3].imageUrl || "");}}
+                      className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300" />
                     </div>
                   )}
                 </div>
@@ -164,6 +174,27 @@ export default function DriveCarousel({ drives }: { drives: HomeDrive[] }) {
                 aria-label={`Go to ${group.images[0]?.title} drive images`}
               />
             ))}
+          </div>
+        )}
+        {driveGroups && isModalOpen && (
+          <div className="fixed inset-0 z-[100] w-full h-full flex items-center justify-center p-4 sm:p-6 md:p-8 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+            <button 
+              onClick={() => setIsModalOpen(!isModalOpen)} 
+              className="fixed z-[101] top-4 right-4 md:top-6 md:right-6 p-2 md:p-3 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-md transition-all border border-white/20 hover:scale-110 shadow-lg"
+              aria-label="Close"
+            >
+              <X className="w-5 h-5 md:w-6 md:h-6" />
+            </button>
+            
+            <div className="relative w-full h-full max-h-[85vh] md:max-w-[90vw] lg:max-w-[80vw] mx-auto flex items-center justify-center animate-in zoom-in-[0.98] duration-300">
+            {selectedDrive && (
+              <img
+                src={selectedDrive}
+                alt="Drive Image"
+                className="max-w-full max-h-[85vh] rounded-lg drop-shadow-2xl object-contain"
+              />
+            )}
+            </div>
           </div>
         )}
       </div>

@@ -11,11 +11,8 @@ export const metadata = {
 export default function MemoriesPage() {
   return (
     <div className="bg-background min-h-screen flex flex-col selection:bg-brand/10 selection:text-brand">
-      {/* Navigation */}
       <Nav />
-      {/* Client Component Gallery */}
       <MemoriesGallery />
-      {/* Footer */}
       <Footer />
     </div>
   );

@@ -108,7 +108,7 @@ export default function MemoriesGallery() {
                   <div
                     key={memory.id}
                     ref={isLastElement ? lastImageRef : null}
-                    className="group break-inside-avoid mb-5 md:mb-8 cursor-pointer flex flex-col bg-card rounded-2xl md:rounded-none md:rounded-tr-3xl md:rounded-bl-3xl p-3 md:p-4 border border-border/40 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] hover:border-brand/20 transition-all duration-500 animate-in fade-in slide-in-from-bottom-8 fill-mode-both"
+                    className="group break-inside-avoid mb-5 md:mb-8 cursor-pointer flex flex-col bg-card rounded-lg md:rounded-none md:rounded-tr-xl md:rounded-bl-xl p-3 md:p-4 border border-border/40 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] hover:border-brand/20 transition-all duration-500 animate-in fade-in slide-in-from-bottom-8 fill-mode-both"
                     style={{ animationDelay: `${(index % 12) * 50}ms` }}
                     onClick={() => setSelectedImage(memory)}
                   >
@@ -158,43 +158,51 @@ export default function MemoriesGallery() {
         </main>
       </div>
 
-      {/* Optimized Lightbox Modal for Mobile */}
+      {/* Premium Glassmorphic Modal */}
       {selectedImage && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-6 bg-background/95 backdrop-blur-xl animate-in fade-in duration-300"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-8 bg-black/80 backdrop-blur-2xl animate-in fade-in duration-500"
           onClick={() => setSelectedImage(null)}
         >
+          {/* Subtle animated background glow */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden flex items-center justify-center">
+            <div className="w-[50vw] h-[50vw] max-w-[800px] max-h-[800px] bg-brand/20 rounded-full blur-[120px] opacity-40 animate-pulse duration-[4000ms]" />
+          </div>
+
           <button
-            className="absolute z-[101] top-4 right-4 md:top-8 md:right-8 text-foreground p-3 hover:bg-muted rounded-full transition-colors bg-background/50 backdrop-blur-md md:bg-transparent"
+            className="absolute z-[101] top-4 right-4 md:top-8 md:right-8 text-white/80 p-3 hover:text-white hover:bg-white/20 rounded-full transition-all duration-300 backdrop-blur-md border border-white/10 hover:scale-110 hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] bg-black/20"
             onClick={(e) => {
               e.stopPropagation();
               setSelectedImage(null);
             }}
           >
-            <X className="w-6 h-6 md:w-8 md:h-8" />
+            <X className="size-4 md:size-6" />
           </button>
 
           <div
-            className="relative w-full h-full md:h-auto md:max-w-5xl md:max-h-[85vh] flex flex-col scale-in-center bg-card md:bg-transparent"
+            className="relative w-full h-full md:h-auto md:max-w-7xl md:max-h-[90vh] flex flex-col items-center justify-center group z-10"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Image Container */}
-            <div className="relative w-full flex-1 md:h-[70vh] md:rounded-3xl overflow-hidden bg-black flex items-center justify-center">
+            {/* Image Container with Glow & Glassmorphism */}
+            <div className="relative w-full h-full md:h-auto max-h-[100dvh] md:max-h-[85vh] flex-1 md:rounded-xl overflow-hidden md:border md:border-white/10 md:shadow-2xl transition-all duration-700 bg-black/50 backdrop-blur-sm flex items-center justify-center">
               <img
                 src={selectedImage.imageUrl}
                 alt={selectedImage.title}
                 loading="lazy"
-                className="w-full h-full object-contain md:object-scale-down"
+                className="w-full h-full object-contain md:object-scale-down animate-in zoom-in-[0.97] duration-500 ease-out"
               />
-            </div>
-            
-            {/* Title & Info Banner */}
-            <div className="p-6 md:p-8 flex flex-col bg-card md:bg-background border-t border-border">
-              <h2 className="text-xl md:text-3xl font-serif text-foreground leading-tight">{selectedImage.title}</h2>
-              <div className="flex items-center gap-2 mt-2">
-                <span className="text-muted-foreground font-medium text-xs md:text-sm tracking-widest uppercase">
-                  Captured by {selectedImage.uploaderName || "Anonymous"}
-                </span>
+              
+              {/* Glassmorphic Overlay for Info */}
+              <div className="absolute bottom-0 inset-x-0 p-6 md:p-10 bg-gradient-to-t from-black/95 via-black/70 to-transparent opacity-100 md:translate-y-4 md:opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 ease-out flex flex-col pointer-events-none">
+                <h2 className="text-2xl md:text-4xl font-serif text-white leading-tight mb-2 md:mb-3 drop-shadow-lg pointer-events-auto">
+                  {selectedImage.title}
+                </h2>
+                <div className="flex items-center gap-3 pointer-events-auto">
+                  <span className="flex items-center gap-2 text-white/80 font-medium text-xs md:text-sm tracking-[0.2em] uppercase drop-shadow-md">
+                    <Camera className="w-4 h-4 text-brand" />
+                    {selectedImage.uploaderName || "Anonymous"}
+                  </span>
+                </div>
               </div>
             </div>
           </div>

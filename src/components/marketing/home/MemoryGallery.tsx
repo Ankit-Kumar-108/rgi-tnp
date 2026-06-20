@@ -1,6 +1,8 @@
+"use client"
 import Image from "next/image";
 import Link from "next/link";
-import { Camera, ArrowRight } from "lucide-react";
+import { Camera, ArrowRight, X } from "lucide-react";
+import { useState } from "react";
 
 interface MemoryData {
   id: string;
@@ -11,8 +13,10 @@ interface MemoryData {
 }
 
 export default function MemoryGallery({ memories }: { memories: MemoryData[] }) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedMemory, setSelectedMemory] = useState<string | null>(null);
   return (
-    <section className="max-w-7xl mx-auto px-4 md:px-8 lg:px-20 section-y">
+    <section className="relative z-50 max-w-7xl mx-auto px-4 md:px-8 lg:px-20 section-y">
       <div className="flex flex-col md:flex-row items-center justify-between mb-10 md:mb-14 gap-4">
         <div className="text-center md:text-left">
           <h2 className="text-2xl md:text-4xl font-black tracking-tight">Life at Radharaman <span className="text-brand">Placements</span></h2>
@@ -39,7 +43,9 @@ export default function MemoryGallery({ memories }: { memories: MemoryData[] }) 
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6">
+            <div
+            onClick={() => {setIsModalOpen(!isModalOpen); setSelectedMemory(memories[0].imageUrl || "")}}
+            className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6">
               <p className="text-white font-bold text-lg">{memories[0].title}</p>
               <p className="text-white/70 text-xs mt-1">by {memories[0].uploaderName}</p>
             </div>
@@ -53,7 +59,9 @@ export default function MemoryGallery({ memories }: { memories: MemoryData[] }) 
               fill
               sizes="(max-width: 768px) 50vw, 25vw"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+            <div 
+            onClick={() => {setIsModalOpen(!isModalOpen); setSelectedMemory(memories[1].imageUrl || "")}}
+            className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
               <p className="text-white text-xs font-bold">{memories[1].title}</p>
               <p className="text-white/70 text-xs mt-0.5">by {memories[1].uploaderName}</p>
             </div>
@@ -67,7 +75,9 @@ export default function MemoryGallery({ memories }: { memories: MemoryData[] }) 
               fill
               sizes="(max-width: 768px) 50vw, 25vw"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+            <div 
+            onClick={() => {setIsModalOpen(!isModalOpen); setSelectedMemory(memories[2].imageUrl || "")}} 
+            className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
               <p className="text-white text-xs font-bold">{memories[2].title}</p>
               <p className="text-white/70 text-xs mt-0.5">by {memories[2].uploaderName}</p>
             </div>
@@ -81,7 +91,9 @@ export default function MemoryGallery({ memories }: { memories: MemoryData[] }) 
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6">
+            <div 
+            onClick={() => {setIsModalOpen(!isModalOpen); setSelectedMemory(memories[3].imageUrl || "")}} 
+            className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6">
               <p className="text-white font-bold">{memories[3].title}</p>
               <p className="text-white/70 text-xs mt-1">by {memories[3].uploaderName}</p>
             </div>
@@ -113,6 +125,28 @@ export default function MemoryGallery({ memories }: { memories: MemoryData[] }) 
             <div className="absolute inset-0 bg-gradient-to-t from-brand/70 via-brand/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
               <p className="text-white font-bold">Corporate Mentorship</p>
             </div>
+          </div>
+        </div>
+      )}
+      {/* Memory modal */}
+      {isModalOpen && memories && (
+        <div className="fixed inset-0 z-[100] w-full h-full flex items-center justify-center p-4 sm:p-6 md:p-8 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+          <button
+            onClick={() => setIsModalOpen(!isModalOpen)}
+            className="fixed z-[101] top-4 right-4 md:top-6 md:right-6 p-2 md:p-3 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-md transition-all border border-white/20 hover:scale-110 shadow-lg"
+            aria-label="Close"
+          >
+            <X className="w-5 h-5 md:w-6 md:h-6" />
+          </button>
+
+          <div className="relative w-full h-full max-h-[85vh] md:max-w-[90vw] lg:max-w-[80vw] mx-auto flex items-center justify-center animate-in zoom-in-[0.98] duration-300">
+            {selectedMemory && (
+              <img
+                src={selectedMemory}
+                alt="Memory"
+                className="max-w-full max-h-[85vh] rounded-lg drop-shadow-2xl object-contain"
+              />
+            )}
           </div>
         </div>
       )}
