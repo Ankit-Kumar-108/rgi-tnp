@@ -511,6 +511,9 @@ Verify Token + Role Authorization
 - [ ] **Site (improve site content)  (to change on 25/06/2026 [Done])** 
   - improve content of site and add more content in home page and about us page for better visibility and understanding of site
 
+- [ ] **Alumni ( alumni drive eligibility addition and basic alumni passing and data like cgpa gender etc) (to be done)**
+  - add feature to add alumni drive eligibility and basic alumni passing and data like cgpa gender etc for better visibility and understanding of profile of alumni
+
 - [ ] **Take Suggestion from sir about final selection and mail notification**
 
 ### Phase 2 (Next Quarter)
