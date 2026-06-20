@@ -177,7 +177,9 @@ export default function DriveCarousel({ drives }: { drives: HomeDrive[] }) {
           </div>
         )}
         {driveGroups && isModalOpen && (
-          <div className="fixed inset-0 z-[100] w-full h-full flex items-center justify-center p-4 sm:p-6 md:p-8 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+          <div 
+          onClick={() => setIsModalOpen(!isModalOpen)}
+          className="fixed inset-0 z-[100] w-full h-full flex items-center justify-center p-4 sm:p-6 md:p-8 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
             <button 
               onClick={() => setIsModalOpen(!isModalOpen)} 
               className="fixed z-[101] top-4 right-4 md:top-6 md:right-6 p-2 md:p-3 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-md transition-all border border-white/20 hover:scale-110 shadow-lg"
