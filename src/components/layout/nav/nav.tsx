@@ -153,7 +153,7 @@ export default function Nav() {
                 </span>
               )}
               {item.subMenu && (
-                <div className="absolute top-full left-1/2 -translate-x-1/2 z-50 w-56 p-2 bg-background/95 backdrop-blur-md border border-border/50 shadow-2xl shadow-brand/5 rounded-xl opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200 ease-out">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 z-50 w-56 p-2 bg-background/95 backdrop-blur-md border border-border/50 shadow-2xl shadow-brand/5 rounded-lg opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200 ease-out">
                   <div className="flex flex-col gap-1">
                     {item.subMenu.map((subItem) => (
                       <Link
@@ -197,7 +197,7 @@ export default function Nav() {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: -8 }}
                 transition={{ duration: 0.2, ease: 'easeOut' }}
-                className='xl:hidden fixed z-50 right-5 top-24 bg-background border border-brand/20 w-56 rounded-2xl flex flex-col p-2 shadow-xl shadow-brand/10 max-h-[75vh] overflow-y-auto'
+                className='xl:hidden fixed z-50 right-5 top-24 bg-background border border-brand/20 w-56 rounded-lg flex flex-col p-2 shadow-xl shadow-brand/10 max-h-[75vh] overflow-y-auto'
               >
                 <div className="flex flex-col divide-y divide-brand/10">
                   {navItems.map((item) => (

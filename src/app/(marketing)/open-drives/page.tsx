@@ -84,7 +84,7 @@ export default function PublicOpenDrivesPage() {
                 {drives.map((drive, index) => (
                   <div
                     key={drive.id}
-                    className="group flex flex-col bg-card hover:bg-card/80 border border-border/80 hover:border-brand/30 rounded-xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.01)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.04)] transition-all duration-300 relative overflow-hidden h-full animate-in fade-in slide-in-from-bottom-8 fill-mode-both"
+                    className="group flex flex-col bg-card hover:bg-card/80 border border-border/80 hover:border-brand/30 rounded-lg p-6 shadow-[0_8px_30px_rgb(0,0,0,0.01)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.04)] transition-all duration-300 relative overflow-hidden h-full animate-in fade-in slide-in-from-bottom-8 fill-mode-both"
                     style={{ animationDelay: `${(index % 12) * 50}ms` }}
                   >
                     {/* Top Accent Gradient Line */}

@@ -190,7 +190,7 @@ export default function CertificatesPage() {
               </h2>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center bg-card rounded-lg md:rounded-xl p-5 md:p-10 border border-border shadow-[var(--shadow-md)]">
+            <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center bg-card rounded-lg md:rounded-lg p-5 md:p-10 border border-border shadow-[var(--shadow-md)]">
               <div className="relative group rounded-lg overflow-hidden h-52 sm:h-64 md:h-80">
                 <Image
                   alt="Certificate of Appreciation from TCS"
@@ -349,7 +349,7 @@ export default function CertificatesPage() {
             <div className="max-w-7xl mx-auto px-5 md:px-8 lg:px-20 py-14 md:py-28 relative z-10">
               <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
                 <div className="relative">
-                  <div className="rounded-lg md:rounded-xl overflow-hidden relative h-56 sm:h-72 md:h-96">
+                  <div className="rounded-lg md:rounded-lg overflow-hidden relative h-56 sm:h-72 md:h-96">
                     <Image
                       className="object-cover"
                       alt="Students collaborating at RGI campus"

@@ -100,7 +100,7 @@ export default function MemoriesGallery() {
 
           {/* Masonry Grid Optimized for Mobile */}
           <section>
-            <div className="columns-1 md:columns-2 lg:columns-3 gap-5 md:gap-8">
+            <div className="columns-2 md:columns-3 lg:columns-4 gap-5 md:gap-8">
               {data.map((memory, index) => {
                 const isLastElement = index === data.length - 1;
                 
@@ -161,8 +161,8 @@ export default function MemoriesGallery() {
       {/* Premium Glassmorphic Modal */}
       {selectedImage && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-8 bg-black/80 backdrop-blur-2xl animate-in fade-in duration-500"
-          onClick={() => setSelectedImage(null)}
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/80 backdrop-blur-md animate-in fade-in duration-500"
+          onClick={() =>{ setSelectedImage(null)}}
         >
           {/* Subtle animated background glow */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden flex items-center justify-center">
@@ -170,38 +170,36 @@ export default function MemoriesGallery() {
           </div>
 
           <button
-            className="absolute z-[101] top-4 right-4 md:top-8 md:right-8 text-white/80 p-3 hover:text-white hover:bg-white/20 rounded-full transition-all duration-300 backdrop-blur-md border border-white/10 hover:scale-110 hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] bg-black/20"
+            className="fixed z-[101] top-4 right-4 md:top-8 md:right-8 text-white/80 p-3 hover:text-white hover:bg-white/20 rounded-full transition-all duration-300 backdrop-blur-md border border-white/10 hover:scale-110 shadow-lg bg-black/20"
             onClick={(e) => {
               e.stopPropagation();
               setSelectedImage(null);
             }}
           >
-            <X className="size-4 md:size-6" />
+            <X className="w-5 h-5 md:w-6 md:h-6" />
           </button>
 
           <div
-            className="relative w-full h-full md:h-auto md:max-w-7xl md:max-h-[90vh] flex flex-col items-center justify-center group z-10"
-            onClick={(e) => e.stopPropagation()}
+            className="relative w-full h-full max-h-[85vh] md:max-w-[90vw] lg:max-w-[80vw] mx-auto flex items-center justify-center animate-in zoom-in-[0.98] duration-300"
+            onClick={(e) => {e.stopPropagation(); setSelectedImage(null);}}
           >
-            {/* Image Container with Glow & Glassmorphism */}
-            <div className="relative w-full h-full md:h-auto max-h-[100dvh] md:max-h-[85vh] flex-1 md:rounded-xl overflow-hidden md:border md:border-white/10 md:shadow-2xl transition-all duration-700 bg-black/50 backdrop-blur-sm flex items-center justify-center">
+            {/* Inline-Flex perfectly wraps the intrinsic image dimensions */}
+            <div className="relative inline-flex max-w-full max-h-[85vh] group">
               <img
                 src={selectedImage.imageUrl}
                 alt={selectedImage.title}
                 loading="lazy"
-                className="w-full h-full object-contain md:object-scale-down animate-in zoom-in-[0.97] duration-500 ease-out"
+                className="max-w-full max-h-[85vh] rounded-lg drop-shadow-2xl object-contain"
               />
               
               {/* Glassmorphic Overlay for Info */}
-              <div className="absolute bottom-0 inset-x-0 p-6 md:p-10 bg-gradient-to-t from-black/95 via-black/70 to-transparent opacity-100 md:translate-y-4 md:opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 ease-out flex flex-col pointer-events-none">
-                <h2 className="text-2xl md:text-4xl font-serif text-white leading-tight mb-2 md:mb-3 drop-shadow-lg pointer-events-auto">
+              <div className="absolute bottom-0 inset-x-0 p-6 md:p-8 bg-gradient-to-t from-black/95 via-black/60 to-transparent opacity-100 md:translate-y-4 md:opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 rounded-b-lg flex flex-col pointer-events-none">
+                <h2 className="text-xl md:text-3xl font-serif text-white leading-tight mb-2 drop-shadow-lg pointer-events-auto">
                   {selectedImage.title}
                 </h2>
-                <div className="flex items-center gap-3 pointer-events-auto">
-                  <span className="flex items-center gap-2 text-white/80 font-medium text-xs md:text-sm tracking-[0.2em] uppercase drop-shadow-md">
-                    <Camera className="w-4 h-4 text-brand" />
-                    {selectedImage.uploaderName || "Anonymous"}
-                  </span>
+                <div className="flex items-center gap-2 text-white/80 font-medium text-xs md:text-sm tracking-widest uppercase drop-shadow-md pointer-events-auto">
+                  <Camera className="w-4 h-4 text-brand" />
+                  {selectedImage.uploaderName || "Anonymous"}
                 </div>
               </div>
             </div>

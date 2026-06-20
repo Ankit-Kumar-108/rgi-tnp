@@ -176,7 +176,7 @@ export default function StrategicAlliances() {
                             </h2>
                         </div>
 
-                        <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center bg-card rounded-2xl md:rounded-3xl p-5 md:p-10 border border-border shadow-[var(--shadow-md)]">
+                        <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center bg-card rounded-lg md:rounded-3xl p-5 md:p-10 border border-border shadow-[var(--shadow-md)]">
                             <div className="relative group rounded-lg overflow-hidden h-52 sm:h-64 md:h-80">
                                 <Image
                                     alt="TCS Computer Examination Center at RGI"

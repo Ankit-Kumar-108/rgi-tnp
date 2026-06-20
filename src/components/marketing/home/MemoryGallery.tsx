@@ -16,7 +16,7 @@ export default function MemoryGallery({ memories }: { memories: MemoryData[] }) 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMemory, setSelectedMemory] = useState<MemoryData | null>(null);
   return (
-    <section className="relative z-50 max-w-7xl mx-auto px-4 md:px-8 lg:px-20 section-y">
+    <section className="relative z-40 max-w-7xl mx-auto px-4 md:px-8 lg:px-20 section-y">
       <div className="flex flex-col md:flex-row items-center justify-between mb-10 md:mb-14 gap-4">
         <div className="text-center md:text-left">
           <h2 className="text-2xl md:text-4xl font-black tracking-tight">Life at Radharaman <span className="text-brand">Placements</span></h2>

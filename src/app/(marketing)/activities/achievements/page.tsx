@@ -317,7 +317,7 @@ export default function AchievementsPage() {
 
             {/* Chairman meets APJ Abdul Kalam highlight */}
             <div className="mt-8 md:mt-12 bg-muted rounded-lg  p-5 md:p-8 border border-border flex flex-col md:flex-row items-center gap-5 md:gap-8">
-              <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl bg-brand/10 flex items-center justify-center shrink-0">
+              <div className="w-14 h-14 md:w-16 md:h-16 rounded-lg bg-brand/10 flex items-center justify-center shrink-0">
                 <Star className="w-7 h-7 md:w-8 md:h-8 text-brand" />
               </div>
               <div>
@@ -437,7 +437,7 @@ export default function AchievementsPage() {
 
               {/* Image */}
               <div className="space-y-4">
-                <div className="rounded-lg md:rounded-xl overflow-hidden relative h-56 sm:h-72 md:h-96 group">
+                <div className="rounded-lg md:rounded-lg overflow-hidden relative h-56 sm:h-72 md:h-96 group">
                   <Image
                     className="object-cover group-hover:scale-105 transition-transform duration-700"
                     alt="Academic achievements at RGI"

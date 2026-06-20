@@ -335,7 +335,7 @@ export default function RGIProfile() {
 
               <div className="grid md:grid-cols-2 gap-6 md:gap-8">
                 {/* Vision */}
-                <div className="bg-card rounded-xl p-8 md:p-10 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 relative overflow-hidden">
+                <div className="bg-card rounded-lg p-8 md:p-10 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-40 h-40 bg-brand/5 blur-3xl rounded-full"></div>
                   <div className="relative z-10">
                     <div className="w-14 h-14 rounded-lg bg-brand/10 flex items-center justify-center mb-6">
@@ -355,7 +355,7 @@ export default function RGIProfile() {
                 </div>
 
                 {/* Mission */}
-                <div className="bg-card rounded-xl p-8 md:p-10 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 relative overflow-hidden">
+                <div className="bg-card rounded-lg p-8 md:p-10 border border-border shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-300 relative overflow-hidden">
                   <div className="absolute bottom-0 left-0 w-40 h-40 bg-brand/5 blur-3xl rounded-full"></div>
                   <div className="relative z-10">
                     <div className="w-14 h-14 rounded-lg bg-brand/10 flex items-center justify-center mb-6">
@@ -424,7 +424,7 @@ export default function RGIProfile() {
                       }`}
                     >
                       {/* Dot on line */}
-                      <div className="absolute left-5 md:left-1/2 w-10 h-10 -translate-x-1/2 bg-brand rounded-xl flex items-center justify-center z-10 shadow-lg shadow-brand/20">
+                      <div className="absolute left-5 md:left-1/2 w-10 h-10 -translate-x-1/2 bg-brand rounded-lg flex items-center justify-center z-10 shadow-lg shadow-brand/20">
                         <Icon className="w-5 h-5 text-white" />
                       </div>
 
@@ -489,7 +489,7 @@ export default function RGIProfile() {
                   return (
                     <div
                       key={i}
-                      className={`relative rounded-lg md:rounded-xl overflow-hidden group cursor-pointer ${inst.span}`}
+                      className={`relative rounded-lg md:rounded-lg overflow-hidden group cursor-pointer ${inst.span}`}
                     >
                       <img
                         className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
@@ -500,7 +500,7 @@ export default function RGIProfile() {
                         className={`absolute inset-0 bg-gradient-to-t ${inst.color} opacity-80 group-hover:opacity-90 transition-opacity duration-300`}
                       ></div>
                       <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-end relative z-10">
-                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center mb-3 md:mb-4">
+                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-white/15 backdrop-blur-sm flex items-center justify-center mb-3 md:mb-4">
                           <Icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
                         </div>
                         <h3 className="text-xl md:text-2xl font-black text-white mb-1">
@@ -549,7 +549,7 @@ export default function RGIProfile() {
                         key={i}
                         className="flex items-start gap-4 group"
                       >
-                        <div className="w-11 h-11 rounded-xl bg-brand/10 flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
+                        <div className="w-11 h-11 rounded-lg bg-brand/10 flex items-center justify-center shrink-0 group-hover:bg-brand/20 transition-colors">
                           <Icon className="w-5 h-5 text-brand" />
                         </div>
                         <div>
@@ -640,7 +640,7 @@ export default function RGIProfile() {
 
           {/* CTA BANNER */}
           <section className="max-w-7xl mx-auto px-4 md:px-8 lg:px-20 py-20 md:py-28">
-            <div className="bg-brand rounded-xl p-8 md:p-16 relative overflow-hidden">
+            <div className="bg-brand rounded-lg p-8 md:p-16 relative overflow-hidden">
               {/* Decorative */}
               <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
               <div className="absolute -bottom-20 -left-20 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
