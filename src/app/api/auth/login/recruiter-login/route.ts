@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic';
 import { NextResponse, NextRequest } from "next/server";
 import { recruiterLoginSchema } from "@/lib/validations/recruiter";
 import { getDb } from "@/lib/db";
+import { eq } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 import { verifyPassword } from "@/lib/auth-utils";
 import { signAuthToken, attachAuthCookie } from "@/lib/auth-jwt";
 
@@ -15,8 +17,8 @@ export async function POST(req: NextRequest) {
 
         const db = getDb();
         
-        const recruiter = await db.recruiter.findUnique({
-            where: { email: trimmedEmail }
+        const recruiter = await db.query.recruiter.findFirst({
+            where: eq(schema.recruiter.email, trimmedEmail)
         });
 
         if (!recruiter) {

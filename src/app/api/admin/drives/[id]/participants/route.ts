@@ -1,13 +1,13 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
-// import { Prisma } from "@prisma/client";
 import { getDb } from "@/lib/db";
+import { eq, inArray, and, count } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 import { rejectionEmailTemplate } from "@/lib/email-templates";
 import { shortlistedEmailTemplate } from "@/lib/email-templates";
 import { offerSelectionEmailTemplate } from "@/lib/email-templates";
 import { NotificationService } from "@/lib/notification-service";
-import {runInBackground} from "@/lib/background";
-
+import { runInBackground } from "@/lib/background";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -20,86 +20,82 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const page = isNaN(parsedPage) ? 1 : Math.max(1, parsedPage);
     const skip = (page - 1) * limit;
 
-
     const db = getDb();
 
-    // Explicitly type the query to help the compiler
-    const query: any = {
-      where: { driveId: id },
-      take: limit,
-      skip: skip,
-      select: {
-        id: true,
-        status: true,
-        attended: true,
-        createdAt: true,
-        student: {
-          select: {
-            name: true,
-            enrollmentNumber: true,
-            branch: true,
-            cgpa: true,
-            profileImageUrl: true,
-            email: true,
-            phoneNumber: true,
-            resumeUrl: true,
-            linkedinUrl: true,
-            githubUrl: true,
-            course: true,
-            batch: true,
-            tenthPercentage: true,
-            twelfthPercentage: true,
+    const [registrations, totalCountResult, drive] = await Promise.all([
+      db.query.driveRegistration.findMany({
+        where: eq(schema.driveRegistration.driveId, id),
+        limit,
+        offset: skip,
+        with: {
+          student: {
+            columns: {
+              name: true,
+              enrollmentNumber: true,
+              branch: true,
+              cgpa: true,
+              profileImageUrl: true,
+              email: true,
+              phoneNumber: true,
+              resumeUrl: true,
+              linkedinUrl: true,
+              githubUrl: true,
+              course: true,
+              batch: true,
+              tenthPercentage: true,
+              twelfthPercentage: true,
+            }
+          },
+          externalStudent: {
+            columns: {
+              name: true,
+              enrollmentNumber: true,
+              branch: true,
+              cgpa: true,
+              profileImageUrl: true,
+              email: true,
+              phoneNumber: true,
+              resumeUrl: true,
+              collegeName: true,
+              linkedinUrl: true,
+              githubUrl: true,
+              course: true,
+              batch: true,
+              tenthPercentage: true,
+              twelfthPercentage: true,
+            }
+          },
+          alumni: {
+            columns: {
+              name: true,
+              enrollmentNumber: true,
+              branch: true,
+              profileImageUrl: true,
+              personalEmail: true,
+              phoneNumber: true,
+              linkedInUrl: true,
+              course: true,
+              batch: true,
+              currentCompany: true,
+              jobTitle: true,
+              cgpa: true,
+              twelfthPercentage: true,
+              tenthPercentage: true
+            }
           }
         },
-        externalStudent: {
-          select: {
-            name: true,
-            enrollmentNumber: true,
-            branch: true,
-            cgpa: true,
-            profileImageUrl: true,
-            email: true,
-            phoneNumber: true,
-            resumeUrl: true,
-            collegeName: true,
-            linkedinUrl: true,
-            githubUrl: true,
-            course: true,
-            batch: true,
-            tenthPercentage: true,
-            twelfthPercentage: true,
-          }
-        },
-        alumni: {
-          select: {
-            name: true,
-            enrollmentNumber: true,
-            branch: true,
-            profileImageUrl: true,
-            personalEmail: true,
-            phoneNumber: true,
-            linkedInUrl: true,
-            course: true,
-            batch: true,
-            currentCompany: true,
-            jobTitle: true,
-            cgpa: true,
-            twelfthPercentage: true,
-            tenthPercentage: true
-          }
-        }
-      },
-      orderBy: { createdAt: "desc" }
-    };
-
-    const [registrations, totalCount, drive] = await Promise.all([
-      db.driveRegistration.findMany(query),
-      db.driveRegistration.count({ where: { driveId: id } }),
-      db.placementDrive.findUnique({
-        where: { id },
-        select: { googleSheetUrl: true, companyName: true, roleName: true, status: true }
+        orderBy: (t, { desc }) => [desc(t.createdAt)],
+      }),
+      db.select({ count: count() })
+        .from(schema.driveRegistration)
+        .where(eq(schema.driveRegistration.driveId, id)),
+      db.query.placementDrive.findFirst({
+        where: eq(schema.placementDrive.id, id),
+        columns: { googleSheetUrl: true, companyName: true, roleName: true, status: true }
       })
     ])
+
+    const totalCount = totalCountResult[0]?.count || 0;
 
     return NextResponse.json({ success: true, registrations, drive, totalCount });
   } catch (error) {
@@ -136,13 +132,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     }
 
     // Update all registrations with the new status (synchronous — this is fast)
-    await db.driveRegistration.updateMany({
-      where: {
-        id: { in: registrationIds },
-        driveId: driveId
-      },
-      data: { status }
-    });
+    await db.update(schema.driveRegistration)
+      .set({ status })
+      .where(
+        and(
+          inArray(schema.driveRegistration.id, registrationIds),
+          eq(schema.driveRegistration.driveId, driveId)
+        )
+      );
 
     // Return immediately — emails send in background via Cloudflare waitUntil
     // This prevents 30s timeout when sending to 500+ students
@@ -165,12 +162,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
  */
 async function sendBulkStatusEmails(db: any, registrationIds: string[], status: string) {
   try {
-    const updatedRegistrations = await db.driveRegistration.findMany({
-      where: { id: { in: registrationIds } },
-      select: {
-        id: true,
+    const updatedRegistrations = await db.query.driveRegistration.findMany({
+      where: inArray(schema.driveRegistration.id, registrationIds),
+      with: {
         drive: {
-          select: {
+          columns: {
             companyName: true,
             roleName: true,
             ctc: true,
@@ -178,13 +174,13 @@ async function sendBulkStatusEmails(db: any, registrationIds: string[], status: 
           }
         },
         student: {
-          select: { name: true, email: true, id: true }
+          columns: { name: true, email: true, id: true }
         },
         externalStudent: {
-          select: { name: true, email: true, id: true }
+          columns: { name: true, email: true, id: true }
         },
         alumni: {
-          select: { name: true, personalEmail: true, id: true }
+          columns: { name: true, personalEmail: true, id: true }
         }
       }
     });
@@ -289,3 +285,4 @@ async function sendBulkStatusEmails(db: any, registrationIds: string[], status: 
     console.error(`[BulkEmail] Fatal error in background ${status} email task:`, error);
   }
 }
+

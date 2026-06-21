@@ -1,5 +1,7 @@
 import { getDb } from "./db";
 import { sendEmail } from "./send-email";
+import * as schema from "./schema";
+import { eq, and, inArray } from "drizzle-orm";
 
 interface SendEmailWithLogOptions {
   to: string;
@@ -83,20 +85,18 @@ export class NotificationService {
     const db = getDb();
     if (!to) {
       try {
-        await db.emailLog.create({
-          data: {
-            to: "MISSING_ADDRESS",
-            subject,
-            template,
-            status: "failed",
-            error: "Recipient email is empty or undefined",
-            recipientType: recipientType || null,
-            triggeredBy,
-            approvalId: approvalId || null,
-            approvalType: approvalType || null,
-            actionType: actionType || null
-          },
-        })
+        await db.insert(schema.emailLog).values({
+          to: "MISSING_ADDRESS",
+          subject,
+          template,
+          status: "failed",
+          error: "Recipient email is empty or undefined",
+          recipientType: recipientType || null,
+          triggeredBy,
+          approvalId: approvalId || null,
+          approvalType: approvalType || null,
+          actionType: actionType || null
+        });
       } catch (dbError) {
         console.error(`[NotificationService] Failed to log empty-mail`, dbError);
       }
@@ -106,19 +106,17 @@ export class NotificationService {
     const result = await sendEmail({ to, subject, html });
 
     try {
-      await db.emailLog.create({
-        data: {
-          to,
-          subject,
-          template,
-          status: result.success ? "sent" : "failed",
-          error: result.error || null,
-          recipientType: recipientType || null,
-          triggeredBy,
-          approvalId: approvalId || null,
-          approvalType: approvalType || null,
-          actionType: actionType || null
-        },
+      await db.insert(schema.emailLog).values({
+        to,
+        subject,
+        template,
+        status: result.success ? "sent" : "failed",
+        error: result.error || null,
+        recipientType: recipientType || null,
+        triggeredBy,
+        approvalId: approvalId || null,
+        approvalType: approvalType || null,
+        actionType: actionType || null
       });
     } catch (dbError) {
       console.error("[NotificationService] Failed to create EmailLog record:", dbError);
@@ -143,19 +141,18 @@ export class NotificationService {
   }: CreateInAppNotificationOptions) {
     const db = getDb();
     try {
-      return await db.notification.create({
-        data: {
-          type,
-          title,
-          message,
-          link: link || null,
-          recipientType,
-          studentId: studentId || null,
-          alumniId: alumniId || null,
-          externalStudentId: externalStudentId || null,
-          recruiterId: recruiterId || null,
-        },
-      });
+      const result = await db.insert(schema.notification).values({
+        type,
+        title,
+        message,
+        link: link || null,
+        recipientType,
+        studentId: studentId || null,
+        alumniId: alumniId || null,
+        externalStudentId: externalStudentId || null,
+        recruiterId: recruiterId || null,
+      }).returning();
+      return result[0];
     } catch (error) {
       console.error("[NotificationService] Failed to create in-app notification in DB:", error);
       throw error;
@@ -236,84 +233,83 @@ export class NotificationService {
 
     // Resolve audience lists
     if (audience === "all_students") {
-      const where: any = { isEmailVerified: true };
-      if (course) where.course = course;
-      if (branch) where.branch = branch;
-      if (driveId) where.driveId = driveId
+      const conditions: any[] = [eq(schema.student.isEmailVerified, true)];
+      if (course) conditions.push(eq(schema.student.course, course));
+      if (branch) conditions.push(eq(schema.student.branch, branch));
 
-      const list = await db.student.findMany({
-        where,
-        select: { id: true, name: true, email: true },
+      const list = await db.query.student.findMany({
+        where: and(...conditions),
+        columns: { id: true, name: true, email: true },
       });
-      recipients = list.map((r) => ({ ...r, type: "student" as const }));
+      recipients = list.map((r: any) => ({ ...r, type: "student" as const }));
     } else if (audience === "all_external_students") {
-      const where: any = { isVerified: true };
-      if (course) where.course = course;
-      if (branch) where.branch = branch;
+      const conditions: any[] = [eq(schema.externalStudent.isVerified, true)];
+      if (course) conditions.push(eq(schema.externalStudent.course, course));
+      if (branch) conditions.push(eq(schema.externalStudent.branch, branch));
 
-      const list = await db.externalStudent.findMany({
-        where,
-        select: { id: true, name: true, email: true },
+      const list = await db.query.externalStudent.findMany({
+        where: and(...conditions),
+        columns: { id: true, name: true, email: true },
       });
-      recipients = list.map((r) => ({ ...r, type: "external_student" as const }));
+      recipients = list.map((r: any) => ({ ...r, type: "external_student" as const }));
     } else if (audience === "cs_students") {
-      const list = await db.student.findMany({
-        where: {
-          isEmailVerified: true,
-          branch: { in: ["Computer Science"] },
-        },
-        select: { id: true, name: true, email: true },
+      const list = await db.query.student.findMany({
+        where: and(
+          eq(schema.student.isEmailVerified, true),
+          inArray(schema.student.branch, ["Computer Science"])
+        ),
+        columns: { id: true, name: true, email: true },
       });
-      recipients = list.map((r) => ({ ...r, type: "student" as const }));
+      recipients = list.map((r: any) => ({ ...r, type: "student" as const }));
     } else if (audience === "mech_students") {
-      const list = await db.student.findMany({
-        where: {
-          isEmailVerified: true,
-          branch: { in: ["Mechanical"] },
-        },
-        select: { id: true, name: true, email: true },
+      const list = await db.query.student.findMany({
+        where: and(
+          eq(schema.student.isEmailVerified, true),
+          inArray(schema.student.branch, ["Mechanical"])
+        ),
+        columns: { id: true, name: true, email: true },
       });
-      recipients = list.map((r) => ({ ...r, type: "student" as const }));
+      recipients = list.map((r: any) => ({ ...r, type: "student" as const }));
     } else if (audience === "all_alumnis") {
-      const list = await db.alumni.findMany({
-        where: { isVerified: true },
-        select: { id: true, name: true, personalEmail: true },
+      const list = await db.query.alumni.findMany({
+        where: eq(schema.alumni.isVerified, true),
+        columns: { id: true, name: true, personalEmail: true },
       });
-      recipients = list.map((r) => ({ id: r.id, name: r.name, email: r.personalEmail, type: "alumni" as const }));
+      recipients = list.map((r: any) => ({ id: r.id, name: r.name, email: r.personalEmail, type: "alumni" as const }));
     } else if (audience === "all_recruiters") {
-      const list = await db.recruiter.findMany({
-        select: { id: true, name: true, email: true },
+      const list = await db.query.recruiter.findMany({
+        columns: { id: true, name: true, email: true },
       });
-      recipients = list.map((r) => ({ ...r, type: "recruiter" as const }));
+      recipients = list.map((r: any) => ({ ...r, type: "recruiter" as const }));
     } else if (audience.startsWith("batch_")) {
       const batchYear = audience.replace("batch_", "");
-      const list = await db.student.findMany({
-        where: { isEmailVerified: true, batch: batchYear },
-        select: { id: true, name: true, email: true },
+      const list = await db.query.student.findMany({
+        where: and(eq(schema.student.isEmailVerified, true), eq(schema.student.batch, batchYear)),
+        columns: { id: true, name: true, email: true },
       });
-      recipients = list.map((r) => ({ ...r, type: "student" as const }));
+      recipients = list.map((r: any) => ({ ...r, type: "student" as const }));
     } else if (audience === "selected_drive_participants") {
       if (!registrationIds?.length) {
         return { success: false, message: "No selected participants were provided" }
       }
 
-      const list = await db.driveRegistration.findMany({
-        where: {
-          driveId,
-          id: { in: registrationIds },
-        },
-        select: {
-          student: { select: { id: true, name: true, email: true } },
-          externalStudent: { select: { id: true, name: true, email: true } },
-          alumni: { select: { id: true, name: true, personalEmail: true } }
+      const list = await db.query.driveRegistration.findMany({
+        where: and(
+          driveId ? eq(schema.driveRegistration.driveId, driveId) : undefined,
+          inArray(schema.driveRegistration.id, registrationIds)
+        ),
+        with: {
+          student: { columns: { id: true, name: true, email: true } },
+          externalStudent: { columns: { id: true, name: true, email: true } },
+          alumni: { columns: { id: true, name: true, personalEmail: true } }
         }
       })
-      const rawRecipients = list.map((reg) => {
+      const rawRecipients = list.map((reg: any) => {
         if (reg.student) return { ...reg.student, type: "student" as const }
         if (reg.externalStudent) return { ...reg.externalStudent, type: "external_student" as const }
         if (reg.alumni) return { id: reg.alumni.id, name: reg.alumni.name, email: reg.alumni.personalEmail, type: "alumni" as const }
         return null
-      }).filter((r): r is NonNullable<typeof r> => Boolean(r?.email))
+      }).filter((r: any): r is NonNullable<typeof r> => Boolean(r?.email))
 
       const uniqueMap = new Map<string, typeof rawRecipients[number]>()
       for (const person of rawRecipients) {
@@ -324,20 +320,20 @@ export class NotificationService {
       }
       recipients = Array.from(uniqueMap.values())
     } else if (audience === "all_drive_participants") {
-      const list = await db.driveRegistration.findMany({
-        where: { driveId: driveId },
-        select: {
-          student: { select: { id: true, name: true, email: true } },
-          externalStudent: { select: { id: true, name: true, email: true } },
-          alumni: { select: { id: true, name: true, personalEmail: true } }
+      const list = await db.query.driveRegistration.findMany({
+        where: driveId ? eq(schema.driveRegistration.driveId, driveId) : undefined,
+        with: {
+          student: { columns: { id: true, name: true, email: true } },
+          externalStudent: { columns: { id: true, name: true, email: true } },
+          alumni: { columns: { id: true, name: true, personalEmail: true } }
         }
       })
-      const rawRecipients = list.map((reg) => {
+      const rawRecipients = list.map((reg: any) => {
         if (reg.student) return { ...reg.student, type: "student" as const }
         if (reg.externalStudent) return { ...reg.externalStudent, type: "external_student" as const }
         if (reg.alumni) return { id: reg.alumni.id, name: reg.alumni.name, email: reg.alumni.personalEmail, type: "alumni" as const }
         return null
-      }).filter((r): r is NonNullable<typeof r> => Boolean(r?.email))
+      }).filter((r: any): r is NonNullable<typeof r> => Boolean(r?.email))
       const uniqueMap = new Map<string, typeof rawRecipients[number]>()
       for (const person of rawRecipients) {
         const email = person.email.trim().toLowerCase()
@@ -348,11 +344,11 @@ export class NotificationService {
       recipients = Array.from(uniqueMap.values())
 
     } else if (audience === "internal_drive_participants") {
-      const list = await db.driveRegistration.findMany({
-        where: { driveId: driveId },
-        select: {
+      const list = await db.query.driveRegistration.findMany({
+        where: driveId ? eq(schema.driveRegistration.driveId, driveId) : undefined,
+        with: {
           student: {
-            select: {
+            columns: {
               id: true,
               name: true,
               email: true
@@ -360,10 +356,10 @@ export class NotificationService {
           }
         }
       })
-      const rawRecipients = list.map((reg) => {
+      const rawRecipients = list.map((reg: any) => {
         if (reg.student) return { ...reg.student, type: "student" as const }
         return null
-      }).filter((r): r is NonNullable<typeof r> => Boolean(r?.email))
+      }).filter((r: any): r is NonNullable<typeof r> => Boolean(r?.email))
 
       const uniqueMap = new Map<string, typeof rawRecipients[number]>()
       for (const person of rawRecipients) {
@@ -375,11 +371,11 @@ export class NotificationService {
       recipients = Array.from(uniqueMap.values())
 
     } else if (audience === "external_drive_participants") {
-      const list = await db.driveRegistration.findMany({
-        where: { driveId },
-        select: {
+      const list = await db.query.driveRegistration.findMany({
+        where: driveId ? eq(schema.driveRegistration.driveId, driveId) : undefined,
+        with: {
           externalStudent: {
-            select: {
+            columns: {
               id: true,
               name: true,
               email: true,
@@ -387,10 +383,10 @@ export class NotificationService {
           }
         }
       })
-      const rawRecipients = list.map((reg) => {
+      const rawRecipients = list.map((reg: any) => {
         if (reg.externalStudent) return { ...reg.externalStudent, type: "external_student" as const }
         return null
-      }).filter((r): r is NonNullable<typeof r> => Boolean(r?.email))
+      }).filter((r: any): r is NonNullable<typeof r> => Boolean(r?.email))
 
       const uniqueMap = new Map<string, typeof rawRecipients[number]>()
       for (const person of rawRecipients) {
@@ -401,11 +397,11 @@ export class NotificationService {
       }
       recipients = Array.from(uniqueMap.values())
     } else if (audience === "alumni_drive_participants") {
-      const list = await db.driveRegistration.findMany({
-        where: { driveId },
-        select: {
+      const list = await db.query.driveRegistration.findMany({
+        where: driveId ? eq(schema.driveRegistration.driveId, driveId) : undefined,
+        with: {
           alumni: {
-            select: {
+            columns: {
               id: true,
               name: true,
               personalEmail: true,
@@ -413,7 +409,7 @@ export class NotificationService {
           }
         }
       })
-      const rawRecipients = list.map((reg) => {
+      const rawRecipients = list.map((reg: any) => {
         if (reg.alumni) {
           return {
             id: reg.alumni.id,
@@ -423,7 +419,7 @@ export class NotificationService {
           }
         }
         return null
-      }).filter((r): r is NonNullable<typeof r> => Boolean(r?.email))
+      }).filter((r: any): r is NonNullable<typeof r> => Boolean(r?.email))
 
       const uniqueMap = new Map<string, typeof rawRecipients[number]>()
       for (const person of rawRecipients) {

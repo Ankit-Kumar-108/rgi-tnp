@@ -3,6 +3,9 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
+import { student as studentTable, volunteer as volunteerTable, placementDrive, driveImage } from "@/lib/schema";
+import { eq, count } from "drizzle-orm";
+
 /**
  * POST: Volunteer uploads drive images (up to 4 per drive)
  */
@@ -10,7 +13,7 @@ export async function POST(req: NextRequest) {
   try {
     const studentTokenData = await getVerifiedAuthPayloadFromRequest(req, ["student"]);
 
-    if (!studentTokenData) {
+    if (!studentTokenData || !studentTokenData.enrollmentNumber) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
         { status: 401 }
@@ -42,7 +45,7 @@ export async function POST(req: NextRequest) {
 
     if (imageUrls.length !== 4) {
       return NextResponse.json(
-        { success: false, message: "Exactly 4 image URLLs are required" },
+        { success: false, message: "Exactly 4 image URLs are required" },
         { status: 400 }
       );
     }
@@ -57,23 +60,23 @@ export async function POST(req: NextRequest) {
     const db = getDb();
 
     // Get student and verify volunteer status
-    const student = await db.student.findUnique({
-      where: { enrollmentNumber: studentTokenData.enrollmentNumber },
-      select: { id: true, email: true },
+    const studentData = await db.query.student.findFirst({
+      where: eq(studentTable.enrollmentNumber, studentTokenData.enrollmentNumber),
+      columns: { id: true, email: true },
     });
 
-    if (!student) {
+    if (!studentData) {
       return NextResponse.json(
         { success: false, message: "Student not found" },
         { status: 404 }
       );
     }
 
-    const volunteer = await db.volunteer.findUnique({
-      where: { studentId: student.id },
+    const volunteerData = await db.query.volunteer.findFirst({
+      where: eq(volunteerTable.studentId, studentData.id),
     });
 
-    if (!volunteer) {
+    if (!volunteerData) {
       return NextResponse.json(
         { success: false, message: "Not authorized as volunteer" },
         { status: 403 }
@@ -81,8 +84,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Verify drive exists
-    const drive = await db.placementDrive.findUnique({
-      where: { id: driveId },
+    const drive = await db.query.placementDrive.findFirst({
+      where: eq(placementDrive.id, driveId),
     });
 
     if (!drive) {
@@ -93,9 +96,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Check existing image count for this drive (max 4 total)
-    const existingCount = await db.driveImage.count({
-      where: { driveId },
-    });
+    const existingCountResult = await db.select({ count: count() }).from(driveImage).where(eq(driveImage.driveId, driveId));
+    const existingCount = existingCountResult[0]?.count || 0;
 
     if (existingCount + imageUrls.length > 4) {
       return NextResponse.json(
@@ -107,19 +109,20 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create all DriveImage records
-    const createdImages = await db.$transaction(
+    // Create all DriveImage records in batch
+    const createdImagesResult = await db.batch(
       imageUrls.map((url) =>
-        db.driveImage.create({
-          data: {
-            title,
-            imageUrl: url,
-            driveId,
-            uploadedBy: student.email,
-          },
-        })
-      )
-    );
+        db.insert(driveImage).values({
+          title,
+          imageUrl: url,
+          driveId,
+          uploadedBy: studentData.email,
+          createdAt: new Date().toISOString(),
+        }).returning()
+      ) as any
+    ) as any[][];
+
+    const createdImages = createdImagesResult.map(res => res[0]);
 
     return NextResponse.json({ success: true, driveImages: createdImages });
   } catch (error) {
@@ -138,7 +141,7 @@ export async function GET(req: NextRequest) {
   try {
     const studentTokenData = await getVerifiedAuthPayloadFromRequest(req, ["student"]);
 
-    if (!studentTokenData) {
+    if (!studentTokenData || !studentTokenData.enrollmentNumber) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
         { status: 401 }
@@ -148,23 +151,23 @@ export async function GET(req: NextRequest) {
     const db = getDb();
 
     // Get student and verify volunteer status
-    const student = await db.student.findUnique({
-      where: { enrollmentNumber: studentTokenData.enrollmentNumber },
-      select: { id: true, email: true },
+    const studentData = await db.query.student.findFirst({
+      where: eq(studentTable.enrollmentNumber, studentTokenData.enrollmentNumber),
+      columns: { id: true, email: true },
     });
 
-    if (!student) {
+    if (!studentData) {
       return NextResponse.json(
         { success: false, message: "Student not found" },
         { status: 404 }
       );
     }
 
-    const volunteer = await db.volunteer.findUnique({
-      where: { studentId: student.id },
+    const volunteerData = await db.query.volunteer.findFirst({
+      where: eq(volunteerTable.studentId, studentData.id),
     });
 
-    if (!volunteer) {
+    if (!volunteerData) {
       return NextResponse.json(
         { success: false, message: "Not authorized as volunteer" },
         { status: 403 }
@@ -178,23 +181,22 @@ export async function GET(req: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1", 10);
     const skip = (page - 1) * limit;
 
-    let where: any = {};
-    if (driveId) {
-      where.driveId = driveId;
-    }
+    const whereClause = driveId ? eq(driveImage.driveId, driveId) : undefined;
 
-    const [images, totalCount] = await Promise.all([
-      db.driveImage.findMany({
-        where,
-        take: limit,
-        skip,
-        include: {
-          drive: { select: { id: true, companyName: true, driveDate: true } },
+    const [images, totalCountResult] = await Promise.all([
+      db.query.driveImage.findMany({
+        where: whereClause,
+        limit: limit,
+        offset: skip,
+        with: {
+          drive: { columns: { id: true, companyName: true, driveDate: true } },
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: (t, { desc }) => [desc(t.createdAt)],
       }),
-      db.driveImage.count({ where }),
+      db.select({ count: count() }).from(driveImage).where(whereClause),
     ]);
+
+    const totalCount = totalCountResult[0]?.count || 0;
 
     return NextResponse.json({
       success: true,

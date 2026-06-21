@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { externalStudentRegistrationSchema } from "@/lib/validations/external-student";
 import { hashPassword, generateVerificationToken, getresetTokenExpiry } from "@/lib/auth-utils";
 import { getDb } from "@/lib/db";
+import { eq } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 import { verificationEmailTemplate } from "@/lib/email-templates";
 import { NotificationService } from "@/lib/notification-service";
 
@@ -27,8 +29,8 @@ export async function POST(req: NextRequest) {
       phoneNumber: validatedData.phoneNumber.trim(),
     };
 
-    const emailExists = await db.externalStudent.findUnique({
-      where: { email: trimmedData.email },
+    const emailExists = await db.query.externalStudent.findFirst({
+      where: eq(schema.externalStudent.email, trimmedData.email),
     });
 
     if (emailExists) {
@@ -43,28 +45,27 @@ export async function POST(req: NextRequest) {
     const verificationToken = generateVerificationToken();
     const verificationTokenExpiry = getresetTokenExpiry();
 
-    const externalStudent = await db.externalStudent.create({
-      data: {
-        name: trimmedData.name,
-        collegeName: trimmedData.collegeName,
-        enrollmentNumber: trimmedData.enrollmentNumber,
-        email: trimmedData.email,
-        gender: trimmedData.gender,
-        branch: trimmedData.branch,
-        course: trimmedData.course,
-        batch: trimmedData.batch,
-        semester: trimmedData.semester,
-        cgpa: trimmedData.cgpa,
-        resumeUrl: trimmedData.resumeUrl,
-        phoneNumber: trimmedData.phoneNumber,
-        passwordHash: passwordHash,
-        profileImageUrl: trimmedData.profileImageUrl || "",
-        emailVerificationToken: verificationToken,
-        emailVerificationTokenExpiry: verificationTokenExpiry,
-        tenthPercentage: 0,
-        twelfthPercentage: 0,
-      },
-    });
+    const result = await db.insert(schema.externalStudent).values({
+      name: trimmedData.name,
+      collegeName: trimmedData.collegeName,
+      enrollmentNumber: trimmedData.enrollmentNumber,
+      email: trimmedData.email,
+      gender: trimmedData.gender,
+      branch: trimmedData.branch,
+      course: trimmedData.course,
+      batch: trimmedData.batch,
+      semester: trimmedData.semester,
+      cgpa: trimmedData.cgpa,
+      resumeUrl: trimmedData.resumeUrl,
+      phoneNumber: trimmedData.phoneNumber,
+      passwordHash: passwordHash,
+      profileImageUrl: trimmedData.profileImageUrl || "",
+      emailVerificationToken: verificationToken,
+      emailVerificationTokenExpiry: verificationTokenExpiry,
+      tenthPercentage: 0,
+      twelfthPercentage: 0,
+    }).returning();
+    const externalStudent = result[0];
 
     const host = req.headers.get("host");
     const protocol = host?.includes("localhost") ? "http" : "https";
@@ -84,13 +85,10 @@ export async function POST(req: NextRequest) {
 
     if (!emailResult.success) {
       console.error("[EXTERNAL-STUDENT-REGISTER] Email verification failed for:", trimmedData.email, emailResult.error);
-      await db.externalStudent.update({
-        where: { id: externalStudent.id },
-        data: {
-          emailVerificationFailed: true,
-          emailVerificationError: emailResult.error || "Unknown email service error"
-        }
-      });
+      await db.update(schema.externalStudent).set({
+        emailVerificationFailed: true,
+        emailVerificationError: emailResult.error || "Unknown email service error"
+      }).where(eq(schema.externalStudent.id, externalStudent.id));
       return NextResponse.json(
         {
           success: false,

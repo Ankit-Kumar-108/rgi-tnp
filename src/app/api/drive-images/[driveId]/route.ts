@@ -3,6 +3,9 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 
+import { eq, desc } from "drizzle-orm";
+import { driveImage } from "@/lib/schema";
+
 // GET: Fetch drive images by driveId (public endpoint)
 export async function GET(
   req: NextRequest,
@@ -14,9 +17,9 @@ export async function GET(
 
     // Fetch images without including drive info (already have driveId)
     // This eliminates the N+1 query problem
-    const images = await db.driveImage.findMany({
-      where: { driveId },
-      select: {
+    const images = await db.query.driveImage.findMany({
+      where: eq(driveImage.driveId, driveId),
+      columns: {
         id: true,
         title: true,
         imageUrl: true,
@@ -24,8 +27,8 @@ export async function GET(
         createdAt: true,
         uploadedBy: true,
       },
-      orderBy: { createdAt: "desc" },
-      take: 100, // Limit results to prevent huge responses
+      orderBy: [desc(driveImage.createdAt)],
+      limit: 100, // Limit results to prevent huge responses
     });
 
     if (images.length === 0) {

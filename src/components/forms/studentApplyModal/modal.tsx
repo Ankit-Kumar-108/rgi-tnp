@@ -299,36 +299,51 @@ export default function JobDetailsModal({
                 </div>
 
                 {/* Sticky Footer CTA */}
-                {!readonly && (
-                    <div className="px-6 py-5 md:px-8 bg-background border-t border-border flex items-center justify-between gap-6 shrink-0 rounded-b-[2.5rem]">
-                        <div className="hidden sm:block">
-                            <p className="text-sm font-bold text-foreground">Active Placement Drive</p>
-                            <p className="text-xs text-brand font-medium mt-0.5">Register in {getDaysLeft()}</p>
-                        </div>
-                        <div className="flex-1 sm:flex-none flex flex-col sm:flex-row items-center gap-4">
-                            <button
-                                onClick={() => registerForDrive()}
-                                disabled={registering}
-                                className="w-full sm:w-auto px-8 py-3.5 rounded-lg bg-brand text-primary-foreground font-black shadow-lg shadow-brand/30 hover:shadow-brand/40 transition-all active:scale-95 flex items-center justify-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                                {publicMode ?
-                                    "Login to Apply"
-                                    :
-                                    isRegistered ?
-                                        "Registered"
+                {!readonly && (() => {
+                    const isAlumniIneligible = role === "alumni" && !isRegistered && (drive as any).isEligible === false;
+                    return (
+                        <div className="px-6 py-5 md:px-8 bg-background border-t border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shrink-0 rounded-b-[2.5rem]">
+                            <div className="w-full sm:w-auto">
+                                {isAlumniIneligible ? (
+                                    <div className="text-red-500 text-xs font-semibold max-w-md">
+                                        <span className="font-bold block mb-0.5">Eligibility Mismatch:</span>
+                                        {(drive as any).ineligibilityReason}
+                                    </div>
+                                ) : (
+                                    <div className="hidden sm:block">
+                                        <p className="text-sm font-bold text-foreground">Active Placement Drive</p>
+                                        <p className="text-xs text-brand font-medium mt-0.5">Register in {getDaysLeft()}</p>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="w-full sm:w-auto flex flex-col sm:flex-row items-center gap-4">
+                                <button
+                                    onClick={() => registerForDrive()}
+                                    disabled={registering || isAlumniIneligible}
+                                    className="w-full sm:w-auto px-8 py-3.5 rounded-lg bg-brand text-primary-foreground font-black shadow-lg shadow-brand/30 hover:shadow-brand/40 transition-all active:scale-95 flex items-center justify-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                                    {publicMode ?
+                                        "Login to Apply"
                                         :
-                                        registering ?
-                                            (
-                                                <div className="flex items-center justify-center gap-2">
-                                                    <div className="w-4 h-4 animate-spin rounded-full border-2 border-t-brand border-r-brand border-b-brand border-l-transparent">
-                                                    </div>
-                                                    Registering...
-                                                </div>
-                                            ) :
-                                            "Apply for Role"}
-                            </button>
+                                        isRegistered ?
+                                            "Registered"
+                                            :
+                                            isAlumniIneligible ?
+                                                "Not Eligible"
+                                                :
+                                                registering ?
+                                                    (
+                                                        <div className="flex items-center justify-center gap-2">
+                                                            <div className="w-4 h-4 animate-spin rounded-full border-2 border-t-brand border-r-brand border-b-brand border-l-transparent">
+                                                            </div>
+                                                            Registering...
+                                                        </div>
+                                                    ) :
+                                                    "Apply for Role"}
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                )}
+                    );
+                })()}
 
             </div>
         </div>

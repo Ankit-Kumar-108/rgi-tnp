@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { eq, count, and, or, like } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 import { NotificationService } from "@/lib/notification-service";
 
 /**
@@ -21,43 +23,52 @@ export async function GET(req: NextRequest) {
     const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
     const skip = (page - 1) * limit;
 
-    // Build Prisma query condition
-    const where: any = {};
+    // Build conditions
+    const conditions: any[] = [];
 
     if (search) {
-      where.OR = [
-        { to: { contains: search } },
-        { subject: { contains: search } },
-      ];
+      conditions.push(
+        or(
+          like(schema.emailLog.to, `%${search}%`),
+          like(schema.emailLog.subject, `%${search}%`)
+        )
+      );
     }
 
     if (status !== "all") {
-      where.status = status;
+      conditions.push(eq(schema.emailLog.status, status));
     }
 
     if (type !== "all") {
-      where.template = type;
+      conditions.push(eq(schema.emailLog.template, type));
     }
 
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
     // Execute queries in parallel
-    const [items, totalCount, stats] = await Promise.all([
-      db.emailLog.findMany({
-        where,
-        orderBy: { createdAt: "desc" },
-        take: limit,
-        skip,
+    const [items, totalCountResult, statsRows] = await Promise.all([
+      db.query.emailLog.findMany({
+        where: whereClause,
+        orderBy: (t, { desc }) => [desc(t.createdAt)],
+        limit,
+        offset: skip,
       }),
-      db.emailLog.count({ where }),
-      db.emailLog.groupBy({
-        by: ["status"],
-        _count: true,
-      }),
+      db.select({ count: count() }).from(schema.emailLog).where(whereClause),
+      db.select({
+        status: schema.emailLog.status,
+        cnt: count(),
+      })
+      .from(schema.emailLog)
+      .where(whereClause)
+      .groupBy(schema.emailLog.status),
     ]);
 
+    const totalCount = totalCountResult[0]?.count || 0;
+
     // Format metrics
-    const totalSent = stats.reduce((acc, curr) => acc + curr._count, 0);
-    const sentSuccess = stats.find((s) => s.status === "sent")?._count || 0;
-    const sentFailed = stats.find((s) => s.status === "failed")?._count || 0;
+    const totalSent = statsRows.reduce((acc, curr) => acc + curr.cnt, 0);
+    const sentSuccess = statsRows.find((s) => s.status === "sent")?.cnt || 0;
+    const sentFailed = statsRows.find((s) => s.status === "failed")?.cnt || 0;
 
     return NextResponse.json({
       success: true,
@@ -171,3 +182,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

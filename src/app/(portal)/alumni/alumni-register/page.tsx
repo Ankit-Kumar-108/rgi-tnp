@@ -35,6 +35,7 @@ export default function AlumniRegister() {
     const [form, setForm] = useState({
         name: "", personalEmail: "", enrollmentNumber: "",
         course: "", batch: "", branch: "",
+        gender: "", cgpa: "",
         password: "", confirmPassword: "",
     });
 
@@ -359,6 +360,31 @@ export default function AlumniRegister() {
                                     <option value="Finance">Finance</option>
                                     <option value="Human Resource">Human Resource</option>
                                 </select>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                                <div className="space-y-1">
+                                    <label className="text-xs sm:text-sm font-semibold text-foreground">Gender</label>
+                                    <select className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} required value={form.gender} onChange={update("gender")}>
+                                        <option value="">Select Gender</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-xs sm:text-sm font-semibold text-foreground">CGPA</label>
+                                    <input 
+                                        className={inputClass.replace('pl-10 sm:pl-11', 'pl-3 sm:pl-4')} 
+                                        type="number" 
+                                        step="0.01" 
+                                        min="0" 
+                                        max="10" 
+                                        placeholder="e.g. 8.5" 
+                                        required 
+                                        value={form.cgpa} 
+                                        onChange={update("cgpa")} 
+                                    />
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-1 sm:pt-2">

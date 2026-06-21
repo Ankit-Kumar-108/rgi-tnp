@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { eq, and, sql } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 import { getMaxSemestersForCourse } from "@/lib/constants";
 import { NotificationService } from "@/lib/notification-service";
 import { alumniTransferTemplate } from "@/lib/email-templates";
@@ -43,8 +45,8 @@ export async function POST(req: NextRequest) {
 
     for (const studentId of studentIds) {
       try {
-        const student = await db.student.findUnique({
-          where: { id: studentId },
+        const student = await db.query.student.findFirst({
+          where: eq(schema.student.id, studentId),
         });
 
         if (!student) {
@@ -63,8 +65,8 @@ export async function POST(req: NextRequest) {
           continue;
         }
 
-        const existingAlumni = await db.alumni.findUnique({
-          where: { enrollmentNumber: student.enrollmentNumber },
+        const existingAlumni = await db.query.alumni.findFirst({
+          where: eq(schema.alumni.enrollmentNumber, student.enrollmentNumber),
         });
 
         if (existingAlumni) {
@@ -74,8 +76,8 @@ export async function POST(req: NextRequest) {
           continue;
         }
 
-        const emailExists = await db.alumni.findUnique({
-          where: { personalEmail: student.email },
+        const emailExists = await db.query.alumni.findFirst({
+          where: eq(schema.alumni.personalEmail, student.email),
         });
 
         if (emailExists) {
@@ -87,16 +89,9 @@ export async function POST(req: NextRequest) {
           continue;
         }
 
-        await db.$executeRawUnsafe(
-          `INSERT OR REPLACE INTO "AlumniMaster" ("id", "enrollmentNumber", "name", "branch", "course", "batch")
-           VALUES (COALESCE((SELECT "id" FROM "AlumniMaster" WHERE "enrollmentNumber" = ?), ?), ?, ?, ?, ?, ?)`,
-          student.enrollmentNumber,
-          generateId(),
-          student.enrollmentNumber,
-          student.name,
-          student.branch,
-          student.course,
-          student.batch
+        await db.run(
+          sql`INSERT OR REPLACE INTO "AlumniMaster" ("id", "enrollmentNumber", "name", "branch", "course", "batch")
+              VALUES (COALESCE((SELECT "id" FROM "AlumniMaster" WHERE "enrollmentNumber" = ${student.enrollmentNumber}), ${generateId()}), ${student.enrollmentNumber}, ${student.name}, ${student.branch}, ${student.course}, ${student.batch})`
         );
 
         let placementSnapsJson: any[] = [];
@@ -108,8 +103,8 @@ export async function POST(req: NextRequest) {
           }];
         }
 
-        const newAlumni = await db.alumni.create({
-          data: {
+        const insertResult = await db.insert(schema.alumni)
+          .values({
             name: student.name,
             enrollmentNumber: student.enrollmentNumber,
             personalEmail: student.email,
@@ -130,25 +125,24 @@ export async function POST(req: NextRequest) {
             twelfthPercentage: student.twelfthPercentage,
             tenthPercentage: student.tenthPercentage,
             gender: student.gender
-          },
-        });
+          })
+          .returning();
+        const newAlumni = insertResult[0];
 
-        await db.memory.updateMany({
-          where: { studentId: student.id },
-          data: { studentId: null, alumniId: newAlumni.id },
-        });
+        await db.update(schema.memory)
+          .set({ studentId: null, alumniId: newAlumni.id })
+          .where(eq(schema.memory.studentId, student.id));
 
-        await db.notification.updateMany({
-          where: { studentId: student.id },
-          data: { studentId: null, alumniId: newAlumni.id, recipientType: "alumni" },
-        });
+        await db.update(schema.notification)
+          .set({ studentId: null, alumniId: newAlumni.id, recipientType: "alumni" })
+          .where(eq(schema.notification.studentId, student.id));
 
-        await db.driveRegistration.deleteMany({ where: { studentId: student.id } });
-        await db.studentFeedback.deleteMany({ where: { studentId: student.id } });
-        await db.volunteerStudentStatus.deleteMany({ where: { studentId: student.id } });
-        await db.volunteer.deleteMany({ where: { studentId: student.id } });
+        await db.delete(schema.driveRegistration).where(eq(schema.driveRegistration.studentId, student.id));
+        await db.delete(schema.studentFeedback).where(eq(schema.studentFeedback.studentId, student.id));
+        await db.delete(schema.volunteerStudentStatus).where(eq(schema.volunteerStudentStatus.studentId, student.id));
+        await db.delete(schema.volunteer).where(eq(schema.volunteer.studentId, student.id));
 
-        await db.student.delete({ where: { id: student.id } });
+        await db.delete(schema.student).where(eq(schema.student.id, student.id));
 
         const host = req.headers.get("host");
         const protocol = host?.includes("localhost") ? "http" : "https";
@@ -168,7 +162,7 @@ export async function POST(req: NextRequest) {
 
         transferred++;
       } catch (err: any) {
-        // Perstudent catch so one failure doesn't stop the batch
+        // Per-student catch so one failure doesn't stop the batch
         const msg = err?.message || String(err);
         console.error(`[TRANSFER] Failed for student ${studentId}:`, msg);
         if (errors.length < 5) errors.push(`${studentId}: ${msg}`);
@@ -191,3 +185,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

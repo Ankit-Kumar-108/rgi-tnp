@@ -3,12 +3,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
 import { normalizeAcademicScoreToCgpa } from "@/lib/cgpa-utils";
+import { placementDrive } from "@/lib/schema";
+import { eq } from "drizzle-orm";
 
 // POST: Create a new drive request
 export async function POST(req: NextRequest) {
   try {
     const recruiter = await getVerifiedAuthPayloadFromRequest(req, ["recruiter"]);
-    if (!recruiter) {
+    if (!recruiter || !recruiter.id) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
@@ -34,28 +36,27 @@ export async function POST(req: NextRequest) {
 
     const db = getDb();
 
-    const drive = await db.placementDrive.create({
-      data: {
-        companyName: body.companyName,
-        roleName: body.roleName,
-        jobDescription: body.jobDescription,
-        ctc: body.ctc,
-        eligibleBranches: body.eligibleBranches,
-        minCGPA: normalizeAcademicScoreToCgpa(body.minCGPA) ?? 0,
-        minBatch: body.minBatch,
-        maxBatch: body.maxBatch,
-        course: body.course,
-        driveDate: new Date(body.driveDate),
-        driveType: body.driveType || "Closed",
-        jobType: body.jobType || "Full-Time",
-        genderPreference: body.genderPreference || "Both",
-        duration: body.duration || null,
-        interviewProcess: body.interviewProcess || null,
-        status: "pending",
-        recruiter: { connect: { id: recruiter.id } },
-        allowAlumni: body.allowAlumni || false,
-      },
-    });
+    const driveResult = await db.insert(placementDrive).values({
+      companyName: body.companyName,
+      roleName: body.roleName,
+      jobDescription: body.jobDescription,
+      ctc: body.ctc,
+      eligibleBranches: body.eligibleBranches,
+      minCGPA: normalizeAcademicScoreToCgpa(body.minCGPA) ?? 0,
+      minBatch: body.minBatch,
+      maxBatch: body.maxBatch,
+      course: body.course,
+      driveDate: new Date(body.driveDate),
+      driveType: body.driveType || "Closed",
+      jobType: body.jobType || "Full-Time",
+      genderPreference: body.genderPreference || "Both",
+      duration: body.duration || null,
+      interviewProcess: body.interviewProcess || null,
+      status: "pending",
+      recruiterId: recruiter.id,
+      allowAlumni: body.allowAlumni || false,
+    }).returning();
+    const drive = driveResult[0];
 
     return NextResponse.json({ success: true, message: "Drive request submitted for admin approval", drive });
   } catch (error) {
@@ -68,7 +69,7 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const recruiter = await getVerifiedAuthPayloadFromRequest(req, ["recruiter"]);
-    if (!recruiter) {
+    if (!recruiter || !recruiter.id) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
@@ -95,35 +96,34 @@ export async function PUT(req: NextRequest) {
     const db = getDb();
 
     // Ensure the drive actually belongs to this recruiter
-    const existingDrive = await db.placementDrive.findUnique({
-      where: { id: body.id },
+    const existingDrive = await db.query.placementDrive.findFirst({
+      where: eq(placementDrive.id, body.id),
     });
 
     if (!existingDrive || existingDrive.recruiterId !== recruiter.id) {
       return NextResponse.json({ success: false, message: "Unauthorized to edit this drive" }, { status: 403 });
     }
 
-    const updatedDrive = await db.placementDrive.update({
-      where: { id: body.id },
-      data: {
-        companyName: body.companyName,
-        roleName: body.roleName,
-        jobDescription: body.jobDescription,
-        ctc: body.ctc,
-        eligibleBranches: body.eligibleBranches,
-        minCGPA: normalizeAcademicScoreToCgpa(body.minCGPA) ?? 0,
-        minBatch: body.minBatch,
-        maxBatch: body.maxBatch,
-        course: body.course,
-        driveDate: new Date(body.driveDate),
-        driveType: body.driveType || existingDrive.driveType,
-        jobType: body.jobType || existingDrive.jobType,
-        genderPreference: body.genderPreference || existingDrive.genderPreference,
-        duration: body.duration || existingDrive.duration,
-        interviewProcess: body.interviewProcess || existingDrive.interviewProcess,
-        allowAlumni: body.allowAlumni ?? existingDrive.allowAlumni,
-      },
-    });
+    const updatedDriveResult = await db.update(placementDrive).set({
+      companyName: body.companyName,
+      roleName: body.roleName,
+      jobDescription: body.jobDescription,
+      ctc: body.ctc,
+      eligibleBranches: body.eligibleBranches,
+      minCGPA: normalizeAcademicScoreToCgpa(body.minCGPA) ?? 0,
+      minBatch: body.minBatch,
+      maxBatch: body.maxBatch,
+      course: body.course,
+      driveDate: new Date(body.driveDate),
+      driveType: body.driveType || existingDrive.driveType,
+      jobType: body.jobType || existingDrive.jobType,
+      genderPreference: body.genderPreference || existingDrive.genderPreference,
+      duration: body.duration || existingDrive.duration,
+      interviewProcess: body.interviewProcess || existingDrive.interviewProcess,
+      allowAlumni: body.allowAlumni ?? existingDrive.allowAlumni,
+      updatedAt: new Date().toISOString(),
+    }).where(eq(placementDrive.id, body.id)).returning();
+    const updatedDrive = updatedDriveResult[0];
 
     return NextResponse.json({ success: true, message: "Drive updated successfully", drive: updatedDrive });
   } catch (error) {

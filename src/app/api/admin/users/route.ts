@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { eq, inArray, and, or, like, gte, notInArray, count } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 import { deleteMultipleFromR2 } from "@/lib/r2-delete";
 import { COURSE_SEMESTER_MAP, MAX_SEMESTERS } from "@/lib/constants";
 
@@ -22,41 +24,42 @@ export async function GET(req: NextRequest) {
     const db = getDb();
 
     if (role === "student") {
-      const where: any = {};
-      if (branch) where.branch = branch;
-      
-      const searchOr = search ? [
-        { name: { contains: search } },
-        { enrollmentNumber: { contains: search } },
-        { email: { contains: search } },
-      ] : undefined;
-
-      const passoutOr = passoutOnly ? [
-        ...Object.entries(COURSE_SEMESTER_MAP).map(([course, maxSems]) => ({
-          course,
-          semester: { gte: maxSems }
-        })),
-        {
-          course: { notIn: Object.keys(COURSE_SEMESTER_MAP) },
-          semester: { gte: MAX_SEMESTERS }
-        }
-      ] : undefined;
-
-      if (searchOr && passoutOr) {
-        where.AND = [
-          { OR: searchOr },
-          { OR: passoutOr }
-        ];
-      } else if (searchOr) {
-        where.OR = searchOr;
-      } else if (passoutOr) {
-        where.OR = passoutOr;
+      const conditions: any[] = [];
+      if (branch) {
+        conditions.push(eq(schema.student.branch, branch));
+      }
+      if (search) {
+        conditions.push(
+          or(
+            like(schema.student.name, `%${search}%`),
+            like(schema.student.enrollmentNumber, `%${search}%`),
+            like(schema.student.email, `%${search}%`)
+          )
+        );
+      }
+      if (passoutOnly) {
+        conditions.push(
+          or(
+            ...Object.entries(COURSE_SEMESTER_MAP).map(([course, maxSems]) => 
+              and(
+                eq(schema.student.course, course),
+                gte(schema.student.semester, maxSems)
+              )
+            ),
+            and(
+              notInArray(schema.student.course, Object.keys(COURSE_SEMESTER_MAP)),
+              gte(schema.student.semester, MAX_SEMESTERS)
+            )
+          )
+        );
       }
 
-      const [students, totalCount] = await Promise.all([
-        db.student.findMany({
-          where,
-          select: {
+      const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+      const [students, totalCountResult] = await Promise.all([
+        db.query.student.findMany({
+          where: whereClause,
+          columns: {
             id: true,
             name: true,
             enrollmentNumber: true,
@@ -74,29 +77,35 @@ export async function GET(req: NextRequest) {
             course: true,
             batch: true,
           },
-          orderBy: { createdAt: "desc" },
-          take: limit,
-          skip: skip,
+          orderBy: (t, { desc }) => [desc(t.createdAt)],
+          limit,
+          offset: skip,
         }),
-        db.student.count({ where })
-      ])
+        db.select({ count: count() }).from(schema.student).where(whereClause)
+      ]);
       
+      const totalCount = totalCountResult[0]?.count || 0;
       return NextResponse.json({ success: true, users: students, role, totalCount });
     }
 
     if (role === "alumni") {
-      const where: any = {};
+      const conditions: any[] = [];
       if (search) {
-        where.OR = [
-          { name: { contains: search } },
-          { enrollmentNumber: { contains: search } },
-          { personalEmail: { contains: search } },
-        ];
+        conditions.push(
+          or(
+            like(schema.alumni.name, `%${search}%`),
+            like(schema.alumni.enrollmentNumber, `%${search}%`),
+            like(schema.alumni.personalEmail, `%${search}%`)
+          )
+        );
       }
 
-      const [alumni, totalCount] = await Promise.all([
-        db.alumni.findMany({
-          select: {
+      const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+      const [alumni, totalCountResult] = await Promise.all([
+        db.query.alumni.findMany({
+          where: whereClause,
+          columns: {
             id: true,
             name: true,
             enrollmentNumber: true,
@@ -112,32 +121,35 @@ export async function GET(req: NextRequest) {
             linkedInUrl: true,
             course: true,
             batch: true,
-            
           },
-          orderBy: { createdAt: "desc" },
-          take: limit,
-          skip: skip,
+          orderBy: (t, { desc }) => [desc(t.createdAt)],
+          limit,
+          offset: skip,
         }),
-        db.alumni.count({ where })
-      ])
+        db.select({ count: count() }).from(schema.alumni).where(whereClause)
+      ]);
+      const totalCount = totalCountResult[0]?.count || 0;
       return NextResponse.json({ success: true, users: alumni, role, totalCount });
     }
 
-
     if (role === "recruiter") {
-      const where: any = {};
+      const conditions: any[] = [];
       if (search) {
-        where.OR = [
-          { name: { contains: search } },
-          { email: { contains: search } },
-          { company: { contains: search } },
-        ];
+        conditions.push(
+          or(
+            like(schema.recruiter.name, `%${search}%`),
+            like(schema.recruiter.email, `%${search}%`),
+            like(schema.recruiter.company, `%${search}%`)
+          )
+        );
       }
 
-      const [recruiters, totalCount] = await Promise.all([
-        db.recruiter.findMany({
-          where,
-          select: {
+      const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+      const [recruiters, totalCountResult] = await Promise.all([
+        db.query.recruiter.findMany({
+          where: whereClause,
+          columns: {
             id: true,
             name: true,
             email: true,
@@ -145,28 +157,33 @@ export async function GET(req: NextRequest) {
             designation: true,
             phoneNumber: true,
           },
-          take: limit,
-          skip: skip,
+          limit,
+          offset: skip,
         }),
-        db.recruiter.count({ where })
-      ])
+        db.select({ count: count() }).from(schema.recruiter).where(whereClause)
+      ]);
+      const totalCount = totalCountResult[0]?.count || 0;
       return NextResponse.json({ success: true, users: recruiters, role, totalCount });
     }
 
     if (role === "external") {
-      const where: any = {};
+      const conditions: any[] = [];
       if (search) {
-        where.OR = [
-          { name: { contains: search } },
-          { enrollmentNumber: { contains: search } },
-          { email: { contains: search } },
-        ];
+        conditions.push(
+          or(
+            like(schema.externalStudent.name, `%${search}%`),
+            like(schema.externalStudent.enrollmentNumber, `%${search}%`),
+            like(schema.externalStudent.email, `%${search}%`)
+          )
+        );
       }
 
-      const [externals, totalCount] = await Promise.all([
-        db.externalStudent.findMany({
-          where,
-          select: {
+      const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+      const [externals, totalCountResult] = await Promise.all([
+        db.query.externalStudent.findMany({
+          where: whereClause,
+          columns: {
             id: true,
             name: true,
             collegeName: true,
@@ -182,13 +199,13 @@ export async function GET(req: NextRequest) {
             githubUrl: true,
             course: true,
             batch: true,
-
           },
-          take: limit,
-          skip: skip,
+          limit,
+          offset: skip,
         }),
-        db.externalStudent.count({ where })
-      ])
+        db.select({ count: count() }).from(schema.externalStudent).where(whereClause)
+      ]);
+      const totalCount = totalCountResult[0]?.count || 0;
       return NextResponse.json({ success: true, users: externals, role, totalCount });
     }
 
@@ -216,33 +233,28 @@ export async function PATCH(req: NextRequest) {
     const db = getDb();
     switch (role) {
       case "student":
-        await db.student.updateMany({
-          where: { id: { in: ids } },
-          data: { 
+        await db.update(schema.student)
+          .set({ 
             isEmailVerified: true,
             isVerified: true
-
-           }, 
-        });
+          })
+          .where(inArray(schema.student.id, ids));
         break;
 
       case "alumni":
-        await db.alumni.updateMany({
-          where: { id: { in: ids } },
-          data: { 
+        await db.update(schema.alumni)
+          .set({ 
             isVerified: true,
-
-           }, 
-        });
+          })
+          .where(inArray(schema.alumni.id, ids));
         break;
 
       case "external":
-        await db.externalStudent.updateMany({
-          where: { id: { in: ids } },
-          data: { 
+        await db.update(schema.externalStudent)
+          .set({ 
             isVerified: true,
-          },
-        });
+          })
+          .where(inArray(schema.externalStudent.id, ids));
         break;
 
       case "recruiter":
@@ -268,63 +280,51 @@ export async function DELETE(req: NextRequest) {
     const db = getDb();
     switch (role) {
       case "student": {
-        const students = await db.student.findMany({
-          where: { id: { in: ids } },
-          select: { profileImageUrl: true, resumeUrl: true },
+        const students = await db.query.student.findMany({
+          where: inArray(schema.student.id, ids),
+          columns: { profileImageUrl: true, resumeUrl: true },
         });
         const studentUrls = students
           .flatMap((s) => [s.profileImageUrl, s.resumeUrl])
           .filter((url): url is string => Boolean(url));
 
-        await db.driveRegistration.deleteMany({
-          where: { studentId: { in: ids } },
-        });
-        await db.student.deleteMany({
-          where: { id: { in: ids } },
-        });
+        await db.delete(schema.driveRegistration).where(inArray(schema.driveRegistration.studentId, ids));
+        await db.delete(schema.student).where(inArray(schema.student.id, ids));
 
         if (studentUrls.length > 0) await deleteMultipleFromR2(studentUrls);
         break;
       }
 
       case "alumni": {
-        const alumniRecords = await db.alumni.findMany({
-          where: { id: { in: ids } },
-          select: { profileImageUrl: true },
+        const alumniRecords = await db.query.alumni.findMany({
+          where: inArray(schema.alumni.id, ids),
+          columns: { profileImageUrl: true },
         });
         const alumniUrls = alumniRecords
           .map((a) => a.profileImageUrl)
           .filter(Boolean);
 
-        await db.alumni.deleteMany({
-          where: { id: { in: ids } },
-        });
+        await db.delete(schema.alumni).where(inArray(schema.alumni.id, ids));
 
         if (alumniUrls.length > 0) await deleteMultipleFromR2(alumniUrls);
         break;
       }
 
       case "recruiter":
-        await db.recruiter.deleteMany({
-          where: { id: { in: ids } },
-        });
+        await db.delete(schema.recruiter).where(inArray(schema.recruiter.id, ids));
         break;
 
       case "external": {
-        const externals = await db.externalStudent.findMany({
-          where: { id: { in: ids } },
-          select: { profileImageUrl: true, resumeUrl: true },
+        const externals = await db.query.externalStudent.findMany({
+          where: inArray(schema.externalStudent.id, ids),
+          columns: { profileImageUrl: true, resumeUrl: true },
         });
         const externalUrls = externals
           .flatMap((s) => [s.profileImageUrl, s.resumeUrl])
           .filter((url): url is string => Boolean(url));
 
-        await db.driveRegistration.deleteMany({
-          where: { externalStudentId: { in: ids } },
-        });
-        await db.externalStudent.deleteMany({
-          where: { id: { in: ids } },
-        });
+        await db.delete(schema.driveRegistration).where(inArray(schema.driveRegistration.externalStudentId, ids));
+        await db.delete(schema.externalStudent).where(inArray(schema.externalStudent.id, ids));
 
         if (externalUrls.length > 0) await deleteMultipleFromR2(externalUrls);
         break;
@@ -340,3 +340,4 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ success: false, message: "Failed to delete users" }, { status: 500 });
   }
 }
+

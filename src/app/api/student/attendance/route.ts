@@ -6,6 +6,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { verifyAuthToken } from "@/lib/auth-jwt";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
+import { student as studentTable, externalStudent, placementDrive, driveRegistration } from "@/lib/schema";
+import { eq, and } from "drizzle-orm";
 // Read the student's login token from the request header
 
 
@@ -60,9 +62,9 @@ export async function POST(req: NextRequest) {
 
     if (role === "external_student") {
       // External student path
-      const extStudent = await db.externalStudent.findUnique({
-        where: { email: studentData.email },
-        select: { id: true, name: true },
+      const extStudent = await db.query.externalStudent.findFirst({
+        where: eq(externalStudent.email, studentData.email),
+        columns: { id: true, name: true },
       });
 
       if (!extStudent) {
@@ -72,32 +74,32 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      registration = await db.driveRegistration.findFirst({
-        where: {
-          driveId: driveId,
-          externalStudentId: extStudent.id,
-        },
+      registration = await db.query.driveRegistration.findFirst({
+        where: and(
+          eq(driveRegistration.driveId, driveId),
+          eq(driveRegistration.externalStudentId, extStudent.id)
+        ),
       });
 
     } else {
       // Regular student path
-      const student = await db.student.findUnique({
-        where: { enrollmentNumber: studentData.enrollmentNumber },
-        select: { id: true, name: true },
+      const studentInfo = await db.query.student.findFirst({
+        where: eq(studentTable.enrollmentNumber, studentData.enrollmentNumber),
+        columns: { id: true, name: true },
       });
 
-      if (!student) {
+      if (!studentInfo) {
         return NextResponse.json(
           { success: false, message: "Student not found" },
           { status: 404 }
         );
       }
 
-      registration = await db.driveRegistration.findFirst({
-        where: {
-          driveId: driveId,
-          studentId: student.id,
-        },
+      registration = await db.query.driveRegistration.findFirst({
+        where: and(
+          eq(driveRegistration.driveId, driveId),
+          eq(driveRegistration.studentId, studentInfo.id)
+        ),
       });
     }
 
@@ -113,9 +115,9 @@ export async function POST(req: NextRequest) {
 
     // Already marked present (scanning twice is fine, no error)
     if (registration.attended) {
-      const drive = await db.placementDrive.findUnique({
-        where: { id: driveId },
-        select: { companyName: true },
+      const drive = await db.query.placementDrive.findFirst({
+        where: eq(placementDrive.id, driveId),
+        columns: { companyName: true },
       });
       return NextResponse.json({
         success: true,
@@ -126,14 +128,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Mark them present!
-    await db.driveRegistration.update({
-      where: { id: registration.id },
-      data: { attended: true },
-    });
+    await db.update(driveRegistration).set({
+      attended: true,
+    }).where(eq(driveRegistration.id, registration.id));
 
-    const drive = await db.placementDrive.findUnique({
-      where: { id: driveId },
-      select: { companyName: true, roleName: true },
+    const drive = await db.query.placementDrive.findFirst({
+      where: eq(placementDrive.id, driveId),
+      columns: { companyName: true, roleName: true },
     });
 
     return NextResponse.json({

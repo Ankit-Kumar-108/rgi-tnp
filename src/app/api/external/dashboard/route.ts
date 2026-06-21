@@ -6,6 +6,8 @@ import { NotificationService } from "@/lib/notification-service";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
 import { formatCgpaCriteria, meetsCgpaCriteria } from "@/lib/cgpa-utils";
 import { runInBackground } from "@/lib/background";
+import { externalStudent, placementDrive, driveRegistration } from "@/lib/schema";
+import { eq, and, inArray, count } from "drizzle-orm";
 
 export async function GET(req: NextRequest) {
   try {
@@ -22,52 +24,55 @@ export async function GET(req: NextRequest) {
     const registrationsPage = Math.max(1, parseInt(searchParams.get("registrationsPage") || "1", 10));
 
     const db = getDb();
-    const student = await db.externalStudent.findUnique({ where: { id: ext.id } });
+    const student = await db.query.externalStudent.findFirst({ where: eq(externalStudent.id, ext.id) });
     if (!student) {
       return NextResponse.json({ success: false, message: "Not found" }, { status: 404 });
     }
 
     // Parallel fetches for better performance
-    const [drives, archivedDrives, registrations, drivesCount, registrationsCount] = await Promise.all([
+    const [drives, archivedDrives, registrations, drivesCountResult, registrationsCountResult] = await Promise.all([
       // Get open & active drives with pagination
-      db.placementDrive.findMany({
-        where: {
-          status: "active",
-          driveType: { in: ["Open", "Pool"] },
-        },
-        take: drivesLimit,
-        skip: (drivesPage - 1) * drivesLimit,
-        orderBy: { driveDate: "asc" },
+      db.query.placementDrive.findMany({
+        where: and(
+          eq(placementDrive.status, "active"),
+          inArray(placementDrive.driveType, ["Open", "Pool"])
+        ),
+        limit: drivesLimit,
+        offset: (drivesPage - 1) * drivesLimit,
+        orderBy: (t, { asc }) => [asc(t.driveDate)],
       }),
       // Get archived drives (limited)
-      db.placementDrive.findMany({
-        where: {
-          status: "completed",
-          driveType: { in: ["Open", "Pool"] }
-        },
-        take: 10,
-        orderBy: { driveDate: "desc" }
+      db.query.placementDrive.findMany({
+        where: and(
+          eq(placementDrive.status, "completed"),
+          inArray(placementDrive.driveType, ["Open", "Pool"])
+        ),
+        limit: 10,
+        orderBy: (t, { desc }) => [desc(t.driveDate)]
       }),
       // Get registrations with pagination
-      db.driveRegistration.findMany({
-        where: { externalStudentId: student.id },
-        include: {
-          drive: { select: { companyName: true, roleName: true, driveDate: true, status: true } },
+      db.query.driveRegistration.findMany({
+        where: eq(driveRegistration.externalStudentId, student.id),
+        with: {
+          drive: { columns: { companyName: true, roleName: true, driveDate: true, status: true } },
         },
-        take: registrationsLimit,
-        skip: (registrationsPage - 1) * registrationsLimit,
-        orderBy: { createdAt: "desc" },
+        limit: registrationsLimit,
+        offset: (registrationsPage - 1) * registrationsLimit,
+        orderBy: (t, { desc }) => [desc(t.createdAt)],
       }),
       // Count total open drives
-      db.placementDrive.count({
-        where: {
-          status: "active",
-          driveType: { in: ["Open", "Pool"] },
-        }
-      }),
+      db.select({ count: count() }).from(placementDrive).where(
+        and(
+          eq(placementDrive.status, "active"),
+          inArray(placementDrive.driveType, ["Open", "Pool"])
+        )
+      ),
       // Count total registrations
-      db.driveRegistration.count({ where: { externalStudentId: student.id } }),
+      db.select({ count: count() }).from(driveRegistration).where(eq(driveRegistration.externalStudentId, student.id)),
     ]);
+
+    const drivesCount = drivesCountResult[0]?.count || 0;
+    const registrationsCount = registrationsCountResult[0]?.count || 0;
 
     const registeredDriveIds = registrations.map((r: any) => r.driveId);
 
@@ -111,18 +116,21 @@ export async function POST(req: NextRequest) {
     const body = (await req.json()) as { driveId: string };
     const db = getDb();
 
-    const student = await db.externalStudent.findUnique({ where: { id: ext.id } });
+    const student = await db.query.externalStudent.findFirst({ where: eq(externalStudent.id, ext.id) });
     if (!student || !student.isVerified) {
       return NextResponse.json({ success: false, message: "You must verify your email before registering." }, { status: 403 });
     }
 
-    const drive = await db.placementDrive.findUnique({ where: { id: body.driveId } });
+    const drive = await db.query.placementDrive.findFirst({ where: eq(placementDrive.id, body.driveId) });
     if (!drive || drive.status !== "active" || !["Open", "Pool"].includes(drive.driveType)) {
       return NextResponse.json({ success: false, message: "Drive not available" }, { status: 400 });
     }
 
-    const existing = await db.driveRegistration.findFirst({
-      where: { driveId: body.driveId, externalStudentId: ext.id },
+    const existing = await db.query.driveRegistration.findFirst({
+      where: and(
+        eq(driveRegistration.driveId, body.driveId),
+        eq(driveRegistration.externalStudentId, ext.id)
+      ),
     });
     if (existing) {
       return NextResponse.json({ success: false, message: "Already registered" }, { status: 409 });
@@ -155,8 +163,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: `This drive is open to ${drive.genderPreference} candidates only` }, { status: 403 });
     }
 
-    await db.driveRegistration.create({
-      data: { driveId: body.driveId, externalStudentId: ext.id },
+    await db.insert(driveRegistration).values({
+      driveId: body.driveId,
+      externalStudentId: ext.id,
+      createdAt: new Date().toISOString(),
     });
 
     // Fire-and-forget: send email + in-app notification in background

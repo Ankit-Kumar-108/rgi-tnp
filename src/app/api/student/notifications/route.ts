@@ -3,6 +3,9 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
+import { student as studentTable, notification } from "@/lib/schema";
+import { eq, and, count } from "drizzle-orm";
+
 /**
  * GET /api/student/notifications
  * Returns paginated notifications for the student and the total unread count.
@@ -10,7 +13,7 @@ import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
 export async function GET(req: NextRequest) {
   try {
     const studentTokenData = await getVerifiedAuthPayloadFromRequest(req, ["student"]);
-    if (!studentTokenData) {
+    if (!studentTokenData || !studentTokenData.enrollmentNumber) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
@@ -22,40 +25,43 @@ export async function GET(req: NextRequest) {
     const db = getDb();
 
     // First fetch the student id
-    const student = await db.student.findUnique({
-      where: { enrollmentNumber: studentTokenData.enrollmentNumber },
-      select: { id: true },
+    const studentData = await db.query.student.findFirst({
+      where: eq(studentTable.enrollmentNumber, studentTokenData.enrollmentNumber),
+      columns: { id: true },
     });
 
-    if (!student) {
+    if (!studentData) {
       return NextResponse.json({ success: false, message: "Student not found" }, { status: 404 });
     }
 
     // Fetch unread count and paginated list in parallel
-    const [items, totalCount, unreadCount] = await Promise.all([
-      db.notification.findMany({
-        where: {
-          studentId: student.id,
-          recipientType: "student",
-        },
-        orderBy: { createdAt: "desc" },
-        take: limit,
-        skip,
+    const [items, totalCountResult, unreadCountResult] = await Promise.all([
+      db.query.notification.findMany({
+        where: and(
+          eq(notification.studentId, studentData.id),
+          eq(notification.recipientType, "student")
+        ),
+        orderBy: (t, { desc }) => [desc(t.createdAt)],
+        limit: limit,
+        offset: skip,
       }),
-      db.notification.count({
-        where: {
-          studentId: student.id,
-          recipientType: "student",
-        },
-      }),
-      db.notification.count({
-        where: {
-          studentId: student.id,
-          recipientType: "student",
-          isRead: false,
-        },
-      }),
+      db.select({ count: count() }).from(notification).where(
+        and(
+          eq(notification.studentId, studentData.id),
+          eq(notification.recipientType, "student")
+        )
+      ),
+      db.select({ count: count() }).from(notification).where(
+        and(
+          eq(notification.studentId, studentData.id),
+          eq(notification.recipientType, "student"),
+          eq(notification.isRead, false)
+        )
+      ),
     ]);
+
+    const totalCount = totalCountResult[0]?.count || 0;
+    const unreadCount = unreadCountResult[0]?.count || 0;
 
     return NextResponse.json({
       success: true,
@@ -75,7 +81,7 @@ export async function GET(req: NextRequest) {
  export async function PATCH(req: NextRequest) {
   try {
     const studentTokenData = await getVerifiedAuthPayloadFromRequest(req, ["student"]);
-    if (!studentTokenData) {
+    if (!studentTokenData || !studentTokenData.enrollmentNumber) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
@@ -84,25 +90,24 @@ export async function GET(req: NextRequest) {
 
     const db = getDb();
 
-    const student = await db.student.findUnique({
-      where: { enrollmentNumber: studentTokenData.enrollmentNumber },
-      select: { id: true },
+    const studentData = await db.query.student.findFirst({
+      where: eq(studentTable.enrollmentNumber, studentTokenData.enrollmentNumber),
+      columns: { id: true },
     });
 
-    if (!student) {
+    if (!studentData) {
       return NextResponse.json({ success: false, message: "Student not found" }, { status: 404 });
     }
 
     if (all) {
       // Mark all as read
-      await db.notification.updateMany({
-        where: {
-          studentId: student.id,
-          recipientType: "student",
-          isRead: false,
-        },
-        data: { isRead: true },
-      });
+      await db.update(notification).set({ isRead: true }).where(
+        and(
+          eq(notification.studentId, studentData.id),
+          eq(notification.recipientType, "student"),
+          eq(notification.isRead, false)
+        )
+      );
 
       return NextResponse.json({ success: true, message: "All notifications marked as read" });
     }
@@ -112,14 +117,13 @@ export async function GET(req: NextRequest) {
     }
 
     // Mark single notification as read
-    await db.notification.updateMany({
-      where: {
-        id: notificationId,
-        studentId: student.id,
-        recipientType: "student",
-      },
-      data: { isRead: true },
-    });
+    await db.update(notification).set({ isRead: true }).where(
+      and(
+        eq(notification.id, notificationId),
+        eq(notification.studentId, studentData.id),
+        eq(notification.recipientType, "student")
+      )
+    );
 
     return NextResponse.json({ success: true, message: "Notification marked as read" });
   } catch (error) {

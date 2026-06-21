@@ -881,9 +881,10 @@ export default function DriveParticipantsPage({ params: paramsPromise }: { param
                         <div className="flex items-start justify-between gap-2 mb-1.5">
                           <div className="flex items-center gap-2 flex-wrap min-w-0">
                             <h3 className="font-black text-foreground text-base leading-tight truncate">{user.name || "—"}</h3>
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isInternal ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300" : "bg-brand/10 text-brand"}`}>
+                            {/* this flag can you be enabled if needed in future */}
+                            {/* <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isInternal ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300" : "bg-brand/10 text-brand"}`}>
                               {isInternal ? "Internal" : "External"}
-                            </span>
+                            </span> */}
                             <div className="hidden md:block">
                               <StatusBadge status={reg.status} />
                             </div>

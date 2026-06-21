@@ -1,10 +1,13 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 export const dynamic = 'force-dynamic';
-// @ts-nocheck
+
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { eq } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
+
 export async function GET(req: NextRequest) {
   try {
     const adminTokenData = await getVerifiedAuthPayloadFromRequest(req, ["admin"]);
@@ -16,16 +19,13 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Admin is verified via JWT, no need to check database
-    // The token was already verified by getAdminFromToken
-
     const db = getDb();
 
     // Get all volunteers with student details
-    const volunteers = await db.volunteer.findMany({
-      include: {
+    const volunteers = await db.query.volunteer.findMany({
+      with: {
         student: {
-          select: {
+          columns: {
             id: true,
             name: true,
             email: true,
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: (t, { desc }) => [desc(t.createdAt)],
     });
 
     return NextResponse.json({
@@ -82,17 +82,17 @@ export async function POST(req: NextRequest) {
     
     // First try to find by ID if it looks like a UUID
     if (studentId.length > 10) {
-      student = await db.student.findUnique({
-        where: { id: studentId },
-        select: { id: true, name: true, email: true },
+      student = await db.query.student.findFirst({
+        where: eq(schema.student.id, studentId),
+        columns: { id: true, name: true, email: true },
       });
     }
     
     // If not found by ID, try by enrollmentNumber
     if (!student) {
-      student = await db.student.findUnique({
-        where: { enrollmentNumber: studentId },
-        select: { id: true, name: true, email: true },
+      student = await db.query.student.findFirst({
+        where: eq(schema.student.enrollmentNumber, studentId),
+        columns: { id: true, name: true, email: true },
       });
     }
 
@@ -104,8 +104,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if already a volunteer
-    const existingVolunteer = await db.volunteer.findUnique({
-      where: { studentId: student.id },
+    const existingVolunteer = await db.query.volunteer.findFirst({
+      where: eq(schema.volunteer.studentId, student.id),
     });
 
     if (existingVolunteer) {
@@ -116,18 +116,22 @@ export async function POST(req: NextRequest) {
     }
 
     // Create volunteer record
-    const newVolunteer = await db.volunteer.create({
-      data: {
+    const insertResult = await db.insert(schema.volunteer)
+      .values({
         studentId: student.id,
         designation: designation || "Volunteer",
         isVerified: isVerified || false,
         verificationNotes: verificationNotes || null,
         assignedBy: adminTokenData.email,
-        assignedAt: new Date(),
-      },
-      include: {
+        assignedAt: new Date().toISOString(),
+      })
+      .returning();
+
+    const newVolunteer = await db.query.volunteer.findFirst({
+      where: eq(schema.volunteer.id, insertResult[0].id),
+      with: {
         student: {
-          select: {
+          columns: {
             id: true,
             name: true,
             email: true,

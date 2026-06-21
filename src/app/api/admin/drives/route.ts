@@ -2,9 +2,10 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { eq, ne, count, inArray } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 import { normalizeAcademicScoreToCgpa } from "@/lib/cgpa-utils";
 
-// GET: Fetch all drives with registration counts
 // GET: Fetch all drives with registration counts
 export async function GET(req: NextRequest) {
   try {
@@ -19,39 +20,57 @@ export async function GET(req: NextRequest) {
 
     const db = getDb();
     
-    // 2. Define the exact conditions (Filter in the DB, not in memory)
-    const where = {
-        status: { not: "archived" }
-    };
-
-    // 3. Parallel fetching for speed
-    const [drives, totalCount] = await Promise.all([
-      db.placementDrive.findMany({
-        where, 
-        take: limit,
-        skip: skip,
-        include: {
-          recruiter: { select: { name: true, company: true } },
+    // 2. Parallel fetching for speed
+    const [drives, totalCountResult] = await Promise.all([
+      db.query.placementDrive.findMany({
+        where: ne(schema.placementDrive.status, "archived"), 
+        limit,
+        offset: skip,
+        with: {
+          recruiter: {
+            columns: {
+              name: true,
+              company: true,
+            }
+          },
         },
-        orderBy: { driveDate: "desc" },
+        orderBy: (t, { desc: descOp }) => [descOp(t.driveDate)],
       }),
-      db.placementDrive.count({ where })
+      db.select({ count: count() })
+        .from(schema.placementDrive)
+        .where(ne(schema.placementDrive.status, "archived"))
     ]);
+
+    const totalCount = totalCountResult[0]?.count || 0;
 
     // Single GROUP BY query instead of N separate count() calls
     const driveIds = drives.map((d: any) => d.id);
     const countMap = new Map<string, number>();
     if (driveIds.length > 0) {
       try {
-        const placeholders = driveIds.map(() => '?').join(',');
-        const countRows: any[] = await db.$queryRaw`SELECT "driveId", COUNT(*) as cnt FROM "DriveRegistration" WHERE "driveId" IN (${placeholders}) GROUP BY "driveId"`;
+        const countRows = await db
+          .select({
+            driveId: schema.driveRegistration.driveId,
+            cnt: count(),
+          })
+          .from(schema.driveRegistration)
+          .where(inArray(schema.driveRegistration.driveId, driveIds))
+          .groupBy(schema.driveRegistration.driveId);
+
         for (const row of countRows) {
           countMap.set(row.driveId, Number(row.cnt));
         }
-      } catch {
-        // Fallback: use individual count queries if raw SQL fails
+      } catch (e) {
+        console.error("Failed to fetch drive registration counts via group by:", e);
+        // Fallback: use individual count queries if group by fails
         const counts = await Promise.all(
-          drives.map((drive: any) => db.driveRegistration.count({ where: { driveId: drive.id } }))
+          drives.map(async (drive: any) => {
+            const res = await db
+              .select({ count: count() })
+              .from(schema.driveRegistration)
+              .where(eq(schema.driveRegistration.driveId, drive.id));
+            return res[0]?.count || 0;
+          })
         );
         drives.forEach((d: any, i: number) => countMap.set(d.id, counts[i]));
       }
@@ -85,20 +104,17 @@ export async function POST(req: NextRequest) {
     const db = getDb();
 
     if (action === "close") {
-      await db.placementDrive.update({
-        where: { id },
-        data: { status: "completed" },
-      });
+      await db.update(schema.placementDrive)
+        .set({ status: "completed" })
+        .where(eq(schema.placementDrive.id, id));
     } else if (action === "reopen") {
-      await db.placementDrive.update({
-        where: { id },
-        data: { status: "active" },
-      });
+      await db.update(schema.placementDrive)
+        .set({ status: "active" })
+        .where(eq(schema.placementDrive.id, id));
     } else if (action === "archive") {
-      await db.placementDrive.update({
-        where: { id },
-        data: { status: "archived" },
-      });
+      await db.update(schema.placementDrive)
+        .set({ status: "archived" })
+        .where(eq(schema.placementDrive.id, id));
     }
 
     return NextResponse.json({ success: true, message: `Drive ${action}d successfully` });
@@ -133,17 +149,16 @@ export async function PUT(req: NextRequest) {
 
     const db = getDb();
 
-    const existingDrive = await db.placementDrive.findUnique({
-      where: { id: body.id },
+    const existingDrive = await db.query.placementDrive.findFirst({
+      where: eq(schema.placementDrive.id, body.id),
     });
 
     if (!existingDrive) {
       return NextResponse.json({ success: false, message: "Drive not found" }, { status: 404 });
     }
 
-    const updatedDrive = await db.placementDrive.update({
-      where: { id: body.id },
-      data: {
+    const updatedResult = await db.update(schema.placementDrive)
+      .set({
         companyName: body.companyName,
         roleName: body.roleName,
         genderPreference: body.genderPreference,
@@ -160,12 +175,14 @@ export async function PUT(req: NextRequest) {
         driveType: body.driveType || existingDrive.driveType,
         jobType: body.jobType || existingDrive.jobType,
         allowAlumni: body.allowAlumni ?? existingDrive.allowAlumni,
-      },
-    });
+      })
+      .where(eq(schema.placementDrive.id, body.id))
+      .returning();
 
-    return NextResponse.json({ success: true, message: "Drive updated successfully", drive: updatedDrive });
+    return NextResponse.json({ success: true, message: "Drive updated successfully", drive: updatedResult[0] });
   } catch (error: any) {
     console.error("Update Drive Error:", error);
     return NextResponse.json({ success: false, message: "Failed to update drive" }, { status: 500 });
   }
 }
+

@@ -1,6 +1,8 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { eq } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 import { generateVerificationToken, getresetTokenExpiry } from "@/lib/auth-utils";
 import { verificationEmailTemplate } from "@/lib/email-templates";
 import { NotificationService } from "@/lib/notification-service";
@@ -22,7 +24,7 @@ export async function POST(req: NextRequest) {
         let userName = "User";
 
         if (role === "student") {
-            const student = await db.student.findUnique({ where: { email } });
+            const student = await db.query.student.findFirst({ where: eq(schema.student.email, email) });
             if (!student) {
                 return NextResponse.json({ success: false, message: "Account not found" }, { status: 404 });
             }
@@ -33,13 +35,10 @@ export async function POST(req: NextRequest) {
             const newToken = generateVerificationToken();
             const newExpiry = getresetTokenExpiry();
 
-            await db.student.update({
-                where: { email },
-                data: {
-                    emailVerificationToken: newToken,
-                    emailVerificationTokenExpiry: newExpiry,
-                }
-            });
+            await db.update(schema.student).set({
+                emailVerificationToken: newToken,
+                emailVerificationTokenExpiry: newExpiry,
+            }).where(eq(schema.student.email, email));
 
             const verificationLink = `${protocol}://${host}/verify-email?token=${newToken}&email=${email}&role=student`;
             try {
@@ -63,7 +62,7 @@ export async function POST(req: NextRequest) {
             }
 
         } else if (role === "external_student") {
-            const extStudent = await db.externalStudent.findUnique({ where: { email } });
+            const extStudent = await db.query.externalStudent.findFirst({ where: eq(schema.externalStudent.email, email) });
             if (!extStudent) {
                 return NextResponse.json({ success: false, message: "Account not found" }, { status: 404 });
             }
@@ -75,13 +74,10 @@ export async function POST(req: NextRequest) {
             const newToken = generateVerificationToken();
             const newExpiry = getresetTokenExpiry();
 
-            await db.externalStudent.update({
-                where: { email },
-                data: {
-                    emailVerificationToken: newToken,
-                    emailVerificationTokenExpiry: newExpiry,
-                }
-            });
+            await db.update(schema.externalStudent).set({
+                emailVerificationToken: newToken,
+                emailVerificationTokenExpiry: newExpiry,
+            }).where(eq(schema.externalStudent.email, email));
 
             const verificationLink = `${protocol}://${host}/verify-email?token=${newToken}&email=${email}&role=external_student`;
             try {
@@ -105,7 +101,7 @@ export async function POST(req: NextRequest) {
             }
 
         } else if (role === "alumni") {
-            const alumni = await db.alumni.findUnique({ where: { personalEmail: email } });
+            const alumni = await db.query.alumni.findFirst({ where: eq(schema.alumni.personalEmail, email) });
             if (!alumni) {
                 return NextResponse.json({ success: false, message: "Account not found" }, { status: 404 });
             }
@@ -117,13 +113,10 @@ export async function POST(req: NextRequest) {
             const newToken = generateVerificationToken();
             const newExpiry = getresetTokenExpiry();
 
-            await db.alumni.update({
-                where: { personalEmail: email },
-                data: {
-                    emailVerificationToken: newToken,
-                    emailVerificationTokenExpiry: newExpiry,
-                }
-            });
+            await db.update(schema.alumni).set({
+                emailVerificationToken: newToken,
+                emailVerificationTokenExpiry: newExpiry,
+            }).where(eq(schema.alumni.personalEmail, email));
 
             const verificationLink = `${protocol}://${host}/verify-email?token=${newToken}&email=${email}&role=alumni`;
             try {

@@ -16,7 +16,7 @@ export default function MemoryGallery({ memories }: { memories: MemoryData[] }) 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMemory, setSelectedMemory] = useState<MemoryData | null>(null);
   return (
-    <section className="relative z-40 max-w-7xl mx-auto px-4 md:px-8 lg:px-20 section-y">
+    <section className="relative max-w-7xl mx-auto px-4 md:px-8 lg:px-20 section-y">
       <div className="flex flex-col md:flex-row items-center justify-between mb-10 md:mb-14 gap-4">
         <div className="text-center md:text-left">
           <h2 className="text-2xl md:text-4xl font-black tracking-tight">Life at Radharaman <span className="text-brand">Placements</span></h2>
@@ -132,10 +132,10 @@ export default function MemoryGallery({ memories }: { memories: MemoryData[] }) 
       {isModalOpen && memories && (
         <div
         onClick={() => setIsModalOpen(!isModalOpen)} 
-        className="fixed inset-0 z-[100] w-full h-full flex items-center justify-center p-4 sm:p-6 md:p-8 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+        className="fixed inset-0 z-70 w-full h-full flex items-center justify-center p-4 sm:p-6 md:p-8 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
           <button
             onClick={() => setIsModalOpen(!isModalOpen)}
-            className="fixed z-[101] top-4 right-4 md:top-6 md:right-6 p-2 md:p-3 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-md transition-all border border-white/20 hover:scale-110 shadow-lg"
+            className="fixed z-70 top-4 right-4 md:top-6 md:right-6 p-2 md:p-3 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-md transition-all border border-white/20 hover:scale-110 shadow-lg"
             aria-label="Close"
           >
             <X className="w-5 h-5 md:w-6 md:h-6" />

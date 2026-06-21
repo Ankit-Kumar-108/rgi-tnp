@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { eq, count, desc } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 
 export async function POST(req: NextRequest) {
   try {
@@ -37,7 +39,7 @@ export async function POST(req: NextRequest) {
 
     if (imageUrls.length !== 4) {
       return NextResponse.json(
-        { success: false, message: "Exactly 4 image URLLs are required" },
+        { success: false, message: "Exactly 4 image URLs are required" },
         { status: 400 },
       );
     }
@@ -52,8 +54,8 @@ export async function POST(req: NextRequest) {
     const db = getDb();
 
     // Verify drive exists
-    const drive = await db.placementDrive.findUnique({
-      where: { id: driveId },
+    const drive = await db.query.placementDrive.findFirst({
+      where: eq(schema.placementDrive.id, driveId),
     });
 
     if (!drive) {
@@ -64,9 +66,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Check existing image count for this drive (max 4 total)
-    const existingCount = await db.driveImage.count({
-      where: { driveId },
-    });
+    const existingCountResult = await db
+      .select({ count: count() })
+      .from(schema.driveImage)
+      .where(eq(schema.driveImage.driveId, driveId));
+    
+    const existingCount = existingCountResult[0]?.count || 0;
 
     if (existingCount + imageUrls.length > 4) {
       return NextResponse.json(
@@ -78,19 +83,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create all DriveImage records using a transaction for atomicity
-    const createdImages = await db.$transaction(
+    // Create all DriveImage records using a batch for atomicity in D1
+    const batchResult = await db.batch(
       imageUrls.map((url) =>
-        db.driveImage.create({
-          data: {
-            title,
-            imageUrl: url,
-            driveId,
-            uploadedBy,
-          },
-        }),
-      ),
+        db.insert(schema.driveImage).values({
+          title,
+          imageUrl: url,
+          driveId,
+          uploadedBy,
+        }).returning()
+      ) as any,
     );
+
+    const createdImages = batchResult.map((arr) => arr[0]);
 
     return NextResponse.json({ success: true, driveImages: createdImages });
   } catch (error) {
@@ -113,23 +118,29 @@ export async function GET(req: NextRequest) {
 
     const db = getDb();
 
-    let where: any = {};
-    if (driveId) {
-      where.driveId = driveId;
-    }
+    const whereClause = driveId ? eq(schema.driveImage.driveId, driveId) : undefined;
 
-    const [images, totalCount] = await Promise.all([
-      db.driveImage.findMany({
-        where,
-        take: limit,
-        skip,
-        include: {
-          drive: { select: { id: true, roleName: true, companyName: true, driveDate: true } },
+    const [images, countResult] = await Promise.all([
+      db.query.driveImage.findMany({
+        where: whereClause,
+        limit,
+        offset: skip,
+        with: {
+          drive: {
+            columns: {
+              id: true,
+              roleName: true,
+              companyName: true,
+              driveDate: true,
+            }
+          },
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: (t, { desc: descOp }) => [descOp(t.createdAt)],
       }),
-      db.driveImage.count({ where }),
+      db.select({ count: count() }).from(schema.driveImage).where(whereClause),
     ]);
+
+    const totalCount = countResult[0]?.count || 0;
 
     return NextResponse.json({
       success: true,
@@ -149,3 +160,4 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+

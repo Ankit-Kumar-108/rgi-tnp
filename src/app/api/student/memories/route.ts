@@ -3,13 +3,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import {deleteFromR2} from "@/lib/r2-delete"
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
-
-
+import { student as studentTable, memory } from "@/lib/schema";
+import { eq, and } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
   try {
     const studentTokenData = await getVerifiedAuthPayloadFromRequest(req, ["student"]);
-    if (!studentTokenData) {
+    if (!studentTokenData || !studentTokenData.enrollmentNumber) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
@@ -22,29 +22,29 @@ export async function POST(req: NextRequest) {
     const db = getDb();
 
     // Find student ID first
-    const student = await db.student.findUnique({
-      where: { enrollmentNumber: studentTokenData.enrollmentNumber },
-      select: { id: true, name: true }
+    const studentData = await db.query.student.findFirst({
+      where: eq(studentTable.enrollmentNumber, studentTokenData.enrollmentNumber),
+      columns: { id: true, name: true }
     });
 
-    if (!student) {
+    if (!studentData) {
       return NextResponse.json({ success: false, message: "Student not found" }, { status: 404 });
     }
 
     // Create Memory records in batch
-    const newRecords = await db.memory.createMany({
-      data: memories.map(m => ({
+    const newRecords = await db.insert(memory).values(
+      memories.map(m => ({
         imageUrl: m.imageUrl,
         title: m.title || "Untitled Memory",
-        uploaderName: student.name,
-        studentId: student.id,
+        uploaderName: studentData.name,
+        studentId: studentData.id,
         status: "pending_moderation"
       }))
-    });
+    ).returning();
 
     return NextResponse.json({ 
       success: true, 
-      message: `${newRecords.count} memories uploaded successfully and sent for moderation`, 
+      message: `${newRecords.length} memories uploaded successfully and sent for moderation`, 
     });
 
   } catch (error: any) {
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const studentTokenData = await getVerifiedAuthPayloadFromRequest(req, ["student"]);
-    if (!studentTokenData) {
+    if (!studentTokenData || !studentTokenData.enrollmentNumber) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
@@ -69,22 +69,22 @@ export async function DELETE(req: NextRequest) {
     }
 
     const db = getDb();
-    const student = await db.student.findUnique({
-      where: { enrollmentNumber: studentTokenData.enrollmentNumber },
-      select: { id: true }
+    const studentData = await db.query.student.findFirst({
+      where: eq(studentTable.enrollmentNumber, studentTokenData.enrollmentNumber),
+      columns: { id: true }
     });
 
-    if (!student) {
+    if (!studentData) {
       return NextResponse.json({ success: false, message: "Student not found" }, { status: 404 });
     }
 
-    const imgUrl = await db.memory.findFirst({
-      where: {
-        id: id,
-        studentId: student.id,
-      },
-      select: {imageUrl: true}
-    })
+    const imgUrl = await db.query.memory.findFirst({
+      where: and(
+        eq(memory.id, id),
+        eq(memory.studentId, studentData.id)
+      ),
+      columns: {imageUrl: true}
+    });
 
     if(!imgUrl){
       return NextResponse.json({success: false, message: "Memory not found or you don't have permission to delete it"})
@@ -92,14 +92,14 @@ export async function DELETE(req: NextRequest) {
 
     await deleteFromR2(imgUrl.imageUrl)
 
-    const deletedMemory = await db.memory.deleteMany({
-      where: { 
-        id: id,
-        studentId: student.id
-       }
-    });
+    const deletedMemoryResult = await db.delete(memory).where(
+      and(
+        eq(memory.id, id),
+        eq(memory.studentId, studentData.id)
+      )
+    ).returning();
 
-    if (deletedMemory.count === 0) {
+    if (deletedMemoryResult.length === 0) {
       return NextResponse.json({ success: false, message: "Memory not found or you don't have permission to delete it" }, { status: 404 });
     }
     return NextResponse.json({ success: true, message: "Memory deleted successfully" });

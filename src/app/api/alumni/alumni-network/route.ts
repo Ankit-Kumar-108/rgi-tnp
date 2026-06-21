@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic'; // Required for Cloudflare D1
 
 import { NextResponse, NextRequest } from "next/server";
 import { getDb } from "@/lib/db";
+import { and, eq, or, like, desc, count } from "drizzle-orm";
+import { alumni } from "@/lib/schema";
 
 export async function GET(req: NextRequest) {
     try {
@@ -17,39 +19,35 @@ export async function GET(req: NextRequest) {
         
         const skipOffset = (page - 1) * limit;
 
-        const whereClause: any = {
-            isVerified: true,
-        };
+        const conditions = [eq(alumni.isVerified, true)];
 
         if (batch && batch !== "All Batches") {
-            whereClause.batch = batch;
+            conditions.push(eq(alumni.batch, batch));
         }
         
         if (branch && branch !== "All Branches") {
-            whereClause.branch = branch;
-        }
-
-        if(course && course !== "All Courses") {
-            whereClause.course = course;
-        }
-
-        // FIXED: Removed mode: "insensitive" as SQLite doesn't support/need it
-        if (search && search !== "") {
-            whereClause.OR = [
-                { name: { contains: search } },
-                { currentCompany: { contains: search } },
-                { jobTitle: { contains: search } },
-                { city: { contains: search } },
-            ];
+            conditions.push(eq(alumni.branch, branch));
         }
 
         if (course && course !== "All Courses") {
-            whereClause.course = course;
+            conditions.push(eq(alumni.course, course));
         }
 
-        const alumniData = await db.alumni.findMany({
-            where: whereClause,
-            select: {
+        if (search && search !== "") {
+            const searchPattern = `%${search}%`;
+            conditions.push(or(
+                like(alumni.name, searchPattern),
+                like(alumni.currentCompany, searchPattern),
+                like(alumni.jobTitle, searchPattern),
+                like(alumni.city, searchPattern)
+            )!);
+        }
+
+        const whereExpr = and(...conditions);
+
+        const alumniData = await db.query.alumni.findMany({
+            where: whereExpr,
+            columns: {
                 id: true,
                 name: true,
                 enrollmentNumber: true,
@@ -65,19 +63,14 @@ export async function GET(req: NextRequest) {
                 linkedInUrl: true,
                 privacyJson: true,
                 isVerified: true,
-                
-
             },
-            skip: skipOffset,
-            take: limit,
-            orderBy: {
-                id: 'desc' 
-            }
+            offset: skipOffset,
+            limit: limit,
+            orderBy: [desc(alumni.id)],
         });
 
-        const totalRecords = await db.alumni.count({
-            where: whereClause 
-        });
+        const totalRecordsResult = await db.select({ count: count() }).from(alumni).where(whereExpr);
+        const totalRecords = totalRecordsResult[0]?.count || 0;
 
         const hasMore = (skipOffset + limit) < totalRecords;
 

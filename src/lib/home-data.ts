@@ -1,33 +1,38 @@
 import { getDb } from "@/lib/db";
+import { sql, eq, desc, asc, inArray } from "drizzle-orm";
+import * as schema from "./schema";
 
 export async function fetchHomeDrives(limit = 10) {
   try {
     const db = getDb();
-    const drives = await db.placementDrive.findMany({
-      where: {
-        status: { in: ["active", "completed"] },
-        driveImages: { some: {} },
-      },
-      select: {
+    // Fetch drives that are active or completed, with their images
+    const drives = await db.query.placementDrive.findMany({
+      where: (t: any, { or, eq: eqOp }: any) => or(eqOp(t.status, "active"), eqOp(t.status, "completed")),
+      columns: {
         id: true,
         companyName: true,
         driveDate: true,
+      },
+      with: {
         driveImages: {
-          select: {
+          columns: {
             id: true,
             title: true,
             imageUrl: true,
             driveId: true,
             createdAt: true,
           },
-          orderBy: { createdAt: "desc" },
-          take: 4,
+          orderBy: (t: any, { desc: descOp }: any) => [descOp(t.createdAt)],
+          limit: 4,
         },
       },
-      orderBy: { driveDate: "desc" },
-      take: limit,
+      orderBy: (t: any, { desc: descOp }: any) => [descOp(t.driveDate)],
+      limit,
     });
-    return drives.map((d: any) => ({ ...d, title: d.companyName }));
+    // Only return drives that have images
+    return drives
+      .filter((d: any) => d.driveImages && d.driveImages.length > 0)
+      .map((d: any) => ({ ...d, title: d.companyName }));
   } catch (error) {
     console.error("Home drive images error:", error);
     return [];
@@ -37,7 +42,7 @@ export async function fetchHomeDrives(limit = 10) {
 export async function fetchTestimonials() {
   try {
     const db = getDb();
-    const testimonials = await db.$queryRaw`
+    const testimonials = await db.all(sql`
       SELECT 
         af.id,
         af.content,
@@ -51,7 +56,7 @@ export async function fetchTestimonials() {
       WHERE af."isApproved" = true AND af."rating" >= 4 AND a."isProfileComplete" = true
       ORDER BY RANDOM() 
       LIMIT 3
-    `;
+    `);
     return testimonials as any[];
   } catch (error) {
     console.error("Home testimonials error:", error);
@@ -62,20 +67,22 @@ export async function fetchTestimonials() {
 export async function fetchHomeMemories(limit = 6) {
   try {
     const db = getDb();
-    const memories = await db.memory.findMany({
-      where: { status: "approved" },
-      orderBy: { createdAt: "desc" },
-      take: limit,
-      select: {
+    const memories = await db.query.memory.findMany({
+      where: (t: any, { eq: eqOp }: any) => eqOp(t.status, "approved"),
+      orderBy: (t: any, { desc: descOp }: any) => [descOp(t.createdAt)],
+      limit,
+      columns: {
         id: true,
         imageUrl: true,
         title: true,
         createdAt: true,
+      },
+      with: {
         student: {
-          select: { name: true },
+          columns: { name: true },
         },
         alumni: {
-          select: { name: true },
+          columns: { name: true },
         },
       },
     });
@@ -96,21 +103,23 @@ export async function fetchHomeMemories(limit = 6) {
 export async function fetchHomeVolunteers(limit?: number) {
   try {
     const db = getDb();
-    const volunteers = await db.volunteer.findMany({
-      where: { isActive: true },
-      select: {
+    const volunteers = await db.query.volunteer.findMany({
+      where: (t: any, { eq: eqOp }: any) => eqOp(t.isActive, true),
+      columns: {
         id: true,
         designation: true,
+      },
+      with: {
         student: {
-          select: {
+          columns: {
             name: true,
             profileImageUrl: true,
             linkedinUrl: true,
           },
         },
       },
-      orderBy: { createdAt: "asc" },
-      take: limit,
+      orderBy: (t: any, { asc: ascOp }: any) => [ascOp(t.createdAt)],
+      ...(limit ? { limit } : {}),
     });
     
     return volunteers

@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { eq } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 import { verifyPassword } from "@/lib/auth-utils";
 import { attachAuthCookie, signAuthToken } from "@/lib/auth-jwt";
 
@@ -20,9 +22,9 @@ export async function POST(req: NextRequest) {
     const normalizedEmail = email.trim().toLowerCase();
     const db = getDb();
 
-    let admin = await db.admin.findUnique({
-      where: { email: normalizedEmail },
-      select: {
+    let admin = await db.query.admin.findFirst({
+      where: eq(schema.admin.email, normalizedEmail),
+      columns: {
         id: true,
         email: true,
         passwordHash: true,
@@ -46,24 +48,33 @@ export async function POST(req: NextRequest) {
         passwordMatch = await verifyPassword(password, bootstrapPasswordHash);
 
         if (passwordMatch) {
-          admin = await db.admin.upsert({
-            where: { email: bootstrapEmail },
-            update: {
-              passwordHash: bootstrapPasswordHash,
-              role: "admin",
-            },
-            create: {
-              email: bootstrapEmail,
-              passwordHash: bootstrapPasswordHash,
-              role: "admin",
-            },
-            select: {
-              id: true,
-              email: true,
-              passwordHash: true,
-              role: true,
-            },
+          // Emulate upsert since bootstrap admin wasn't found
+          // First check again (should be empty, but just to be sure)
+          const existing = await db.query.admin.findFirst({
+            where: eq(schema.admin.email, bootstrapEmail)
           });
+
+          if (existing) {
+            const updated = await db
+              .update(schema.admin)
+              .set({
+                passwordHash: bootstrapPasswordHash,
+                role: "admin",
+              })
+              .where(eq(schema.admin.email, bootstrapEmail))
+              .returning();
+            admin = updated[0];
+          } else {
+            const inserted = await db
+              .insert(schema.admin)
+              .values({
+                email: bootstrapEmail,
+                passwordHash: bootstrapPasswordHash,
+                role: "admin",
+              })
+              .returning();
+            admin = inserted[0];
+          }
         }
       }
     }
@@ -105,3 +116,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

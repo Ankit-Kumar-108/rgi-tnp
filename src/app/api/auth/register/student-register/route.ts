@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { registrationSchema } from "@/lib/validations/student";
 import { hashPassword, generateVerificationToken, getresetTokenExpiry } from "@/lib/auth-utils";
 import { getDb } from "@/lib/db";
+import { eq } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 import { verificationEmailTemplate } from "@/lib/email-templates";
 import { NotificationService } from "@/lib/notification-service";
 
@@ -31,13 +33,11 @@ export async function POST(req: NextRequest) {
       semester: validatedData.semester,
       gender: validatedData.gender.trim(),
     };
-    const masterRecords = await db.studentMaster.findMany({
-      where: {
-        batch: trimmedData.batch,
-      },
+    const masterRecords = await db.query.studentMaster.findMany({
+      where: eq(schema.studentMaster.batch, trimmedData.batch),
     });
     const masterRecord = masterRecords.find(
-      (record) =>
+      (record: any) =>
         record.enrollmentNumber?.trim() === trimmedData.enrollmentNumber &&
         record.branch?.trim() === trimmedData.branch &&
         record.course?.trim() === trimmedData.course
@@ -51,8 +51,8 @@ export async function POST(req: NextRequest) {
     }
 
     // 5. Check if already registered
-    const existing = await db.student.findUnique({
-      where: { enrollmentNumber: trimmedData.enrollmentNumber },
+    const existing = await db.query.student.findFirst({
+      where: eq(schema.student.enrollmentNumber, trimmedData.enrollmentNumber),
     });
 
     if (existing) {
@@ -62,8 +62,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const emailExists = await db.student.findUnique({
-      where: { email: trimmedData.email },
+    const emailExists = await db.query.student.findFirst({
+      where: eq(schema.student.email, trimmedData.email),
     });
 
     if (emailExists) {
@@ -79,29 +79,28 @@ export async function POST(req: NextRequest) {
     const expiry = getresetTokenExpiry();
 
     // 7. Create Student Record
-    const student = await db.student.create({
-     data: {
-        name: trimmedData.name,
-        enrollmentNumber: trimmedData.enrollmentNumber,
-        email: trimmedData.email,
-        gender: trimmedData.gender,
-        branch: trimmedData.branch,
-        course: trimmedData.course,
-        semester: trimmedData.semester,
-        cgpa: trimmedData.cgpa,
-        batch: trimmedData.batch,
-        phoneNumber: trimmedData.phoneNumber,
-        passwordHash: passwordHash,
-        profileImageUrl: trimmedData.profileImageUrl || undefined,
-        resumeUrl: trimmedData.resumeUrl || undefined,
-        isVerified: false,
-        isEmailVerified: false,
-        emailVerificationToken: verificationToken,
-        emailVerificationTokenExpiry: expiry,
-        tenthPercentage: 0,
-        twelfthPercentage: 0,
-      },
-    });
+    const result = await db.insert(schema.student).values({
+      name: trimmedData.name,
+      enrollmentNumber: trimmedData.enrollmentNumber,
+      email: trimmedData.email,
+      gender: trimmedData.gender,
+      branch: trimmedData.branch,
+      course: trimmedData.course,
+      semester: trimmedData.semester,
+      cgpa: trimmedData.cgpa,
+      batch: trimmedData.batch,
+      phoneNumber: trimmedData.phoneNumber,
+      passwordHash: passwordHash,
+      profileImageUrl: trimmedData.profileImageUrl || undefined,
+      resumeUrl: trimmedData.resumeUrl || undefined,
+      isVerified: false,
+      isEmailVerified: false,
+      emailVerificationToken: verificationToken,
+      emailVerificationTokenExpiry: expiry,
+      tenthPercentage: 0,
+      twelfthPercentage: 0,
+    }).returning();
+    const student = result[0];
 
     // 8. Send Verification Email
     const host = req.headers.get("host");
@@ -122,13 +121,10 @@ export async function POST(req: NextRequest) {
 
     if (!emailResult.success) {
       console.error("[STUDENT-REGISTER] Email verification failed for:", trimmedData.email, emailResult.error);
-      await db.student.update({
-        where: { id: student.id },
-        data: {
-          emailVerificationFailed: true,
-          emailVerificationError: emailResult.error || "Unknown email service error"
-        }
-      });
+      await db.update(schema.student).set({
+        emailVerificationFailed: true,
+        emailVerificationError: emailResult.error || "Unknown email service error"
+      }).where(eq(schema.student.id, student.id));
       return NextResponse.json({
         success: false,
         message: "Email verification failed. Please contact support.",

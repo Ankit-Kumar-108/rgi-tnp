@@ -10,6 +10,11 @@ export const alumniRegistrationSchema = z.object({
     branch: z.string().trim().min(1, 'Branch is required'),
     course: z.string().trim().min(1, 'Course is required'),
     batch: z.string().trim().min(1, 'Batch is required'),
+    gender: z.string().trim().min(1, 'Gender is required'),
+    cgpa: z.coerce
+        .number({ message: 'CGPA must be a valid number' })
+        .min(0, 'CGPA must be at least 0')
+        .max(10, 'CGPA cannot be more than 10'),
     password: z.string()
         .min(8, 'Password must be at least 8 characters long')
         .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')

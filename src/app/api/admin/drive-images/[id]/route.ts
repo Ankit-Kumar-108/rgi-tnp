@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { eq } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 
 // DELETE: Remove a drive image
 export async function DELETE(
@@ -12,8 +14,8 @@ export async function DELETE(
     const { id } = await params;
     const db = getDb();
 
-    const driveImage = await db.driveImage.findUnique({
-      where: { id },
+    const driveImage = await db.query.driveImage.findFirst({
+      where: eq(schema.driveImage.id, id),
     });
 
     if (!driveImage) {
@@ -24,9 +26,7 @@ export async function DELETE(
     }
 
     // Delete from database
-    await db.driveImage.delete({
-      where: { id },
-    });
+    await db.delete(schema.driveImage).where(eq(schema.driveImage.id, id));
 
     // Note: You may want to also delete from R2, but that's optional
     // For now, we'll leave the image in R2 (can be cleaned up separately)
@@ -43,3 +43,4 @@ export async function DELETE(
     );
   }
 }
+

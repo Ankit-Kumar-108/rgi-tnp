@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { recruiterRegistrationSchema } from "@/lib/validations/recruiter";
 import { hashPassword } from "@/lib/auth-utils";
 import { getDb } from "@/lib/db";
+import { eq } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,8 +23,8 @@ export async function POST(req: NextRequest) {
       designation: validatedData.designation.trim(),
     };
 
-    const emailExists = await db.recruiter.findUnique({
-      where: { email: trimmedData.email },
+    const emailExists = await db.query.recruiter.findFirst({
+      where: eq(schema.recruiter.email, trimmedData.email),
     });
 
     if (emailExists) {
@@ -34,16 +36,15 @@ export async function POST(req: NextRequest) {
 
     const passwordHash = await hashPassword(trimmedData.password);
 
-    const recruiter = await db.recruiter.create({
-      data: {
-        name: trimmedData.name,
-        email: trimmedData.email,
-        phoneNumber: trimmedData.phoneNumber,
-        designation: trimmedData.designation,
-        company: trimmedData.company,
-        passwordHash: passwordHash,
-      },
-    });
+    const result = await db.insert(schema.recruiter).values({
+      name: trimmedData.name,
+      email: trimmedData.email,
+      phoneNumber: trimmedData.phoneNumber,
+      designation: trimmedData.designation,
+      company: trimmedData.company,
+      passwordHash: passwordHash,
+    }).returning();
+    const recruiter = result[0];
 
     return NextResponse.json(
       {

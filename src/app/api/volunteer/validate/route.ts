@@ -3,11 +3,14 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
+import { student as studentTable, volunteer as volunteerTable } from "@/lib/schema";
+import { eq } from "drizzle-orm";
+
 export async function GET(req: NextRequest) {
   try {
     const studentTokenData = await getVerifiedAuthPayloadFromRequest(req, ["student"]);
     
-    if (!studentTokenData) {
+    if (!studentTokenData || !studentTokenData.enrollmentNumber) {
       return NextResponse.json(
         { success: false, message: "Unauthorized", isVolunteer: false },
         { status: 401 }
@@ -17,12 +20,12 @@ export async function GET(req: NextRequest) {
     const db = getDb();
     
     // Get student
-    const student = await db.student.findUnique({
-      where: { enrollmentNumber: studentTokenData.enrollmentNumber },
-      select: { id: true, email: true, name: true },
+    const studentData = await db.query.student.findFirst({
+      where: eq(studentTable.enrollmentNumber, studentTokenData.enrollmentNumber),
+      columns: { id: true, email: true, name: true },
     });
 
-    if (!student) {
+    if (!studentData) {
       return NextResponse.json(
         { success: false, message: "Student not found", isVolunteer: false },
         { status: 404 }
@@ -30,9 +33,9 @@ export async function GET(req: NextRequest) {
     }
 
     // Check if student is a volunteer and is active
-    const volunteer = await db.volunteer.findUnique({
-      where: { studentId: student.id },
-      select: {
+    const volunteerData = await db.query.volunteer.findFirst({
+      where: eq(volunteerTable.studentId, studentData.id),
+      columns: {
         id: true,
         isVerified: true,
         isActive: true,
@@ -43,7 +46,7 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    if (!volunteer) {
+    if (!volunteerData) {
       return NextResponse.json(
         {
           success: false,
@@ -54,7 +57,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    if (!volunteer.isActive) {
+    if (!volunteerData.isActive) {
       return NextResponse.json(
         {
           success: false,
@@ -71,11 +74,11 @@ export async function GET(req: NextRequest) {
       message: "Volunteer verified",
       isVolunteer: true,
       volunteer: {
-        isVerified: volunteer.isVerified,
-        designation: volunteer.designation,
-        assignedAt: volunteer.assignedAt,
-        verificationNotes: volunteer.verificationNotes,
-        assignedBy: volunteer.assignedBy,
+        isVerified: volunteerData.isVerified,
+        designation: volunteerData.designation,
+        assignedAt: volunteerData.assignedAt,
+        verificationNotes: volunteerData.verificationNotes,
+        assignedBy: volunteerData.assignedBy,
       },
     });
   } catch (error) {

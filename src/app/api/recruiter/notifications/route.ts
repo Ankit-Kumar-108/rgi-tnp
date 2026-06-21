@@ -3,11 +3,13 @@ export const dynamic = "force-dynamic"
 import { NextResponse, NextRequest } from "next/server"
 import { getDb } from "@/lib/db"
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
+import { recruiter as recruiterTable, notification } from "@/lib/schema";
+import { eq, and, count } from "drizzle-orm";
 
 export async function GET(req: NextRequest) {
     try {
         const recruiterTokenData = await getVerifiedAuthPayloadFromRequest(req, ["recruiter"])
-        if (!recruiterTokenData) {
+        if (!recruiterTokenData || !recruiterTokenData.email) {
             return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 })
         }
 
@@ -17,39 +19,42 @@ export async function GET(req: NextRequest) {
         const skip = (page - 1) * limit
 
         const db = getDb()
-        const recruiter = await db.recruiter.findUnique({
-            where: { email: recruiterTokenData.email },
-            select: { id: true },
+        const recruiterData = await db.query.recruiter.findFirst({
+            where: eq(recruiterTable.email, recruiterTokenData.email),
+            columns: { id: true },
         })
 
-        if (!recruiter) {
+        if (!recruiterData) {
             return NextResponse.json({ success: false, message: "Recruiter not found" }, { status: 404 })
         }
 
-        const [items, totalCount, unreadCount] = await Promise.all([
-            db.notification.findMany({
-                where: {
-                    recruiterId: recruiter.id,
-                    recipientType: "recruiter"
-                },
-                orderBy: { createdAt: "desc" },
-                take: limit,
-                skip,
+        const [items, totalCountResult, unreadCountResult] = await Promise.all([
+            db.query.notification.findMany({
+                where: and(
+                    eq(notification.recruiterId, recruiterData.id),
+                    eq(notification.recipientType, "recruiter")
+                ),
+                orderBy: (t, { desc }) => [desc(t.createdAt)],
+                limit: limit,
+                offset: skip,
             }),
-            db.notification.count({
-                where: {
-                    recruiterId: recruiter.id,
-                    recipientType: "recruiter",
-                }
-            }),
-            db.notification.count({
-                where: {
-                    recruiterId: recruiter.id,
-                    recipientType: "recruiter",
-                    isRead: false,
-                }
-            })
+            db.select({ count: count() }).from(notification).where(
+                and(
+                    eq(notification.recruiterId, recruiterData.id),
+                    eq(notification.recipientType, "recruiter")
+                )
+            ),
+            db.select({ count: count() }).from(notification).where(
+                and(
+                    eq(notification.recruiterId, recruiterData.id),
+                    eq(notification.recipientType, "recruiter"),
+                    eq(notification.isRead, false)
+                )
+            )
         ])
+
+        const totalCount = Number(totalCountResult[0]?.count || 0);
+        const unreadCount = Number(unreadCountResult[0]?.count || 0);
 
         return NextResponse.json({
             success: true,
@@ -60,7 +65,7 @@ export async function GET(req: NextRequest) {
             currentPage: page,
         })
     } catch (error: any) {
-        console.error("Student Notifications GET Error:", error);
+        console.error("Recruiter Notifications GET Error:", error);
         return NextResponse.json({ success: false, message: "Failed to fetch notifications" }, { status: 500 });
     }
 }
@@ -68,32 +73,31 @@ export async function GET(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
     try {
         const recruiterTokenData = await getVerifiedAuthPayloadFromRequest(req, ["recruiter"])
-        if (!recruiterTokenData) {
+        if (!recruiterTokenData || !recruiterTokenData.email) {
             return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 })
         }
-        const body = await req.json() as { all?: string, notificationId?: string }
+        const body = await req.json() as { all?: boolean, notificationId?: string }
         const { all, notificationId } = body
         const db = getDb()
 
-        const recruiter = await db.recruiter.findUnique({
-            where: { email: recruiterTokenData.email },
-            select: { id: true }
+        const recruiterData = await db.query.recruiter.findFirst({
+            where: eq(recruiterTable.email, recruiterTokenData.email),
+            columns: { id: true }
         })
 
-        if (!recruiter) {
+        if (!recruiterData) {
             return NextResponse.json({ success: false, message: "Recruiter not found" }, { status: 404 })
         }
         if (all) {
-            await db.notification.updateMany({
-                where: {
-                    recruiterId: recruiter.id,
-                    recipientType: "recruiter",
-                    isRead: false
-                },
-                data: {
-                    isRead: true
-                }
-            })
+            await db.update(notification).set({
+                isRead: true
+            }).where(
+                and(
+                    eq(notification.recruiterId, recruiterData.id),
+                    eq(notification.recipientType, "recruiter"),
+                    eq(notification.isRead, false)
+                )
+            );
             return NextResponse.json({ success: true, message: "All notification marked read" })
         }
 
@@ -101,19 +105,18 @@ export async function PATCH(req: NextRequest) {
             return NextResponse.json({success: false, message: "NotificationID is needed!"})
         }
         
-        await db.notification.updateMany({
-            where: {
-                id: notificationId,
-                recruiterId: recruiter.id,
-                recipientType: "recruiter"
-            },
-            data: {
-                isRead: true
-            }
-        })
+        await db.update(notification).set({
+            isRead: true
+        }).where(
+            and(
+                eq(notification.id, notificationId),
+                eq(notification.recruiterId, recruiterData.id),
+                eq(notification.recipientType, "recruiter")
+            )
+        );
         return NextResponse.json({ success: true, message: "Notification marked as read" });
     } catch (error: any) {
-        console.error("Student Notifications GET Error:", error);
-        return NextResponse.json({ success: false, message: "Failed to fetch notifications" }, { status: 500 });
+        console.error("Recruiter Notifications PATCH Error:", error);
+        return NextResponse.json({ success: false, message: "Failed to update notifications" }, { status: 500 });
     }
 }

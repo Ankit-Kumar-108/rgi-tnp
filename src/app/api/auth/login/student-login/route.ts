@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic';
 import { NextResponse, NextRequest } from "next/server";
 import { loginSchema } from "@/lib/validations/student";
 import { getDb } from "@/lib/db";
+import { eq } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 import { verifyPassword } from "@/lib/auth-utils";
 import { signAuthToken, attachAuthCookie } from "@/lib/auth-jwt";
 
@@ -15,8 +17,8 @@ export async function POST(req: NextRequest) {
 
         const db = getDb()
         
-        const student = await db.student.findUnique({
-            where: { email: trimmedEmail }
+        const student = await db.query.student.findFirst({
+            where: eq(schema.student.email, trimmedEmail)
         })
         if (!student) {
             return NextResponse.json({ success: false, message: "Check your email (Not Found!) " }, { status: 401 });

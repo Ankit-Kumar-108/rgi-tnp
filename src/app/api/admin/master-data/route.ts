@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { count, sql } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 
 function generateId() {
   return crypto.randomUUID().replace(/-/g, "").slice(0, 25);
@@ -35,9 +37,8 @@ export async function POST(req: NextRequest) {
     let created = 0;
     let skipped = 0;
     const errors: string[] = [];
-    const table = type === "student" ? "StudentMaster" : type === "alumni" ? "AlumniMaster" : null;
 
-    if (!table) {
+    if (type !== "student" && type !== "alumni") {
       return NextResponse.json(
         { success: false, message: "Invalid type" },
         { status: 400 }
@@ -58,17 +59,19 @@ export async function POST(req: NextRequest) {
           continue;
         }
 
-        await db.$executeRawUnsafe(
-          `INSERT OR REPLACE INTO "${table}" ("id", "enrollmentNumber", "name", "branch", "course", "batch")
-           VALUES (COALESCE((SELECT "id" FROM "${table}" WHERE "enrollmentNumber" = ?), ?), ?, ?, ?, ?, ?)`,
-          enrollmentNumber, // ? #1
-          generateId(),     // ? #2
-          enrollmentNumber, // ? #3
-          name,             // ? #4
-          branch,           // ? #5
-          course,           // ? #6
-          batch             // ? #7
-        );
+        const generatedId = generateId();
+
+        if (type === "student") {
+          await db.run(
+            sql`INSERT OR REPLACE INTO "StudentMaster" ("id", "enrollmentNumber", "name", "branch", "course", "batch")
+                VALUES (COALESCE((SELECT "id" FROM "StudentMaster" WHERE "enrollmentNumber" = ${enrollmentNumber}), ${generatedId}), ${enrollmentNumber}, ${name}, ${branch}, ${course}, ${batch})`
+          );
+        } else {
+          await db.run(
+            sql`INSERT OR REPLACE INTO "AlumniMaster" ("id", "enrollmentNumber", "name", "branch", "course", "batch")
+                VALUES (COALESCE((SELECT "id" FROM "AlumniMaster" WHERE "enrollmentNumber" = ${enrollmentNumber}), ${generatedId}), ${enrollmentNumber}, ${name}, ${branch}, ${course}, ${batch})`
+          );
+        }
         created++;
       } catch (err: any) {
         const msg = err?.message || String(err);
@@ -108,26 +111,31 @@ export async function GET(req: NextRequest) {
       const skip = (page - 1) * limit;
 
       if (type === "student") {
-        const [records, total] = await Promise.all([
-          db.studentMaster.findMany({ skip, take: limit, orderBy: { name: 'asc' } }),
-          db.studentMaster.count()
+        const [records, countResult] = await Promise.all([
+          db.query.studentMaster.findMany({ limit, offset: skip, orderBy: (t, { asc }) => [asc(t.name)] }),
+          db.select({ count: count() }).from(schema.studentMaster)
         ]);
+        const total = countResult[0]?.count || 0;
         return NextResponse.json({ success: true, records, total });
       } else if (type === "alumni") {
-        const [records, total] = await Promise.all([
-          db.alumniMaster.findMany({ skip, take: limit, orderBy: { name: 'asc' } }),
-          db.alumniMaster.count()
+        const [records, totalResult] = await Promise.all([
+          db.query.alumniMaster.findMany({ limit, offset: skip, orderBy: (t, { asc }) => [asc(t.name)] }),
+          db.select({ count: count() }).from(schema.alumniMaster)
         ]);
+        const total = totalResult[0]?.count || 0;
         return NextResponse.json({ success: true, records, total });
       } else {
          return NextResponse.json({ success: false, message: "Invalid type" }, { status: 400 });
       }
     }
 
-    const [studentCount, alumniCount] = await Promise.all([
-      db.studentMaster.count(),
-      db.alumniMaster.count(),
+    const [studentCountResult, alumniCountResult] = await Promise.all([
+      db.select({ count: count() }).from(schema.studentMaster),
+      db.select({ count: count() }).from(schema.alumniMaster),
     ]);
+    const studentCount = studentCountResult[0]?.count || 0;
+    const alumniCount = alumniCountResult[0]?.count || 0;
+
     return NextResponse.json({
       success: true,
       counts: { studentMaster: studentCount, alumniMaster: alumniCount },
@@ -140,3 +148,4 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+

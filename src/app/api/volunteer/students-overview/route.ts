@@ -1,16 +1,15 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-// @ts-nocheck
 export const dynamic = 'force-dynamic';
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
+import { student as studentTable, volunteer as volunteerTable, placementDrive, driveRegistration } from "@/lib/schema";
+import { eq, count } from "drizzle-orm";
 
 export async function GET(req: NextRequest) {
   try {
     const studentTokenData = await getVerifiedAuthPayloadFromRequest(req, ["student"]);
     
-    if (!studentTokenData) {
+    if (!studentTokenData || !studentTokenData.enrollmentNumber) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
         { status: 401 }
@@ -20,24 +19,24 @@ export async function GET(req: NextRequest) {
     const db = getDb();
     
     // Verify this user is a volunteer
-    const student = await db.student.findUnique({
-      where: { enrollmentNumber: studentTokenData.enrollmentNumber },
-      select: { id: true }
+    const studentData = await db.query.student.findFirst({
+      where: eq(studentTable.enrollmentNumber, studentTokenData.enrollmentNumber),
+      columns: { id: true }
     });
 
-    if (!student) {
+    if (!studentData) {
       return NextResponse.json(
         { success: false, message: "Student not found" },
         { status: 404 }
       );
     }
 
-    const volunteer = await db.volunteer.findUnique({
-      where: { studentId: student.id },
-      select: { id: true, isActive: true }
+    const volunteerData = await db.query.volunteer.findFirst({
+      where: eq(volunteerTable.studentId, studentData.id),
+      columns: { id: true, isActive: true }
     });
 
-    if (!volunteer || !volunteer.isActive) {
+    if (!volunteerData || !volunteerData.isActive) {
       return NextResponse.json(
         { success: false, message: "Volunteer not found or inactive" },
         { status: 403 }
@@ -52,9 +51,9 @@ export async function GET(req: NextRequest) {
     const driveIdParam = searchParams.get("driveId");
 
     // Get all active drives (lightweight — just id + name for the drive selector)
-    const activeDrives = await db.placementDrive.findMany({
-      where: { status: "active" },
-      select: {
+    const activeDrives = await db.query.placementDrive.findMany({
+      where: eq(placementDrive.status, "active"),
+      columns: {
         id: true,
         companyName: true,
         roleName: true,
@@ -83,12 +82,12 @@ export async function GET(req: NextRequest) {
     const selectedDrive = activeDrives.find(d => d.id === selectedDriveId) || activeDrives[0];
 
     // Paginated single-drive query
-    const [registrations, totalCount] = await Promise.all([
-      db.driveRegistration.findMany({
-        where: { driveId: selectedDrive.id },
-        include: {
+    const [registrations, countResult] = await Promise.all([
+      db.query.driveRegistration.findMany({
+        where: eq(driveRegistration.driveId, selectedDrive.id),
+        with: {
           student: {
-            select: {
+            columns: {
               id: true,
               name: true,
               enrollmentNumber: true,
@@ -101,7 +100,7 @@ export async function GET(req: NextRequest) {
             }
           },
           externalStudent: {
-            select: {
+            columns: {
               id: true,
               name: true,
               enrollmentNumber: true,
@@ -114,7 +113,7 @@ export async function GET(req: NextRequest) {
             }
           },
           alumni: {
-            select: {
+            columns: {
               id: true,
               name: true,
               enrollmentNumber: true,
@@ -126,12 +125,14 @@ export async function GET(req: NextRequest) {
             }
           }
         },
-        take: limit,
-        skip: skip,
-        orderBy: { createdAt: "desc" },
+        limit: limit,
+        offset: skip,
+        orderBy: (t, { desc }) => [desc(t.createdAt)],
       }),
-      db.driveRegistration.count({ where: { driveId: selectedDrive.id } }),
+      db.select({ count: count() }).from(driveRegistration).where(eq(driveRegistration.driveId, selectedDrive.id)),
     ]);
+
+    const totalCount = countResult[0]?.count || 0;
 
     // Format registrations into flat student objects
     const students = registrations.map(reg => {

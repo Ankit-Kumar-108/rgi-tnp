@@ -1,6 +1,8 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { eq } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 import { NotificationService } from "@/lib/notification-service";
 import { passwordResetEmailTemplate } from "@/lib/email-templates";
 import { generateResetToken, getresetTokenExpiry } from "@/lib/auth-utils";
@@ -35,57 +37,45 @@ export async function POST(req: NextRequest) {
     let userName = "User";
 
     if (role === "student") {
-      const student = await db.student.findUnique({ where: { email } });
+      const student = await db.query.student.findFirst({ where: eq(schema.student.email, email) });
       if (!student) {
         return NextResponse.json({ success: true, message: "NO! account linked with this Email" });
       }
       userName = student.name;
-      await db.student.update({
-        where: { email },
-        data: {
-          resetPasswordToken: resetTokenHash,
-          resetPasswordTokenExpiry: expiry,
-        },
-      });
+      await db.update(schema.student).set({
+        resetPasswordToken: resetTokenHash,
+        resetPasswordTokenExpiry: expiry,
+      }).where(eq(schema.student.email, email));
     } else if (role === "external_student") {
-      const externalStudent = await db.externalStudent.findUnique({ where: { email } });
+      const externalStudent = await db.query.externalStudent.findFirst({ where: eq(schema.externalStudent.email, email) });
       if (!externalStudent) {
         return NextResponse.json({ success: true, message: "NO! account linked with this Email" });
       }
       userName = externalStudent.name;
-      await db.externalStudent.update({
-        where: { email },
-        data: {
-          resetPasswordToken: resetTokenHash,
-          resetPasswordTokenExpiry: expiry,
-        },
-      });
+      await db.update(schema.externalStudent).set({
+        resetPasswordToken: resetTokenHash,
+        resetPasswordTokenExpiry: expiry,
+      }).where(eq(schema.externalStudent.email, email));
     } else if (role === "alumni") {
-      const alumni = await db.alumni.findUnique({ where: { personalEmail: email } });
+      const alumni = await db.query.alumni.findFirst({ where: eq(schema.alumni.personalEmail, email) });
       if (!alumni) {
         return NextResponse.json({ success: true, message: "NO! account linked with this Email" });
       }
       userName = alumni.name;
-      await db.alumni.update({
-        where: { personalEmail: email },
-        data: {
-          resetPasswordToken: resetTokenHash,
-          resetPasswordTokenExpiry: expiry,
-        },
-      });
-    }else if(role == "recruiter"){
-      const recruiter  = await db.recruiter.findUnique({where: {email}})
-      if (!recruiter){
-        return NextResponse.json({success: true, message: "NO! account linked with this Email"})
+      await db.update(schema.alumni).set({
+        resetPasswordToken: resetTokenHash,
+        resetPasswordTokenExpiry: expiry,
+      }).where(eq(schema.alumni.personalEmail, email));
+    } else if (role == "recruiter") {
+      const recruiter = await db.query.recruiter.findFirst({ where: eq(schema.recruiter.email, email) });
+      if (!recruiter) {
+        return NextResponse.json({ success: true, message: "NO! account linked with this Email" });
       }
-      userName = recruiter.name
-      await db.recruiter.update({
-        where: {email},
-        data: {
-          resetPasswordToken: resetTokenHash,
-          resetPasswordTokenExpiry: expiry,
-      }
-      })
+      userName = recruiter.name;
+      await db.update(schema.recruiter).set({
+        resetPasswordToken: resetTokenHash,
+        resetPasswordTokenExpiry: expiry,
+      }).where(eq(schema.recruiter.email, email));
     } else {
       return NextResponse.json({ success: false, message: "Invalid role specified." }, { status: 400 });
     }

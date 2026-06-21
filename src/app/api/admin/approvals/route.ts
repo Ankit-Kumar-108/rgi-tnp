@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 export const dynamic = 'force-dynamic';
-// @ts-nocheck
+
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { eq, inArray, and, or, gte, lte, count } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 import { 
   placementOpportunityTemplate, 
   driveRejectionTemplate, 
@@ -75,19 +77,17 @@ async function notifyEligibleStudentsForDrive(drive: ApprovedDrive, triggeredBy:
   const eligibleCourses =
     drive.course === "All" ? [] : parseEligibleValues(drive.course);
 
-  const eligibleStudents = await db.student.findMany({
-    where: {
-      isEmailVerified: true,
-      branch: { in: eligibleBranches },
-      batch: {
-        gte: drive.minBatch,
-        lte: drive.maxBatch,
-      },
-      ...(eligibleCourses.length > 0
-        ? { course: { in: eligibleCourses } }
-        : {}),
-    },
-    select: {
+  const eligibleStudents = await db.query.student.findMany({
+    where: and(
+      eq(schema.student.isEmailVerified, true),
+      inArray(schema.student.branch, eligibleBranches),
+      gte(schema.student.batch, drive.minBatch),
+      lte(schema.student.batch, drive.maxBatch),
+      eligibleCourses.length > 0
+        ? inArray(schema.student.course, eligibleCourses)
+        : undefined
+    ),
+    columns: {
       id: true,
       name: true,
       email: true,
@@ -143,9 +143,12 @@ async function notifyEligibleStudentsForDrive(drive: ApprovedDrive, triggeredBy:
 
 async function sendApprovedDriveNotifications(driveIds: string[], triggeredBy: string) {
   const db = getDb();
-  const approvedDrives = await db.placementDrive.findMany({
-    where: { id: { in: driveIds }, status: "active" },
-    select: {
+  const approvedDrives = await db.query.placementDrive.findMany({
+    where: and(
+      inArray(schema.placementDrive.id, driveIds),
+      eq(schema.placementDrive.status, "active")
+    ),
+    columns: {
       id: true,
       companyName: true,
       roleName: true,
@@ -176,10 +179,15 @@ async function sendApprovedDriveNotifications(driveIds: string[], triggeredBy: s
 
 async function notifyRecruitersForRejectedDrives(driveIds: string[], triggeredBy: string) {
   const db = getDb();
-  const rejectedDrives = await db.placementDrive.findMany({
-    where: { id: { in: driveIds }, status: "rejected" },
-    include: {
-      recruiter: { select: { id: true, name: true, email: true } },
+  const rejectedDrives = await db.query.placementDrive.findMany({
+    where: and(
+      inArray(schema.placementDrive.id, driveIds),
+      eq(schema.placementDrive.status, "rejected")
+    ),
+    with: {
+      recruiter: {
+        columns: { id: true, name: true, email: true }
+      },
     },
   });
 
@@ -210,10 +218,12 @@ async function notifyRecruitersForRejectedDrives(driveIds: string[], triggeredBy
 
 async function notifyAlumniForReferrals(referralIds: string[], action: "approve" | "reject", triggeredBy: string) {
   const db = getDb();
-  const referrals = await db.referral.findMany({
-    where: { id: { in: referralIds } },
-    include: {
-      alumni: { select: { id: true, name: true, personalEmail: true } },
+  const referrals = await db.query.referral.findMany({
+    where: inArray(schema.referral.id, referralIds),
+    with: {
+      alumni: {
+        columns: { id: true, name: true, personalEmail: true }
+      },
     },
   });
 
@@ -243,15 +253,17 @@ async function notifyAlumniForReferrals(referralIds: string[], action: "approve"
 
 async function notifyUploaderForMemoryApproval(memoryIds: string[], triggeredBy: string) {
   const db = getDb();
-  const memories = await db.memory.findMany({
-    where: { id: { in: memoryIds } },
-    select: {
+  const memories = await db.query.memory.findMany({
+    where: inArray(schema.memory.id, memoryIds),
+    columns: {
       id: true,
       title: true,
       studentId: true,
       alumniId: true,
-      student: { select: { email: true, name: true } },
-      alumni: { select: { personalEmail: true, name: true } },
+    },
+    with: {
+      student: { columns: { email: true, name: true } },
+      alumni: { columns: { personalEmail: true, name: true } },
     },
   });
 
@@ -281,10 +293,12 @@ async function notifyUploaderForMemoryApproval(memoryIds: string[], triggeredBy:
 
 async function notifyVolunteersApproval(volunteerIds: string[], triggeredBy: string) {
   const db = getDb();
-  const volunteers = await db.volunteer.findMany({
-    where: { id: { in: volunteerIds } },
-    include: {
-      student: { select: { id: true, name: true, email: true } },
+  const volunteers = await db.query.volunteer.findMany({
+    where: inArray(schema.volunteer.id, volunteerIds),
+    with: {
+      student: {
+        columns: { id: true, name: true, email: true }
+      },
     },
   });
 
@@ -320,101 +334,100 @@ export async function GET(req: NextRequest) {
     const db = getDb();
 
     if (type === "drives") {
-      const where = { status: "pending" };
-      const [items, totalCount] = await Promise.all([
-        db.placementDrive.findMany({
-          where,
-          include: {
-            recruiter: { select: { name: true, company: true, email: true } },
+      const [items, countResult] = await Promise.all([
+        db.query.placementDrive.findMany({
+          where: eq(schema.placementDrive.status, "pending"),
+          with: {
+            recruiter: { columns: { name: true, company: true, email: true } },
           },
-          orderBy: { driveDate: "desc" },
-          take: limit,
-          skip,
+          orderBy: (t, { desc }) => [desc(t.driveDate)],
+          limit,
+          offset: skip,
         }),
-        db.placementDrive.count({ where }),
+        db.select({ count: count() }).from(schema.placementDrive).where(eq(schema.placementDrive.status, "pending")),
       ]);
+      const totalCount = countResult[0]?.count || 0;
       return NextResponse.json({ success: true, items, totalCount });
     }
 
     if (type === "studentFeedback") {
-      const where = { isApproved: false };
-      const [items, totalCount] = await Promise.all([
-        db.studentFeedback.findMany({
-          where,
-          include: {
+      const [items, countResult] = await Promise.all([
+        db.query.studentFeedback.findMany({
+          where: eq(schema.studentFeedback.isApproved, false),
+          with: {
             student: {
-              select: { name: true, enrollmentNumber: true, profileImageUrl: true },
+              columns: { name: true, enrollmentNumber: true, profileImageUrl: true },
             },
           },
-          orderBy: { createdAt: "desc" },
-          take: limit,
-          skip,
+          orderBy: (t, { desc }) => [desc(t.createdAt)],
+          limit,
+          offset: skip,
         }),
-        db.studentFeedback.count({ where }),
+        db.select({ count: count() }).from(schema.studentFeedback).where(eq(schema.studentFeedback.isApproved, false)),
       ]);
+      const totalCount = countResult[0]?.count || 0;
       return NextResponse.json({ success: true, items, totalCount });
     }
 
     if (type === "alumniFeedback") {
-      const where = { isApproved: false };
-      const [items, totalCount] = await Promise.all([
-        db.alumniFeedback.findMany({
-          where,
-          include: {
+      const [items, countResult] = await Promise.all([
+        db.query.alumniFeedback.findMany({
+          where: eq(schema.alumniFeedback.isApproved, false),
+          with: {
             alumni: {
-              select: { name: true, personalEmail: true, profileImageUrl: true },
+              columns: { name: true, personalEmail: true, profileImageUrl: true },
             },
           },
-          orderBy: { createdAt: "desc" },
-          take: limit,
-          skip,
+          orderBy: (t, { desc }) => [desc(t.createdAt)],
+          limit,
+          offset: skip,
         }),
-        db.alumniFeedback.count({ where }),
+        db.select({ count: count() }).from(schema.alumniFeedback).where(eq(schema.alumniFeedback.isApproved, false)),
       ]);
+      const totalCount = countResult[0]?.count || 0;
       return NextResponse.json({ success: true, items, totalCount });
     }
 
     if (type === "corporateFeedback") {
-      const where = { isApproved: false };
-      const [items, totalCount] = await Promise.all([
-        db.corporateFeedback.findMany({
-          where,
-          include: {
-            recruiter: { select: { name: true, email: true } },
+      const [items, countResult] = await Promise.all([
+        db.query.corporateFeedback.findMany({
+          where: eq(schema.corporateFeedback.isApproved, false),
+          with: {
+            recruiter: { columns: { name: true, email: true } },
           },
-          orderBy: { createdAt: "desc" },
-          take: limit,
-          skip,
+          orderBy: (t, { desc }) => [desc(t.createdAt)],
+          limit,
+          offset: skip,
         }),
-        db.corporateFeedback.count({ where }),
+        db.select({ count: count() }).from(schema.corporateFeedback).where(eq(schema.corporateFeedback.isApproved, false)),
       ]);
+      const totalCount = countResult[0]?.count || 0;
       return NextResponse.json({ success: true, items, totalCount });
     }
 
     if (type === "referrals") {
-      const where = { status: "pending" };
-      const [items, totalCount] = await Promise.all([
-        db.referral.findMany({
-          where,
-          include: {
+      const [items, countResult] = await Promise.all([
+        db.query.referral.findMany({
+          where: eq(schema.referral.status, "pending"),
+          with: {
             alumni: {
-              select: { name: true, personalEmail: true, profileImageUrl: true },
+              columns: { name: true, personalEmail: true, profileImageUrl: true },
             },
           },
-          take: limit,
-          skip,
+          limit,
+          offset: skip,
         }),
-        db.referral.count({ where }),
+        db.select({ count: count() }).from(schema.referral).where(eq(schema.referral.status, "pending")),
       ]);
+      const totalCount = countResult[0]?.count || 0;
       return NextResponse.json({ success: true, items, totalCount });
     }
 
     if (type === "external") {
-      const where = { isVerified: false };
-      const [items, totalCount] = await Promise.all([
-        db.externalStudent.findMany({
-          where,
-          select: {
+      const [items, countResult] = await Promise.all([
+        db.query.externalStudent.findMany({
+          where: eq(schema.externalStudent.isVerified, false),
+          columns: {
             id: true,
             name: true,
             collegeName: true,
@@ -430,44 +443,42 @@ export async function GET(req: NextRequest) {
             tenthPercentage: true,
             twelfthPercentage: true,
           },
-          take: limit,
-          skip,
+          limit,
+          offset: skip,
         }),
-        db.externalStudent.count({ where }),
+        db.select({ count: count() }).from(schema.externalStudent).where(eq(schema.externalStudent.isVerified, false)),
       ]);
+      const totalCount = countResult[0]?.count || 0;
       return NextResponse.json({ success: true, items, totalCount });
     }
 
     if (type === "memories") {
-      const where = {
-        OR: [{ status: "pending_moderation" }, { status: "approved" }],
-      };
-      const [items, totalCount] = await Promise.all([
-        db.memory.findMany({
-          where,
-          include: {
+      const [items, countResult] = await Promise.all([
+        db.query.memory.findMany({
+          where: or(eq(schema.memory.status, "pending_moderation"), eq(schema.memory.status, "approved")),
+          with: {
             student: {
-              select: { name: true, enrollmentNumber: true, profileImageUrl: true },
+              columns: { name: true, enrollmentNumber: true, profileImageUrl: true },
             },
             alumni: {
-              select: { name: true, enrollmentNumber: true, profileImageUrl: true },
+              columns: { name: true, enrollmentNumber: true, profileImageUrl: true },
             },
           },
-          orderBy: { createdAt: "desc" },
-          take: limit,
-          skip,
+          orderBy: (t, { desc }) => [desc(t.createdAt)],
+          limit,
+          offset: skip,
         }),
-        db.memory.count({ where }),
+        db.select({ count: count() }).from(schema.memory).where(or(eq(schema.memory.status, "pending_moderation"), eq(schema.memory.status, "approved"))),
       ]);
+      const totalCount = countResult[0]?.count || 0;
       return NextResponse.json({ success: true, items, totalCount });
     }
 
     if (type === "unverifiedStudents") {
-      const where = { emailVerificationFailed: true };
-      const [items, totalCount] = await Promise.all([
-        db.student.findMany({
-          where,
-          select: {
+      const [items, countResult] = await Promise.all([
+        db.query.student.findMany({
+          where: eq(schema.student.emailVerificationFailed, true),
+          columns: {
             id: true,
             name: true,
             enrollmentNumber: true,
@@ -481,21 +492,21 @@ export async function GET(req: NextRequest) {
             emailVerificationError: true,
             createdAt: true,
           },
-          orderBy: { createdAt: "desc" },
-          take: limit,
-          skip,
+          orderBy: (t, { desc }) => [desc(t.createdAt)],
+          limit,
+          offset: skip,
         }),
-        db.student.count({ where }),
+        db.select({ count: count() }).from(schema.student).where(eq(schema.student.emailVerificationFailed, true)),
       ]);
+      const totalCount = countResult[0]?.count || 0;
       return NextResponse.json({ success: true, items, totalCount });
     }
 
     if (type === "unverifiedAlumni") {
-      const where = { emailVerificationFailed: true };
-      const [items, totalCount] = await Promise.all([
-        db.alumni.findMany({
-          where,
-          select: {
+      const [items, countResult] = await Promise.all([
+        db.query.alumni.findMany({
+          where: eq(schema.alumni.emailVerificationFailed, true),
+          columns: {
             id: true,
             name: true,
             enrollmentNumber: true,
@@ -508,21 +519,21 @@ export async function GET(req: NextRequest) {
             emailVerificationError: true,
             createdAt: true,
           },
-          orderBy: { createdAt: "desc" },
-          take: limit,
-          skip,
+          orderBy: (t, { desc }) => [desc(t.createdAt)],
+          limit,
+          offset: skip,
         }),
-        db.alumni.count({ where }),
+        db.select({ count: count() }).from(schema.alumni).where(eq(schema.alumni.emailVerificationFailed, true)),
       ]);
+      const totalCount = countResult[0]?.count || 0;
       return NextResponse.json({ success: true, items, totalCount });
     }
 
     if (type === "unverifiedExternal") {
-      const where = { emailVerificationFailed: true };
-      const [items, totalCount] = await Promise.all([
-        db.externalStudent.findMany({
-          where,
-          select: {
+      const [items, countResult] = await Promise.all([
+        db.query.externalStudent.findMany({
+          where: eq(schema.externalStudent.emailVerificationFailed, true),
+          columns: {
             id: true,
             name: true,
             enrollmentNumber: true,
@@ -537,27 +548,29 @@ export async function GET(req: NextRequest) {
             emailVerificationError: true,
             createdAt: true,
           },
-          orderBy: { createdAt: "desc" },
-          take: limit,
-          skip,
+          orderBy: (t, { desc }) => [desc(t.createdAt)],
+          limit,
+          offset: skip,
         }),
-        db.externalStudent.count({ where }),
+        db.select({ count: count() }).from(schema.externalStudent).where(eq(schema.externalStudent.emailVerificationFailed, true)),
       ]);
+      const totalCount = countResult[0]?.count || 0;
       return NextResponse.json({ success: true, items, totalCount });
     }
 
     if (type === "volunteers") {
-      const where = { isVerified: false };
-      const [items, totalCount] = await Promise.all([
-        db.volunteer.findMany({
-          where,
-          select: {
+      const [items, countResult] = await Promise.all([
+        db.query.volunteer.findMany({
+          where: eq(schema.volunteer.isVerified, false),
+          columns: {
             id: true,
             studentId: true,
             designation: true,
             createdAt: true,
+          },
+          with: {
             student: {
-              select: {
+              columns: {
                 name: true,
                 enrollmentNumber: true,
                 profileImageUrl: true,
@@ -570,12 +583,13 @@ export async function GET(req: NextRequest) {
               },
             },
           },
-          orderBy: { createdAt: "desc" },
-          take: limit,
-          skip,
+          orderBy: (t, { desc }) => [desc(t.createdAt)],
+          limit,
+          offset: skip,
         }),
-        db.volunteer.count({ where }),
+        db.select({ count: count() }).from(schema.volunteer).where(eq(schema.volunteer.isVerified, false)),
       ]);
+      const totalCount = countResult[0]?.count || 0;
       return NextResponse.json({ success: true, items, totalCount });
     }
 
@@ -606,7 +620,7 @@ export async function POST(req: NextRequest) {
     const { type, id, ids, action, status, driveStudentPair } = body;
     const targetIds = ids || (id ? [id] : []);
 
-    if (targetIds.length === 0) {
+    if (targetIds.length === 0 && type !== "drive_student_status") {
       return NextResponse.json(
         { success: false, message: "No IDs provided" },
         { status: 400 },
@@ -616,10 +630,9 @@ export async function POST(req: NextRequest) {
     const db = getDb();
 
     if (type === "drives") {
-      await db.placementDrive.updateMany({
-        where: { id: { in: targetIds } },
-        data: { status: action === "approve" ? "active" : "rejected" },
-      });
+      await db.update(schema.placementDrive)
+        .set({ status: action === "approve" ? "active" : "rejected" })
+        .where(inArray(schema.placementDrive.id, targetIds));
 
       if (action === "approve") {
         runInBackground(
@@ -633,10 +646,9 @@ export async function POST(req: NextRequest) {
         );
       }
     } else if (type === "referrals") {
-      await db.referral.updateMany({
-        where: { id: { in: targetIds } },
-        data: { status: action === "approve" ? "published" : "rejected" },
-      });
+      await db.update(schema.referral)
+        .set({ status: action === "approve" ? "published" : "rejected" })
+        .where(inArray(schema.referral.id, targetIds));
 
       runInBackground(
         notifyAlumniForReferrals(targetIds, action, adminEmail),
@@ -644,17 +656,16 @@ export async function POST(req: NextRequest) {
       );
     } else if (type === "external") {
       if (action === "approve") {
-        await db.externalStudent.updateMany({
-          where: { id: { in: targetIds } },
-          data: { isVerified: true },
-        });
+        await db.update(schema.externalStudent)
+          .set({ isVerified: true })
+          .where(inArray(schema.externalStudent.id, targetIds));
 
         // Notify External Student
         runInBackground(
           (async () => {
-            const list = await db.externalStudent.findMany({
-              where: { id: { in: targetIds } },
-              select: { id: true, name: true, email: true },
+            const list = await db.query.externalStudent.findMany({
+              where: inArray(schema.externalStudent.id, targetIds),
+              columns: { id: true, name: true, email: true },
             });
             await Promise.allSettled(
               list.map((student) =>
@@ -680,26 +691,23 @@ export async function POST(req: NextRequest) {
         );
       } else {
         // Fetch R2 URLs before deleting
-        const extStudents = await db.externalStudent.findMany({
-          where: { id: { in: targetIds } },
-          select: { profileImageUrl: true, resumeUrl: true },
+        const extStudents = await db.query.externalStudent.findMany({
+          where: inArray(schema.externalStudent.id, targetIds),
+          columns: { profileImageUrl: true, resumeUrl: true },
         });
         const extUrls = extStudents
           .flatMap((s) => [s.profileImageUrl, s.resumeUrl])
           .filter((url): url is string => Boolean(url));
 
-        await db.externalStudent.deleteMany({
-          where: { id: { in: targetIds } },
-        });
+        await db.delete(schema.externalStudent).where(inArray(schema.externalStudent.id, targetIds));
 
         if (extUrls.length > 0) await deleteMultipleFromR2(extUrls);
       }
     } else if (type === "memories") {
       if (action === "approve") {
-        await db.memory.updateMany({
-          where: { id: { in: targetIds } },
-          data: { status: "approved" },
-        });
+        await db.update(schema.memory)
+          .set({ status: "approved" })
+          .where(inArray(schema.memory.id, targetIds));
 
         runInBackground(
           notifyUploaderForMemoryApproval(targetIds, adminEmail),
@@ -707,68 +715,56 @@ export async function POST(req: NextRequest) {
         );
       } else {
         // Fetch imageUrls before deleting
-        const memories = await db.memory.findMany({
-          where: { id: { in: targetIds } },
-          select: { imageUrl: true },
+        const memories = await db.query.memory.findMany({
+          where: inArray(schema.memory.id, targetIds),
+          columns: { imageUrl: true },
         });
         const imageUrls = memories.map((m) => m.imageUrl).filter(Boolean);
 
-        await db.memory.deleteMany({
-          where: { id: { in: targetIds } },
-        });
+        await db.delete(schema.memory).where(inArray(schema.memory.id, targetIds));
 
         if (imageUrls.length > 0) await deleteMultipleFromR2(imageUrls);
       }
     } else if (type === "studentFeedback") {
       if (action === "approve") {
-        await db.studentFeedback.updateMany({
-          where: { id: { in: targetIds } },
-          data: { isApproved: true },
-        });
+        await db.update(schema.studentFeedback)
+          .set({ isApproved: true })
+          .where(inArray(schema.studentFeedback.id, targetIds));
       } else {
-        await db.studentFeedback.deleteMany({
-          where: { id: { in: targetIds } },
-        });
+        await db.delete(schema.studentFeedback).where(inArray(schema.studentFeedback.id, targetIds));
       }
     } else if (type === "alumniFeedback") {
       if (action === "approve") {
-        await db.alumniFeedback.updateMany({
-          where: { id: { in: targetIds } },
-          data: { isApproved: true },
-        });
+        await db.update(schema.alumniFeedback)
+          .set({ isApproved: true })
+          .where(inArray(schema.alumniFeedback.id, targetIds));
       } else {
-        await db.alumniFeedback.deleteMany({
-          where: { id: { in: targetIds } },
-        });
+        await db.delete(schema.alumniFeedback).where(inArray(schema.alumniFeedback.id, targetIds));
       }
     } else if (type === "corporateFeedback") {
       if (action === "approve") {
-        await db.corporateFeedback.updateMany({
-          where: { id: { in: targetIds } },
-          data: { isApproved: true },
-        });
+        await db.update(schema.corporateFeedback)
+          .set({ isApproved: true })
+          .where(inArray(schema.corporateFeedback.id, targetIds));
       } else {
-        await db.corporateFeedback.deleteMany({
-          where: { id: { in: targetIds } },
-        });
+        await db.delete(schema.corporateFeedback).where(inArray(schema.corporateFeedback.id, targetIds));
       }
     } else if (type === "unverifiedStudents") {
       if (action === "approve") {
-        await db.student.updateMany({
-          where: { id: { in: targetIds } },
-          data: {
+        await db.update(schema.student)
+          .set({
             emailVerificationFailed: false,
             emailVerificationError: null,
             isEmailVerified: true,
             isVerified: true,
-          },
-        });
+          })
+          .where(inArray(schema.student.id, targetIds));
 
         runInBackground(
           (async () => {
-            const list = await db.student.findMany({
-              where: { id: { in: targetIds } },
-              select: { id: true, name: true, email: true },
+            const list = await db.query.student.findMany({
+              where: inArray(schema.student.id, targetIds),
+              columns: { id: true, name: true, email: true },
             });
             await Promise.allSettled(
               list.map((student) =>
@@ -793,36 +789,33 @@ export async function POST(req: NextRequest) {
           "student verification notifications"
         );
       } else {
-        const students = await db.student.findMany({
-          where: { id: { in: targetIds } },
-          select: { profileImageUrl: true, resumeUrl: true },
+        const students = await db.query.student.findMany({
+          where: inArray(schema.student.id, targetIds),
+          columns: { profileImageUrl: true, resumeUrl: true },
         });
         const studentUrls = students
           .flatMap((s) => [s.profileImageUrl, s.resumeUrl])
           .filter((url): url is string => Boolean(url));
 
-        await db.student.deleteMany({
-          where: { id: { in: targetIds } },
-        });
+        await db.delete(schema.student).where(inArray(schema.student.id, targetIds));
 
         if (studentUrls.length > 0) await deleteMultipleFromR2(studentUrls);
       }
     } else if (type === "unverifiedAlumni") {
       if (action === "approve") {
-        await db.alumni.updateMany({
-          where: { id: { in: targetIds } },
-          data: {
+        await db.update(schema.alumni)
+          .set({
             emailVerificationFailed: false,
             emailVerificationError: null,
             isVerified: true,
-          },
-        });
+          })
+          .where(inArray(schema.alumni.id, targetIds));
 
         runInBackground(
           (async () => {
-            const list = await db.alumni.findMany({
-              where: { id: { in: targetIds } },
-              select: { id: true, name: true, personalEmail: true },
+            const list = await db.query.alumni.findMany({
+              where: inArray(schema.alumni.id, targetIds),
+              columns: { id: true, name: true, personalEmail: true },
             });
             await Promise.allSettled(
               list.map((alumni) =>
@@ -847,36 +840,33 @@ export async function POST(req: NextRequest) {
           "alumni verification notifications"
         );
       } else {
-        const alumniRecords = await db.alumni.findMany({
-          where: { id: { in: targetIds } },
-          select: { profileImageUrl: true },
+        const alumniRecords = await db.query.alumni.findMany({
+          where: inArray(schema.alumni.id, targetIds),
+          columns: { profileImageUrl: true },
         });
         const alumniUrls = alumniRecords
           .map((a) => a.profileImageUrl)
           .filter(Boolean);
 
-        await db.alumni.deleteMany({
-          where: { id: { in: targetIds } },
-        });
+        await db.delete(schema.alumni).where(inArray(schema.alumni.id, targetIds));
 
         if (alumniUrls.length > 0) await deleteMultipleFromR2(alumniUrls);
       }
     } else if (type === "unverifiedExternal") {
       if (action === "approve") {
-        await db.externalStudent.updateMany({
-          where: { id: { in: targetIds } },
-          data: {
+        await db.update(schema.externalStudent)
+          .set({
             emailVerificationFailed: false,
             emailVerificationError: null,
             isVerified: true,
-          },
-        });
+          })
+          .where(inArray(schema.externalStudent.id, targetIds));
 
         runInBackground(
           (async () => {
-            const list = await db.externalStudent.findMany({
-              where: { id: { in: targetIds } },
-              select: { id: true, name: true, email: true },
+            const list = await db.query.externalStudent.findMany({
+              where: inArray(schema.externalStudent.id, targetIds),
+              columns: { id: true, name: true, email: true },
             });
             await Promise.allSettled(
               list.map((student) =>
@@ -901,35 +891,30 @@ export async function POST(req: NextRequest) {
           "external verification notifications"
         );
       } else {
-        const extRecords = await db.externalStudent.findMany({
-          where: { id: { in: targetIds } },
-          select: { profileImageUrl: true, resumeUrl: true },
+        const extRecords = await db.query.externalStudent.findMany({
+          where: inArray(schema.externalStudent.id, targetIds),
+          columns: { profileImageUrl: true, resumeUrl: true },
         });
         const extUrls = extRecords
           .flatMap((s) => [s.profileImageUrl, s.resumeUrl])
           .filter((url): url is string => Boolean(url));
 
-        await db.externalStudent.deleteMany({
-          where: { id: { in: targetIds } },
-        });
+        await db.delete(schema.externalStudent).where(inArray(schema.externalStudent.id, targetIds));
 
         if (extUrls.length > 0) await deleteMultipleFromR2(extUrls);
       }
     } else if (type === "volunteers") {
       if (action === "approve") {
-        await db.volunteer.updateMany({
-          where: { id: { in: targetIds } },
-          data: { isVerified: true, assignedAt: new Date() },
-        });
+        await db.update(schema.volunteer)
+          .set({ isVerified: true, assignedAt: new Date().toISOString() })
+          .where(inArray(schema.volunteer.id, targetIds));
 
         runInBackground(
           notifyVolunteersApproval(targetIds, adminEmail),
           "volunteer approval notifications",
         );
       } else {
-        await db.volunteer.deleteMany({
-          where: { id: { in: targetIds } },
-        });
+        await db.delete(schema.volunteer).where(inArray(schema.volunteer.id, targetIds));
       }
     } else if (type === "drive_student_status") {
       // Handle volunteer student status updates
@@ -949,20 +934,25 @@ export async function POST(req: NextRequest) {
 
       // Upsert status for each drive-student pair
       for (const pair of driveStudentPair) {
-        await db.volunteerStudentStatus.upsert({
-          where: {
-            driveId_studentId: {
+        const existing = await db.query.volunteerStudentStatus.findFirst({
+          where: and(
+            eq(schema.volunteerStudentStatus.driveId, pair.driveId),
+            eq(schema.volunteerStudentStatus.studentId, pair.studentId)
+          ),
+        });
+
+        if (existing) {
+          await db.update(schema.volunteerStudentStatus)
+            .set({ status, updatedAt: new Date().toISOString() })
+            .where(eq(schema.volunteerStudentStatus.id, existing.id));
+        } else {
+          await db.insert(schema.volunteerStudentStatus)
+            .values({
               driveId: pair.driveId,
               studentId: pair.studentId,
-            },
-          },
-          update: { status },
-          create: {
-            driveId: pair.driveId,
-            studentId: pair.studentId,
-            status,
-          },
-        });
+              status,
+            });
+        }
       }
     } else {
       return NextResponse.json(
@@ -1007,16 +997,15 @@ export async function PUT(req :NextRequest) {
 
     const db = getDb()
 
-    const existingDrive = await db.placementDrive.findUnique({
-      where: {id: body.id},
+    const existingDrive = await db.query.placementDrive.findFirst({
+      where: eq(schema.placementDrive.id, body.id),
     })
     if (!existingDrive) {
       return NextResponse.json({ success: false, message: "Drive not found" }, { status: 404 });
     }
 
-    const updatedDrive = await db.placementDrive.update({
-      where: { id: body.id },
-      data: {
+    const updatedResult = await db.update(schema.placementDrive)
+      .set({
         companyName: body.companyName,
         roleName: body.roleName,
         genderPreference: body.genderPreference,
@@ -1032,11 +1021,11 @@ export async function PUT(req :NextRequest) {
         driveDate: new Date(body.driveDate),
         driveType: body.driveType || existingDrive.driveType,
         jobType: body.jobType || existingDrive.jobType,
-        
-      },
-    });
+      })
+      .where(eq(schema.placementDrive.id, body.id))
+      .returning();
 
-    return NextResponse.json({ success: true, message: "Drive updated successfully", drive: updatedDrive });
+    return NextResponse.json({ success: true, message: "Drive updated successfully", drive: updatedResult[0] });
   } catch (error: any) {
     console.error("Error Upadting Drive", error)
     return NextResponse.json({

@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
 import { deleteFromR2 } from "@/lib/r2-delete";
+import { student } from "@/lib/schema";
+import { eq } from "drizzle-orm";
 
 function hasValue(value: unknown) {
   return value !== undefined && value !== null && value !== "";
@@ -62,9 +64,9 @@ export async function PATCH(req: NextRequest) {
     }
 
     const db = getDb();
-    const existingStudent = await db.student.findUnique({
-      where: { enrollmentNumber: studentTokenData.enrollmentNumber },
-      select: {
+    const existingStudent = await db.query.student.findFirst({
+      where: eq(student.enrollmentNumber, studentTokenData.enrollmentNumber),
+      columns: {
         name: true,
         profileImageUrl: true,
         phoneNumber: true,
@@ -114,23 +116,22 @@ export async function PATCH(req: NextRequest) {
       Number.isFinite(nextActiveBacklog) &&
       Number(nextActiveBacklog) >= 0;
 
-    const updatedStudent = await db.student.update({
-      where: { enrollmentNumber: studentTokenData.enrollmentNumber },
-      data: {
-        ...(profileImageUrl !== undefined && { profileImageUrl }),
-        ...(phoneNumber !== undefined && { phoneNumber }),
-        ...(resumeUrl !== undefined && { resumeUrl }),
-        ...(tenthPercentage !== undefined && { tenthPercentage: normalizedTenth }),
-        ...(twelfthPercentage !== undefined && {
-          twelfthPercentage: normalizedTwelfth,
-        }),
-        ...(cgpa !== undefined && { cgpa: normalizedCgpa }),
-        ...(activeBacklog !== undefined && { activeBacklog: normalizedBacklog }),
-        ...(linkedinUrl !== undefined && { linkedinUrl }),
-        ...(githubUrl !== undefined && { githubUrl }),
-        isProfileComplete,
-      },
-    });
+    const updatedStudentResult = await db.update(student).set({
+      ...(profileImageUrl !== undefined && { profileImageUrl }),
+      ...(phoneNumber !== undefined && { phoneNumber }),
+      ...(resumeUrl !== undefined && { resumeUrl }),
+      ...(tenthPercentage !== undefined && { tenthPercentage: normalizedTenth }),
+      ...(twelfthPercentage !== undefined && {
+        twelfthPercentage: normalizedTwelfth,
+      }),
+      ...(cgpa !== undefined && { cgpa: normalizedCgpa }),
+      ...(activeBacklog !== undefined && { activeBacklog: normalizedBacklog }),
+      ...(linkedinUrl !== undefined && { linkedinUrl }),
+      ...(githubUrl !== undefined && { githubUrl }),
+      isProfileComplete,
+      updatedAt: new Date().toISOString(),
+    }).where(eq(student.enrollmentNumber, studentTokenData.enrollmentNumber)).returning();
+    const updatedStudent = updatedStudentResult[0];
 
     // Clean up old R2 files if replaced
     if (profileImageUrl && existingStudent.profileImageUrl &&

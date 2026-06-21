@@ -1,15 +1,14 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-// @ts-nocheck
 export const dynamic = 'force-dynamic';
-// @ts-nocheck
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
+import { placementDrive, driveRegistration, student, externalStudent } from "@/lib/schema";
+import { eq, and, ne, inArray, count } from "drizzle-orm";
 
 export async function GET(req: NextRequest) {
   try {
     const recruiter = await getVerifiedAuthPayloadFromRequest(req, ["recruiter"]);
-    if (!recruiter) {
+    if (!recruiter || !recruiter.id) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
@@ -21,12 +20,12 @@ export async function GET(req: NextRequest) {
 
 
     // Get recruiter's drives WITHOUT nested registrations (avoid N+1)
-    const drives = await db.placementDrive.findMany({
-      where: { 
-        recruiterId: recruiter.id,
-        status: { not: "archived" }
-      },
-      select: {
+    const drives = await db.query.placementDrive.findMany({
+      where: and(
+        eq(placementDrive.recruiterId, recruiter.id),
+        ne(placementDrive.status, "archived")
+      ),
+      columns: {
         id: true,
         companyName: true,
         roleName: true,
@@ -46,7 +45,7 @@ export async function GET(req: NextRequest) {
         jobType: true,
         allowAlumni: true,
       },
-      orderBy: { driveDate: "desc" },
+      orderBy: (t, { desc }) => [desc(t.driveDate)],
     });
 
     // Single GROUP BY query instead of N separate count() calls
@@ -54,15 +53,25 @@ export async function GET(req: NextRequest) {
     const countMap = new Map<string, number>();
     if (driveIds.length > 0) {
       try {
-        const placeholders = driveIds.map(() => '?').join(',');
-        const countRows: any[] = await db.$queryRaw`SELECT "driveId", COUNT(*) as cnt FROM "DriveRegistration" WHERE "driveId" IN (${placeholders}) GROUP BY "driveId"`;
+        const countRows = await db.select({
+          driveId: driveRegistration.driveId,
+          cnt: count(),
+        })
+        .from(driveRegistration)
+        .where(inArray(driveRegistration.driveId, driveIds))
+        .groupBy(driveRegistration.driveId);
+
         for (const row of countRows) {
           countMap.set(row.driveId, Number(row.cnt));
         }
-      } catch {
+      } catch (error) {
+        console.error("Group by query failed, falling back to individual counts:", error);
         // Fallback: use individual count queries if raw SQL fails
         const counts = await Promise.all(
-          drives.map((drive: any) => db.driveRegistration.count({ where: { driveId: drive.id } }))
+          drives.map(async (drive: any) => {
+            const res = await db.select({ count: count() }).from(driveRegistration).where(eq(driveRegistration.driveId, drive.id));
+            return res[0]?.count || 0;
+          })
         );
         drives.forEach((d: any, i: number) => countMap.set(d.id, counts[i]));
       }
@@ -76,69 +85,72 @@ export async function GET(req: NextRequest) {
     const driveParams = searchParams.get("driveId")
     const targetDriveId = driveParams || drives[0]?.id
 
-    if (drives.length > 0) {
-      [applicants, applicantsCount] = await Promise.all([
-        db.driveRegistration.findMany({
-          where: { driveId: targetDriveId },
-          select: {
+    if (drives.length > 0 && targetDriveId) {
+      const [applicantsResult, countResult] = await Promise.all([
+        db.query.driveRegistration.findMany({
+          where: eq(driveRegistration.driveId, targetDriveId),
+          columns: {
             id: true,
             attended: true,
             createdAt: true,
             status: true,
             studentId: true,
             externalStudentId: true,
+          },
+          with: {
             drive: {
-              select :{
+              columns: {
                 roleName: true,
-                companyName: true
+                companyName: true,
               }
             },
             student: {
-              select: {
-                    profileImageUrl: true
+              columns: {
+                profileImageUrl: true,
               }
             },
             externalStudent: {
-              select : {
-                profileImageUrl: true
+              columns: {
+                profileImageUrl: true,
               }
             }
           },
-          take: applicantsLimit,
-          skip: (applicantsPage - 1) * applicantsLimit,
-          orderBy: { createdAt: "desc" },
+          limit: applicantsLimit,
+          offset: (applicantsPage - 1) * applicantsLimit,
+          orderBy: (t, { desc }) => [desc(t.createdAt)],
         }),
-        db.driveRegistration.count({
-          where: { driveId: targetDriveId }
-        })
+        db.select({ count: count() }).from(driveRegistration).where(eq(driveRegistration.driveId, targetDriveId))
       ]);
+
+      applicants = applicantsResult;
+      applicantsCount = countResult[0]?.count || 0;
 
       // Fetch student/external data separately (not nested)
-      const studentIds = applicants.filter(a => a.studentId).map(a => a.studentId);
-      const externalIds = applicants.filter(a => a.externalStudentId).map(a => a.externalStudentId);
+      const studentIds = applicants.filter(a => a.studentId).map(a => a.studentId as string);
+      const externalIds = applicants.filter(a => a.externalStudentId).map(a => a.externalStudentId as string);
 
       const [students, externalStudents] = await Promise.all([
-        studentIds.length > 0
-          ? db.student.findMany({
-              where: { id: { in: studentIds } },
-              select: { id: true, name: true, enrollmentNumber: true, branch: true, cgpa: true, email: true, profileImageUrl: true }
+        (studentIds.length > 0
+          ? db.query.student.findMany({
+              where: inArray(student.id, studentIds),
+              columns: { id: true, name: true, enrollmentNumber: true, branch: true, cgpa: true, email: true, profileImageUrl: true }
             })
-          : Promise.resolve([]),
-        externalIds.length > 0
-          ? db.externalStudent.findMany({
-              where: { id: { in: externalIds } },
-              select: { id: true, name: true, collegeName: true, branch: true, cgpa: true, email: true, profileImageUrl: true }
+          : Promise.resolve([])) as Promise<any[]>,
+        (externalIds.length > 0
+          ? db.query.externalStudent.findMany({
+              where: inArray(externalStudent.id, externalIds),
+              columns: { id: true, name: true, collegeName: true, branch: true, cgpa: true, email: true, profileImageUrl: true }
             })
-          : Promise.resolve([]),
+          : Promise.resolve([])) as Promise<any[]>,
       ]);
 
-      const studentMap = new Map(students.map(s => [s.id, s]));
-      const externalMap = new Map(externalStudents.map(e => [e.id, e]));
+      const studentMap = new Map(students.map(s => [s.id, s] as const));
+      const externalMap = new Map(externalStudents.map(e => [e.id, e] as const));
 
       applicants = applicants.map((a: any) => {
-        const student = a.studentId ? studentMap.get(a.studentId) : null;
-        const external = a.externalStudentId ? externalMap.get(a.externalStudentId) : null;
-        const data = student || external;
+        const studentData = a.studentId ? studentMap.get(a.studentId) : null;
+        const externalData = a.externalStudentId ? externalMap.get(a.externalStudentId) : null;
+        const data = studentData || externalData;
 
         return {
           id: a.id,
@@ -150,7 +162,7 @@ export async function GET(req: NextRequest) {
           branch: data?.branch || "",
           cgpa: data?.cgpa || 0,
           email: data?.email || "",
-          type: student ? "internal" : "external",
+          type: studentData ? "internal" : "external",
           profileImageUrl: data?.profileImageUrl || a.student?.profileImageUrl || a.externalStudent?.profileImageUrl || null,
         };
       });

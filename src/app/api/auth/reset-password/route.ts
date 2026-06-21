@@ -1,8 +1,9 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { eq, and, gt } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 import { hashPassword } from "@/lib/auth-utils";
-import { success } from "zod";
 
 function bufferToHex(buffer: ArrayBuffer): string {
   return Array.from(new Uint8Array(buffer))
@@ -34,89 +35,77 @@ export async function POST(req: NextRequest) {
     const tokenHash = await sha256(token);
 
     if (role === "student") {
-      const student = await db.student.findFirst({
-        where: {
-          resetPasswordToken: tokenHash,
-          resetPasswordTokenExpiry: { gt: new Date() },
-        },
+      const student = await db.query.student.findFirst({
+        where: and(
+          eq(schema.student.resetPasswordToken, tokenHash),
+          gt(schema.student.resetPasswordTokenExpiry, new Date())
+        ),
       });
 
       if (!student) {
         return NextResponse.json({ success: false, message: "Invalid or expired reset token" }, { status: 400 });
       }
 
-      const passwordHash = await hashPassword(password);
-      await db.student.update({
-        where: { id: student.id },
-        data: {
-          passwordHash,
-          resetPasswordToken: null,
-          resetPasswordTokenExpiry: null,
-        },
-      });
+      const passwordHashVal = await hashPassword(password);
+      await db.update(schema.student).set({
+        passwordHash: passwordHashVal,
+        resetPasswordToken: null,
+        resetPasswordTokenExpiry: null,
+      }).where(eq(schema.student.id, student.id));
     } else if (role === "external_student") {
-      const externalStudent = await db.externalStudent.findFirst({
-        where: {
-          resetPasswordToken: tokenHash,
-          resetPasswordTokenExpiry: { gt: new Date() },
-        },
+      const externalStudent = await db.query.externalStudent.findFirst({
+        where: and(
+          eq(schema.externalStudent.resetPasswordToken, tokenHash),
+          gt(schema.externalStudent.resetPasswordTokenExpiry, new Date())
+        ),
       });
 
       if (!externalStudent) {
         return NextResponse.json({ success: false, message: "Invalid or expired reset token" }, { status: 400 });
       }
 
-      const passwordHash = await hashPassword(password);
-      await db.externalStudent.update({
-        where: { id: externalStudent.id },
-        data: {
-          passwordHash,
-          resetPasswordToken: null,
-          resetPasswordTokenExpiry: null,
-        },
-      });
+      const passwordHashVal = await hashPassword(password);
+      await db.update(schema.externalStudent).set({
+        passwordHash: passwordHashVal,
+        resetPasswordToken: null,
+        resetPasswordTokenExpiry: null,
+      }).where(eq(schema.externalStudent.id, externalStudent.id));
     } else if (role === "alumni") {
-      const alumni = await db.alumni.findFirst({
-        where: {
-          resetPasswordToken: tokenHash,
-          resetPasswordTokenExpiry: { gt: new Date() },
-        },
+      const alumni = await db.query.alumni.findFirst({
+        where: and(
+          eq(schema.alumni.resetPasswordToken, tokenHash),
+          gt(schema.alumni.resetPasswordTokenExpiry, new Date())
+        ),
       });
 
       if (!alumni) {
         return NextResponse.json({ success: false, message: "Invalid or expired reset token" }, { status: 400 });
       }
 
-      const passwordHash = await hashPassword(password);
-      await db.alumni.update({
-        where: { id: alumni.id },
-        data: {
-          passwordHash,
-          resetPasswordToken: null,
-          resetPasswordTokenExpiry: null,
-        },
+      const passwordHashVal = await hashPassword(password);
+      await db.update(schema.alumni).set({
+        passwordHash: passwordHashVal,
+        resetPasswordToken: null,
+        resetPasswordTokenExpiry: null,
+      }).where(eq(schema.alumni.id, alumni.id));
+    } else if (role === "recruiter") {
+      const recruiter = await db.query.recruiter.findFirst({
+        where: and(
+          eq(schema.recruiter.resetPasswordToken, tokenHash),
+          gt(schema.recruiter.resetPasswordTokenExpiry, new Date())
+        ),
       });
-    }else if (role === "recruiter") {
-      const recruiter = await db.recruiter.findFirst({
-        where: {
-          resetPasswordToken: tokenHash,
-          resetPasswordTokenExpiry: { gt: new Date() },
-        },
-      })
 
       if (!recruiter) {
         return NextResponse.json({ success: false, message: "Invalid or expired reset token" }, { status: 400 });
       }
 
-      const passwordHash = await hashPassword(password);
-      await db.recruiter.update({
-        where: { id: recruiter.id },
-        data: {
-          passwordHash,
-          resetPasswordToken: null,
-          resetPasswordTokenExpiry: null,
-        },
-      });
+      const passwordHashVal = await hashPassword(password);
+      await db.update(schema.recruiter).set({
+        passwordHash: passwordHashVal,
+        resetPasswordToken: null,
+        resetPasswordTokenExpiry: null,
+      }).where(eq(schema.recruiter.id, recruiter.id));
     } else {
       return NextResponse.json({ success: false, message: "Invalid role specified" }, { status: 400 });
     }

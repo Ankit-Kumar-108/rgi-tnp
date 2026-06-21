@@ -47,6 +47,8 @@ export interface PlacementDrive {
   recruiterId?: string | null;
   recruiter?: Recruiter;
   isRegistered?: boolean;
+  isEligible?: boolean;
+  ineligibilityReason?: string;
 }
 
 export interface DriveRegistration {

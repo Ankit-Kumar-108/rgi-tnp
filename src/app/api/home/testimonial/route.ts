@@ -1,25 +1,33 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { alumniFeedback, alumni } from "@/lib/schema";
+import { eq, and, gte, sql } from "drizzle-orm";
 
 export async function GET() {
   const db = getDb();
   
-  const testimonials = await db.$queryRaw`
-    SELECT 
-      af.id,
-      af.content,
-      af.rating,
-      a.name,
-      a."jobTitle",
-      a."profileImageUrl",
-      a."currentCompany"
-    FROM "AlumniFeedback" af
-    JOIN "Alumni" a ON af."alumniId" = a.id
-    WHERE af."isApproved" = true AND af."rating" >= 4 AND a."isProfileComplete" = true
-    ORDER BY RANDOM() 
-    LIMIT 3
-  `;
+  const testimonials = await db
+    .select({
+      id: alumniFeedback.id,
+      content: alumniFeedback.content,
+      rating: alumniFeedback.rating,
+      name: alumni.name,
+      jobTitle: alumni.jobTitle,
+      profileImageUrl: alumni.profileImageUrl,
+      currentCompany: alumni.currentCompany,
+    })
+    .from(alumniFeedback)
+    .innerJoin(alumni, eq(alumniFeedback.alumniId, alumni.id))
+    .where(
+      and(
+        eq(alumniFeedback.isApproved, true),
+        gte(alumniFeedback.rating, 4),
+        eq(alumni.isProfileComplete, true)
+      )
+    )
+    .orderBy(sql`RANDOM()`)
+    .limit(3);
 
   return NextResponse.json(testimonials, {
     headers: {

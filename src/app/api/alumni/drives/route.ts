@@ -7,6 +7,8 @@ import { driveRegistrationTemplate } from "@/lib/email-templates";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
 import { formatCgpaCriteria, meetsCgpaCriteria } from "@/lib/cgpa-utils";
 import { runInBackground } from "@/lib/background";
+import { eq, and, desc, count } from "drizzle-orm";
+import { alumni as alumniTable, placementDrive, driveRegistration } from "@/lib/schema";
 
 // Same token extraction pattern as your student/drives/route.ts
 
@@ -27,7 +29,7 @@ function extractBatchNumber(batchStr: string): number {
 export async function GET(req: NextRequest) {
   try {
     const alumni = await getVerifiedAuthPayloadFromRequest(req, ["alumni"]);
-    if (!alumni) {
+    if (!alumni || !alumni.id) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
         { status: 401 }
@@ -37,9 +39,9 @@ export async function GET(req: NextRequest) {
     const db = getDb();
 
     // Fetch alumni data to know their branch/course/batch for eligibility
-    const alumniData = await db.alumni.findUnique({
-      where: { id: alumni.id },
-      select: { id: true, branch: true, course: true, batch: true, cgpa: true, gender: true },
+    const alumniData = await db.query.alumni.findFirst({
+      where: eq(alumniTable.id, alumni.id),
+      columns: { id: true, branch: true, course: true, batch: true, cgpa: true, gender: true },
     });
 
     if (!alumniData) {
@@ -50,72 +52,77 @@ export async function GET(req: NextRequest) {
     }
 
     // Fetch active drives that allow alumni
-    const drives = await db.placementDrive.findMany({
-      where: {
-        allowAlumni: true,
-        status: "active",
-      },
-      include: {
-        recruiter: { select: { name: true, company: true } },
+    const drives = await db.query.placementDrive.findMany({
+      where: and(
+        eq(placementDrive.allowAlumni, true),
+        eq(placementDrive.status, "active")
+      ),
+      with: {
+        recruiter: { columns: { name: true, company: true } },
         //  Include this alumni's registration to check isRegistered
         registrations: {
-          where: { alumniId: alumniData.id },
-          select: { id: true },
+          where: eq(driveRegistration.alumniId, alumniData.id),
+          columns: { id: true },
         },
       },
-      orderBy: { driveDate: "desc" },
+      orderBy: [desc(placementDrive.driveDate)],
     });
+    //  Map drives to add isRegistered, eligibility flags, and registration counts
+    const processedDrives = drives.map((drive) => {
+      const eligibilityErrors: string[] = [];
 
-    //  Filter drives by alumni's branch/course eligibility
-    //    and add isRegistered flag
-    const filteredDrives = drives
-      .filter((drive) => {
-        // Course check
-        if (drive.course !== "All" && !drive.course.includes(alumniData.course)) {
-          return false;
-        }
-        // Branch check
-        const branches = parseBranches(drive.eligibleBranches);
-        if (!branches.has(alumniData.branch)) {
-          return false;
-        }
-        
-        // Batch check
-        const alumniBatchNum = extractBatchNumber(alumniData.batch);
-        const minBatchNum = extractBatchNumber(drive.minBatch);
-        const maxBatchNum = extractBatchNumber(drive.maxBatch);
-        if (!isNaN(alumniBatchNum) && !isNaN(minBatchNum) && !isNaN(maxBatchNum) && 
-            (alumniBatchNum < minBatchNum || alumniBatchNum > maxBatchNum)) {
-          return false;
-        }
-        
-        // CGPA check
-        if (!meetsCgpaCriteria(alumniData.cgpa, drive.minCGPA)) {
-          return false;
-        }
-        
-        // Gender check
-        if (drive.genderPreference !== "Both" && alumniData.gender !== drive.genderPreference) {
-          return false;
-        }
+      // Course check
+      if (drive.course !== "All" && !drive.course.includes(alumniData.course)) {
+        eligibilityErrors.push(`Course (${alumniData.course}) is not eligible`);
+      }
 
-        return true;
-      });
+      // Branch check
+      const branches = parseBranches(drive.eligibleBranches);
+      if (!branches.has(alumniData.branch)) {
+        eligibilityErrors.push(`Branch (${alumniData.branch}) is not eligible`);
+      }
 
-    const registrationCounts = await Promise.all(
-      filteredDrives.map(drive =>
-        db.driveRegistration.count({
-          where: { driveId: drive.id }
-        })
-      )
-    );
+      // Batch check
+      const alumniBatchNum = extractBatchNumber(alumniData.batch);
+      const minBatchNum = extractBatchNumber(drive.minBatch);
+      const maxBatchNum = extractBatchNumber(drive.maxBatch);
+      if (!isNaN(alumniBatchNum) && !isNaN(minBatchNum) && !isNaN(maxBatchNum) && 
+          (alumniBatchNum < minBatchNum || alumniBatchNum > maxBatchNum)) {
+        eligibilityErrors.push(`Batch (${alumniData.batch}) is not eligible (Requires ${drive.minBatch} to ${drive.maxBatch})`);
+      }
 
-    const eligibleDrives = filteredDrives.map((drive, idx) => ({
+      // CGPA check
+      if (!meetsCgpaCriteria(alumniData.cgpa, drive.minCGPA)) {
+        eligibilityErrors.push(`Minimum CGPA of ${drive.minCGPA} required (Your CGPA: ${alumniData.cgpa || 0})`);
+      }
+
+      // Gender check
+      if (drive.genderPreference !== "Both" && alumniData.gender !== drive.genderPreference) {
+        eligibilityErrors.push(`Drive is open to ${drive.genderPreference} candidates only`);
+      }
+
+      return {
         ...drive,
         isRegistered: drive.registrations.length > 0,
-        registrationCount: registrationCounts[idx],
         registrations: undefined,
-      }));
+        isEligible: eligibilityErrors.length === 0,
+        ineligibilityReason: eligibilityErrors.length > 0 ? eligibilityErrors.join(", ") : undefined,
+      };
+    });
+
+    const registrationCounts = await Promise.all(
+      processedDrives.map(async (drive) => {
+        const res = await db.select({ count: count() })
+          .from(driveRegistration)
+          .where(eq(driveRegistration.driveId, drive.id));
+        return res[0]?.count || 0;
+      })
+    );
+
+    const eligibleDrives = processedDrives.map((drive, idx) => ({
+      ...drive,
+      registrationCount: registrationCounts[idx],
+    }));
 
     return NextResponse.json({
       success: true,
@@ -134,7 +141,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const alumni = await getVerifiedAuthPayloadFromRequest(req, ["alumni"]);
-    if (!alumni) {
+    if (!alumni || !alumni.id) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
         { status: 401 }
@@ -146,8 +153,8 @@ export async function POST(req: NextRequest) {
     const db = getDb();
 
     // Fetch alumni for eligibility checks
-    const alumniData = await db.alumni.findUnique({
-      where: { id: alumni.id },
+    const alumniData = await db.query.alumni.findFirst({
+      where: eq(alumniTable.id, alumni.id),
     });
 
     if (!alumniData) {
@@ -158,8 +165,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Fetch and validate the drive
-    const drive = await db.placementDrive.findUnique({
-      where: { id: driveId },
+    const drive = await db.query.placementDrive.findFirst({
+      where: eq(placementDrive.id, driveId),
     });
 
     if (!drive || drive.status !== "active") {
@@ -178,8 +185,11 @@ export async function POST(req: NextRequest) {
     }
 
     // Check: already registered?
-    const existing = await db.driveRegistration.findFirst({
-      where: { driveId, alumniId: alumniData.id },
+    const existing = await db.query.driveRegistration.findFirst({
+      where: and(
+        eq(driveRegistration.driveId, driveId),
+        eq(driveRegistration.alumniId, alumniData.id)
+      ),
     });
 
     if (existing) {
@@ -235,8 +245,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Register
-    await db.driveRegistration.create({
-      data: { driveId, alumniId: alumniData.id },
+    await db.insert(driveRegistration).values({
+      driveId,
+      alumniId: alumniData.id,
     });
 
     // Fire-and-forget: send email + in-app notification in background

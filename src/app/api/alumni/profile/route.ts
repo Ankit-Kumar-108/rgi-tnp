@@ -3,13 +3,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { deleteFromR2 } from "@/lib/r2-delete";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
-
-
+import { alumni as alumniTable } from "@/lib/schema";
+import { eq } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
   try {
     const alumni = await getVerifiedAuthPayloadFromRequest(req, ["alumni"]);
-    if (!alumni) {
+    if (!alumni || !alumni.id) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
@@ -22,30 +22,33 @@ export async function POST(req: NextRequest) {
       phoneNumber?: string;
       about?: string;
       profileImageUrl?: string;
+      cgpa?: string | number;
+      batch?: string;
     };
 
     const db = getDb();
 
     // Fetch existing alumni to check for old profileImageUrl
-    const existingAlumni = await db.alumni.findUnique({
-      where: { id: alumni.id },
-      select: { profileImageUrl: true }
+    const existingAlumni = await db.query.alumni.findFirst({
+      where: eq(alumniTable.id, alumni.id),
+      columns: { profileImageUrl: true }
     });
 
-    const updatedAlumni = await db.alumni.update({
-      where: { id: alumni.id },
-      data: {
-        currentCompany: body.currentCompany,
-        jobTitle: body.jobTitle,
-        city: body.city,
-        country: body.country,
-        linkedInUrl: body.linkedInUrl,
-        phoneNumber: body.phoneNumber,
-        about: body.about,
-        ...(body.profileImageUrl !== undefined && { profileImageUrl: body.profileImageUrl }),
-        isProfileComplete: true,
-      },
-    });
+    const updatedAlumniResult = await db.update(alumniTable).set({
+      currentCompany: body.currentCompany,
+      jobTitle: body.jobTitle,
+      city: body.city,
+      country: body.country,
+      linkedInUrl: body.linkedInUrl,
+      phoneNumber: body.phoneNumber,
+      about: body.about,
+      ...(body.cgpa !== undefined && { cgpa: body.cgpa !== "" ? Number(body.cgpa) : null }),
+      ...(body.batch !== undefined && { batch: body.batch }),
+      ...(body.profileImageUrl !== undefined && { profileImageUrl: body.profileImageUrl }),
+      isProfileComplete: true,
+      updatedAt: new Date().toISOString(),
+    }).where(eq(alumniTable.id, alumni.id)).returning();
+    const updatedAlumni = updatedAlumniResult[0];
 
     // Clean up old R2 files if replaced
     if (body.profileImageUrl && existingAlumni?.profileImageUrl &&

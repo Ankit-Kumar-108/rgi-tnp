@@ -2,11 +2,14 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
+import { student, placementDrive, driveRegistration, memory } from "@/lib/schema";
+import { eq, count } from "drizzle-orm";
+
 export async function GET(req: NextRequest) {
   try {
     const studentTokenData = await getVerifiedAuthPayloadFromRequest(req, ["student"]);
     
-    if (!studentTokenData) {
+    if (!studentTokenData || !studentTokenData.enrollmentNumber) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
@@ -18,9 +21,9 @@ export async function GET(req: NextRequest) {
     const registrationsPage = Math.max(1, parseInt(searchParams.get("registrationsPage") || "1", 10));
 
     const db = getDb();
-    const studentData = await db.student.findUnique({
-      where: { enrollmentNumber: studentTokenData.enrollmentNumber },
-      select: {
+    const studentData = await db.query.student.findFirst({
+      where: eq(student.enrollmentNumber, studentTokenData.enrollmentNumber),
+      columns: {
         id: true, name: true, enrollmentNumber: true, email: true,
         branch: true, semester: true, cgpa: true, isEmailVerified: true, isVerified: true,
         profileImageUrl: true, phoneNumber: true, course: true, batch: true,
@@ -35,41 +38,46 @@ export async function GET(req: NextRequest) {
     }
 
     // Parallel fetch for better performance
-    const [drives, archivedDrives, registrations, memories, drivesCount, registrationsCount] = await Promise.all([
+    const [drives, archivedDrives, registrations, memories, drivesCountResult, registrationsCountResult] = await Promise.all([
       // Get active drives with pagination
-      db.placementDrive.findMany({
-        where: { status: "active" },
-        take: drivesLimit,
-        skip: (drivesPage - 1) * drivesLimit,
-        orderBy: { driveDate: "asc" },
+      db.query.placementDrive.findMany({
+        where: eq(placementDrive.status, "active"),
+        limit: drivesLimit,
+        offset: (drivesPage - 1) * drivesLimit,
+        orderBy: (t, { asc }) => [asc(t.driveDate)],
       }),
       // Get archived/completed drives
-      db.placementDrive.findMany({
-        where: { status: "completed" },
-        take: 10, // Limit archived drives
-        orderBy: { driveDate: "desc" },
+      db.query.placementDrive.findMany({
+        where: eq(placementDrive.status, "completed"),
+        limit: 10, // Limit archived drives
+        orderBy: (t, { desc }) => [desc(t.driveDate)],
       }),
       // Get student's registrations with pagination
-      db.driveRegistration.findMany({
-        where: { student: { enrollmentNumber: studentTokenData.enrollmentNumber } },
-        include: {
-          drive: { select: { companyName: true, roleName: true, driveDate: true, status: true } },
+      db.query.driveRegistration.findMany({
+        where: eq(driveRegistration.studentId, studentData.id),
+        with: {
+          drive: {
+            columns: { companyName: true, roleName: true, driveDate: true, status: true }
+          },
         },
-        take: registrationsLimit,
-        skip: (registrationsPage - 1) * registrationsLimit,
-        orderBy: { createdAt: "desc" },
+        limit: registrationsLimit,
+        offset: (registrationsPage - 1) * registrationsLimit,
+        orderBy: (t, { desc }) => [desc(t.createdAt)],
       }),
       // Get student's memories (limited)
-      db.memory.findMany({
-        where: { studentId: studentData.id },
-        take: 20,
-        orderBy: { createdAt: "desc" },
+      db.query.memory.findMany({
+        where: eq(memory.studentId, studentData.id),
+        limit: 20,
+        orderBy: (t, { desc }) => [desc(t.createdAt)],
       }),
       // Count total active drives
-      db.placementDrive.count({ where: { status: "active" } }),
+      db.select({ count: count() }).from(placementDrive).where(eq(placementDrive.status, "active")),
       // Count total registrations
-      db.driveRegistration.count({ where: { student: { enrollmentNumber: studentTokenData.enrollmentNumber } } }),
+      db.select({ count: count() }).from(driveRegistration).where(eq(driveRegistration.studentId, studentData.id)),
     ]);
+
+    const drivesCount = drivesCountResult[0]?.count || 0;
+    const registrationsCount = registrationsCountResult[0]?.count || 0;
 
     const registeredDriveIds = registrations.map((r: any) => r.driveId);
 

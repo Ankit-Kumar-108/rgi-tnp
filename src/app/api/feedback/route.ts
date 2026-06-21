@@ -1,6 +1,8 @@
 export const dynamic = 'force-dynamic';
 import { NextResponse, NextRequest } from "next/server";
 import { getDb } from "@/lib/db";
+import { studentFeedback, alumniFeedback, corporateFeedback } from "@/lib/schema";
+import { eq, count } from "drizzle-orm";
 
 export async function GET(req: NextRequest) {
     try {
@@ -14,15 +16,22 @@ export async function GET(req: NextRequest) {
 
         const db = getDb();
         
-        const [studentFeedback, alumniFeedback, corporateFeedback, studentFeedbackCount, alumniFeedbackCount, corporateFeedbackCount] = await Promise.all([
-            db.studentFeedback.findMany({
-                take: limit,
-                skip,
-                where: { isApproved: true },
-                orderBy: { createdAt: "desc" },
-                include: {
+        const [
+            studentFeedbackList,
+            alumniFeedbackList,
+            corporateFeedbackList,
+            studentFeedbackCountResult,
+            alumniFeedbackCountResult,
+            corporateFeedbackCountResult
+        ] = await Promise.all([
+            db.query.studentFeedback.findMany({
+                limit: limit,
+                offset: skip,
+                where: eq(studentFeedback.isApproved, true),
+                orderBy: (t, { desc }) => [desc(t.createdAt)],
+                with: {
                     student: {
-                        select: {
+                        columns: {
                             name: true,
                             branch: true,
                             batch: true,
@@ -32,14 +41,14 @@ export async function GET(req: NextRequest) {
                     }
                 }
             }),
-            db.alumniFeedback.findMany({
-                take: limit,
-                skip,
-                where: { isApproved: true },
-                orderBy: { createdAt: "desc" },
-                include: {
+            db.query.alumniFeedback.findMany({
+                limit: limit,
+                offset: skip,
+                where: eq(alumniFeedback.isApproved, true),
+                orderBy: (t, { desc }) => [desc(t.createdAt)],
+                with: {
                     alumni: {
-                        select: {
+                        columns: {
                             name: true,
                             branch: true,
                             batch: true,
@@ -49,14 +58,14 @@ export async function GET(req: NextRequest) {
                     }
                 }
             }),
-            db.corporateFeedback.findMany({
-                take: limit,
-                skip,
-                where: { isApproved: true },
-                orderBy: { createdAt: "desc" },
-                include: {
+            db.query.corporateFeedback.findMany({
+                limit: limit,
+                offset: skip,
+                where: eq(corporateFeedback.isApproved, true),
+                orderBy: (t, { desc }) => [desc(t.createdAt)],
+                with: {
                     recruiter: {
-                        select: {
+                        columns: {
                             name: true,
                             company: true,
                             designation: true,
@@ -64,12 +73,24 @@ export async function GET(req: NextRequest) {
                     }
                 }
             }),
-            db.studentFeedback.count({ where: { isApproved: true } }),
-            db.alumniFeedback.count({ where: { isApproved: true } }),
-            db.corporateFeedback.count({ where: { isApproved: true } }),
+            db.select({ count: count() }).from(studentFeedback).where(eq(studentFeedback.isApproved, true)),
+            db.select({ count: count() }).from(alumniFeedback).where(eq(alumniFeedback.isApproved, true)),
+            db.select({ count: count() }).from(corporateFeedback).where(eq(corporateFeedback.isApproved, true)),
         ])
+
+        const studentFeedbackCount = studentFeedbackCountResult[0]?.count || 0;
+        const alumniFeedbackCount = alumniFeedbackCountResult[0]?.count || 0;
+        const corporateFeedbackCount = corporateFeedbackCountResult[0]?.count || 0;
         
-        return NextResponse.json({ success: true, studentFeedback, alumniFeedback, corporateFeedback, studentFeedbackCount, alumniFeedbackCount, corporateFeedbackCount });
+        return NextResponse.json({
+            success: true,
+            studentFeedback: studentFeedbackList,
+            alumniFeedback: alumniFeedbackList,
+            corporateFeedback: corporateFeedbackList,
+            studentFeedbackCount,
+            alumniFeedbackCount,
+            corporateFeedbackCount
+        });
     } catch (error: any) {
         console.error("Error fetching feedback:", error);
         return NextResponse.json({ success: false, message: "Failed to fetch feedback" }, { status: 500 });

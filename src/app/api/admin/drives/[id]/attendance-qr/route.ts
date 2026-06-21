@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { eq } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 import { signAuthToken } from "@/lib/auth-jwt";
 
 export async function GET(
@@ -12,9 +14,9 @@ export async function GET(
     const { id: driveId } = await params;
 
     const db = getDb();
-    const drive = await db.placementDrive.findUnique({
-      where: { id: driveId },
-      select: { id: true, companyName: true, status: true },
+    const drive = await db.query.placementDrive.findFirst({
+      where: eq(schema.placementDrive.id, driveId),
+      columns: { id: true, companyName: true, status: true },
     });
 
     if (!drive) {
@@ -61,4 +63,4 @@ export async function GET(
       { status: 500 }
     );
   }
-}
+}

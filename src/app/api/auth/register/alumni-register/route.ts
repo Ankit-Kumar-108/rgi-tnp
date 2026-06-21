@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { alumniRegistrationSchema } from "@/lib/validations/alumni";
 import { hashPassword, generateVerificationToken, getresetTokenExpiry } from "@/lib/auth-utils";
 import { getDb } from "@/lib/db";
+import { eq } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 import { verificationEmailTemplate } from "@/lib/email-templates";
 import { NotificationService } from "@/lib/notification-service";
 
@@ -22,16 +24,12 @@ export async function POST(req: NextRequest) {
     };
 
     // Verify Enrollment Number in Master Records
-    // Fetch all master records for this batch and compare with trimmed values
-    // This handles any existing data with extra whitespace
-    const masterRecords = await db.alumniMaster.findMany({
-      where: {
-        batch: trimmedData.batch,
-      },
+    const masterRecords = await db.query.alumniMaster.findMany({
+      where: eq(schema.alumniMaster.batch, trimmedData.batch),
     });
 
     const masterRecord = masterRecords.find(
-      (record) =>
+      (record: any) =>
         record.enrollmentNumber?.trim() === trimmedData.enrollmentNumber &&
         record.branch?.trim() === trimmedData.branch &&
         record.course?.trim() === trimmedData.course
@@ -45,8 +43,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if already registered
-    const existing = await db.alumni.findUnique({
-      where: { enrollmentNumber: trimmedData.enrollmentNumber },
+    const existing = await db.query.alumni.findFirst({
+      where: eq(schema.alumni.enrollmentNumber, trimmedData.enrollmentNumber),
     });
 
     if (existing) {
@@ -56,8 +54,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const emailExists = await db.alumni.findUnique({
-      where: { personalEmail: trimmedData.personalEmail },
+    const emailExists = await db.query.alumni.findFirst({
+      where: eq(schema.alumni.personalEmail, trimmedData.personalEmail),
     });
 
     if (emailExists) {
@@ -72,21 +70,22 @@ export async function POST(req: NextRequest) {
     const expiry = getresetTokenExpiry();
 
     // Create Alumni Record
-    const alumni = await db.alumni.create({
-      data: {
-        name: trimmedData.name,
-        enrollmentNumber: trimmedData.enrollmentNumber,
-        personalEmail: trimmedData.personalEmail,
-        branch: trimmedData.branch,
-        course: trimmedData.course,
-        batch: trimmedData.batch,
-        passwordHash: passwordHash,
-        profileImageUrl: trimmedData.profileImageUrl || "",
-        isVerified: false,
-        emailVerificationToken: verificationToken,
-        emailVerificationTokenExpiry: expiry,
-      },
-    });
+    const result = await db.insert(schema.alumni).values({
+      name: trimmedData.name,
+      enrollmentNumber: trimmedData.enrollmentNumber,
+      personalEmail: trimmedData.personalEmail,
+      branch: trimmedData.branch,
+      course: trimmedData.course,
+      batch: trimmedData.batch,
+      gender: validatedData.gender,
+      cgpa: validatedData.cgpa,
+      passwordHash: passwordHash,
+      profileImageUrl: trimmedData.profileImageUrl || "",
+      isVerified: false,
+      emailVerificationToken: verificationToken,
+      emailVerificationTokenExpiry: expiry,
+    }).returning();
+    const alumni = result[0];
 
     // Send Verification Email
     const host = req.headers.get("host");
@@ -107,13 +106,10 @@ export async function POST(req: NextRequest) {
 
     if (!emailResult.success) {
       console.error("[ALUMNI-REGISTER] Email verification failed for:", trimmedData.personalEmail, emailResult.error);
-      await db.alumni.update({
-        where: { id: alumni.id },
-        data: {
-          emailVerificationFailed: true,
-          emailVerificationError: emailResult.error || "Unknown email service error"
-        }
-      });
+      await db.update(schema.alumni).set({
+        emailVerificationFailed: true,
+        emailVerificationError: emailResult.error || "Unknown email service error"
+      }).where(eq(schema.alumni.id, alumni.id));
       return NextResponse.json({
         success: false,
         message: "Email verification failed. Please contact support.",

@@ -2,10 +2,17 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { eq, count } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 
 export async function GET(req: NextRequest) {
   try {
     const db = getDb();
+
+    const getCount = async (query: any) => {
+      const res = await query;
+      return res[0]?.count || 0;
+    };
 
     const [
       totalStudents,
@@ -25,22 +32,22 @@ export async function GET(req: NextRequest) {
       pendingUnverifiedAlumni,
       pendingUnverifiedExternal,
     ] = await Promise.all([
-      db.student.count(),
-      db.alumni.count(),
-      db.recruiter.count(),
-      db.externalStudent.count(),
-      db.placementDrive.count({ where: { status: "pending" } }),
-      db.placementDrive.count({ where: { status: "active" } }),
-      db.referral.count({ where: { status: "pending" } }),
-      db.memory.count({ where: { status: "pending_moderation" } }),
-      db.externalStudent.count({ where: { isVerified: false } }),
-      db.volunteer.count({ where: { isVerified: false } }),
-      db.studentFeedback.count({ where: { isApproved: false } }),
-      db.alumniFeedback.count({ where: { isApproved: false } }),
-      db.corporateFeedback.count({ where: { isApproved: false } }),
-      db.student.count({ where: { emailVerificationFailed: true } }),
-      db.alumni.count({ where: { emailVerificationFailed: true } }),
-      db.externalStudent.count({ where: { emailVerificationFailed: true } }),
+      getCount(db.select({ count: count() }).from(schema.student)),
+      getCount(db.select({ count: count() }).from(schema.alumni)),
+      getCount(db.select({ count: count() }).from(schema.recruiter)),
+      getCount(db.select({ count: count() }).from(schema.externalStudent)),
+      getCount(db.select({ count: count() }).from(schema.placementDrive).where(eq(schema.placementDrive.status, "pending"))),
+      getCount(db.select({ count: count() }).from(schema.placementDrive).where(eq(schema.placementDrive.status, "active"))),
+      getCount(db.select({ count: count() }).from(schema.referral).where(eq(schema.referral.status, "pending"))),
+      getCount(db.select({ count: count() }).from(schema.memory).where(eq(schema.memory.status, "pending_moderation"))),
+      getCount(db.select({ count: count() }).from(schema.externalStudent).where(eq(schema.externalStudent.isVerified, false))),
+      getCount(db.select({ count: count() }).from(schema.volunteer).where(eq(schema.volunteer.isVerified, false))),
+      getCount(db.select({ count: count() }).from(schema.studentFeedback).where(eq(schema.studentFeedback.isApproved, false))),
+      getCount(db.select({ count: count() }).from(schema.alumniFeedback).where(eq(schema.alumniFeedback.isApproved, false))),
+      getCount(db.select({ count: count() }).from(schema.corporateFeedback).where(eq(schema.corporateFeedback.isApproved, false))),
+      getCount(db.select({ count: count() }).from(schema.student).where(eq(schema.student.emailVerificationFailed, true))),
+      getCount(db.select({ count: count() }).from(schema.alumni).where(eq(schema.alumni.emailVerificationFailed, true))),
+      getCount(db.select({ count: count() }).from(schema.externalStudent).where(eq(schema.externalStudent.emailVerificationFailed, true))),
     ]);
 
     const pendingApprovals =
@@ -76,3 +83,4 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+

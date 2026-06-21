@@ -3,6 +3,9 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
+import { student as studentTable, volunteer as volunteerTable, driveImage } from "@/lib/schema";
+import { eq } from "drizzle-orm";
+
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -10,7 +13,7 @@ export async function DELETE(
   try {
     const studentTokenData = await getVerifiedAuthPayloadFromRequest(req, ["student"]);
 
-    if (!studentTokenData) {
+    if (!studentTokenData || !studentTokenData.enrollmentNumber) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
         { status: 401 }
@@ -21,23 +24,23 @@ export async function DELETE(
     const { id } = await params;
 
     // Get student and verify volunteer status
-    const student = await db.student.findUnique({
-      where: { enrollmentNumber: studentTokenData.enrollmentNumber },
-      select: { id: true, email: true },
+    const studentData = await db.query.student.findFirst({
+      where: eq(studentTable.enrollmentNumber, studentTokenData.enrollmentNumber),
+      columns: { id: true, email: true },
     });
 
-    if (!student) {
+    if (!studentData) {
       return NextResponse.json(
         { success: false, message: "Student not found" },
         { status: 404 }
       );
     }
 
-    const volunteer = await db.volunteer.findUnique({
-      where: { studentId: student.id },
+    const volunteerData = await db.query.volunteer.findFirst({
+      where: eq(volunteerTable.studentId, studentData.id),
     });
 
-    if (!volunteer) {
+    if (!volunteerData) {
       return NextResponse.json(
         { success: false, message: "Not authorized as volunteer" },
         { status: 403 }
@@ -45,9 +48,9 @@ export async function DELETE(
     }
 
     // Get the image and verify ownership
-    const image = await db.driveImage.findUnique({
-      where: { id },
-      select: { id: true, uploadedBy: true, imageUrl: true },
+    const image = await db.query.driveImage.findFirst({
+      where: eq(driveImage.id, id),
+      columns: { id: true, uploadedBy: true, imageUrl: true },
     });
 
     if (!image) {
@@ -58,7 +61,7 @@ export async function DELETE(
     }
 
     // Verify the image was uploaded by this volunteer
-    if (image.uploadedBy !== student.email) {
+    if (image.uploadedBy !== studentData.email) {
       return NextResponse.json(
         { success: false, message: "Not authorized to delete this image" },
         { status: 403 }
@@ -66,9 +69,7 @@ export async function DELETE(
     }
 
     // Delete the image
-    await db.driveImage.delete({
-      where: { id },
-    });
+    await db.delete(driveImage).where(eq(driveImage.id, id));
 
     return NextResponse.json({ success: true, message: "Image deleted" });
   } catch (error) {

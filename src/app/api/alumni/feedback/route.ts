@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
+import { alumniFeedback } from "@/lib/schema";
 // POST: Submit curriculum feedback
 export async function POST(req: NextRequest) {
   try {
@@ -13,15 +14,15 @@ export async function POST(req: NextRequest) {
     const body = (await req.json()) as { content: string; rating: number };
     const db = getDb();
 
-    const feedback = await db.alumniFeedback.create({
-      data: {
-        content: body.content,
-        rating: body.rating,
-        alumniId: alumni.id,
-        isApproved: false,
-        createdAt: new Date(),
-      },
-    });
+    const feedbackResult = await db.insert(alumniFeedback).values({
+      content: body.content,
+      rating: body.rating,
+      alumniId: alumni.id,
+      isApproved: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }).returning();
+    const feedback = feedbackResult[0];
 
     return NextResponse.json({ success: true, message: "Feedback submitted — thank you!", feedback });
   } catch (error) {

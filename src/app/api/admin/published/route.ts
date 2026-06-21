@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { eq, inArray, count } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 
 // GET: Fetch published/approved items by type
 export async function GET(req: NextRequest) {
@@ -18,80 +20,80 @@ export async function GET(req: NextRequest) {
     const db = getDb();
 
     if (type === "memories") {
-      const where = { status: "approved" };
-      const [memories, totalCount] = await Promise.all([
-        db.memory.findMany({
-          where,
-          include: {
-            student: { select: { name: true, enrollmentNumber: true, profileImageUrl: true } },
-            alumni: { select: { name: true, enrollmentNumber: true, profileImageUrl: true } }
+      const [memories, countResult] = await Promise.all([
+        db.query.memory.findMany({
+          where: eq(schema.memory.status, "approved"),
+          with: {
+            student: { columns: { name: true, enrollmentNumber: true, profileImageUrl: true } },
+            alumni: { columns: { name: true, enrollmentNumber: true, profileImageUrl: true } }
           },
-          orderBy: { createdAt: "desc" },
-          take: limit,
-          skip: skip,
+          orderBy: (t, { desc }) => [desc(t.createdAt)],
+          limit,
+          offset: skip,
         }),
-        db.memory.count({ where })
+        db.select({ count: count() }).from(schema.memory).where(eq(schema.memory.status, "approved"))
       ]);
+      const totalCount = countResult[0]?.count || 0;
       return NextResponse.json({ success: true, items: memories, totalCount });
     }
 
     if (type === "referrals") {
-      const where = { status: "published" };
-      const [referrals, totalCount] = await Promise.all([
-        db.referral.findMany({
-          where,
-          include: { alumni: { select: { name: true, personalEmail: true, profileImageUrl: true, enrollmentNumber: true } } },
-          orderBy: { createdAt: "desc" },
-          take: limit,
-          skip: skip,
+      const [referrals, countResult] = await Promise.all([
+        db.query.referral.findMany({
+          where: eq(schema.referral.status, "published"),
+          with: { alumni: { columns: { name: true, personalEmail: true, profileImageUrl: true, enrollmentNumber: true } } },
+          orderBy: (t, { desc }) => [desc(t.createdAt)],
+          limit,
+          offset: skip,
         }),
-        db.referral.count({ where })
+        db.select({ count: count() }).from(schema.referral).where(eq(schema.referral.status, "published"))
       ]);
+      const totalCount = countResult[0]?.count || 0;
       return NextResponse.json({ success: true, items: referrals, totalCount });
     }
 
     if (type === "studentFeedback") {
-      const where = { isApproved: true };
-      const [feedbacks, totalCount] = await Promise.all([
-        db.studentFeedback.findMany({
-          where,
-          include: { student: { select: { name: true, enrollmentNumber: true, profileImageUrl: true, email: true } } },
-          orderBy: { createdAt: "desc" },
-          take: limit,
-          skip: skip,
+      const [feedbacks, countResult] = await Promise.all([
+        db.query.studentFeedback.findMany({
+          where: eq(schema.studentFeedback.isApproved, true),
+          with: { student: { columns: { name: true, enrollmentNumber: true, profileImageUrl: true, email: true } } },
+          orderBy: (t, { desc }) => [desc(t.createdAt)],
+          limit,
+          offset: skip,
         }),
-        db.studentFeedback.count({ where })
+        db.select({ count: count() }).from(schema.studentFeedback).where(eq(schema.studentFeedback.isApproved, true))
       ]);
+      const totalCount = countResult[0]?.count || 0;
       return NextResponse.json({ success: true, items: feedbacks, totalCount });
     }
 
     if (type === "alumniFeedback") {
-      const where = { isApproved: true };
-      const [feedbacks, totalCount] = await Promise.all([
-        db.alumniFeedback.findMany({
-          where,
-          include: { alumni: { select: { name: true, personalEmail: true, profileImageUrl: true, enrollmentNumber: true } } },
-          orderBy: { createdAt: "desc" },
-          take: limit,
-          skip: skip,
+      const [feedbacks, countResult] = await Promise.all([
+        db.query.alumniFeedback.findMany({
+          where: eq(schema.alumniFeedback.isApproved, true),
+          with: { alumni: { columns: { name: true, personalEmail: true, profileImageUrl: true, enrollmentNumber: true } } },
+          orderBy: (t, { desc }) => [desc(t.createdAt)],
+          limit,
+          offset: skip,
         }),
-        db.alumniFeedback.count({ where })
+        db.select({ count: count() }).from(schema.alumniFeedback).where(eq(schema.alumniFeedback.isApproved, true))
       ]);
+      const totalCount = countResult[0]?.count || 0;
       return NextResponse.json({ success: true, items: feedbacks, totalCount });
     }
 
     if (type === "corporateFeedback") {
-      const where = { isApproved: true };
-      const [feedbacks, totalCount] = await Promise.all([
-        db.corporateFeedback.findMany({
-          where,
-          include: { recruiter: { select: { name: true, email: true } } },
-          orderBy: { createdAt: "desc" },
-          take: limit,
-          skip: skip,
+      const [feedbacks, countResult] = await Promise.all([
+        db.query.corporateFeedback.findMany({
+          where: eq(schema.corporateFeedback.isApproved, true),
+          with: { recruiter: { columns: { name: true, email: true } } },
+          orderBy: (t, { desc }) => [desc(t.createdAt)],
+          limit,
+          offset: skip,
         }),
-        db.corporateFeedback.count({ where })
+        db.select({ count: count() }).from(schema.corporateFeedback).where(eq(schema.corporateFeedback.isApproved, true))
       ]);
+      const totalCount = countResult[0]?.count || 0;
       return NextResponse.json({ success: true, items: feedbacks, totalCount });
     }
 
@@ -122,58 +124,43 @@ export async function POST(req: NextRequest) {
 
     if (type === "memories") {
       if (action === "unpublish") {
-        await db.memory.updateMany({
-          where: { id: { in: targetIds } },
-          data: { status: "pending_moderation" },
-        });
+        await db.update(schema.memory)
+          .set({ status: "pending_moderation" })
+          .where(inArray(schema.memory.id, targetIds));
       } else {
-        await db.memory.deleteMany({
-          where: { id: { in: targetIds } },
-        });
+        await db.delete(schema.memory).where(inArray(schema.memory.id, targetIds));
       }
     } else if (type === "referrals") {
       if (action === "unpublish") {
-        await db.referral.updateMany({
-          where: { id: { in: targetIds } },
-          data: { status: "pending" },
-        });
+        await db.update(schema.referral)
+          .set({ status: "pending" })
+          .where(inArray(schema.referral.id, targetIds));
       } else {
-        await db.referral.deleteMany({
-          where: { id: { in: targetIds } },
-        });
+        await db.delete(schema.referral).where(inArray(schema.referral.id, targetIds));
       }
     } else if (type === "studentFeedback") {
       if (action === "unpublish") {
-        await db.studentFeedback.updateMany({
-          where: { id: { in: targetIds } },
-          data: { isApproved: false },
-        });
+        await db.update(schema.studentFeedback)
+          .set({ isApproved: false })
+          .where(inArray(schema.studentFeedback.id, targetIds));
       } else {
-        await db.studentFeedback.deleteMany({
-          where: { id: { in: targetIds } },
-        });
+        await db.delete(schema.studentFeedback).where(inArray(schema.studentFeedback.id, targetIds));
       }
     } else if (type === "alumniFeedback") {
       if (action === "unpublish") {
-        await db.alumniFeedback.updateMany({
-          where: { id: { in: targetIds } },
-          data: { isApproved: false },
-        });
+        await db.update(schema.alumniFeedback)
+          .set({ isApproved: false })
+          .where(inArray(schema.alumniFeedback.id, targetIds));
       } else {
-        await db.alumniFeedback.deleteMany({
-          where: { id: { in: targetIds } },
-        });
+        await db.delete(schema.alumniFeedback).where(inArray(schema.alumniFeedback.id, targetIds));
       }
     } else if (type === "corporateFeedback") {
       if (action === "unpublish") {
-        await db.corporateFeedback.updateMany({
-          where: { id: { in: targetIds } },
-          data: { isApproved: false },
-        });
+        await db.update(schema.corporateFeedback)
+          .set({ isApproved: false })
+          .where(inArray(schema.corporateFeedback.id, targetIds));
       } else {
-        await db.corporateFeedback.deleteMany({
-          where: { id: { in: targetIds } },
-        });
+        await db.delete(schema.corporateFeedback).where(inArray(schema.corporateFeedback.id, targetIds));
       }
     } else {
       return NextResponse.json({ success: false, message: "Invalid type" }, { status: 400 });
@@ -186,3 +173,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, message: "Action failed" }, { status: 500 });
   }
 }
+

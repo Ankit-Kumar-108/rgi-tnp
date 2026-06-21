@@ -1,6 +1,8 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { eq } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 import { isTokenExpired } from "@/lib/auth-utils";
 import { NotificationService } from "@/lib/notification-service";
 import { verificationSuccessStudentTemplate, verificationSuccessExternalStudentTemplate, verificationSuccessAlumniTemplate } from "@/lib/email-templates";
@@ -15,38 +17,6 @@ export async function POST(req: NextRequest) {
     }
 
     const db = getDb();
-
-    // Helper to verify and update — returns `newlyVerified` flag to prevent duplicate welcome emails
-    const verifyUser = async (user: any, model: any, targetEmailField: string, flagField: string, isStudent: boolean = false) => {
-      if (user[flagField]) {
-        return { success: true, newlyVerified: false, message: "Email already verified" };
-      }
-
-      if (!user.emailVerificationToken || user.emailVerificationToken !== token) {
-        return { success: false, newlyVerified: false, message: "Invalid verification token" };
-      }
-
-      if (user.emailVerificationTokenExpiry && isTokenExpired(user.emailVerificationTokenExpiry)) {
-        return { success: false, newlyVerified: false, message: "Verification token expired" };
-      }
-
-      const updateData: any = {
-        [flagField]: true,
-        emailVerificationToken: null,
-        emailVerificationTokenExpiry: null,
-      };
-      
-      if (isStudent) {
-        updateData.isVerified = true;
-      }
-
-      await model.update({
-        where: { [targetEmailField]: email },
-        data: updateData,
-      });
-
-      return { success: true, newlyVerified: true, message: "Email verified successfully! You can now log in.", userName: user.name };
-    };
 
     const sendWelcomeEmail = async (toEmail: string, verificationSuccessTemplate: string) => {
       try {
@@ -63,54 +33,104 @@ export async function POST(req: NextRequest) {
       }
     };
 
+    // Helper to verify token validity on a user record
+    const checkToken = (user: any, flagField: string) => {
+      if (user[flagField]) {
+        return { success: true, newlyVerified: false, message: "Email already verified" };
+      }
+      if (!user.emailVerificationToken || user.emailVerificationToken !== token) {
+        return { success: false, newlyVerified: false, message: "Invalid verification token" };
+      }
+      if (user.emailVerificationTokenExpiry && isTokenExpired(user.emailVerificationTokenExpiry)) {
+        return { success: false, newlyVerified: false, message: "Verification token expired" };
+      }
+      return null; // Token is valid, proceed with update
+    };
+
+    // Verify Student
+    const verifyStudent = async (u: any) => {
+      const check = checkToken(u, "isEmailVerified");
+      if (check) return check;
+      await db.update(schema.student).set({
+        isEmailVerified: true,
+        isVerified: true,
+        emailVerificationToken: null,
+        emailVerificationTokenExpiry: null,
+      }).where(eq(schema.student.email, email));
+      return { success: true, newlyVerified: true, message: "Email verified successfully! You can now log in.", userName: u.name };
+    };
+
+    // Verify External Student
+    const verifyExternal = async (u: any) => {
+      const check = checkToken(u, "isVerified");
+      if (check) return check;
+      await db.update(schema.externalStudent).set({
+        isVerified: true,
+        emailVerificationToken: null,
+        emailVerificationTokenExpiry: null,
+      }).where(eq(schema.externalStudent.email, email));
+      return { success: true, newlyVerified: true, message: "Email verified successfully! You can now log in.", userName: u.name };
+    };
+
+    // Verify Alumni
+    const verifyAlumni = async (u: any) => {
+      const check = checkToken(u, "isVerified");
+      if (check) return check;
+      await db.update(schema.alumni).set({
+        isVerified: true,
+        emailVerificationToken: null,
+        emailVerificationTokenExpiry: null,
+      }).where(eq(schema.alumni.personalEmail, email));
+      return { success: true, newlyVerified: true, message: "Email verified successfully! You can now log in.", userName: u.name };
+    };
+
     // 1. Try if role is provided
     if (role === "student") {
-      const u = await db.student.findUnique({ where: { email } });
+      const u = await db.query.student.findFirst({ where: eq(schema.student.email, email) });
       if (u) {
-        const res = await verifyUser(u, db.student, "email", "isEmailVerified", true);
-        if (res.newlyVerified) await sendWelcomeEmail(email, verificationSuccessStudentTemplate( res.userName || u.name));
+        const res = await verifyStudent(u);
+        if (res.newlyVerified) await sendWelcomeEmail(email, verificationSuccessStudentTemplate(u.name));
         return NextResponse.json(res, { status: res.success ? 200 : 400 });
       }
     } else if (role === "external_student") {
-      const u = await db.externalStudent.findUnique({ where: { email } });
+      const u = await db.query.externalStudent.findFirst({ where: eq(schema.externalStudent.email, email) });
       if (u) {
-        const res = await verifyUser(u, db.externalStudent, "email", "isVerified");
-        if (res.newlyVerified) await sendWelcomeEmail(email, verificationSuccessExternalStudentTemplate(res.userName || u.name));
+        const res = await verifyExternal(u);
+        if (res.newlyVerified) await sendWelcomeEmail(email, verificationSuccessExternalStudentTemplate(u.name));
         return NextResponse.json(res, { status: res.success ? 200 : 400 });
       }
     } else if (role === "alumni") {
-      const u = await db.alumni.findUnique({ where: { personalEmail: email } });
+      const u = await db.query.alumni.findFirst({ where: eq(schema.alumni.personalEmail, email) });
       if (u) {
-        const res = await verifyUser(u, db.alumni, "personalEmail", "isVerified");
-        if (res.newlyVerified) await sendWelcomeEmail(email, verificationSuccessAlumniTemplate(res.userName || u.name));
+        const res = await verifyAlumni(u);
+        if (res.newlyVerified) await sendWelcomeEmail(email, verificationSuccessAlumniTemplate(u.name));
         return NextResponse.json(res, { status: res.success ? 200 : 400 });
       }
     }
 
     // 2. Fallback: Search all in PARALLEL if role is missing or user not found with role
     if (!role) {
-      // Use Promise.all for parallel queries instead of sequential
-      const [student, external, alumni] = await Promise.all([
-        db.student.findUnique({ where: { email } }),
-        db.externalStudent.findUnique({ where: { email } }),
-        db.alumni.findUnique({ where: { personalEmail: email } }),
+      const [studentUser, externalUser, alumniUser] = await Promise.all([
+        db.query.student.findFirst({ where: eq(schema.student.email, email) }),
+        db.query.externalStudent.findFirst({ where: eq(schema.externalStudent.email, email) }),
+        db.query.alumni.findFirst({ where: eq(schema.alumni.personalEmail, email) }),
       ]);
 
-      if (student) {
-        const res = await verifyUser(student, db.student, "email", "isEmailVerified", true);
-        if (res.newlyVerified) await sendWelcomeEmail(email, verificationSuccessStudentTemplate(res.userName || student.name));
+      if (studentUser) {
+        const res = await verifyStudent(studentUser);
+        if (res.newlyVerified) await sendWelcomeEmail(email, verificationSuccessStudentTemplate(studentUser.name));
         return NextResponse.json(res, { status: res.success ? 200 : 400 });
       }
 
-      if (external) {
-        const res = await verifyUser(external, db.externalStudent, "email", "isVerified");
-        if (res.newlyVerified) await sendWelcomeEmail(email, verificationSuccessExternalStudentTemplate(res.userName || external.name));
+      if (externalUser) {
+        const res = await verifyExternal(externalUser);
+        if (res.newlyVerified) await sendWelcomeEmail(email, verificationSuccessExternalStudentTemplate(externalUser.name));
         return NextResponse.json(res, { status: res.success ? 200 : 400 });
       }
 
-      if (alumni) {
-        const res = await verifyUser(alumni, db.alumni, "personalEmail", "isVerified");
-        if (res.newlyVerified) await sendWelcomeEmail(email, verificationSuccessAlumniTemplate(res.userName || alumni.name));
+      if (alumniUser) {
+        const res = await verifyAlumni(alumniUser);
+        if (res.newlyVerified) await sendWelcomeEmail(email, verificationSuccessAlumniTemplate(alumniUser.name));
         return NextResponse.json(res, { status: res.success ? 200 : 400 });
       }
     }

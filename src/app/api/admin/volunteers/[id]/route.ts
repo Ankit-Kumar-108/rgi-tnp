@@ -2,7 +2,10 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
+import { eq } from "drizzle-orm";
+import * as schema from "@/lib/schema";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -21,11 +24,11 @@ export async function GET(
     const db = getDb();
     const { id } = await params;
 
-    const volunteer = await db.volunteer.findUnique({
-      where: { id },
-      include: {
+    const volunteer = await db.query.volunteer.findFirst({
+      where: eq(schema.volunteer.id, id),
+      with: {
         student: {
-          select: {
+          columns: {
             id: true,
             name: true,
             email: true,
@@ -78,8 +81,8 @@ export async function PUT(
     const db = getDb();
     const { id } = await params;
 
-    const volunteer = await db.volunteer.findUnique({
-      where: { id },
+    const volunteer = await db.query.volunteer.findFirst({
+      where: eq(schema.volunteer.id, id),
     });
 
     if (!volunteer) {
@@ -92,17 +95,20 @@ export async function PUT(
     const body = await req.json() as any
     const { designation, isVerified, verificationNotes } = body;
 
-    const updatedVolunteer = await db.volunteer.update({
-      where: { id },
-      data: {
+    await db.update(schema.volunteer)
+      .set({
         designation: designation ?? volunteer.designation,
         isVerified: isVerified ?? volunteer.isVerified,
         verificationNotes: verificationNotes ?? volunteer.verificationNotes,
-        updatedAt: new Date(),
-      },
-      include: {
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(schema.volunteer.id, id));
+
+    const updatedVolunteer = await db.query.volunteer.findFirst({
+      where: eq(schema.volunteer.id, id),
+      with: {
         student: {
-          select: {
+          columns: {
             id: true,
             name: true,
             email: true,
@@ -149,8 +155,8 @@ export async function DELETE(
     const db = getDb();
     const { id } = await params;
 
-    const volunteer = await db.volunteer.findUnique({
-      where: { id },
+    const volunteer = await db.query.volunteer.findFirst({
+      where: eq(schema.volunteer.id, id),
     });
 
     if (!volunteer) {
@@ -161,9 +167,7 @@ export async function DELETE(
     }
 
     // Hard delete
-    await db.volunteer.delete({
-      where: { id },
-    });
+    await db.delete(schema.volunteer).where(eq(schema.volunteer.id, id));
 
     return NextResponse.json({
       success: true,
@@ -177,3 +181,4 @@ export async function DELETE(
     );
   }
 }
+

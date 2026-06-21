@@ -3,11 +3,14 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
+import { student as studentTable, volunteer as volunteerTable, placementDrive } from "@/lib/schema";
+import { eq } from "drizzle-orm";
+
 export async function GET(req: NextRequest) {
   try {
     const studentTokenData = await getVerifiedAuthPayloadFromRequest(req, ["student"]);
     
-    if (!studentTokenData) {
+    if (!studentTokenData || !studentTokenData.enrollmentNumber) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
         { status: 401 }
@@ -17,23 +20,23 @@ export async function GET(req: NextRequest) {
     const db = getDb();
 
     // Verify student is a volunteer
-    const student = await db.student.findUnique({
-      where: { enrollmentNumber: studentTokenData.enrollmentNumber },
-      select: { id: true },
+    const studentData = await db.query.student.findFirst({
+      where: eq(studentTable.enrollmentNumber, studentTokenData.enrollmentNumber),
+      columns: { id: true },
     });
 
-    if (!student) {
+    if (!studentData) {
       return NextResponse.json(
         { success: false, message: "Student not found" },
         { status: 404 }
       );
     }
 
-    const volunteer = await db.volunteer.findUnique({
-      where: { studentId: student.id },
+    const volunteerData = await db.query.volunteer.findFirst({
+      where: eq(volunteerTable.studentId, studentData.id),
     });
 
-    if (!volunteer) {
+    if (!volunteerData) {
       return NextResponse.json(
         { success: false, message: "Not authorized as volunteer" },
         { status: 403 }
@@ -47,16 +50,16 @@ export async function GET(req: NextRequest) {
     const skip = (page - 1) * limit;
 
     // Fetch active drives
-    const drives = await db.placementDrive.findMany({
-      where: { status: "active" },
-      select: {
+    const drives = await db.query.placementDrive.findMany({
+      where: eq(placementDrive.status, "active"),
+      columns: {
         id: true,
         companyName: true,
         driveDate: true,
       },
-      take: limit,
-      skip: skip,
-      orderBy: { driveDate: "desc" },
+      limit: limit,
+      offset: skip,
+      orderBy: (t, { desc }) => [desc(t.driveDate)],
     });
 
     return NextResponse.json({

@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic';
 
 import { NextResponse, NextRequest } from "next/server";
 import { getDb } from "@/lib/db";
+import { memory } from "@/lib/schema";
+import { eq, count } from "drizzle-orm";
 
 export async function GET(req: NextRequest) {
     try {
@@ -14,16 +16,17 @@ export async function GET(req: NextRequest) {
         const skip = (page - 1) * limit;
 
         const db = getDb();
-        const where = { status: "approved" }
-        const [memories, totalCount] = await Promise.all([
-            db.memory.findMany({
-                where,
-                orderBy: { createdAt: "desc" },
-                take: limit,
-                skip: skip,
+        const [memories, totalCountResult] = await Promise.all([
+            db.query.memory.findMany({
+                where: eq(memory.status, "approved"),
+                orderBy: (t, { desc }) => [desc(t.createdAt)],
+                limit: limit,
+                offset: skip,
             }),
-            db.memory.count({ where })
-        ])
+            db.select({ count: count() }).from(memory).where(eq(memory.status, "approved"))
+        ]);
+        const totalCount = totalCountResult[0]?.count || 0;
+
         return NextResponse.json(
             { success: true, memories, totalCount },
             {

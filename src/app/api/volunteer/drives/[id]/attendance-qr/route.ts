@@ -4,6 +4,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { signAuthToken, verifyAuthToken } from "@/lib/auth-jwt";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
+import { student as studentTable, volunteer as volunteerTable, placementDrive } from "@/lib/schema";
+import { eq } from "drizzle-orm";
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -11,35 +14,35 @@ export async function GET(
   try {
     // 1. Verify user is a student
     const studentData = await getVerifiedAuthPayloadFromRequest(req, ["student"]);
-    if (!studentData) {
+    if (!studentData || !studentData.enrollmentNumber) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
     const db = getDb();
 
     // 2. Verify student is actually a volunteer and is verified
-    const student = await db.student.findUnique({
-      where: { enrollmentNumber: studentData.enrollmentNumber },
+    const studentInfo = await db.query.student.findFirst({
+      where: eq(studentTable.enrollmentNumber, studentData.enrollmentNumber),
     });
 
-    if (!student) {
+    if (!studentInfo) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 403 });
     }
 
-    const volunteer = await db.volunteer.findUnique({
-      where: { studentId: student.id },
+    const volunteerInfo = await db.query.volunteer.findFirst({
+      where: eq(volunteerTable.studentId, studentInfo.id),
     });
 
-    if (!volunteer || !volunteer.isVerified || !volunteer.isActive) {
+    if (!volunteerInfo || !volunteerInfo.isVerified || !volunteerInfo.isActive) {
        return NextResponse.json({ success: false, message: "Unauthorized: Active and verified volunteer access only" }, { status: 403 });
     }
 
     const { id: driveId } = await params;
 
     // 3. Verify the drive exists and is active
-    const drive = await db.placementDrive.findUnique({
-      where: { id: driveId },
-      select: { id: true, companyName: true, status: true },
+    const drive = await db.query.placementDrive.findFirst({
+      where: eq(placementDrive.id, driveId),
+      columns: { id: true, companyName: true, status: true },
     });
 
     if (!drive) {

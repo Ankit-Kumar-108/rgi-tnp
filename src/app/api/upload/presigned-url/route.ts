@@ -12,6 +12,8 @@ import {
   type UploadFolder,
   verifyUploadPermissionToken,
 } from "@/lib/upload-auth";
+import { eq } from "drizzle-orm";
+import { student as studentTable, volunteer as volunteerTable } from "@/lib/schema";
 
 // Lazy-initialized S3 client — process.env is NOT available at module
 // load time on Cloudflare Workers, so we must defer construction.
@@ -48,21 +50,21 @@ async function verifyVolunteerUploadAccess(enrollmentNumber?: string) {
   }
 
   const db = getDb();
-  const student = await db.student.findUnique({
-    where: { enrollmentNumber },
-    select: { id: true },
+  const studentRecord = await db.query.student.findFirst({
+    where: eq(studentTable.enrollmentNumber, enrollmentNumber),
+    columns: { id: true },
   });
 
-  if (!student) {
+  if (!studentRecord) {
     return false;
   }
 
-  const volunteer = await db.volunteer.findUnique({
-    where: { studentId: student.id },
-    select: { isActive: true, isVerified: true },
+  const volunteerRecord = await db.query.volunteer.findFirst({
+    where: eq(volunteerTable.studentId, studentRecord.id),
+    columns: { isActive: true, isVerified: true },
   });
 
-  return Boolean(volunteer?.isActive && volunteer.isVerified);
+  return Boolean(volunteerRecord?.isActive && volunteerRecord.isVerified);
 }
 
 export async function POST(req: NextRequest) {

@@ -210,7 +210,7 @@ export default function AlumniDashboard() {
     setFbMsg(null);
     try {
       const token = getToken("alumni");
-      const combinedContent = fbSelectedTags.length > 0 
+      const combinedContent = fbSelectedTags.length > 0
         ? `[Tags: ${fbSelectedTags.join(", ")}]\n${fbContent}`
         : fbContent;
 
@@ -467,22 +467,22 @@ export default function AlumniDashboard() {
             <GraduationCap className="w-4 h-4" /> Alumni
           </div>
           <div className="hidden md:flex">
-          <AlumniDashboardHeader
-            alumni={alumni}
-            showProfileForm={showProfileForm}
-            setShowProfileForm={setShowProfileForm}
-            isProfileIncomplete={isProfileIncomplete}
-            setShowFeedbackModal={setShowFeedbackModal}
-            setShowReferralModal={setShowReferralModal}
-            handleLogout={handleLogout}
-            fetchDashboard={fetchDashboard}
-          />
+            <AlumniDashboardHeader
+              alumni={alumni}
+              showProfileForm={showProfileForm}
+              setShowProfileForm={setShowProfileForm}
+              isProfileIncomplete={isProfileIncomplete}
+              setShowFeedbackModal={setShowFeedbackModal}
+              setShowReferralModal={setShowReferralModal}
+              handleLogout={handleLogout}
+              fetchDashboard={fetchDashboard}
+            />
           </div>
 
           {/* Notification bell */}
-        <div className="mt-2 w-full md:hidden flex justify-end ">
-          <NotificationBell role="alumni" />
-        </div>
+          <div className="mt-2 w-full md:hidden flex justify-end ">
+            <NotificationBell role="alumni" />
+          </div>
 
           {/* Loader State */}
           {loading && (
@@ -515,16 +515,16 @@ export default function AlumniDashboard() {
           )}
 
           <div className="md:hidden">
-          <AlumniDashboardHeader
-            alumni={alumni}
-            showProfileForm={showProfileForm}
-            setShowProfileForm={setShowProfileForm}
-            isProfileIncomplete={isProfileIncomplete}
-            setShowFeedbackModal={setShowFeedbackModal}
-            setShowReferralModal={setShowReferralModal}
-            handleLogout={handleLogout}
-            fetchDashboard={fetchDashboard}
-          />
+            <AlumniDashboardHeader
+              alumni={alumni}
+              showProfileForm={showProfileForm}
+              setShowProfileForm={setShowProfileForm}
+              isProfileIncomplete={isProfileIncomplete}
+              setShowFeedbackModal={setShowFeedbackModal}
+              setShowReferralModal={setShowReferralModal}
+              handleLogout={handleLogout}
+              fetchDashboard={fetchDashboard}
+            />
           </div>
 
           {/* Stats */}
@@ -582,7 +582,7 @@ export default function AlumniDashboard() {
               </div>
 
               {drives.length === 0 ? (
-                <div className="bg-gradient-to-br from-muted/30 to-muted/10 rounded-[2rem] border-2 border-dashed border-border p-12 text-center space-y-4 group hover:border-brand/30 transition-colors">
+                <div className="bg-gradient-to-br from-muted/30 to-muted/10 rounded-lg border-2 border-dashed border-border p-12 text-center space-y-4 group hover:border-brand/30 transition-colors">
                   <div className="inline-flex items-center justify-center w-16 h-16 bg-muted rounded-full group-hover:bg-brand/10 transition-colors">
                     <Briefcase className="w-8 h-8 text-muted-foreground group-hover:text-brand transition-colors" />
                   </div>
@@ -613,9 +613,16 @@ export default function AlumniDashboard() {
                               <p className="text-xs text-muted-foreground truncate">{drive.roleName}</p>
                             </div>
                           </div>
-                          <span className={`text-xs px-2.5 py-1 rounded-full font-bold whitespace-nowrap ml-2 ${drive.driveType === "Open" ? "bg-green-500/15 text-green-700" : "bg-blue-500/15 text-blue-700"}`}>
-                            {drive.driveType}
-                          </span>
+                          <div className="flex flex-col items-end gap-1.5">
+                            <span className={`text-xs px-2.5 py-1 rounded-full font-bold whitespace-nowrap ${drive.driveType === "Open" ? "bg-green-500/15 text-green-700" : "bg-blue-500/15 text-blue-700"}`}>
+                              {drive.driveType}
+                            </span>
+                            {drive.isEligible === false && (
+                              <span className="text-xs px-2.5 py-1 rounded-full font-bold whitespace-nowrap bg-red-500/15 text-red-700">
+                                Ineligible
+                              </span>
+                            )}
+                          </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4 py-3 border-y border-border/50">
@@ -684,9 +691,16 @@ export default function AlumniDashboard() {
                               <span className="text-muted-foreground font-medium">{new Date(drive.driveDate).toLocaleDateString('en-IN')}</span>
                             </td>
                             <td className="px-6 py-4 text-center">
-                              <span className={`inline-flex px-3 py-1 rounded-full text-xs font-bold ${drive.driveType === "Open" ? "bg-green-500/15 text-green-700" : "bg-blue-500/15 text-blue-700"}`}>
-                                {drive.driveType}
-                              </span>
+                              <div className="flex flex-col items-center gap-1.5">
+                                <span className={`inline-flex px-3 py-1 rounded-full text-xs font-bold ${drive.driveType === "Open" ? "bg-green-500/15 text-green-700" : "bg-blue-500/15 text-blue-700"}`}>
+                                  {drive.driveType}
+                                </span>
+                                {drive.isEligible === false && (
+                                  <span className="inline-flex px-3 py-1 rounded-full text-[10px] font-bold bg-red-500/15 text-red-700 uppercase tracking-wider">
+                                    Ineligible
+                                  </span>
+                                )}
+                              </div>
                             </td>
                             <td className="px-6 py-4 flex justify-end">
                               {drive.isRegistered ? (
@@ -732,7 +746,7 @@ export default function AlumniDashboard() {
               </div>
 
               {registrations.length === 0 ? (
-                <div className="bg-gradient-to-br from-muted/30 to-muted/10 rounded-[2rem] border-2 border-dashed border-border p-12 text-center space-y-4 group hover:border-brand/30 transition-colors">
+                <div className="bg-gradient-to-br from-muted/30 to-muted/10 rounded-lg border-2 border-dashed border-border p-12 text-center space-y-4 group hover:border-brand/30 transition-colors">
                   <div className="inline-flex items-center justify-center w-16 h-16 bg-muted rounded-full group-hover:bg-brand/10 transition-colors">
                     <Briefcase className="w-8 h-8 text-muted-foreground group-hover:text-brand transition-colors" />
                   </div>
@@ -945,8 +959,8 @@ export default function AlumniDashboard() {
               {showReferralModal && (
                 <div className="fixed inset-0 z-[100] w-full h-full flex items-center justify-center p-4">
                   <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setShowReferralModal(false)} />
-                  <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-card rounded-[2rem] border border-border shadow-2xl animate-in zoom-in-95 duration-300 custom-scrollbar flex flex-col">
-                    
+                  <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-card rounded-lg border border-border shadow-2xl animate-in zoom-in-95 duration-300 custom-scrollbar flex flex-col">
+
                     {/* Header */}
                     <div className="flex items-center justify-between p-6 md:p-8 border-b border-border bg-muted/10">
                       <div className="flex items-center gap-4">
@@ -965,7 +979,7 @@ export default function AlumniDashboard() {
 
                     <div className="p-6 md:p-8">
                       <form onSubmit={handleSubmitReferral} className="space-y-6">
-                        
+
                         {/* Validation Messages */}
                         {refMsg && (
                           <div className={`p-5 rounded-lg flex items-start gap-3 border ${refMsg.ok
@@ -995,7 +1009,7 @@ export default function AlumniDashboard() {
                                 <Building2 className="w-4 h-4 text-brand" />
                                 <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">Role Basics</h3>
                               </div>
-                              
+
                               <div className="space-y-4">
                                 <div className="space-y-2">
                                   <label className="text-xs font-bold text-muted-foreground uppercase">Company Name *</label>
@@ -1111,7 +1125,7 @@ export default function AlumniDashboard() {
                         {/* Footer Action */}
                         <div className="pt-4 mt-6 border-t border-border flex items-center justify-end">
                           <button type="submit" disabled={submittingRef}
-                            className="w-full md:w-auto bg-foreground hover:bg-foreground/90 disabled:bg-muted disabled:text-muted-foreground text-background px-8 py-4 rounded-lg font-black text-sm transition-all flex items-center justify-center gap-2 shadow-lg disabled:shadow-none"
+                            className="w-full md:w-auto bg-brand hover:bg-brand/90 text-background px-8 py-4 rounded-lg font-black text-sm transition-all flex items-center justify-center gap-2 shadow-lg disabled:shadow-none"
                           >
                             {submittingRef ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                             {submittingRef ? "Submitting..." : "Submit Referral"}
@@ -1163,7 +1177,7 @@ export default function AlumniDashboard() {
 
                         {/* Scrollable Content */}
                         <div className="p-5 md:p-6 space-y-5 overflow-y-auto custom-scrollbar flex-1">
-                          
+
                           {/* Rating Bento */}
                           <div className="bg-surface border border-border rounded-lg p-4 md:p-5 shadow-sm relative overflow-hidden">
                             <label className="block text-xs font-bold uppercase tracking-widest text-muted-foreground mb-4">
@@ -1174,11 +1188,10 @@ export default function AlumniDashboard() {
                                 <button
                                   key={e.val}
                                   onClick={() => setFbRating(e.val)}
-                                  className={`flex flex-col items-center justify-center gap-2 py-3 md:py-4 rounded-lg transition-all duration-300 ${
-                                    fbRating === e.val 
-                                      ? "bg-brand/10 border border-brand/30 shadow-inner scale-[1.02] ring-2 ring-brand/20 ring-offset-1 ring-offset-background" 
-                                      : "hover:bg-muted border border-transparent grayscale hover:grayscale-0 opacity-60 hover:opacity-100 hover:scale-105"
-                                  }`}
+                                  className={`flex flex-col items-center justify-center gap-2 py-3 md:py-4 rounded-lg transition-all duration-300 ${fbRating === e.val
+                                    ? "bg-brand/10 border border-brand/30 shadow-inner scale-[1.02] ring-2 ring-brand/20 ring-offset-1 ring-offset-background"
+                                    : "hover:bg-muted border border-transparent grayscale hover:grayscale-0 opacity-60 hover:opacity-100 hover:scale-105"
+                                    }`}
                                 >
                                   <span className="text-2xl md:text-4xl filter drop-shadow-sm transform transition-transform duration-300">{e.icon}</span>
                                   <span className={`text-[10px] md:text-xs font-bold ${fbRating === e.val ? "text-brand" : "text-muted-foreground"}`}>{e.label}</span>
@@ -1199,11 +1212,10 @@ export default function AlumniDashboard() {
                                   <button
                                     key={tag}
                                     onClick={() => toggleFbTag(tag)}
-                                    className={`px-3 md:px-4 py-2 rounded-lg text-[11px] md:text-xs font-bold transition-all border flex items-center gap-1.5 ${
-                                      active 
-                                        ? "bg-foreground text-background border-foreground shadow-sm scale-105" 
-                                        : "bg-background text-muted-foreground border-border hover:border-foreground/30 hover:bg-muted hover:text-foreground"
-                                    }`}
+                                    className={`px-3 md:px-4 py-2 rounded-lg text-[11px] md:text-xs font-bold transition-all border flex items-center gap-1.5 ${active
+                                      ? "bg-foreground text-background border-foreground shadow-sm scale-105"
+                                      : "bg-background text-muted-foreground border-border hover:border-foreground/30 hover:bg-muted hover:text-foreground"
+                                      }`}
                                   >
                                     {active && <CheckCircle className="w-3.5 h-3.5 shrink-0" />}
                                     {tag}

@@ -3,6 +3,9 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 
+import { and, inArray, exists, eq, desc } from "drizzle-orm";
+import { placementDrive, driveImage } from "@/lib/schema";
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -10,29 +13,35 @@ export async function GET(req: NextRequest) {
     const limit = Number.isNaN(parsedLimit) ? 10 : Math.max(1, Math.min(parsedLimit, 100));
     const db = getDb();
 
-    const drives = await db.placementDrive.findMany({
-      where: {
-        status: { in: ["active", "completed"] },
-        driveImages: { some: {} },
-      },
-      select: {
+    const drives = await db.query.placementDrive.findMany({
+      where: and(
+        inArray(placementDrive.status, ["active", "completed"]),
+        exists(
+          db.select({ id: driveImage.id })
+            .from(driveImage)
+            .where(eq(driveImage.driveId, placementDrive.id))
+        )
+      ),
+      columns: {
         id: true,
         companyName: true,
         driveDate: true,
+      },
+      with: {
         driveImages: {
-          select: {
+          columns: {
             id: true,
             title: true,
             imageUrl: true,
             driveId: true,
             createdAt: true,
           },
-          orderBy: { createdAt: "desc" },
-          take: 4,
+          orderBy: [desc(driveImage.createdAt)],
+          limit: 4,
         },
       },
-      orderBy: { driveDate: "desc" },
-      take: limit,
+      orderBy: [desc(placementDrive.driveDate)],
+      limit: limit,
     });
 
     return NextResponse.json(

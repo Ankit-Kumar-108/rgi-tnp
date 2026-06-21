@@ -6,6 +6,8 @@ import { NotificationService } from "@/lib/notification-service";
 import { getVerifiedAuthPayloadFromRequest } from "@/lib/auth-jwt";
 import { formatCgpaCriteria, meetsCgpaCriteria } from "@/lib/cgpa-utils";
 import { runInBackground } from "@/lib/background";
+import { student as studentTable, placementDrive, driveRegistration } from "@/lib/schema";
+import { eq, and } from "drizzle-orm";
 
 
 
@@ -29,7 +31,7 @@ function parseBranches(branchesStr: string): Set<string> {
 export async function POST(req: NextRequest) {
   try {
     const student = await getVerifiedAuthPayloadFromRequest(req, ["student"]);
-    if (!student) {
+    if (!student || !student.enrollmentNumber) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
@@ -37,19 +39,26 @@ export async function POST(req: NextRequest) {
     const { driveId } = body;
     const db = getDb();
 
-    const studentData = await db.student.findUnique({ where: { enrollmentNumber: student.enrollmentNumber } });
+    const studentData = await db.query.student.findFirst({
+      where: eq(studentTable.enrollmentNumber, student.enrollmentNumber),
+    });
     if (!studentData) {
       return NextResponse.json({ success: false, message: "Student not found" }, { status: 404 });
     }
 
-    const drive = await db.placementDrive.findUnique({ where: { id: driveId } });
+    const drive = await db.query.placementDrive.findFirst({
+      where: eq(placementDrive.id, driveId),
+    });
     if (!drive || drive.status !== "active") {
       return NextResponse.json({ success: false, message: "Drive not available" }, { status: 400 });
     }
 
     // Check: already registered?
-    const existing = await db.driveRegistration.findFirst({
-      where: { driveId, studentId: studentData.id }, // Optimized: use studentId directly
+    const existing = await db.query.driveRegistration.findFirst({
+      where: and(
+        eq(driveRegistration.driveId, driveId),
+        eq(driveRegistration.studentId, studentData.id)
+      ),
     });
     if (existing) {
       return NextResponse.json({ success: false, message: "Already registered for this drive" }, { status: 409 });
@@ -104,8 +113,9 @@ export async function POST(req: NextRequest) {
 
     // Register (with unique constraint safety net for concurrent requests)
     try {
-      await db.driveRegistration.create({
-        data: { driveId, studentId: studentData.id },
+      await db.insert(driveRegistration).values({
+        driveId,
+        studentId: studentData.id,
       });
     } catch (createError: any) {
       // Unique constraint violation = concurrent duplicate registration
