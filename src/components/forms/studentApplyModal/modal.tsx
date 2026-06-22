@@ -25,6 +25,8 @@ export default function JobDetailsModal({
     publicMode = false,
     readonly = false,
     isRegistered = false,
+    isEligible,
+    ineligibilityReason,
 }: {
     drive: PlacementDrive;
     isOpen: boolean;
@@ -34,6 +36,8 @@ export default function JobDetailsModal({
     publicMode?: boolean;
     readonly?: boolean;
     isRegistered?: boolean;
+    isEligible?: boolean;
+    ineligibilityReason?: string;
 }) {
     const router = useRouter();
     const [registering, setRegistering] = useState(false)
@@ -300,14 +304,18 @@ export default function JobDetailsModal({
 
                 {/* Sticky Footer CTA */}
                 {!readonly && (() => {
-                    const isAlumniIneligible = role === "alumni" && !isRegistered && (drive as any).isEligible === false;
+                    const isIneligible = !isRegistered && (
+                        (role === "alumni" && (drive as any).isEligible === false) ||
+                        (isEligible === false)
+                    );
+                    const reason = isEligible === false ? ineligibilityReason : (drive as any).ineligibilityReason;
                     return (
                         <div className="px-6 py-5 md:px-8 bg-background border-t border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shrink-0 rounded-b-[2.5rem]">
                             <div className="w-full sm:w-auto">
-                                {isAlumniIneligible ? (
+                                {isIneligible ? (
                                     <div className="text-red-500 text-xs font-semibold max-w-md">
                                         <span className="font-bold block mb-0.5">Eligibility Mismatch:</span>
-                                        {(drive as any).ineligibilityReason}
+                                        {reason}
                                     </div>
                                 ) : (
                                     <div className="hidden sm:block">
@@ -319,7 +327,7 @@ export default function JobDetailsModal({
                             <div className="w-full sm:w-auto flex flex-col sm:flex-row items-center gap-4">
                                 <button
                                     onClick={() => registerForDrive()}
-                                    disabled={registering || isAlumniIneligible}
+                                    disabled={registering || isIneligible}
                                     className="w-full sm:w-auto px-8 py-3.5 rounded-lg bg-brand text-primary-foreground font-black shadow-lg shadow-brand/30 hover:shadow-brand/40 transition-all active:scale-95 flex items-center justify-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed">
                                     {publicMode ?
                                         "Login to Apply"
@@ -327,7 +335,7 @@ export default function JobDetailsModal({
                                         isRegistered ?
                                             "Registered"
                                             :
-                                            isAlumniIneligible ?
+                                            isIneligible ?
                                                 "Not Eligible"
                                                 :
                                                 registering ?

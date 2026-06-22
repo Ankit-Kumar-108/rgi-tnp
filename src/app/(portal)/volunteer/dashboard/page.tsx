@@ -23,7 +23,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { getToken, logout } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import type { StudentData } from "@/components/volunteer/StudentsOverviewTabs";
+import { StudentData, DriveData, VolunteerData } from "@/types";
 
 // Lazy load heavy tab components — only loaded when user switches to that tab
 const VolunteerDriveImageManagement = dynamic(
@@ -57,40 +57,6 @@ const VolunteerAttendanceQR = dynamic(
   }
 );
 
-interface VolunteerData {
-  volunteer: {
-    id: string;
-    studentId: string;
-    designation: string;
-    isVerified: boolean;
-    isActive: boolean;
-    assignedBy?: string;
-    assignedAt?: string;
-    verificationNotes?: string;
-    createdAt: string;
-    updatedAt: string;
-  };
-  student: {
-    id: string;
-    name: string;
-    enrollmentNumber: string;
-    email: string;
-    branch: string;
-    semester: number;
-    cgpa: number;
-    profileImageUrl?: string;
-    linkedinUrl?: string;
-    githubUrl?: string;
-    batch: string;
-    course: string;
-  };
-  stats: {
-    driveImagesUploaded: number;
-    activeDrives: number;
-    registeredStudents: number;
-    totalApprovals: number;
-  };
-}
 
 export default function VolunteerDashboard() {
   const { loading: authLoading, authenticated } = useAuth(
@@ -135,12 +101,15 @@ export default function VolunteerDashboard() {
 
   /* ── SWR: Students overview (loaded on tab switch) ── */
   const [activeTab, setActiveTab] = useState<"students-overview" | "drive-images" | "overview" | "attendance-qr">("students-overview");
+  const [driveId, setDrivesId] = useState<string | null>(null)
 
   const {
     data: studentsResult,
     isLoading: studentsOverviewLoading,
-  } = useSWR<{ success: boolean; students?: StudentData[]; message?: string }>(
-    authenticated && activeTab === "students-overview" ? "/api/volunteer/students-overview" : null,
+  } = useSWR<{ success: boolean; activeDrives?: DriveData[]; students?: StudentData[]; message?: string }>(
+    authenticated && activeTab === "students-overview" 
+  ? `/api/volunteer/students-overview${driveId ? `?driveId=${driveId}` : ""}` 
+  : null,
     volFetcher,
     {
       revalidateOnFocus: false,
@@ -154,6 +123,7 @@ export default function VolunteerDashboard() {
   );
 
   const studentsOverviewData: StudentData[] = studentsResult?.success ? (studentsResult.students || []) : [];
+  const drives: DriveData[] = studentsResult?.success ? (studentsResult.activeDrives || []) : [];
 
   const router = useRouter();
 
@@ -179,9 +149,9 @@ export default function VolunteerDashboard() {
   const student = data?.student;
   const volunteer = data?.volunteer;
 
+
   return (
     <div className="min-h-screen bg-background overflow-hidden">
-
       {/* Header */}
       <header className="sticky z-40 bg-card/80 backdrop-blur-xl border-b border-border">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
@@ -203,8 +173,8 @@ export default function VolunteerDashboard() {
             className="flex items-center gap-2 px-4 py-2 bg-muted text-foreground rounded-full hover:bg-muted/80 transition-colors font-medium text-sm"
           >
             <div className="flex items-center gap-1 bg-destructive/10 text-destructive rounded-md px-1.5 py-1">
-            <LogOut className="w-4 h-4" />
-            <span className="hidden md:block">Logout</span>
+              <LogOut className="w-4 h-4" />
+              <span className="hidden md:block">Logout</span>
             </div>
           </button>
         </div>
@@ -372,8 +342,8 @@ export default function VolunteerDashboard() {
           <button
             onClick={() => setActiveTab("students-overview")}
             className={`pb-4 px-4 font-bold text-sm transition-colors ${activeTab === "students-overview"
-                ? "text-brand border-b-2 border-brand"
-                : "text-muted-foreground hover:text-foreground"
+              ? "text-brand border-b-2 border-brand"
+              : "text-muted-foreground hover:text-foreground"
               }`}
           >
             <div className="flex items-center gap-2">
@@ -384,8 +354,8 @@ export default function VolunteerDashboard() {
           <button
             onClick={() => setActiveTab("drive-images")}
             className={`pb-4 px-4 font-bold text-sm transition-colors ${activeTab === "drive-images"
-                ? "text-brand border-b-2 border-brand"
-                : "text-muted-foreground hover:text-foreground"
+              ? "text-brand border-b-2 border-brand"
+              : "text-muted-foreground hover:text-foreground"
               }`}
           >
             <div className="flex items-center gap-2">
@@ -396,8 +366,8 @@ export default function VolunteerDashboard() {
           <button
             onClick={() => setActiveTab("attendance-qr")}
             className={`pb-4 px-4 font-bold text-sm transition-colors whitespace-nowrap ${activeTab === "attendance-qr"
-                ? "text-brand border-b-2 border-brand"
-                : "text-muted-foreground hover:text-foreground"
+              ? "text-brand border-b-2 border-brand"
+              : "text-muted-foreground hover:text-foreground"
               }`}
           >
             <div className="flex items-center gap-2">
@@ -408,8 +378,8 @@ export default function VolunteerDashboard() {
           <button
             onClick={() => setActiveTab("overview")}
             className={`pb-4 px-4 font-bold text-sm transition-colors ${activeTab === "overview"
-                ? "text-brand border-b-2 border-brand"
-                : "text-muted-foreground hover:text-foreground"
+              ? "text-brand border-b-2 border-brand"
+              : "text-muted-foreground hover:text-foreground"
               }`}
           >
             <div className="flex items-center gap-2">
@@ -508,7 +478,11 @@ export default function VolunteerDashboard() {
                 <StudentsOverviewTabs
                   students={studentsOverviewData}
                   loading={studentsOverviewLoading}
+                  drives={drives}
+                  selectedDriveId={driveId || (drives[0]?.id ?? null)}
+                  setDriveId={setDrivesId}
                 />
+
               </section>
             )}
 

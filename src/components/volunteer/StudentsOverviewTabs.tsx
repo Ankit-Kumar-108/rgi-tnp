@@ -2,37 +2,27 @@
 
 import React, { useMemo } from "react";
 import { Search, GraduationCap } from "lucide-react";
+import { StudentData, DriveData} from "@/types";
 
-export interface StudentData {
-    registrationId: string;
-    driveId: string;
-    studentId: string;
-    studentType: "internal" | "external";
-    name: string;
-    enrollmentNumber: string;
-    email: string;
-    branch: string;
-    cgpa: number;
-    semester?: number;
-    batch?: string;
-    collegeName?: string;
-    profileImageUrl?: string;
-    companyName: string;
-    roleName: string;
-    ctc: string;
-    minCGPA: number;
-    jobType: string;
-    driveDate: string | Date;
-    status: "Applied" | "Selected" | "Rejected" | "Shortlisted";
-    appliedAt: string | Date;
-}
 
 type TabType = "all" | "selected" | "rejected" | "shortlisted";
 
 interface StudentsOverviewTabsProps {
     students: StudentData[];
     loading?: boolean;
+    drives: DriveData[];
+    selectedDriveId: string | null;
+    setDriveId: (driveId: string | null) => void;
 }
+
+export default function StudentsOverviewTabs({ 
+    students, 
+    loading = false, 
+    drives, 
+    selectedDriveId,
+    setDriveId 
+}: StudentsOverviewTabsProps) {
+
 
 const statusColors: Record<string, { bg: string; badge: string; text: string }> = {
     Applied: { bg: "bg-muted/20", badge: "bg-muted text-muted-foreground", text: "gray" },
@@ -41,7 +31,7 @@ const statusColors: Record<string, { bg: string; badge: string; text: string }> 
     Shortlisted: { bg: "bg-yellow-500/20", badge: "bg-yellow-100 text-yellow-700", text: "yellow" },
 };
 
-export default function StudentsOverviewTabs({ students, loading = false }: StudentsOverviewTabsProps) {
+
     const [activeTab, setActiveTab] = React.useState<TabType>("all");
     const [searchQuery, setSearchQuery] = React.useState("");
 
@@ -79,7 +69,7 @@ export default function StudentsOverviewTabs({ students, loading = false }: Stud
         }
 
         return filtered;
-    }, [students, activeTab, searchQuery]);
+    }, [students, activeTab, searchQuery, drives]);
 
     const stats = useMemo(() => {
         return {
@@ -106,7 +96,23 @@ export default function StudentsOverviewTabs({ students, loading = false }: Stud
     return (
         <div className="space-y-6 rounded-2xl bg-card p-2 md:p-6">
             {/* Stats Cards */}
-            <h1 className="text-text font-bold text-s md:text ml-2">Filter Buttons</h1>
+            <div className="flex justify-between items-center">
+                <h1 className="text-text font-bold text-s md:text ml-2">Filter Buttons</h1>
+                <select 
+                value={selectedDriveId || ""}
+                onChange={(e) => setDriveId(e.target.value || null)}
+                className="p-2 px-3 border border-border rounded-lg text-text bg-background cursor-pointer"
+                >
+                    {drives.map((drive) => (
+                        <option 
+                        key={drive?.id} 
+                        value={drive?.id}
+                        >
+                            {drive?.companyName}
+                        </option>
+                    ))}
+                </select>
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {tabs.map((tab) => (
                     <button

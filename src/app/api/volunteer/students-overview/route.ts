@@ -8,7 +8,7 @@ import { eq, count } from "drizzle-orm";
 export async function GET(req: NextRequest) {
   try {
     const studentTokenData = await getVerifiedAuthPayloadFromRequest(req, ["student"]);
-    
+
     if (!studentTokenData || !studentTokenData.enrollmentNumber) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
     }
 
     const db = getDb();
-    
+
     // Verify this user is a volunteer
     const studentData = await db.query.student.findFirst({
       where: eq(studentTable.enrollmentNumber, studentTokenData.enrollmentNumber),

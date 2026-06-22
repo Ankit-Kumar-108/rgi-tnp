@@ -95,10 +95,13 @@ export default function ExternalStudentDashboard() {
     if (reason) {
       return {
         actionElement: (
-          <div className="flex flex-col items-end">
-            <span className="inline-flex items-center gap-1 text-red-500 text-xs font-bold"><XCircle className="w-4 h-4" /> Ineligible</span>
-            <span className="text-xs text-muted-foreground leading-none mt-1">{reason}</span>
-          </div>
+          <button
+            onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
+            className="inline-flex items-center gap-1.5 text-red-600 bg-red-500/10 hover:bg-red-500/20 px-4 py-2.5 rounded-lg text-xs font-bold transition-all"
+          >
+            <span>Ineligible</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
         )
       };
     }
@@ -155,21 +158,36 @@ export default function ExternalStudentDashboard() {
   return (
     <>
       <Nav />
-      {selectedDrive && (
-        <JobDetailsModal
-          role="external_student"
-          drive={selectedDrive}
-          isOpen={isModalOpen}
-          onClose={() => {
-            setIsModalOpen(false);
-            setSelectedDrive(null);
-          }}
-          onSuccess={() => {
-            fetchDashboard();
-          }}
-          isRegistered={registrations.some((r: any) => r.driveId === selectedDrive.id)}
-        />
-      )}
+      {selectedDrive && (() => {
+        let reason = "";
+        if (selectedDrive.course !== "All" && !selectedDrive.course?.includes(student?.course)) reason = "Course Ineligible";
+        else if (!selectedDrive.eligibleBranches?.includes(student?.branch)) reason = "Branch Ineligible";
+        else if (!meetsCgpaCriteria(student?.cgpa, selectedDrive.minCGPA)) reason = "CGPA too low";
+        else if (student?.batch && selectedDrive.minBatch && selectedDrive.maxBatch) {
+          const sBatch = parseInt(student.batch.split('-').pop() || "0", 10);
+          const minB = parseInt(selectedDrive.minBatch.split('-').pop() || "0", 10);
+          const maxB = parseInt(selectedDrive.maxBatch.split('-').pop() || "0", 10);
+          if (sBatch < minB || sBatch > maxB) reason = "Batch Ineligible";
+        }
+        const isEligible = !reason;
+        return (
+          <JobDetailsModal
+            role="external_student"
+            drive={selectedDrive}
+            isOpen={isModalOpen}
+            onClose={() => {
+              setIsModalOpen(false);
+              setSelectedDrive(null);
+            }}
+            onSuccess={() => {
+              fetchDashboard();
+            }}
+            isRegistered={registrations.some((r: any) => r.driveId === selectedDrive.id)}
+            isEligible={isEligible}
+            ineligibilityReason={reason}
+          />
+        );
+      })()}
 
       <div className="bg-background text-foreground antialiased font-sans min-h-screen mt-15 overflow-hidden">
         <div className="fixed bottom-0 right-0 w-96 h-96 bg-brand/5 rounded-full blur-[120px] -z-10" />

@@ -274,7 +274,7 @@ export default function VolunteersManagement() {
 
       {/* Main Container */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        
+
         {/* Dynamic Key Stats Section - Highlighted at the Top */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {/* Card 1: Total Volunteers */}
@@ -371,7 +371,7 @@ export default function VolunteersManagement() {
 
         {/* Volunteers Display Area */}
         <section className="space-y-6">
-          
+
           {/* Volunteers Table - Desktop View */}
           <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm hidden md:block transition-all duration-300">
             {filteredVolunteers.length === 0 ? (
@@ -477,10 +477,10 @@ export default function VolunteersManagement() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                           {volunteer.assignedAt
                             ? new Date(volunteer.assignedAt).toLocaleDateString("en-US", {
-                                year: "numeric",
-                                month: "short",
-                                day: "numeric",
-                              })
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            })
                             : "-"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

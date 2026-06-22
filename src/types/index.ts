@@ -127,3 +127,79 @@ export interface Recruiter {
   company: string;
   role?: string;
 }
+
+export interface StudentData {
+  registrationId: string;
+  driveId: string;
+  studentId: string;
+  studentType: "internal" | "external";
+  name: string;
+  enrollmentNumber: string;
+  email: string;
+  branch: string;
+  cgpa: number;
+  semester?: number;
+  batch?: string;
+  collegeName?: string;
+  profileImageUrl?: string;
+  companyName: string;
+  roleName: string;
+  ctc: string;
+  minCGPA: number;
+  jobType: string;
+  driveDate: string | Date;
+  status: "Applied" | "Selected" | "Rejected" | "Shortlisted";
+  appliedAt: string | Date;
+}
+
+export interface DriveData {
+  id: string;
+  companyName: string;
+  roleName: string;
+  ctc: string;
+  minCGPA: number;
+  jobType: string;
+  driveDate: string | Date;
+}
+
+export interface VolunteerData {
+  volunteer: {
+    id: string;
+    studentId: string;
+    designation: string;
+    isVerified: boolean;
+    isActive: boolean;
+    assignedBy?: string;
+    assignedAt?: string;
+    verificationNotes?: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+  student: {
+    id: string;
+    name: string;
+    enrollmentNumber: string;
+    email: string;
+    branch: string;
+    semester: number;
+    cgpa: number;
+    profileImageUrl?: string;
+    linkedinUrl?: string;
+    githubUrl?: string;
+    batch: string;
+    course: string;
+  };
+  stats: {
+    driveImagesUploaded: number;
+    activeDrives: number;
+    registeredStudents: number;
+    totalApprovals: number;
+  };
+}
+
+export interface SelectedDriveId {
+    selectedDriveId: string;
+}
+
+
+
