@@ -53,7 +53,7 @@ export async function fetchTestimonials() {
         a."currentCompany"
       FROM "AlumniFeedback" af
       JOIN "Alumni" a ON af."alumniId" = a.id
-      WHERE af."isApproved" = true AND af."rating" >= 4 AND a."isProfileComplete" = true
+      WHERE af."isApproved" = 1 AND af."rating" >= 4 AND a."isProfileComplete" = 1
       ORDER BY RANDOM() 
       LIMIT 3
     `);

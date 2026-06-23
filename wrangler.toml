@@ -26,3 +26,13 @@ bucket_name = "placement-assets"
 [[kv_namespaces]]
 binding = "IMAGES"
 id = "2cfdb84a0d6d42bdbc3b14a2285ebbf6"
+
+[vars]
+R2_BUCKET_NAME = "placement-assets"
+R2_END_POINT = "https://f1367f64dbf752b13589fe0e999e885b.r2.cloudflarestorage.com"
+R2_PUBLIC_URL = "https://pub-1b5e6b5b4fbe4c89940f9bb74b08fa75.r2.dev"
+EMAIL_FROM = "ankit@ankitdevprojects.qzz.io"
+GMAIL_USER = "ankit.education86@gmail.com"
+ADMIN_EMAIL = "admin@rgi.ac.in"
+DOMAIN_NAME = "ankit-dev.me"
+
