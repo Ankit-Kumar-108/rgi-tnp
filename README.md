@@ -514,6 +514,15 @@ Verify Token + Role Authorization
 - [ ] **Alumni ( alumni drive eligibility addition and basic alumni passing and data like cgpa gender etc) (to be done)**
   - add feature to add alumni drive eligibility and basic alumni passing and data like cgpa gender etc for better visibility and understanding of profile of alumni
 
+- [ ] **Alumin, Student, Exernal Dashboard (add memories images Modal) (to be done)**
+  - add memories images Modal in alumni, student, external dashboard for better visibility and understanding of memories
+
+- [ ] **Recruiter (add better ui for applicants) (to be done)**
+  - add better ui for applicants in recruiter dashboard for better visibility and understanding of applicants
+
+- [ ] **forgot password, memory upload ui, etc.. (ui/ux improvement) (to be done)**
+  - forgot password, memory upload ui, etc.. (ui/ux improvement) for better visibility and understanding of profile and also check why cgpa 12th, 10th and back is default 0
+
 - [ ] **Take Suggestion from sir about final selection and mail notification**
 
 ### Phase 2 (Next Quarter)
