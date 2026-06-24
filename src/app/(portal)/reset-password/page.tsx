@@ -96,7 +96,7 @@ function ResetPasswordContent() {
           </div>
 
           <div className="mb-5 sm:mb-6 space-y-3">
-            <div className="inline-flex items-center gap-2 rounded-2xl border border-brand/15 bg-brand/5 px-3 py-2 text-xs font-semibold text-brand">
+            <div className="inline-flex items-center gap-2 rounded-lg border border-brand/15 bg-brand/5 px-3 py-2 text-xs font-semibold text-brand">
               <LockKeyhole className="h-4 w-4" /> Secure recovery
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
@@ -108,9 +108,9 @@ function ResetPasswordContent() {
           </div>
 
           {tokenMissing && status !== "success" ? (
-              <div className="rounded-3xl border border-amber-500/20 bg-amber-500/5 p-5 sm:p-6 text-left">
+              <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-5 sm:p-6 text-left">
               <div className="flex items-start gap-3">
-                <div className="rounded-2xl bg-amber-500/10 p-3 text-amber-500">
+                <div className="rounded-lg bg-amber-500/10 p-3 text-amber-500">
                   <AlertTriangle className="h-5 w-5" />
                 </div>
                 <div>
@@ -121,15 +121,15 @@ function ResetPasswordContent() {
                 </div>
               </div>
               <div className="mt-5">
-                <Link href="/forgot-password" className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl bg-brand px-5 py-3 text-sm font-bold text-primary-foreground transition-all hover:bg-brand/90">
+                <Link href="/forgot-password" className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg bg-brand px-5 py-3 text-sm font-bold text-primary-foreground transition-all hover:bg-brand/90">
                   Request a new link <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
             </div>
           ) : status === "success" ? (
-            <div className="rounded-3xl border border-green-500/20 bg-green-500/5 p-5 sm:p-8 text-left">
+            <div className="rounded-lg border border-green-500/20 bg-green-500/5 p-5 sm:p-8 text-left">
               <div className="flex items-start gap-4">
-                <div className="rounded-2xl bg-green-500/10 p-3 text-green-500">
+                <div className="rounded-lg bg-green-500/10 p-3 text-green-500">
                   <CheckCircle className="h-6 w-6" />
                 </div>
                 <div className="space-y-2">
@@ -138,7 +138,7 @@ function ResetPasswordContent() {
                 </div>
               </div>
               <div className="mt-6">
-                <Link href={getLoginHref()} className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl bg-brand px-5 py-3 text-sm font-bold text-primary-foreground shadow-(--shadow-brand) transition-all hover:-translate-y-0.5 hover:bg-brand/90 sm:py-3.5">
+                <Link href={getLoginHref()} className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg bg-brand px-5 py-3 text-sm font-bold text-primary-foreground shadow-(--shadow-brand) transition-all hover:-translate-y-0.5 hover:bg-brand/90 sm:py-3.5">
                   Go to Login <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
@@ -146,14 +146,14 @@ function ResetPasswordContent() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
               {status === "error" && message && (
-                <div className="rounded-2xl border border-destructive/20 bg-destructive/10 p-4 text-sm font-medium text-destructive">
+                <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-4 text-sm font-medium text-destructive">
                   {message}
                 </div>
               )}
 
               <div className="space-y-2.5">
                 <label className="text-sm font-semibold text-foreground">Account Type</label>
-                <div className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-muted/50 px-4 py-3 text-sm font-semibold text-foreground">
+                <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted/50 px-4 py-3 text-sm font-semibold text-foreground">
                   <span>
                     {role === "student" && "Internal Student (RGI)"}
                     {role === "external_student" && "External Student"}
@@ -172,7 +172,7 @@ function ResetPasswordContent() {
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
-                      className="w-full rounded-2xl border border-input bg-background px-4 py-3 pr-12 text-sm outline-none transition-all placeholder:text-muted-foreground/60 focus:border-brand focus:ring-2 focus:ring-brand/15"
+                      className="w-full rounded-lg border border-input bg-background px-4 py-3 pr-12 text-sm outline-none transition-all placeholder:text-muted-foreground/60 focus:border-brand focus:ring-2 focus:ring-brand/15"
                       placeholder="Enter new password (min 8 characters)"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -194,7 +194,7 @@ function ResetPasswordContent() {
                   <div className="relative">
                     <input
                       type={showConfirm ? "text" : "password"}
-                      className="w-full rounded-2xl border border-input bg-background px-4 py-3 pr-12 text-sm outline-none transition-all placeholder:text-muted-foreground/60 focus:border-brand focus:ring-2 focus:ring-brand/15"
+                      className="w-full rounded-lg border border-input bg-background px-4 py-3 pr-12 text-sm outline-none transition-all placeholder:text-muted-foreground/60 focus:border-brand focus:ring-2 focus:ring-brand/15"
                       placeholder="Confirm new password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
@@ -214,7 +214,7 @@ function ResetPasswordContent() {
               <button
                 type="submit"
                 disabled={status === "loading"}
-                className="group inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-brand px-5 py-3 text-sm font-bold text-primary-foreground shadow-(--shadow-brand) transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand/90 disabled:translate-y-0 disabled:opacity-50 sm:py-3.5"
+                className="group inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-5 py-3 text-sm font-bold text-primary-foreground shadow-(--shadow-brand) transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand/90 disabled:translate-y-0 disabled:opacity-50 sm:py-3.5"
               >
                 {status === "loading" ? (
                   <><Loader2 className="h-5 w-5 animate-spin" /> Resetting...</>
@@ -223,7 +223,7 @@ function ResetPasswordContent() {
                 )}
               </button>
 
-              <div className="rounded-2xl border border-border bg-muted/30 p-4 text-sm text-muted-foreground leading-relaxed">
+              <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground leading-relaxed">
                 Tip: use a unique password with letters, numbers, and symbols for better account security.
               </div>
             </form>

@@ -69,7 +69,7 @@ function StudentLoginContent() {
         <div className="min-h-screen flex flex-col bg-background">
             <Nav/>
             <main className="flex-1 flex w-full items-center justify-center p-4 sm:p-6 sm:mt-10 md:mt-2 pt-24 md:pt-32 pb-12 lg:h-screen lg:max-h-screen lg:py-24">
-                <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-background/50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-[var(--shadow-xl)] border border-border lg:h-[85vh] lg:max-h-200 mt-10 overflow-hidden">
+                <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-background/50 backdrop-blur-sm rounded-lg shadow-[var(--shadow-xl)] border border-border lg:h-[85vh] lg:max-h-200 mt-10 overflow-hidden">
                     {/* Left Side: Visual/Branding */}
                     <div className="relative hidden lg:flex flex-col justify-end p-10 xl:p-12 overflow-hidden bg-brand/5">
                         <div 
@@ -78,7 +78,7 @@ function StudentLoginContent() {
                             style={{ backgroundImage: "linear-gradient(180deg, rgba(146, 19, 236, 0.2) 0%, rgba(26, 16, 34, 0.9) 100%), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop')" }}
                         />
                         <div className="relative z-10 text-white">
-                            <div className="mb-4 inline-flex items-center justify-center p-3 bg-brand backdrop-blur-md rounded-2xl text-brand-50 shadow-inner">
+                            <div className="mb-4 inline-flex items-center justify-center p-3 bg-brand backdrop-blur-md rounded-lg text-brand-50 shadow-inner">
                                 <GraduationCap className="w-8 h-8"/>
                             </div>
                             <h1 className="text-4xl font-black mb-4 leading-tight">Kickstart Your Career Journey</h1>
@@ -94,17 +94,17 @@ function StudentLoginContent() {
                         </div>
                     </div>
                     {/* Right Side: Login Form */}
-                    <div className="p-6 sm:p-10 md:p-12 flex flex-col justify-center relative overflow-y-scroll overflow-x-hidden">
-                        <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 rounded-full bg-brand/5 blur-2xl z-0 pointer-events-none"></div>
-                        <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-32 h-32 rounded-full bg-brand/5 blur-2xl z-0 pointer-events-none"></div>
+                    <div className="p-6 sm:p-10 md:p-12 flex flex-col justify-center relative overflow-y-hidden overflow-x-hidden">
+                        <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 rounded-full bg-brand/15 blur-2xl z-0 pointer-events-none"></div>
+                        <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-32 h-32 rounded-full bg-brand/15 blur-2xl z-0 pointer-events-none"></div>
 
                         <div className="mb-8 relative z-10">
-                            <h2 className="text-3xl font-bold tracking-tight text-foreground mb-2 mt-15">Student Portal Login</h2>
-                            <p className="text-muted-foreground text-sm sm:text-base">Please enter your credentials to access your dashboard.</p>
+                            <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground mb-2">Student Portal Login</h2>
+                            <p className="text-muted-foreground text-xs sm:text-sm">Please enter your credentials to access your dashboard.</p>
                         </div>
 
                         {error && (
-                            <div className="mb-4 p-3 rounded-xl bg-destructive/10 text-destructive text-sm font-medium relative z-10">
+                            <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm font-medium relative z-10">
                                 {error}
                             </div>
                         )}
@@ -117,7 +117,7 @@ function StudentLoginContent() {
                                         <Mail className="w-5 h-5"/>
                                     </div>
                                     <input 
-                                        className="w-full pl-11 pr-4 py-3 sm:py-3.5 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all placeholder:text-muted-foreground text-sm sm:text-base shadow-sm" 
+                                        className="w-full pl-11 pr-4 py-3 sm:py-3.5 rounded-lg border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all placeholder:text-muted-foreground text-sm sm:text-base shadow-sm" 
                                         placeholder="Enter your email" 
                                         type="email" 
                                         required
@@ -136,7 +136,7 @@ function StudentLoginContent() {
                                         <LockKeyhole className="w-5 h-5"/>
                                     </div>
                                     <input 
-                                        className="w-full pl-11 pr-12 py-3 sm:py-3.5 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all placeholder:text-muted-foreground text-sm sm:text-base shadow-sm" 
+                                        className="w-full pl-11 pr-12 py-3 sm:py-3.5 rounded-lg border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all placeholder:text-muted-foreground text-sm sm:text-base shadow-sm" 
                                         placeholder="Enter Password" 
                                         type={showPassword ? "text" : "password"} 
                                         required
@@ -170,16 +170,6 @@ function StudentLoginContent() {
                             <Link href="/students/register" className="w-full py-3 sm:py-3.5 rounded-full border-2 border-brand/20 text-brand font-bold bg-transparent hover:bg-brand/5 transition-colors duration-200 flex items-center justify-center gap-2">
                                 Register as Student
                             </Link>
-                        </div>
-                        
-                        <div className="mt-10 flex flex-col items-center gap-2 relative z-10">
-                            <p className="text-xs uppercase tracking-widest text-muted-foreground font-bold">Official Portal of</p>
-                            <span className="text-foreground font-bold text-xs sm:text-sm text-center">RADHARAMAN GROUP OF INSTITUTES</span>
-                            <div className="flex gap-4 mt-2">
-                                <a className="text-muted-foreground hover:text-brand transition-colors p-2 hover:bg-brand/5 rounded-full" href="#" aria-label="Website"><Earth className="w-4 h-4"/></a>
-                                <a className="text-muted-foreground hover:text-brand transition-colors p-2 hover:bg-brand/5 rounded-full" href="#" aria-label="Share"><Share2 className="w-4 h-4"/></a>
-                                <a className="text-muted-foreground hover:text-brand transition-colors p-2 hover:bg-brand/5 rounded-full" href="#" aria-label="Information"><Info className="w-4 h-4"/></a>
-                            </div>
                         </div>
                     </div>
                 </div>

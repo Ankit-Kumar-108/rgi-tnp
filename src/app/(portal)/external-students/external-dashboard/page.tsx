@@ -217,12 +217,14 @@ export default function ExternalStudentDashboard() {
 
           {/* Complete Profile Form (Collapsible) */}
           <div className="hidden md:block">
-            <ExternalProfileCompletionForm 
-              student={student}
-              showProfileForm={showProfileForm}
-              setShowProfileForm={setShowProfileForm}
-              fetchDashboard={fetchDashboard}
-            />
+            {student && (
+              <ExternalProfileCompletionForm 
+                student={student}
+                showProfileForm={showProfileForm}
+                setShowProfileForm={setShowProfileForm}
+                fetchDashboard={fetchDashboard}
+              />
+            )}
           </div>
 
           {loading ? (

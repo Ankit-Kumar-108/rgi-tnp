@@ -57,7 +57,7 @@ export default function ExternalProfileCompletionForm({
       {/* Complete Profile Prompt */}
       {isProfileIncomplete && !showProfileForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-sm p-4">
-          <div className="w-full max-w-xl rounded-xl border border-border bg-card/95 shadow-2xl overflow-hidden animate-in zoom-in-95 fade-in duration-300">
+          <div className="w-full max-w-3xl rounded-xl border border-border bg-card/95 shadow-2xl overflow-hidden animate-in zoom-in-95 fade-in duration-300">
             <div className="p-6 md:p-7">
               <div className="flex items-start gap-4">
                 <div className="shrink-0 rounded-lg bg-brand/10 text-brand p-3">
@@ -91,7 +91,7 @@ export default function ExternalProfileCompletionForm({
       {/* Complete Profile Form (Collapsible) */}
       {showProfileForm && (
         <section className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-sm p-4 ">
-          <div className="w-full max-w-2xl rounded-lg border border-border bg-card/95 shadow-2xl overflow-hidden animate-in zoom-in-95 fade-in duration-300 p-5">
+          <div className="w-full max-w-3xl rounded-lg border border-border bg-card/95 shadow-2xl overflow-hidden animate-in zoom-in-95 fade-in duration-300 p-5">
           <h2 className="text-xl font-bold text-foreground mb-6 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2"><div className="p-2 bg-brand/10 rounded-lg text-brand"><FileText className="w-5 h-5" /></div>
             Academic Details</div>
@@ -163,8 +163,8 @@ export default function ExternalProfileCompletionForm({
                 disabled={submittingProfile}
                 className="bg-brand text-primary-foreground px-8 py-3.5 rounded-lg font-bold hover:bg-brand/90 transition-all flex items-center gap-2 disabled:opacity-50 shadow-[var(--shadow-brand)]"
               >
-                {submittingProfile ? <Loader2 className="w-4 h-4 animate-spin" /> : <ChevronRight className="w-4 h-4" />}
                 {submittingProfile ? "Saving..." : "Save"}
+                {submittingProfile ? <Loader2 className="w-4 h-4 animate-spin" /> : <ChevronRight className="w-4 h-4" />}
               </button>
             </div>
           </form>

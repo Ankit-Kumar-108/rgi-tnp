@@ -64,7 +64,7 @@ function ForgotPasswordContent() {
           </div>
 
           <div className="mb-5 sm:mb-6 space-y-3">
-            <div className="inline-flex items-center gap-2 rounded-2xl border border-brand/15 bg-brand/5 px-3 py-2 text-xs font-semibold text-brand">
+            <div className="inline-flex items-center gap-2 rounded-lg border border-brand/15 bg-brand/5 px-3 py-2 text-xs font-semibold text-brand">
               <ShieldCheck className="h-4 w-4" /> Secure recovery
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
@@ -79,7 +79,7 @@ function ForgotPasswordContent() {
             <div className="space-y-2.5">
               <label className="text-sm font-semibold text-foreground">Account Type</label>
               {roleFromQuery ? (
-                <div className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-muted/50 px-4 py-3 text-sm font-semibold text-foreground shadow-sm">
+                <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted/50 px-4 py-3 text-sm font-semibold text-foreground shadow-sm">
                   <span>
                     {roleFromQuery === "student" && "Internal Student (RGI)"}
                     {roleFromQuery === "external_student" && "External Student"}
@@ -90,7 +90,7 @@ function ForgotPasswordContent() {
                 </div>
               ) : (
                 <select
-                  className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-brand focus:ring-2 focus:ring-brand/15"
+                  className="w-full rounded-lg border border-input bg-background px-4 py-3 text-sm shadow-sm outline-none transition-all focus:border-brand focus:ring-2 focus:ring-brand/15"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
                 >
@@ -105,11 +105,11 @@ function ForgotPasswordContent() {
             <div className="space-y-2.5">
               <label className="text-sm font-semibold text-foreground">Email</label>
               <div className="relative">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 rounded-xl bg-brand/10 p-2 text-brand">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 rounded-lg bg-brand/10 p-2 text-brand">
                   <Mail className="h-4 w-4" />
                 </div>
                 <input
-                  className="w-full rounded-2xl border border-input bg-background pl-14 pr-4 py-3 text-sm outline-none transition-all placeholder:text-muted-foreground/60 focus:border-brand focus:ring-2 focus:ring-brand/15"
+                  className="w-full rounded-lg border border-input bg-background pl-14 pr-4 py-3 text-sm outline-none transition-all placeholder:text-muted-foreground/60 focus:border-brand focus:ring-2 focus:ring-brand/15"
                   placeholder="Enter your registered email"
                   type="email"
                   required
@@ -120,7 +120,7 @@ function ForgotPasswordContent() {
             </div>
 
             <button
-              className="group inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-brand px-5 py-3 text-sm font-bold text-primary-foreground shadow-(--shadow-brand) transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand/90 disabled:translate-y-0 disabled:opacity-50 sm:py-3.5"
+              className="group inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-5 py-3 text-sm font-bold text-primary-foreground shadow-(--shadow-brand) transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand/90 disabled:translate-y-0 disabled:opacity-50 sm:py-3.5"
               type="submit"
               disabled={loading}
             >
@@ -131,7 +131,7 @@ function ForgotPasswordContent() {
               )}
             </button>
 
-            <div className="rounded-2xl border border-border bg-muted/30 p-4 text-sm leading-relaxed text-muted-foreground">
+            <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm leading-relaxed text-muted-foreground">
               Tip: if the email doesn't arrive, confirm the selected role matches the account you're trying to recover.
             </div>
           </form>

@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
         profileImageUrl: true, phoneNumber: true, course: true, batch: true,
         resumeUrl: true, tenthPercentage: true, twelfthPercentage: true,
         activeBacklog: true, linkedinUrl: true, githubUrl: true,
-        isProfileComplete: true,
+        isProfileComplete: true, gender: true,
       },
     });
 

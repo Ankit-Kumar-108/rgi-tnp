@@ -63,7 +63,7 @@ export default function AlumniLogin() {
         <div className="min-h-screen flex flex-col bg-background">
             <Nav />
             <main className="flex-1 flex w-full items-center justify-center p-4 sm:p-6 sm:mt-10 md:mt-2 pt-24 md:pt-32 pb-12 lg:h-screen lg:max-h-screen lg:py-24">
-                <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-background/50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-2xl shadow-brand/10 border border-brand/10 lg:h-[85vh] lg:max-h-200 mt-10 overflow-hidden">
+                <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-background/50 backdrop-blur-sm rounded-lg  shadow-2xl shadow-brand/10 border border-brand/10 lg:h-[85vh] lg:max-h-200 mt-10 overflow-hidden">
                     {/* Left Side: Visual */}
                     <div className="relative hidden lg:flex flex-col justify-end p-10 xl:p-12 overflow-hidden bg-brand/5">
                         <div
@@ -74,7 +74,7 @@ export default function AlumniLogin() {
                             }}
                         />
                         <div className="relative z-10 text-white">
-                            <div className="mb-4 inline-flex items-center justify-center p-3 bg-brand backdrop-blur-md rounded-2xl text-white shadow-inner">
+                            <div className="mb-4 inline-flex items-center justify-center p-3 bg-brand backdrop-blur-md rounded-lg text-white shadow-inner">
                                 <GraduationCap className="w-8 h-8" />
                             </div>
                             <h1 className="text-4xl font-black mb-4 leading-tight">
@@ -92,21 +92,21 @@ export default function AlumniLogin() {
                     </div>
 
                     {/* Right Side: Form */}
-                    <div className="p-6 sm:p-10 md:p-12 flex flex-col justify-center relative overflow-y-scroll overflow-x-hidden">
-                        <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 rounded-full bg-brand/30 blur-2xl z-0 pointer-events-none" />
-                        <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-32 h-32 rounded-full bg-brand/20 blur-2xl z-0 pointer-events-none" />
+                    <div className="p-6 sm:p-10 md:p-12 flex flex-col justify-center relative overflow-y-hidden overflow-x-hidden">
+                        <div className="absolute top-0 right-0 -mr-12 -mt-12 w-24 h-24 rounded-full bg-brand/15 blur-2xl z-0 pointer-events-none" />
+                        <div className="absolute bottom-0 left-0 -ml-12 -mb-12 w-24 h-24 rounded-full bg-brand/15 blur-2xl z-0 pointer-events-none" />
 
-                        <div className="mb-8 relative z-10 mt-15">
-                            <h2 className="text-3xl font-bold tracking-tight text-foreground mb-2">
+                        <div className="mb-8 relative z-10">
+                            <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground mb-2">
                                 Alumni Portal
                             </h2>
-                            <p className="text-muted-foreground text-sm sm:text-base">
+                            <p className="text-muted-foreground text-xs sm:text-sm">
                                 Please enter your credentials to access your dashboard.
                             </p>
                         </div>
 
                         {error && (
-                            <div className="mb-4 p-3 rounded-xl bg-destructive/10 text-destructive text-sm font-medium relative z-10">
+                            <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm font-medium relative z-10">
                                 {error}
                             </div>
                         )}
@@ -121,7 +121,7 @@ export default function AlumniLogin() {
                                         <Mail className="w-5 h-5" />
                                     </div>
                                     <input
-                                        className="w-full pl-11 pr-4 py-3 sm:py-3.5 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all placeholder:text-muted-foreground text-sm sm:text-base shadow-sm"
+                                        className="w-full pl-11 pr-4 py-3 sm:py-3.5 rounded-lg border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all placeholder:text-muted-foreground text-sm sm:text-base shadow-sm"
                                         placeholder="your.email@gmail.com"
                                         type="email"
                                         required
@@ -147,7 +147,7 @@ export default function AlumniLogin() {
                                         <LockKeyhole className="w-5 h-5" />
                                     </div>
                                     <input
-                                        className="w-full pl-11 pr-12 py-3 sm:py-3.5 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all placeholder:text-muted-foreground text-sm sm:text-base shadow-sm"
+                                        className="w-full pl-11 pr-12 py-3 sm:py-3.5 rounded-lg border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all placeholder:text-muted-foreground text-sm sm:text-base shadow-sm"
                                         placeholder="Enter Password"
                                         type={showPassword ? "text" : "password"}
                                         required
@@ -164,7 +164,7 @@ export default function AlumniLogin() {
                                 </div>
                             </div>
                             <button
-                                className="w-full bg-brand hover:bg-brand/90 text-primary-foreground font-bold py-3.5 rounded-xl shadow-[0_4px_14px_0_rgba(var(--brand-rgb),0.39)] hover:shadow-[0_6px_20px_rgba(var(--brand-rgb),0.23)] hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full bg-brand hover:bg-brand/90 text-primary-foreground font-bold py-3.5 rounded-lg shadow-[0_4px_14px_0_rgba(var(--brand-rgb),0.39)] hover:shadow-[0_6px_20px_rgba(var(--brand-rgb),0.23)] hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
                                 type="submit"
                                 disabled={loading}
                             >
@@ -188,30 +188,10 @@ export default function AlumniLogin() {
                             </p>
                             <Link
                                 href="/alumni/alumni-register"
-                                className="w-full py-3 sm:py-3.5 rounded-xl border-2 border-brand/20 text-brand font-bold bg-transparent hover:bg-brand/5 transition-all duration-200 flex items-center justify-center gap-2"
+                                className="w-full py-3 sm:py-3.5 rounded-lg border-2 border-brand/20 text-brand font-bold bg-transparent hover:bg-brand/5 transition-all duration-200 flex items-center justify-center gap-2"
                             >
                                 Register as Alumni
                             </Link>
-                        </div>
-
-                        <div className="mt-10 flex flex-col items-center gap-2 relative z-10">
-                            <p className="text-xs uppercase tracking-widest text-muted-foreground font-bold">
-                                Official Portal of
-                            </p>
-                            <span className="text-foreground font-bold text-xs sm:text-sm text-center">
-                                RADHARAMAN GROUP OF INSTITUTES
-                            </span>
-                            <div className="flex gap-4 mt-2">
-                                <a className="text-muted-foreground hover:text-brand transition-colors p-2 hover:bg-brand/5 rounded-full" href="#" aria-label="Website">
-                                    <Earth className="w-4 h-4" />
-                                </a>
-                                <a className="text-muted-foreground hover:text-brand transition-colors p-2 hover:bg-brand/5 rounded-full" href="#" aria-label="Share">
-                                    <Share2 className="w-4 h-4" />
-                                </a>
-                                <a className="text-muted-foreground hover:text-brand transition-colors p-2 hover:bg-brand/5 rounded-full" href="#" aria-label="Information">
-                                    <Info className="w-4 h-4" />
-                                </a>
-                            </div>
                         </div>
                     </div>
                 </div>

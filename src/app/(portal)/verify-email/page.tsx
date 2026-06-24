@@ -90,8 +90,8 @@ function VerifyEmailContent() {
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-brand/5 rounded-full blur-[120px] translate-y-1/2 -translate-x-1/2" />
       </div>
 
-      <div className="max-w-md w-full bg-card/50 backdrop-blur-xl border border-border p-8 rounded-3xl shadow-2xl text-center">
-        <div className="w-20 h-20 bg-brand/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+      <div className="max-w-md w-full bg-card/50 backdrop-blur-xl border border-border p-8 rounded-lg shadow-2xl text-center">
+        <div className="w-20 h-20 bg-brand/10 rounded-lg flex items-center justify-center mx-auto mb-6">
           {status === "loading" && <Loader2 className="w-10 h-10 text-brand animate-spin" />}
           {status === "success" && <CheckCircle className="w-10 h-10 text-green-500" />}
           {status === "error" && <XCircle className="w-10 h-10 text-red-500" />}
@@ -111,7 +111,7 @@ function VerifyEmailContent() {
           <div className="space-y-3">
             <Link
               href={getLoginHref()}
-              className="flex items-center justify-center gap-2 w-full py-3 bg-brand text-primary-foreground rounded-xl font-bold hover:bg-brand/90 transition-all shadow-[var(--shadow-brand)] group"
+              className="flex items-center justify-center gap-2 w-full py-3 bg-brand text-primary-foreground rounded-lg font-bold hover:bg-brand/90 transition-all shadow-[var(--shadow-brand)] group"
             >
               Go to Login
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -123,7 +123,7 @@ function VerifyEmailContent() {
           <div className="space-y-3">
             <Link
               href={getLoginHref()}
-              className="flex items-center justify-center gap-2 w-full py-3 bg-brand text-primary-foreground rounded-xl font-bold hover:bg-brand/90 transition-all shadow-[var(--shadow-brand)] group"
+              className="flex items-center justify-center gap-2 w-full py-3 bg-brand text-primary-foreground rounded-lg font-bold hover:bg-brand/90 transition-all shadow-[var(--shadow-brand)] group"
             >
               Go to Login
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -133,7 +133,7 @@ function VerifyEmailContent() {
               <button
                 onClick={handleResend}
                 disabled={resending}
-                className="flex items-center justify-center gap-2 w-full py-3 border border-brand/20 text-brand rounded-xl font-semibold hover:bg-brand/5 transition-all disabled:opacity-50"
+                className="flex items-center justify-center gap-2 w-full py-3 border border-brand/20 text-brand rounded-lg font-semibold hover:bg-brand/5 transition-all disabled:opacity-50"
               >
                 {resending ? (
                   <><Loader2 className="w-4 h-4 animate-spin" /> Sending...</>

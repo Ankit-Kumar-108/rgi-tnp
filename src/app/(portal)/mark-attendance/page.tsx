@@ -78,7 +78,7 @@ function MarkAttendanceContent() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-card border border-border rounded-2xl p-8 text-center shadow-lg">
+      <div className="w-full max-w-md bg-card border border-border rounded-lg p-8 text-center shadow-lg">
 
         {/* LOADING */}
         {status === "loading" && (
@@ -151,13 +151,13 @@ function MarkAttendanceContent() {
             <div className="flex flex-col gap-3">
               <Link
                 href={`/students/login?redirect=${encodeURIComponent("/mark-attendance?token=" + attendanceToken)}`}
-                className="w-full px-6 py-3 bg-brand text-white rounded-xl font-bold text-sm hover:opacity-90 transition-opacity"
+                className="w-full px-6 py-3 bg-brand text-white rounded-lg font-bold text-sm hover:opacity-90 transition-opacity"
               >
                 Login as RGI Student
               </Link>
               <Link
                 href={`/external-students/login?redirect=${encodeURIComponent("/mark-attendance?token=" + attendanceToken)}`}
-                className="w-full px-6 py-3 bg-card border-2 border-brand text-brand rounded-xl font-bold text-sm hover:bg-brand/5 transition-colors"
+                className="w-full px-6 py-3 bg-card border-2 border-brand text-brand rounded-lg font-bold text-sm hover:bg-brand/5 transition-colors"
               >
                 Login as External Student
               </Link>

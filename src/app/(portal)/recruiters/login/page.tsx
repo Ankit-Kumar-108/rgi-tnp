@@ -62,27 +62,27 @@ export default function RecruiterLogin() {
         <div className="min-h-screen flex flex-col bg-background">
             <Nav/>
             <main className="flex-1 flex w-full items-center justify-center p-4 sm:p-6 sm:mt-10 md:mt-2 pt-24 md:pt-32 pb-12 lg:h-screen lg:max-h-screen lg:py-24">
-                <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-background/50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-2xl shadow-brand/10 border border-brand/10 lg:h-[85vh] lg:max-h-200 mt-10 overflow-hidden">
+                <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-background/50 backdrop-blur-sm rounded-lg shadow-2xl shadow-brand/10 border border-brand/10 lg:h-[85vh] lg:max-h-200 mt-10 overflow-hidden">
                     <div className="relative hidden lg:flex flex-col justify-end p-10 xl:p-12 overflow-hidden bg-brand/5">
                         <div className="absolute inset-0 bg-cover bg-center z-0 opacity-80" data-alt="Modern corporate office setting" style={{ backgroundImage: "linear-gradient(180deg, rgba(146, 19, 236, 0.2) 0%, rgba(26, 16, 34, 0.9) 100%), url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop')" }} />
                         <div className="relative z-10 text-white">
-                            <div className="mb-4 inline-flex items-center justify-center p-3 bg-brand backdrop-blur-md rounded-2xl text-brand-50 shadow-inner"><Briefcase className="w-8 h-8"/></div>
+                            <div className="mb-4 inline-flex items-center justify-center p-3 bg-brand backdrop-blur-md rounded-lg text-brand-50 shadow-inner"><Briefcase className="w-8 h-8"/></div>
                             <h1 className="text-4xl font-black mb-4 leading-tight">Partner With Excellence</h1>
                             <p className="text-lg text-white/80 font-light max-w-md">Login to access a pool of talented, driven, and industry-ready professionals from our institution.</p>
                             <div className="mt-12 flex items-center gap-4"><span className="text-sm font-medium text-white/90">Join 500+ top recruiters hiring from us</span></div>
                         </div>
                     </div>
-                    <div className="p-6 sm:p-10 md:p-12 flex flex-col justify-center relative overflow-y-scroll overflow-x-hidden">
+                    <div className="p-6 sm:p-10 md:p-12 flex flex-col justify-center relative overflow-y-hidden overflow-x-hidden">
                         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 rounded-full bg-brand/5 blur-2xl z-0 pointer-events-none"></div>
                         <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-32 h-32 rounded-full bg-brand/5 blur-2xl z-0 pointer-events-none"></div>
 
                         <div className="mb-8 relative z-10">
-                            <h2 className="text-3xl font-bold tracking-tight text-foreground mb-2 mt-15">Recruiter Portal Login</h2>
-                            <p className="text-muted-foreground text-sm sm:text-base">Please enter your credentials to access your dashboard.</p>
+                            <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground mb-2">Recruiter Portal Login</h2>
+                            <p className="text-muted-foreground text-xs sm:text-sm">Please enter your credentials to access your dashboard.</p>
                         </div>
 
                         {error && (
-                            <div className="mb-4 p-3 rounded-xl bg-destructive/10 text-destructive text-sm font-medium relative z-10">{error}</div>
+                            <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm font-medium relative z-10">{error}</div>
                         )}
 
                         <form className="space-y-5 relative z-10" onSubmit={handleSubmit}>
@@ -90,7 +90,7 @@ export default function RecruiterLogin() {
                                 <label className="text-sm font-semibold text-foreground">Official Email</label>
                                 <div className="relative">
                                     <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"><Mail className="w-5 h-5"/></div>
-                                    <input className="w-full pl-11 pr-4 py-3 sm:py-3.5 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all placeholder:text-muted-foreground text-sm sm:text-base shadow-sm" placeholder="Enter official email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                                    <input className="w-full pl-11 pr-4 py-3 sm:py-3.5 rounded-lg border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all placeholder:text-muted-foreground text-sm sm:text-base shadow-sm" placeholder="Enter official email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
                                 </div>
                             </div>
                             <div className="space-y-2">
@@ -100,7 +100,7 @@ export default function RecruiterLogin() {
                                 </div>
                                 <div className="relative">
                                     <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"><LockKeyhole className="w-5 h-5"/></div>
-                                    <input className="w-full pl-11 pr-12 py-3 sm:py-3.5 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all placeholder:text-muted-foreground text-sm sm:text-base shadow-sm" placeholder="Enter Password" type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} />
+                                    <input className="w-full pl-11 pr-12 py-3 sm:py-3.5 rounded-lg border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all placeholder:text-muted-foreground text-sm sm:text-base shadow-sm" placeholder="Enter Password" type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} />
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
@@ -110,24 +110,13 @@ export default function RecruiterLogin() {
                                     </button>
                                 </div>
                             </div>
-                            <button className="w-full bg-brand hover:bg-brand/90 text-primary-foreground font-bold py-3.5 rounded-xl shadow-[0_4px_14px_0_rgba(var(--brand-rgb),0.39)] hover:shadow-[0_6px_20px_rgba(var(--brand-rgb),0.23)] hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed" type="submit" disabled={loading}>
+                            <button className="w-full bg-brand hover:bg-brand/90 text-primary-foreground font-bold py-3.5 rounded-lg shadow-[0_4px_14px_0_rgba(var(--brand-rgb),0.39)] hover:shadow-[0_6px_20px_rgba(var(--brand-rgb),0.23)] hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed" type="submit" disabled={loading}>
                                 {loading ? (<><Loader2 className="w-5 h-5 animate-spin" /><span>Signing in...</span></>) : (<><span>Login</span><LogIn className="w-5 h-5 group-hover:translate-x-1 transition-transform"/></>)}
                             </button>
                         </form>
-                        
                         <div className="mt-8 pt-6 border-t border-border relative z-10">
                             <p className="text-center text-muted-foreground mb-4 text-sm">New to our network?</p>
-                            <Link href="/recruiters/register" className="w-full py-3 sm:py-3.5 rounded-xl border-2 border-brand/20 text-brand font-bold bg-transparent hover:bg-brand/5 transition-all duration-200 flex items-center justify-center gap-2">Register Organization</Link>
-                        </div>
-                        
-                        <div className="mt-10 flex flex-col items-center gap-2 relative z-10">
-                            <p className="text-xs uppercase tracking-widest text-muted-foreground font-bold">Official Portal of</p>
-                            <span className="text-foreground font-bold text-xs sm:text-sm text-center">RADHARAMAN GROUP OF INSTITUTES</span>
-                            <div className="flex gap-4 mt-2">
-                                <a className="text-muted-foreground hover:text-brand transition-colors p-2 hover:bg-brand/5 rounded-full" href="#" aria-label="Website"><Earth className="w-4 h-4"/></a>
-                                <a className="text-muted-foreground hover:text-brand transition-colors p-2 hover:bg-brand/5 rounded-full" href="#" aria-label="Share"><Share2 className="w-4 h-4"/></a>
-                                <a className="text-muted-foreground hover:text-brand transition-colors p-2 hover:bg-brand/5 rounded-full" href="#" aria-label="Information"><Info className="w-4 h-4"/></a>
-                            </div>
+                            <Link href="/recruiters/register" className="w-full py-3 sm:py-3.5 rounded-lg border-2 border-brand/20 text-brand font-bold bg-transparent hover:bg-brand/5 transition-all duration-200 flex items-center justify-center gap-2">Register Organization</Link>
                         </div>
                     </div>
                 </div>

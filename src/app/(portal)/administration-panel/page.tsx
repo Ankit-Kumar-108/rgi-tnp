@@ -65,7 +65,7 @@ export default function AdministrationPanelPage() {
           
           {/* Header Section */}
           <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
-            <div className="inline-flex items-center justify-center p-3 mb-4 rounded-2xl bg-brand/5 text-brand ring-1 ring-brand/10">
+            <div className="inline-flex items-center justify-center p-3 mb-4 rounded-lg bg-brand/5 text-brand ring-1 ring-brand/10">
               <ShieldCheck className="w-8 h-8" strokeWidth={1.5} />
             </div>
             
@@ -84,11 +84,11 @@ export default function AdministrationPanelPage() {
               <Link 
                 key={i} 
                 href={gate.href}
-                className={`group flex flex-col bg-card rounded-2xl border transition-all duration-300 overflow-hidden shadow-sm hover:shadow-xl ${gate.borderColor} ${gate.hoverBorder} ${gate.hoverShadow} hover:-translate-y-1`}
+                className={`group flex flex-col bg-card rounded-lg border transition-all duration-300 overflow-hidden shadow-sm hover:shadow-xl ${gate.borderColor} ${gate.hoverBorder} ${gate.hoverShadow} hover:-translate-y-1`}
               >
                 <div className="p-8 flex flex-col grow">
                   <div className="flex items-center justify-between mb-6">
-                    <div className={`p-4 rounded-xl ${gate.bgColor} ${gate.primaryColor}`}>
+                    <div className={`p-4 rounded-lg ${gate.bgColor} ${gate.primaryColor}`}>
                       <gate.icon className="w-8 h-8" strokeWidth={1.5} />
                     </div>
                     <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-3 py-1 rounded-full bg-secondary">
@@ -101,7 +101,7 @@ export default function AdministrationPanelPage() {
                     {gate.description}
                   </p>
 
-                  <div className={`mt-auto inline-flex items-center justify-center w-full py-3 px-4 rounded-xl font-semibold transition-colors duration-200 ${gate.buttonBg}`}>
+                  <div className={`mt-auto inline-flex items-center justify-center w-full py-3 px-4 rounded-lg font-semibold transition-colors duration-200 ${gate.buttonBg}`}>
                     Access Portal
                     <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                   </div>

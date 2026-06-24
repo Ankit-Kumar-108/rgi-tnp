@@ -186,39 +186,6 @@ export default function StudentDashboard() {
   return (
     <>
       <Nav />
-      {/* Complete Profile Prompt */}
-      {isProfileIncomplete && !showProfileForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-sm p-4">
-          <div className="w-full max-w-xl rounded-xl border border-border bg-card/95 shadow-2xl overflow-hidden animate-in zoom-in-95 fade-in duration-300">
-            <div className="p-6 md:p-7">
-              <div className="flex items-start gap-4">
-                <div className="shrink-0 rounded-lg bg-brand/10 text-brand p-3">
-                  <AlertTriangle className="w-6 h-6" />
-                </div>
-                <div className="space-y-2">
-                  <h2 className="text-xl md:text-2xl font-black tracking-tight text-foreground">
-                    Complete Your Profile
-                  </h2>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Please add your 10th, 12th/ Diploma, and resume details to unlock drive applications and improve your recruiter visibility. GitHub and LinkedIn are optional
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:justify-end">
-                <button
-                  type="button"
-                  onClick={() => setShowProfileForm(true)}
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand text-primary-foreground px-5 py-2.5 text-sm font-bold hover:bg-brand/90 transition-colors"
-                >
-                  Complete Profile
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
       {selectedDrive && (() => {
         let reason = "";
         if (selectedDrive.course !== "All" && !selectedDrive.course?.includes(student?.course)) reason = "Course Ineligible";
@@ -277,12 +244,14 @@ export default function StudentDashboard() {
 
           {/* Complete Profile Form (Collapsible) */}
           <div className="hidden md:block">
+          {student && (
             <ProfileCompletionForm
               student={student}
               showProfileForm={showProfileForm}
               setShowProfileForm={setShowProfileForm}
               fetchDashboard={fetchDashboard}
             />
+            )}
           </div>
 
           {loading ? (

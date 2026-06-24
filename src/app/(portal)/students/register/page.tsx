@@ -204,7 +204,7 @@ export default function StudentRegister() {
         }
     };
 
-    const inputClass = "w-full pl-10 sm:pl-11 pr-12 py-2.5 sm:py-3.5 rounded-xl border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all placeholder:text-muted-foreground text-sm sm:text-base shadow-sm";
+    const inputClass = "w-full pl-10 sm:pl-11 pr-12 py-2.5 sm:py-3.5 rounded-lg border border-input bg-background focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition-all placeholder:text-muted-foreground text-sm sm:text-base shadow-sm";
     const iconClass = "absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-muted-foreground";
 
     return (
@@ -214,7 +214,7 @@ export default function StudentRegister() {
             {/* --- Profile Image Modal Overlay --- */}
             {isProfileImgModalOpen && (
                 <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-md">
-                    <div className="w-full max-w-lg bg-card rounded-[1.5rem] sm:rounded-[2rem] shadow-2xl overflow-hidden ring-1 ring-border relative">
+                    <div className="w-full max-w-lg bg-card rounded-lg shadow-2xl overflow-hidden ring-1 ring-border relative">
                         <div className="absolute -top-24 -right-24 w-64 h-64 bg-brand/10 rounded-full blur-[80px] pointer-events-none -z-10"></div>
 
                         <div className="px-6 sm:px-8 pt-6 sm:pt-8 pb-4 flex justify-between items-start relative z-10">
@@ -263,7 +263,7 @@ export default function StudentRegister() {
                                         handleFileSelection(e.dataTransfer.files[0]);
                                     }
                                 }}
-                                className={`relative group border-2 border-dashed rounded-2xl sm:rounded-3xl p-6 sm:p-10 flex flex-col items-center justify-center gap-3 sm:gap-4 transition-all cursor-pointer ${isDragging ? 'border-brand bg-brand/10 scale-[1.02]' : 'border-border bg-muted/30 hover:border-brand/50 hover:bg-brand/5'
+                                className={`relative group border-2 border-dashed rounded-lg p-6 sm:p-10 flex flex-col items-center justify-center gap-3 sm:gap-4 transition-all cursor-pointer ${isDragging ? 'border-brand bg-brand/10 scale-[1.02]' : 'border-border bg-muted/30 hover:border-brand/50 hover:bg-brand/5'
                                     }`}
                             >
                                 <input
@@ -277,7 +277,7 @@ export default function StudentRegister() {
                                     accept="image/png, image/jpeg, image/webp"
                                     className="hidden"
                                 />
-                                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-brand text-primary-foreground flex items-center justify-center shadow-[var(--shadow-brand)] group-hover:scale-110 transition-transform">
+                                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-lg bg-brand text-primary-foreground flex items-center justify-center shadow-[var(--shadow-brand)] group-hover:scale-110 transition-transform">
                                     <UploadCloud className="w-5 h-5 sm:w-6 sm:h-6" />
                                 </div>
                                 <div className="text-center">
@@ -294,7 +294,7 @@ export default function StudentRegister() {
                             <button
                                 disabled={!profileImageFile}
                                 onClick={() => setIsProfileImgModalOpen(false)}
-                                className={`flex-1 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm transition-all ${profileImageFile
+                                className={`flex-1 py-3 sm:py-4 rounded-lg sm:rounded-lg font-bold text-sm transition-all ${profileImageFile
                                         ? "bg-brand text-primary-foreground shadow-[var(--shadow-brand)]"
                                         : "bg-muted text-muted-foreground cursor-not-allowed"
                                     }`}
@@ -306,7 +306,7 @@ export default function StudentRegister() {
                                     setIsProfileImgModalOpen(false);
                                     if (!profileImageFile) setImgPreviewURL(null);
                                 }}
-                                className="flex-1 py-3 sm:py-4 bg-background border-2 border-border text-foreground rounded-xl sm:rounded-2xl font-bold text-sm hover:bg-muted transition-all"
+                                className="flex-1 py-3 sm:py-4 bg-background border-2 border-border text-foreground rounded-lg sm:rounded-lg font-bold text-sm hover:bg-muted transition-all"
                             >
                                 Cancel
                             </button>
@@ -318,7 +318,7 @@ export default function StudentRegister() {
             {/* --- Resume PDF Preview Modal Overlay --- */}
             {isResumePreviewOpen && resumePreviewURL && (
                 <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-md">
-                    <div className="w-full max-w-5xl bg-card rounded-[1.5rem] sm:rounded-[2rem] shadow-2xl overflow-hidden ring-1 ring-border flex flex-col h-[90vh] relative">
+                    <div className="w-full max-w-5xl bg-card rounded-lg shadow-2xl overflow-hidden ring-1 ring-border flex flex-col h-[90vh] relative">
 
                         <div className="absolute -top-24 -right-24 w-64 h-64 bg-brand/10 rounded-full blur-[80px] pointer-events-none -z-10"></div>
 
@@ -339,7 +339,7 @@ export default function StudentRegister() {
                         <div className="flex-1 w-full bg-muted/20 p-4 md:p-6 relative z-10">
                             <iframe
                                 src={`${resumePreviewURL}#toolbar=0`}
-                                className="w-full h-full rounded-xl shadow-sm border border-border bg-white"
+                                className="w-full h-full rounded-lg shadow-sm border border-border bg-white"
                                 title="Resume Preview"
                             />
                         </div>
@@ -348,7 +348,7 @@ export default function StudentRegister() {
                             <button
                                 type="button"
                                 onClick={() => setIsResumePreviewOpen(false)}
-                                className="px-8 py-3 bg-brand text-primary-foreground rounded-xl font-bold text-sm shadow-[var(--shadow-brand)] transition-all"
+                                className="px-8 py-3 bg-brand text-primary-foreground rounded-lg font-bold text-sm shadow-[var(--shadow-brand)] transition-all"
                             >
                                 Looks Good
                             </button>
@@ -361,13 +361,13 @@ export default function StudentRegister() {
             <main className="flex-1 flex w-full items-center justify-center p-4 sm:p-6 sm:mt-15 md:mt-0 pt-24 md:pt-32 lg:mt-10 pb-12 lg:h-screen lg:max-h-screen lg:py-24">
 
                 {/* Fixed Container Height for Desktop */}
-                <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-background/50 backdrop-blur-sm rounded-2xl md:rounded-3xl shadow-2xl shadow-brand/10 border border-brand/10 lg:h-[85vh] lg:max-h-200 lg:overflow-hidden">
+                <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 bg-background/50 backdrop-blur-sm rounded-lg  shadow-2xl shadow-brand/10 border border-brand/10 lg:h-[85vh] lg:max-h-200 lg:overflow-hidden">
 
                     {/* Left Decorative Side (Hidden on Mobile) */}
                     <div className="relative hidden lg:flex flex-col justify-end p-10 xl:p-12 bg-brand/5 h-full">
                         <div className="absolute inset-0 bg-cover bg-center z-0 opacity-80" style={{ backgroundImage: "linear-gradient(180deg, rgba(146, 19, 236, 0.2) 0%, rgba(26, 16, 34, 0.9) 100%), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop')" }} />
                         <div className="relative z-10 text-white">
-                            <div className="mb-4 inline-flex items-center justify-center p-3 bg-brand backdrop-blur-md rounded-2xl text-brand-50 shadow-inner">
+                            <div className="mb-4 inline-flex items-center justify-center p-3 bg-brand backdrop-blur-md rounded-lg text-brand-50 shadow-inner">
                                 <GraduationCap className="w-8 h-8" />
                             </div>
                             <h1 className="text-4xl font-black mb-4 leading-tight">Join Your Student Community</h1>
@@ -384,16 +384,7 @@ export default function StudentRegister() {
                     </div>
 
                     {/* Form Side with Independent Scroll */}
-                    <div className="p-5 sm:p-8 md:p-10 lg:p-12 flex flex-col relative h-full lg:overflow-y-auto overflow-x-hidden custom-scrollbar">
-
-                        <style dangerouslySetInnerHTML={{
-                            __html: `
-                            .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-                            .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-                            .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-                            `
-                        }} />
-
+                    <div className="p-5 sm:p-8 md:p-10 lg:p-12 flex flex-col relative h-full lg:overflow-y-auto overflow-x-hidden">
                         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 rounded-full bg-brand/5 blur-2xl z-0 pointer-events-none"></div>
 
                         <div className="mb-6 relative z-10">
@@ -401,8 +392,8 @@ export default function StudentRegister() {
                             <p className="text-muted-foreground text-xs sm:text-sm">Register as a Student to access the portal.</p>
                         </div>
 
-                        {error && <div className="mb-4 p-3 rounded-xl bg-destructive/10 text-destructive text-sm font-medium relative z-10 border border-destructive/20">{error}</div>}
-                        {success && <div className="mb-4 p-3 rounded-xl bg-green-500/10 text-green-600 dark:text-green-400 text-sm font-medium relative z-10 border border-green-500/20">{success}</div>}
+                        {error && <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm font-medium relative z-10 border border-destructive/20">{error}</div>}
+                        {success && <div className="mb-4 p-3 rounded-lg bg-green-500/10 text-green-600 dark:text-green-400 text-sm font-medium relative z-10 border border-green-500/20">{success}</div>}
 
                         <form className="space-y-3 sm:space-y-4 relative z-10" onSubmit={handleSubmit}>
 
@@ -419,7 +410,7 @@ export default function StudentRegister() {
                                     <button
                                         type="button"
                                         onClick={() => setIsProfileImgModalOpen(true)}
-                                        className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-brand/10 text-brand rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm border border-brand/20 hover:bg-brand/20 transition-all w-full sm:w-auto"
+                                        className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-brand/10 text-brand rounded-lg sm:rounded-lg font-bold text-xs sm:text-sm border border-brand/20 hover:bg-brand/20 transition-all w-full sm:w-auto"
                                     >
                                         <User className="w-4 h-4 sm:w-5 sm:h-5" /> Upload Profile Image *
                                     </button>
@@ -528,7 +519,7 @@ export default function StudentRegister() {
                             <div className="space-y-1">
                                 <label className="text-xs sm:text-sm font-semibold text-foreground">Resume (PDF, max 5MB) *</label>
                                 {resumeFile ? (
-                                    <div className="flex items-center justify-between p-3 rounded-xl border border-brand/30 bg-brand/5">
+                                    <div className="flex items-center justify-between p-3 rounded-lg border border-brand/30 bg-brand/5">
                                         <div className="flex items-center gap-3 overflow-hidden">
                                             <div className="p-2 bg-brand/10 rounded-lg text-brand shrink-0">
                                                 <FileText className="w-4 h-4" />
@@ -564,7 +555,7 @@ export default function StudentRegister() {
                                         accept=".pdf"
                                         required
                                         onChange={handleResumeChange}
-                                        className="w-full text-xs sm:text-sm text-muted-foreground file:mr-3 sm:file:mr-4 file:py-1.5 sm:file:py-2 file:px-3 sm:file:px-4 file:rounded-xl file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-brand/10 file:text-brand hover:file:bg-brand/20 cursor-pointer border border-dashed border-border p-2 rounded-xl transition-all hover:border-brand/50"
+                                        className="w-full text-xs sm:text-sm text-muted-foreground file:mr-3 sm:file:mr-4 file:py-1.5 sm:file:py-2 file:px-3 sm:file:px-4 file:rounded-lg file:border-0 file:text-xs sm:file:text-sm file:font-semibold file:bg-brand/10 file:text-brand hover:file:bg-brand/20 cursor-pointer border border-dashed border-border p-2 rounded-lg transition-all hover:border-brand/50"
                                     />
                                 )}
                             </div>
@@ -604,7 +595,7 @@ export default function StudentRegister() {
                                 Password must contain: uppercase letter, lowercase letter, number, and special character (@$!%*?&)
                             </p>
 
-                            <button className="w-full bg-brand hover:bg-brand/90 text-primary-foreground font-bold py-3 sm:py-3.5 rounded-xl shadow-[0_4px_14px_0_rgba(var(--brand-rgb),0.39)] hover:shadow-[0_6px_20px_rgba(var(--brand-rgb),0.23)] flex items-center justify-center gap-2 group mt-4 sm:mt-6 disabled:opacity-50 transition-all text-sm sm:text-base shrink-0" type="submit" disabled={loading}>
+                            <button className="w-full bg-brand hover:bg-brand/90 text-primary-foreground font-bold py-3 sm:py-3.5 rounded-lg shadow-[0_4px_14px_0_rgba(var(--brand-rgb),0.39)] hover:shadow-[0_6px_20px_rgba(var(--brand-rgb),0.23)] flex items-center justify-center gap-2 group mt-4 sm:mt-6 disabled:opacity-50 transition-all text-sm sm:text-base shrink-0" type="submit" disabled={loading}>
                                 {loading ? (
                                     <><Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" /><span>Registering...</span></>
                                 ) : (
@@ -615,18 +606,7 @@ export default function StudentRegister() {
 
                         <div className="mt-5 sm:mt-6 pt-4 border-t border-border relative z-10 shrink-0">
                             <p className="text-center text-muted-foreground mb-2 sm:mb-3 text-xs sm:text-sm">Already have an account?</p>
-                            <Link href="/students/login" className="w-full py-2.5 sm:py-3.5 rounded-xl border-2 border-brand/20 text-brand font-bold bg-transparent hover:bg-brand/5 transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base">Login Here</Link>
-                        </div>
-
-                        {/* Footer Info Box */}
-                        <div className="mt-8 flex flex-col items-center gap-2 relative z-10 shrink-0">
-                            <p className="text-xs uppercase tracking-widest text-muted-foreground font-bold">Official Portal of</p>
-                            <span className="text-foreground font-bold text-xs sm:text-sm text-center">RADHARAMAN GROUP OF INSTITUTES</span>
-                            <div className="flex gap-4 mt-2">
-                                <a className="text-muted-foreground hover:text-brand transition-colors p-2 hover:bg-brand/5 rounded-full" href="#" aria-label="Website"><Earth className="w-4 h-4" /></a>
-                                <a className="text-muted-foreground hover:text-brand transition-colors p-2 hover:bg-brand/5 rounded-full" href="#" aria-label="Share"><Share2 className="w-4 h-4" /></a>
-                                <a className="text-muted-foreground hover:text-brand transition-colors p-2 hover:bg-brand/5 rounded-full" href="#" aria-label="Information"><Info className="w-4 h-4" /></a>
-                            </div>
+                            <Link href="/students/login" className="w-full py-2.5 sm:py-3.5 rounded-lg border-2 border-brand/20 text-brand font-bold bg-transparent hover:bg-brand/5 transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base">Login Here</Link>
                         </div>
                     </div>
                 </div>
