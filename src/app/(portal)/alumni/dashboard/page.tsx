@@ -104,6 +104,8 @@ export default function AlumniDashboard() {
   const [selectedMemFiles, setSelectedMemFiles] = useState<File[]>([]);
   const [memBatchTitle, setMemBatchTitle] = useState("");
   const [memPreviews, setMemPreviews] = useState<string[]>([]);
+  const [isMemoryModalOpen, setIsMemoryModalOpen] = useState(false);
+  const [selectedMemory, setSelectedMemory] = useState<any | null>(null);
   const [data, setData] = useState<any>(null);
   const [memUploading, setMemUploading] = useState(false);
   const [profileUploading, setProfileUploading] = useState(false);
@@ -1375,9 +1377,11 @@ export default function AlumniDashboard() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {memories.map((m: any) => (
                   <div key={m.id} className="bg-card rounded-lg border border-border overflow-hidden">
-                    <div className="aspect-square bg-muted flex items-center justify-center object-top">
+                    <div
+                      onClick={() => { setIsMemoryModalOpen(true); setSelectedMemory(m); }}
+                      className="aspect-square bg-muted flex items-center justify-center object-top cursor-pointer"
+                    >
                       <img src={m.imageUrl} alt="Memory" loading="lazy" className="w-full h-full object-cover" />
-
                     </div>
                     <div className="p-3 flex items-center justify-between">
                       <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${m.status === "approved" ? "bg-green-500/10 text-green-600"
@@ -1390,6 +1394,73 @@ export default function AlumniDashboard() {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {isMemoryModalOpen && (
+              <div
+                onClick={() => setIsMemoryModalOpen(false)}
+                className="fixed inset-0 z-50 w-full h-full flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md animate-in fade-in duration-300"
+              >
+                <button
+                  onClick={() => setIsMemoryModalOpen(false)}
+                  className="fixed z-[60] top-4 right-4 p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-md transition-all border border-white/20 hover:scale-110 shadow-lg"
+                  aria-label="Close"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="relative w-full max-w-2xl bg-card rounded-xl border border-border shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-[0.98] duration-300"
+                >
+                  {selectedMemory && (
+                    <>
+                      {/* Image Viewer */}
+                      <div className="bg-muted flex items-center justify-center p-2 min-h-[300px] max-h-[65vh] overflow-hidden">
+                        <img
+                          src={selectedMemory.imageUrl}
+                          alt={selectedMemory.title}
+                          className="max-w-full max-h-[63vh] rounded-lg object-contain shadow-sm"
+                        />
+                      </div>
+                      
+                      {/* Info & Action Bar */}
+                      <div className="p-4 bg-card border-t border-border flex items-center justify-between gap-4">
+                        <div className="flex flex-col gap-1 min-w-0">
+                          <p className="text-sm font-semibold text-foreground truncate">
+                            {selectedMemory.title || "Untitled Memory"}
+                          </p>
+                          <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full font-bold w-fit ${
+                            selectedMemory.status === "approved"
+                              ? "bg-green-500/10 text-green-600"
+                              : selectedMemory.status === "rejected"
+                              ? "bg-red-500/10 text-red-500"
+                              : "bg-yellow-500/10 text-yellow-600"
+                          }`}>
+                            {selectedMemory.status === "pending_moderation" ? "Pending" : selectedMemory.status}
+                          </span>
+                        </div>
+                        <div className="flex items-center shrink-0">
+                          {isDeleting === selectedMemory.id ? (
+                            <Loader2 className="w-5 h-5 text-red-500 animate-spin" />
+                          ) : (
+                            <button
+                              onClick={async () => {
+                                await handleDeleteMemory(selectedMemory.id);
+                                setIsMemoryModalOpen(false);
+                                setSelectedMemory(null);
+                              }}
+                              className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+                              title="Delete Memory"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             )}
           </section>
