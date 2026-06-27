@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Camera, BadgeCheck, BadgeAlert, Linkedin, ChevronRight, Loader2, User, Mail, Phone, User2, ExternalLink, Eye, X, GraduationCap, Briefcase, MapPin } from "lucide-react";
+import { Camera, BadgeCheck, BadgeAlert, Linkedin, ChevronRight, Loader2, User, Mail, Phone, User2, ExternalLink, Eye, X, GraduationCap, Briefcase, MapPin, FileText, Upload } from "lucide-react";
 
 interface AlumniDashboardOverviewProps {
   alumni: any;
@@ -9,6 +9,8 @@ interface AlumniDashboardOverviewProps {
   showProfileForm: boolean;
   setShowProfileForm: (val: boolean) => void;
   isProfileIncomplete: boolean;
+  resumeUploading?: boolean;
+  handleResumeUpload?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export default function AlumniDashboardOverview({
@@ -19,6 +21,8 @@ export default function AlumniDashboardOverview({
   showProfileForm,
   setShowProfileForm,
   isProfileIncomplete,
+  resumeUploading = false,
+  handleResumeUpload,
 }: AlumniDashboardOverviewProps) {
   const [showAllData, setShowAllData] = useState(false);
   return (
@@ -128,6 +132,31 @@ export default function AlumniDashboardOverview({
                       <span className="xs:hidden">LinkedIn</span>
                     </a>
                   )}
+                  {alumni?.resumeUrl ? (
+                    <a
+                      href={alumni.resumeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-brand/10 text-brand hover:bg-brand/20 px-5 py-2.5 rounded-lg font-bold text-sm transition-all shadow-md"
+                    >
+                      <FileText className="w-4 h-4" /> View Resume
+                    </a>
+                  ) : (
+                    <span className="inline-flex items-center gap-2 bg-muted text-muted-foreground px-5 py-2.5 rounded-lg font-bold text-sm shadow-sm">
+                      <FileText className="w-4 h-4" /> No Resume
+                    </span>
+                  )}
+                  <label className="inline-flex items-center gap-2 bg-muted text-foreground hover:bg-muted/80 px-5 py-2.5 rounded-lg font-bold text-sm transition-all cursor-pointer shadow-md">
+                    {resumeUploading ? <Loader2 className="w-4 h-4 animate-spin text-brand" /> : <Upload className="w-4 h-4" />}
+                    {resumeUploading ? "Uploading..." : "Update Resume"}
+                    <input
+                      type="file"
+                      accept=".pdf"
+                      className="hidden"
+                      onChange={handleResumeUpload}
+                      disabled={resumeUploading}
+                    />
+                  </label>
                   <button
                     onClick={() => setShowAllData(true)}
                     className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand text-primary-foreground rounded-lg font-bold hover:bg-brand/90 transition-all text-sm cursor-pointer shadow-md"

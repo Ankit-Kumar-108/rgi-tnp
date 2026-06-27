@@ -78,19 +78,19 @@ function ResetPasswordContent() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4 sm:p-6 overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-black/60 p-4 sm:p-6 overflow-hidden">
       <div className="fixed inset-0 overflow-hidden -z-10">
         <div className="absolute top-0 right-0 h-80 w-80 rounded-full bg-brand/10 blur-[120px] -translate-y-1/2 translate-x-1/2" />
         <div className="absolute bottom-0 left-0 h-96 w-96 rounded-full bg-foreground/5 blur-[120px] translate-y-1/2 -translate-x-1/2" />
       </div>
 
-      <div className="relative w-full max-w-xl max-h-[calc(100dvh-7rem)] overflow-y-auto overflow-hidden rounded-[2rem] border border-border bg-card/85 shadow-[0_30px_120px_rgba(16,16,32,0.18)] backdrop-blur-xl">
+      <div className="relative w-full max-w-xl max-h-[calc(100dvh-7rem)] overflow-y-auto overflow-hidden rounded-lg border border-border bg-card shadow-[0_30px_120px_rgba(16,16,32,0.18)] backdrop-blur-xl">
         <div className="p-4 sm:p-6 md:p-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
             <div className="inline-flex items-center gap-2 rounded-full bg-brand/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-brand">
               <KeyRound className="h-4 w-4" /> Reset Password
             </div>
-            <Link href={getLoginHref()} className="text-sm font-medium text-muted-foreground hover:text-brand transition-colors">
+            <Link href={getLoginHref()} className="text-sm font-medium text-brand/60 hover:text-brand transition-colors duration-300">
               Back to Login
             </Link>
           </div>
@@ -223,8 +223,8 @@ function ResetPasswordContent() {
                 )}
               </button>
 
-              <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground leading-relaxed">
-                Tip: use a unique password with letters, numbers, and symbols for better account security.
+              <div className="rounded-lg border border-border bg-brand/5 p-4 text-sm text-muted-foreground leading-relaxed">
+                💡Tip: use a unique password with letters, numbers, and symbols for better account security.
               </div>
             </form>
           )}

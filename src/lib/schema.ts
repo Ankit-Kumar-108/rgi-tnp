@@ -81,6 +81,7 @@ export const alumni = sqliteTable("Alumni", {
   isProfileComplete: integer("isProfileComplete", { mode: "boolean" }).notNull().default(false),
   currentCompany: text("currentCompany"),
   profileImageUrl: text("profileImageUrl").notNull(),
+  resumeUrl: text("resumeUrl"),
   jobTitle: text("jobTitle"),
   city: text("city"),
   cgpa: real("cgpa"),

@@ -49,7 +49,7 @@ function ForgotPasswordContent() {
     };
 
     return (
-      <div className="relative w-full max-w-xl max-h-[calc(100dvh-7rem)] overflow-y-auto overflow-hidden rounded-[2rem] border border-border bg-card/85 shadow-[0_30px_120px_rgba(16,16,32,0.18)] backdrop-blur-xl">
+      <div className="relative w-full max-w-xl max-h-[calc(100dvh-7rem)] overflow-y-auto overflow-hidden rounded-lg border border-border bg-card/85 shadow-[0_30px_120px_rgba(16,16,32,0.18)] backdrop-blur-xl">
         <div className="p-4 sm:p-6 md:p-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
             <div className="inline-flex items-center gap-2 rounded-full bg-brand/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-brand">
@@ -131,8 +131,8 @@ function ForgotPasswordContent() {
               )}
             </button>
 
-            <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm leading-relaxed text-muted-foreground">
-              Tip: if the email doesn't arrive, confirm the selected role matches the account you're trying to recover.
+            <div className="rounded-lg border border-brand/10 bg-brand/5 p-4 text-sm leading-relaxed text-muted-foreground">
+              💡Tip: if the email doesn't arrive, confirm the selected role matches the account you're trying to recover.
             </div>
           </form>
         </div>
@@ -151,7 +151,7 @@ export default function ForgotPassword() {
                 </div>
 
                 <Suspense fallback={
-                    <div className="relative w-full max-w-xl rounded-[2rem] border border-border bg-card/85 shadow-[0_30px_120px_rgba(16,16,32,0.18)] flex items-center justify-center h-96">
+                    <div className="relative w-full max-w-xl rounded-lg border border-border bg-card/85 shadow-[0_30px_120px_rgba(16,16,32,0.18)] flex items-center justify-center h-96">
                         <Loader2 className="w-8 h-8 animate-spin text-brand" />
                     </div>
                 }>

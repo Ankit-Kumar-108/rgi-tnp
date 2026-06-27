@@ -7,36 +7,26 @@ import {
   TrendingUp,
   Send,
   MessageSquareShare,
-  Star,
   Loader2,
   ChevronRight,
   Briefcase,
   CheckCircle,
-  Linkedin,
-  MapPin,
-  Phone,
-  LogOut,
   RefreshCw,
-  BadgeCheck,
-  BadgeAlert,
   X,
   AlertCircle,
-  Sparkles,
   Heart,
   Building2,
   Link2,
   FileText,
-  Calendar,
   Users,
-  Award,
-  ExternalLink,
   Camera,
   Trash2,
   Upload,
   AlertTriangle,
   CalendarDays,
   Clock,
-  UserRoundPen
+  UserCheck,
+  UploadCloud
 } from "lucide-react";
 import Nav from "@/components/layout/nav/nav";
 import Footer from "@/components/layout/footer/footer";
@@ -115,6 +105,148 @@ export default function AlumniDashboard() {
   // Profile Form State
   const [showProfileForm, setShowProfileForm] = useState(false);
   const [isDeleting, setIsDeleting] = useState<string | null>()
+
+  //Placement Data Completion State
+  const [isPlacemntDataComplete, setIsPlacemntDataComplete] = useState(false)
+  const [placementModal, setPlacementModal] = useState(false)
+  const [resumeUploading, setResumeUploading] = useState(false);
+  const [submittingPlacement, setSubmittingPlacement] = useState(false);
+
+  //Placement Data Form 
+  const [placementForm, setPlacementForm] = useState<{
+    course: string;
+    branch: string;
+    batch: string;
+    cgpa: string;
+    tenthPercentage: string;
+    twelfthPercentage: string;
+    resume: string | null;
+    gender: string;
+  }>({
+    course: "",
+    branch: "",
+    batch: "",
+    cgpa: "",
+    tenthPercentage: "",
+    twelfthPercentage: "",
+    resume: null,
+    gender: "",
+  });
+
+  // Pre-populate placement form when alumni data is loaded
+  useEffect(() => {
+    if (data?.alumni && data.alumni.id) {
+      setPlacementForm({
+        course: data.alumni.course || "",
+        branch: data.alumni.branch || "",
+        batch: data.alumni.batch || "",
+        cgpa: data.alumni.cgpa ? String(data.alumni.cgpa) : "",
+        tenthPercentage: data.alumni.tenthPercentage ? String(data.alumni.tenthPercentage) : "",
+        twelfthPercentage: data.alumni.twelfthPercentage ? String(data.alumni.twelfthPercentage) : "",
+        resume: data.alumni.resumeUrl || null,
+        gender: data.alumni.gender || "",
+      });
+    }
+  }, [data]);
+
+  const handleResumeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== "application/pdf") {
+      toast.error("Please upload a PDF file only");
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("File size must be less than 2MB");
+      return;
+    }
+
+    try {
+      setResumeUploading(true);
+      const url = await uploadFileToR2(file, "resumes", { role: "alumni" });
+      setPlacementForm((prev) => ({ ...prev, resume: url }));
+      toast.success("Resume uploaded successfully!");
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Resume upload failed: " + err.message);
+    } finally {
+      setResumeUploading(false);
+      e.target.value = ""; // Reset input value
+    }
+  };
+
+  const handleSubmitPlacementForm = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!placementForm.course) {
+      toast.error("Please select a course");
+      return;
+    }
+    if (!placementForm.branch) {
+      toast.error("Please select a branch");
+      return;
+    }
+    if (!placementForm.batch) {
+      toast.error("Please enter graduation batch");
+      return;
+    }
+    if (!placementForm.cgpa) {
+      toast.error("Please enter your current CGPA");
+      return;
+    }
+    if (!placementForm.gender) {
+      toast.error("Please select your gender");
+      return;
+    }
+    if (!placementForm.tenthPercentage) {
+      toast.error("Please enter your 10th percentage");
+      return;
+    }
+    if (!placementForm.twelfthPercentage) {
+      toast.error("Please enter your 12th/Diploma percentage");
+      return;
+    }
+    if (!placementForm.resume) {
+      toast.error("Please upload your resume");
+      return;
+    }
+
+    setSubmittingPlacement(true);
+    try {
+      const token = getToken("alumni");
+      const res = await fetch("/api/alumni/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          course: placementForm.course,
+          branch: placementForm.branch,
+          batch: placementForm.batch,
+          cgpa: placementForm.cgpa,
+          tenthPercentage: placementForm.tenthPercentage,
+          twelfthPercentage: placementForm.twelfthPercentage,
+          resumeUrl: placementForm.resume,
+          gender: placementForm.gender,
+        }),
+      });
+
+      const d = await res.json() as any;
+      if (d.success) {
+        toast.success("Placement data updated successfully!");
+        setPlacementModal(false);
+        fetchDashboard();
+      } else {
+        toast.error(d.message || "Failed to update placement data");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("An error occurred. Please try again.");
+    } finally {
+      setSubmittingPlacement(false);
+    }
+  };
+
 
   useEffect(() => {
     if (!authenticated) return;
@@ -277,6 +409,45 @@ export default function AlumniDashboard() {
     }
   };
 
+  const handleResumeUploadDirect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== "application/pdf") {
+      toast.error("Please upload a PDF file only");
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("File size must be less than 2MB");
+      return;
+    }
+
+    try {
+      setResumeUploading(true);
+      const url = await uploadFileToR2(file, "resumes", { role: "alumni" });
+      const token = getToken("alumni");
+      const res = await fetch("/api/alumni/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ resumeUrl: url }),
+      });
+      const d = await res.json() as any;
+      if (d.success) {
+        toast.success("Resume updated successfully!");
+        fetchDashboard();
+      } else {
+        throw new Error(d.message);
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Resume upload failed: " + err.message);
+    } finally {
+      setResumeUploading(false);
+      e.target.value = ""; // Reset input
+    }
+  };
+
   const [showReferralModal, setShowReferralModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
@@ -407,6 +578,14 @@ export default function AlumniDashboard() {
   const archivedDrives = data?.archivedDrives || [];
   const registrations = data?.registrations || [];
 
+  function isUserHasEntereddata(drive: any) {
+    if (!alumni.tenthPercentage || !alumni.twelfthPercentage || !alumni.resumeUrl || !alumni.gender) {
+      return setIsPlacemntDataComplete(() => (!isPlacemntDataComplete))
+    }
+    else {
+      return setIsModalOpen(() => (!isModalOpen)), setSelectedDrive(drive)
+    }
+  }
   return (
     <>
       <Nav />
@@ -443,6 +622,7 @@ export default function AlumniDashboard() {
           </div>
         </div>
       )}
+      {/* job details model */}
       {selectedDrive && (
         <JobDetailsModal
           drive={selectedDrive}
@@ -457,6 +637,286 @@ export default function AlumniDashboard() {
           role="alumni"
           isRegistered={registrations.some((r: any) => r.driveId === selectedDrive.id)}
         />
+      )}
+      {/* placement data model */}
+      {isPlacemntDataComplete && (
+        <>
+          <div
+          onClick={() => setIsPlacemntDataComplete(!isPlacemntDataComplete)}
+          className="fixed w-full h-full top-0 left-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-sm p-4">
+            <div 
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-xl rounded-lg border border-border bg-card/95 shadow-2xl overflow-hidden animate-in zoom-in-95 fade-in duration-300">
+              <div className="p-6 md:p-7">
+                <div className="flex items-start gap-4">
+                  <div className="shrink-0 rounded-lg bg-brand/10 text-brand p-3">
+                    <AlertTriangle className="w-6 h-6" />
+                  </div>
+                  <div className="space-y-2">
+                    <h2 className="text-xl md:text-2xl font-black tracking-tight text-foreground">
+                      Complete Your Placement Data
+                    </h2>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Please add your placement data to unlock full functionality and improve your visibility. Other details are optional
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:justify-end">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsPlacemntDataComplete(!isPlacemntDataComplete);
+                      setPlacementModal(!placementModal);
+                    }}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand text-primary-foreground px-5 py-2.5 text-sm font-bold hover:bg-brand/90 transition-colors"
+                  >
+                    Complete Placement Data
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+      {/* Placement Modal */}
+      {placementModal && (
+       <div
+       onClick={() => setPlacementModal(!placementModal)}
+       className="fixed w-full h-full top-0 left-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-2xl max-h-[85vh] rounded-lg border border-border bg-card/95 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 overflow-y-auto">
+        
+        {/* Modal Header */}
+        <div className="flex items-center justify-between border-b border-border p-5 bg-muted/30">
+          <div className="flex items-center gap-3">
+            <div className="shrink-0 rounded-lg bg-brand/10 text-brand p-2.5">
+              <UserCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-foreground flex gap-4">Update <span className="hidden md:block">Placement</span> Data</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">Please ensure all details match your official documents.</p>
+            </div>
+          </div>
+          <button 
+            onClick={() => setPlacementModal(!placementModal)}
+            className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Modal Body / Form */}
+        <form onSubmit={handleSubmitPlacementForm} className="p-6 md:p-7 space-y-6">
+          
+          {/* Section: Academic Details */}
+          <div className="space-y-4">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Academic Details</h3>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Course */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-foreground">Course</label>
+                <select 
+                  value={placementForm.course}
+                  onChange={(e) => setPlacementForm((prev) => ({ ...prev, course: e.target.value }))}
+                  required
+                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 transition-colors"
+                >
+                  <option value="">Select Course</option>
+                  <option value="B.Tech">B.Tech</option>
+                  <option value="M.Tech">M.Tech</option>
+                  <option value="MBA">MBA</option>
+                  <option value="Diploma">Diploma</option>
+                </select>
+              </div>
+
+              {/* Branch */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-foreground">Branch</label>
+                <select 
+                  value={placementForm.branch}
+                  onChange={(e) => setPlacementForm((prev) => ({ ...prev, branch: e.target.value }))}
+                  required
+                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 transition-colors"
+                >
+                  <option value="">Select Branch</option>
+                  <option value="Computer Science">Computer Science</option>
+                  <option value="Mechanical">Mechanical</option>
+                  <option value="Electrical">Electrical</option>
+                  <option value="Civil">Civil</option>
+                  <option value="Electronics">Electronics</option>
+                  <option value="Information Technology">Information Technology</option>
+                  <option value="Digital Communication">Digital Communication</option>
+                  <option value="Power Systems">Power Systems</option>
+                  <option value="Thermal Engineering">Thermal Engineering</option>
+                  <option value="Marketing">Marketing</option>
+                  <option value="Finance">Finance</option>
+                  <option value="Human Resource">Human Resource</option>
+                </select>
+              </div>
+
+              {/* Batch */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-foreground">Graduation Batch</label>
+                <input 
+                  type="number" 
+                  placeholder="e.g., 2026" 
+                  value={placementForm.batch}
+                  onChange={(e) => setPlacementForm((prev) => ({ ...prev, batch: e.target.value }))}
+                  required
+                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 transition-colors"
+                />
+              </div>
+
+              {/* CGPA */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-foreground">Current CGPA</label>
+                <input 
+                  type="number" 
+                  step="0.01" 
+                  placeholder="e.g., 9.25" 
+                  value={placementForm.cgpa}
+                  onChange={(e) => setPlacementForm((prev) => ({ ...prev, cgpa: e.target.value }))}
+                  required
+                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 transition-colors"
+                />
+              </div>
+
+              {/* Gender */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-foreground">Gender</label>
+                <select 
+                  value={placementForm.gender}
+                  onChange={(e) => setPlacementForm((prev) => ({ ...prev, gender: e.target.value }))}
+                  required
+                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 transition-colors"
+                >
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <hr className="border-border" />
+
+          {/* Section: Prior Education */}
+          <div className="space-y-4">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Prior Education (%)</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* 10th Score */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-foreground">10th Percentage</label>
+                <input 
+                  type="number" 
+                  step="0.1" 
+                  placeholder="e.g., 95.2" 
+                  value={placementForm.tenthPercentage}
+                  onChange={(e) => setPlacementForm((prev) => ({ ...prev, tenthPercentage: e.target.value }))}
+                  required
+                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 transition-colors"
+                />
+              </div>
+
+              {/* 12th Score */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-foreground">12th / Diploma Percentage</label>
+                <input 
+                  type="number" 
+                  step="0.1" 
+                  placeholder="e.g., 91.4" 
+                  value={placementForm.twelfthPercentage}
+                  onChange={(e) => setPlacementForm((prev) => ({ ...prev, twelfthPercentage: e.target.value }))}
+                  required
+                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 transition-colors"
+                />
+              </div>
+            </div>
+          </div>
+
+          <hr className="border-border" />
+
+          {/* Section: Resume Upload */}
+          <div className="space-y-3">
+            <label className="text-sm font-medium text-foreground flex items-center gap-1.5">
+              Resume <span className="text-destructive">*</span>
+            </label>
+            
+            {/* Drag & Drop Area */}
+            <div className="border-2 border-dashed border-brand/40 hover:border-brand/80 bg-background/80 rounded-lg p-5 text-center cursor-pointer transition-colors group">
+              <input 
+                type="file" 
+                className="hidden" 
+                id="resume-upload" 
+                accept=".pdf" 
+                onChange={handleResumeUpload}
+                disabled={resumeUploading}
+              />
+              <label htmlFor="resume-upload" className="cursor-pointer flex flex-col items-center gap-2">
+                {resumeUploading ? (
+                  <>
+                    <div className="p-2 rounded-full bg-brand/10">
+                      <Loader2 className="w-5 h-5 animate-spin text-brand" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Uploading resume...</p>
+                    </div>
+                  </>
+                ) : placementForm.resume ? (
+                  <>
+                    <div className="p-2 rounded-full bg-green-500/10 text-green-600">
+                      <FileText className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-green-600">Resume Uploaded Successfully</p>
+                      <p className="text-xs text-muted-foreground mt-0.5 max-w-[200px] truncate">
+                        {placementForm.resume.split("/").pop()}
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="p-2 rounded-full bg-muted group-hover:bg-brand/10 group-hover:text-brand transition-colors">
+                      <UploadCloud className="w-5 h-5 text-muted-foreground group-hover:text-brand" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Click to upload or drag & drop</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">PDF format only (Max 2MB)</p>
+                    </div>
+                  </>
+                )}
+              </label>
+            </div>
+          </div>
+
+          {/* Modal Footer */}
+          <div className="pt-2 flex flex-col sm:flex-row gap-3 sm:justify-end border-t border-border mt-6">
+            <button
+              type="button"
+              onClick={() => setPlacementModal(!placementModal)}
+              disabled={submittingPlacement || resumeUploading}
+              className="inline-flex items-center justify-center rounded-lg border border-input bg-background px-5 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors order-2 sm:order-1 disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={submittingPlacement || resumeUploading}
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand text-primary-foreground px-5 py-2.5 text-sm font-bold hover:bg-brand/90 shadow-sm transition-colors order-1 sm:order-2 disabled:opacity-50"
+            >
+              {submittingPlacement ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save changes"}
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+          
+        </form>
+      </div>
+    </div>
       )}
       {/* body */}
       <div className="relative bg-background text-foreground antialiased font-sans min-h-screen mt-15 overflow-hidden">
@@ -504,6 +964,8 @@ export default function AlumniDashboard() {
                 showProfileForm={showProfileForm}
                 setShowProfileForm={setShowProfileForm}
                 isProfileIncomplete={isProfileIncomplete}
+                resumeUploading={resumeUploading}
+                handleResumeUpload={handleResumeUploadDirect}
               />
               <div className="hidden md:block">
                 <AlumniProfileCompletionForm
@@ -648,7 +1110,7 @@ export default function AlumniDashboard() {
                             </button>
                           ) : (
                             <button
-                              onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
+                              onClick={() => isUserHasEntereddata(drive)}
                               className="shrink-0 text-xs font-bold px-4 py-2 rounded-lg bg-brand text-white hover:bg-brand/90 transition-all shadow-md shadow-brand/25"
                             >
                               View Details
@@ -714,7 +1176,7 @@ export default function AlumniDashboard() {
                                 </button>
                               ) : (
                                 <button
-                                  onClick={() => { setSelectedDrive(drive); setIsModalOpen(true); }}
+                                  onClick={() => isUserHasEntereddata(drive)}
                                   className="shrink-0 text-xs font-bold px-4 py-2 rounded-lg bg-brand text-white hover:bg-brand/90 transition-all shadow-md shadow-brand/25"
                                 >
                                   View Details
@@ -1411,7 +1873,7 @@ export default function AlumniDashboard() {
                 </button>
                 <div
                   onClick={(e) => e.stopPropagation()}
-                  className="relative w-full max-w-2xl bg-card rounded-xl border border-border shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-[0.98] duration-300"
+                  className="relative w-full max-w-2xl bg-card rounded-lg border border-border shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-[0.98] duration-300"
                 >
                   {selectedMemory && (
                     <>

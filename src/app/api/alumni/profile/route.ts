@@ -24,14 +24,20 @@ export async function POST(req: NextRequest) {
       profileImageUrl?: string;
       cgpa?: string | number;
       batch?: string;
+      course?: string;
+      branch?: string;
+      tenthPercentage?: string | number;
+      twelfthPercentage?: string | number;
+      resumeUrl?: string;
+      gender?: string;
     };
 
     const db = getDb();
 
-    // Fetch existing alumni to check for old profileImageUrl
+    // Fetch existing alumni to check for old files
     const existingAlumni = await db.query.alumni.findFirst({
       where: eq(alumniTable.id, alumni.id),
-      columns: { profileImageUrl: true }
+      columns: { profileImageUrl: true, resumeUrl: true }
     });
 
     const updatedAlumniResult = await db.update(alumniTable).set({
@@ -44,7 +50,13 @@ export async function POST(req: NextRequest) {
       about: body.about,
       ...(body.cgpa !== undefined && { cgpa: body.cgpa !== "" ? Number(body.cgpa) : null }),
       ...(body.batch !== undefined && { batch: body.batch }),
+      ...(body.course !== undefined && { course: body.course }),
+      ...(body.branch !== undefined && { branch: body.branch }),
+      ...(body.tenthPercentage !== undefined && { tenthPercentage: body.tenthPercentage !== "" ? Number(body.tenthPercentage) : null }),
+      ...(body.twelfthPercentage !== undefined && { twelfthPercentage: body.twelfthPercentage !== "" ? Number(body.twelfthPercentage) : null }),
+      ...(body.resumeUrl !== undefined && { resumeUrl: body.resumeUrl }),
       ...(body.profileImageUrl !== undefined && { profileImageUrl: body.profileImageUrl }),
+      ...(body.gender !== undefined && { gender: body.gender }),
       isProfileComplete: true,
       updatedAt: new Date().toISOString(),
     }).where(eq(alumniTable.id, alumni.id)).returning();
@@ -54,6 +66,10 @@ export async function POST(req: NextRequest) {
     if (body.profileImageUrl && existingAlumni?.profileImageUrl &&
         body.profileImageUrl !== existingAlumni.profileImageUrl) {
       await deleteFromR2(existingAlumni.profileImageUrl);
+    }
+    if (body.resumeUrl && existingAlumni?.resumeUrl &&
+        body.resumeUrl !== existingAlumni.resumeUrl) {
+      await deleteFromR2(existingAlumni.resumeUrl);
     }
 
     return NextResponse.json({ 

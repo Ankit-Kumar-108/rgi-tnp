@@ -33,6 +33,7 @@ export async function GET(req: NextRequest) {
         isVerified: true, about: true, branch: true, batch: true,
         course: true, profileImageUrl: true, privacyJson: true,
         cgpa: true, gender: true, tenthPercentage: true, twelfthPercentage: true,
+        resumeUrl: true,
       },
     });
 

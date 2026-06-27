@@ -99,7 +99,7 @@ export default function VolunteerGrid({ volunteers }: { volunteers: VolunteerDat
                       href={volunteer.student.linkedinUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="absolute top-2 right-2 p-2 bg-white/90 backdrop-blur-md rounded-lg shadow-lg text-[#0077b5] translate-x-12 -translate-y-12 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-500 ease-out hover:bg-[#0077b5] hover:text-white z-10"
+                      className="absolute top-2 right-2 p-1 md:p-2 bg-white/90 backdrop-blur-md rounded-lg shadow-lg text-[#0077b5] md:translate-x-12 md:-translate-y-12 md:group-hover:translate-x-0 md:group-hover:translate-y-0 transition-all duration-500 ease-out hover:bg-[#0077b5] hover:text-white z-10"
                       title="LinkedIn Profile"
                     >
                       <svg className="size-7 md:size-7 fill-current" viewBox="0 0 24 24">
