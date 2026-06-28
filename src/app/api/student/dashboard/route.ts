@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
         id: true, name: true, enrollmentNumber: true, email: true,
         branch: true, semester: true, cgpa: true, isEmailVerified: true, isVerified: true,
         profileImageUrl: true, phoneNumber: true, course: true, batch: true,
+        collegeName: true,
         resumeUrl: true, tenthPercentage: true, twelfthPercentage: true,
         activeBacklog: true, linkedinUrl: true, githubUrl: true,
         isProfileComplete: true, gender: true,

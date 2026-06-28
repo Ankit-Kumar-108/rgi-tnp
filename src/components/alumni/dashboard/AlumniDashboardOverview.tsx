@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Camera, BadgeCheck, BadgeAlert, Linkedin, ChevronRight, Loader2, User, Mail, Phone, User2, ExternalLink, Eye, X, GraduationCap, Briefcase, MapPin, FileText, Upload } from "lucide-react";
+import { Camera, BadgeCheck, BadgeAlert, Linkedin, ChevronRight, Loader2, User, Mail, Phone, User2, ExternalLink, Eye, X, GraduationCap, Briefcase, MapPin, FileText, Upload, Building2 } from "lucide-react";
 
 interface AlumniDashboardOverviewProps {
   alumni: any;
@@ -92,12 +92,17 @@ export default function AlumniDashboardOverview({
 
               <div className="flex-1 space-y-6 md:space-y-8 w-full text-center md:text-left">
                 <div className="space-y-2 md:space-y-3">
-                  <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-foreground tracking-tight leading-tight">
+                  <h1 className="text-3xl md:text-5xl font-black text-foreground tracking-tighter text-center md:text-left leading-none">
                     {alumni?.name}
                   </h1>
-                  <p className="text-sm md:text-lg font-bold text-brand uppercase tracking-widest bg-brand/5 inline-block px-4 py-1 rounded-full">
-                    {alumni?.course}
+                  <p className="text-lg md:text-xl font-medium text-muted-foreground tracking-tight text-center md:text-left">
+                    {alumni?.course} in {alumni?.branch} ({alumni?.batch})
                   </p>
+                  {alumni?.collegeName && (
+                    <p className="text-sm font-medium text-muted-foreground flex items-center gap-1.5 justify-center md:justify-start mt-1">
+                      <Building2 className="w-4 h-4 text-brand" /> {alumni.collegeName}
+                    </p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-6 md:gap-y-0 md:pt-6 border-t border-border/50 pt-6">
@@ -229,6 +234,10 @@ export default function AlumniDashboardOverview({
               <div className="space-y-3">
                 <h3 className="text-xs font-black uppercase tracking-wider text-brand">Academic Records</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <div className="bg-muted/40 p-3.5 rounded-lg border border-border/30">
+                    <span className="block text-[10px] uppercase font-bold text-muted-foreground">College</span>
+                    <span className="text-sm font-bold text-foreground leading-tight">{alumni?.collegeName || "N/A"}</span>
+                  </div>
                   <div className="bg-muted/40 p-3.5 rounded-lg border border-border/30">
                     <span className="block text-[10px] uppercase font-bold text-muted-foreground">Course</span>
                     <span className="text-sm font-bold text-foreground">{alumni?.course || "N/A"}</span>

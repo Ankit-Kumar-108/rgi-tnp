@@ -20,12 +20,13 @@ import {
     Eye,
     EyeOff,
     FileText,
+    Building2,
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getRegistrationUploadToken, uploadFileToR2 } from "@/lib/upload-r2";
-import { getSemesterOptions, getBatchYears } from "@/lib/constants";
+import { getSemesterOptions, getBatchYears, COLLEGE_OPTIONS } from "@/lib/constants";
 import { toast } from "sonner";
 import { fetchWithRetry } from "@/lib/fetch-utils";
 
@@ -39,7 +40,7 @@ export default function StudentRegister() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [form, setForm] = useState({
-        name: "", email: "", enrollmentNumber: "", branch: "", course: "",
+        name: "", email: "", enrollmentNumber: "", collegeName: "", branch: "", course: "",
         semester: "", cgpa: "", batch: "", phoneNumber: "",
         password: "", confirmPassword: "", gender: "",
     });
@@ -438,6 +439,19 @@ export default function StudentRegister() {
                                 <div className="relative">
                                     <div className={iconClass}><Hash className="w-4 h-4 sm:w-5 sm:h-5" /></div>
                                     <input className={inputClass} placeholder="e.g. 0108CS211001" required value={form.enrollmentNumber.toUpperCase()} onChange={update("enrollmentNumber")} />
+                                </div>
+                            </div>
+
+                            <div className="space-y-1">
+                                <label className="text-xs sm:text-sm font-semibold text-foreground">College Name</label>
+                                <div className="relative">
+                                    <div className={iconClass}><Building2 className="w-4 h-4 sm:w-5 sm:h-5" /></div>
+                                    <select className={inputClass} required value={form.collegeName} onChange={update("collegeName")}>
+                                        <option value="">Select College</option>
+                                        {COLLEGE_OPTIONS.map(c => (
+                                            <option key={c} value={c}>{c}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 

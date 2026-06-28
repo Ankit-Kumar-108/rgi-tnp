@@ -6,6 +6,7 @@ export const alumniRegistrationSchema = z.object({
         .trim() 
         .min(1, 'Enrollment number is required')
         .regex(/^[A-Za-z0-9]+$/, 'Enrollment number must be alphanumeric'),
+    collegeName: z.string().trim().min(1, 'College name is required'),
     personalEmail: z.string().trim().email('Invalid email address'),
     branch: z.string().trim().min(1, 'Branch is required'),
     course: z.string().trim().min(1, 'Course is required'),

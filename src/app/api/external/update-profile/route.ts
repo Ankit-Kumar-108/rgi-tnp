@@ -86,51 +86,47 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    const normalizedTenth =
-      tenthPercentage !== undefined ? Number.parseFloat(String(tenthPercentage)) : undefined;
-    const normalizedTwelfth =
-      twelfthPercentage !== undefined
-        ? Number.parseFloat(String(twelfthPercentage))
-        : undefined;
-    const normalizedCGPA =
-      cgpa !== undefined
-        ? Number.parseFloat(String(cgpa))
-        : undefined;
-    const normalizedBacklog =
-      activeBacklog !== undefined ? Number.parseInt(String(activeBacklog), 10) : undefined;
-    const normalizedSemester =
-      semester !== undefined ? Number.parseInt(String(semester), 10) : undefined;
+    const parseFloatSafe = (val: any) => {
+      if (val === undefined || val === null || val === "") return undefined;
+      const parsed = Number.parseFloat(String(val));
+      return Number.isNaN(parsed) ? undefined : parsed;
+    };
+    const parseIntSafe = (val: any) => {
+      if (val === undefined || val === null || val === "") return undefined;
+      const parsed = Number.parseInt(String(val), 10);
+      return Number.isNaN(parsed) ? undefined : parsed;
+    };
+
+    const normalizedTenth = parseFloatSafe(tenthPercentage);
+    const normalizedTwelfth = parseFloatSafe(twelfthPercentage);
+    const normalizedCGPA = parseFloatSafe(cgpa);
+    const normalizedBacklog = parseIntSafe(activeBacklog);
+    const normalizedSemester = parseIntSafe(semester);
+
     const nextProfileImageUrl = profileImageUrl ?? existingStudent.profileImageUrl;
     const nextResumeUrl = resumeUrl ?? existingStudent.resumeUrl;
-    const nextTenthPercentage =
-      tenthPercentage !== undefined ? normalizedTenth : existingStudent.tenthPercentage;
-      const nextTwelfthPercentage =
-        twelfthPercentage !== undefined
-          ? normalizedTwelfth
-          : existingStudent.twelfthPercentage;
-      const nextCGPA =
-        cgpa !== undefined
-          ? normalizedCGPA
-          : existingStudent.cgpa;
-      const nextActiveBacklog =
-      activeBacklog !== undefined ? normalizedBacklog : existingStudent.activeBacklog;
+    const nextTenthPercentage = normalizedTenth !== undefined ? normalizedTenth : existingStudent.tenthPercentage;
+    const nextTwelfthPercentage = normalizedTwelfth !== undefined ? normalizedTwelfth : existingStudent.twelfthPercentage;
+    const nextCGPA = normalizedCGPA !== undefined ? normalizedCGPA : existingStudent.cgpa;
+    const nextActiveBacklog = normalizedBacklog !== undefined ? normalizedBacklog : existingStudent.activeBacklog;
+
     const isProfileComplete =
-      [nextProfileImageUrl, nextResumeUrl, nextCGPA].every(hasValue) &&
-      hasValue(nextTenthPercentage) &&
-      hasValue(nextTwelfthPercentage) &&
+      [nextProfileImageUrl, nextResumeUrl, nextCGPA].every((v) => hasValue(v) && !Number.isNaN(v)) &&
+      hasValue(nextTenthPercentage) && !Number.isNaN(nextTenthPercentage) &&
+      hasValue(nextTwelfthPercentage) && !Number.isNaN(nextTwelfthPercentage) &&
       Number.isFinite(nextActiveBacklog) &&
       Number(nextActiveBacklog) >= 0;
 
     const updatedStudentResult = await db.update(externalStudent).set({
       ...(profileImageUrl !== undefined && { profileImageUrl }),
       ...(resumeUrl !== undefined && { resumeUrl }),
-      ...(tenthPercentage !== undefined && { tenthPercentage: normalizedTenth }),
-      ...(twelfthPercentage !== undefined && { twelfthPercentage: normalizedTwelfth }),
-      ...(cgpa !== undefined && { cgpa: normalizedCGPA }),
-      ...(activeBacklog !== undefined && { activeBacklog: normalizedBacklog }),
+      ...(normalizedTenth !== undefined && { tenthPercentage: normalizedTenth }),
+      ...(normalizedTwelfth !== undefined && { twelfthPercentage: normalizedTwelfth }),
+      ...(normalizedCGPA !== undefined && { cgpa: normalizedCGPA }),
+      ...(normalizedBacklog !== undefined && { activeBacklog: normalizedBacklog }),
       ...(linkedinUrl !== undefined && { linkedinUrl }),
       ...(githubUrl !== undefined && { githubUrl }),
-      ...(semester !== undefined && { semester: normalizedSemester }),
+      ...(normalizedSemester !== undefined && { semester: normalizedSemester }),
       isProfileComplete,
       updatedAt: new Date().toISOString(),
     }).where(eq(externalStudent.id, studentTokenData.id)).returning();

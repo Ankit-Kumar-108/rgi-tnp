@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
       enrollmentNumber: validatedData.enrollmentNumber.trim(),
       name: validatedData.name.trim().replace(/\s+/g, ' '),
       personalEmail: validatedData.personalEmail.trim(),
+      collegeName: validatedData.collegeName.trim(),
     };
 
     // Verify Enrollment Number in Master Records
@@ -77,6 +78,7 @@ export async function POST(req: NextRequest) {
       branch: trimmedData.branch,
       course: trimmedData.course,
       batch: trimmedData.batch,
+      collegeName: trimmedData.collegeName,
       gender: validatedData.gender,
       cgpa: validatedData.cgpa,
       passwordHash: passwordHash,

@@ -44,6 +44,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
               batch: true,
               tenthPercentage: true,
               twelfthPercentage: true,
+              collegeName: true,
             }
           },
           externalStudent: {
@@ -81,7 +82,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
               cgpa: true,
               twelfthPercentage: true,
               tenthPercentage: true,
-              resumeUrl: true
+              resumeUrl: true,
+              collegeName: true,
             }
           }
         },

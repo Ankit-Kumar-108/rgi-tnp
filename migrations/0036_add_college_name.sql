@@ -1,0 +1,2 @@
+ALTER TABLE Alumni ADD COLUMN collegeName text NOT NULL DEFAULT 'RGI';
+ALTER TABLE Student ADD COLUMN collegeName text NOT NULL DEFAULT 'RGI';

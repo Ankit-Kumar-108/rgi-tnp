@@ -115,6 +115,7 @@ export async function POST(req: NextRequest) {
             profileImageUrl: student.profileImageUrl || "",
             phoneNumber: student.phoneNumber || null,
             linkedInUrl: student.linkedinUrl || null,
+            collegeName: student.collegeName || "RGI",
             currentCompany: placementDetails?.currentCompany || null,
             jobTitle: placementDetails?.jobTitle || null,
             isVerified: true,

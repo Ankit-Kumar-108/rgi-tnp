@@ -3,6 +3,7 @@ export interface Student {
   name: string;
   enrollmentNumber: string;
   email: string;
+  collegeName: string;
   branch: string;
   semester: number;
   cgpa: number;
@@ -90,6 +91,7 @@ export interface Alumni {
   about?: string;
   batch: string;
   course: string;
+  collegeName?: string;
   createdAt?: string | Date;
   updatedAt?: string | Date;
 }

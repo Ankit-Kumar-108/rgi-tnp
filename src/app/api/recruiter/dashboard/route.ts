@@ -133,7 +133,7 @@ export async function GET(req: NextRequest) {
         (studentIds.length > 0
           ? db.query.student.findMany({
               where: inArray(student.id, studentIds),
-              columns: { id: true, name: true, enrollmentNumber: true, branch: true, cgpa: true, email: true, profileImageUrl: true }
+              columns: { id: true, name: true, enrollmentNumber: true, branch: true, cgpa: true, email: true, profileImageUrl: true, collegeName: true }
             })
           : Promise.resolve([])) as Promise<any[]>,
         (externalIds.length > 0
@@ -158,7 +158,7 @@ export async function GET(req: NextRequest) {
           status: a.status,
           createdAt: a.createdAt,
           name: data?.name || "Unknown",
-          college: data && 'collegeName' in data ? data.collegeName : "RGI",
+          college: data?.collegeName || "RGI",
           branch: data?.branch || "",
           cgpa: data?.cgpa || 0,
           email: data?.email || "",

@@ -824,8 +824,8 @@ export default function AlumniDashboard() {
               </div>
 
               {/* 12th Score */}
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-foreground">12th / Diploma Percentage</label>
+              {alumni.course === "diploma"?(``) : (<div className="space-y-1.5">
+                <label className="text-sm font-medium text-foreground">Diploma Percentage</label>
                 <input 
                   type="number" 
                   step="0.1" 
@@ -835,7 +835,7 @@ export default function AlumniDashboard() {
                   required
                   className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 transition-colors"
                 />
-              </div>
+              </div>)}
             </div>
           </div>
 

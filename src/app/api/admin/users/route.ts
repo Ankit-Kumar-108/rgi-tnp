@@ -76,6 +76,7 @@ export async function GET(req: NextRequest) {
             githubUrl: true,
             course: true,
             batch: true,
+            collegeName: true,
           },
           orderBy: (t, { desc }) => [desc(t.createdAt)],
           limit,
@@ -121,6 +122,7 @@ export async function GET(req: NextRequest) {
             linkedInUrl: true,
             course: true,
             batch: true,
+            collegeName: true,
           },
           orderBy: (t, { desc }) => [desc(t.createdAt)],
           limit,
@@ -289,6 +291,12 @@ export async function DELETE(req: NextRequest) {
           .filter((url): url is string => Boolean(url));
 
         await db.delete(schema.driveRegistration).where(inArray(schema.driveRegistration.studentId, ids));
+        await db.delete(schema.studentFeedback).where(inArray(schema.studentFeedback.studentId, ids));
+        await db.delete(schema.volunteerStudentStatus).where(inArray(schema.volunteerStudentStatus.studentId, ids));
+        await db.delete(schema.volunteer).where(inArray(schema.volunteer.studentId, ids));
+        await db.delete(schema.memory).where(inArray(schema.memory.studentId, ids));
+        await db.delete(schema.notification).where(inArray(schema.notification.studentId, ids));
+
         await db.delete(schema.student).where(inArray(schema.student.id, ids));
 
         if (studentUrls.length > 0) await deleteMultipleFromR2(studentUrls);
@@ -304,15 +312,35 @@ export async function DELETE(req: NextRequest) {
           .map((a) => a.profileImageUrl)
           .filter(Boolean);
 
+        await db.delete(schema.referral).where(inArray(schema.referral.alumniId, ids));
+        await db.delete(schema.alumniFeedback).where(inArray(schema.alumniFeedback.alumniId, ids));
+        await db.delete(schema.memory).where(inArray(schema.memory.alumniId, ids));
+        await db.delete(schema.notification).where(inArray(schema.notification.alumniId, ids));
+        await db.delete(schema.driveRegistration).where(inArray(schema.driveRegistration.alumniId, ids));
+
         await db.delete(schema.alumni).where(inArray(schema.alumni.id, ids));
 
         if (alumniUrls.length > 0) await deleteMultipleFromR2(alumniUrls);
         break;
       }
 
-      case "recruiter":
+      case "recruiter": {
+        const drives = await db.query.placementDrive.findMany({
+          where: inArray(schema.placementDrive.recruiterId, ids),
+          columns: { id: true }
+        });
+        const driveIds = drives.map(d => d.id);
+        if (driveIds.length > 0) {
+          await db.delete(schema.driveRegistration).where(inArray(schema.driveRegistration.driveId, driveIds));
+          await db.delete(schema.driveImage).where(inArray(schema.driveImage.driveId, driveIds));
+          await db.delete(schema.volunteerStudentStatus).where(inArray(schema.volunteerStudentStatus.driveId, driveIds));
+          await db.delete(schema.placementDrive).where(inArray(schema.placementDrive.id, driveIds));
+        }
+        await db.delete(schema.corporateFeedback).where(inArray(schema.corporateFeedback.recruiterId, ids));
+        await db.delete(schema.notification).where(inArray(schema.notification.recruiterId, ids));
         await db.delete(schema.recruiter).where(inArray(schema.recruiter.id, ids));
         break;
+      }
 
       case "external": {
         const externals = await db.query.externalStudent.findMany({
@@ -324,6 +352,7 @@ export async function DELETE(req: NextRequest) {
           .filter((url): url is string => Boolean(url));
 
         await db.delete(schema.driveRegistration).where(inArray(schema.driveRegistration.externalStudentId, ids));
+        await db.delete(schema.notification).where(inArray(schema.notification.externalStudentId, ids));
         await db.delete(schema.externalStudent).where(inArray(schema.externalStudent.id, ids));
 
         if (externalUrls.length > 0) await deleteMultipleFromR2(externalUrls);

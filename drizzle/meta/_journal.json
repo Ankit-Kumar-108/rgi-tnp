@@ -8,6 +8,13 @@
       "when": 1781384268103,
       "tag": "0000_skinny_smasher",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1782649908854,
+      "tag": "0001_worried_abomination",
+      "breakpoints": true
     }
   ]
 }

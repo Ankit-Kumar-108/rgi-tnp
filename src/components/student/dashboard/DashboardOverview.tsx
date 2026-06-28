@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { BadgeCheck, BadgeAlert, Briefcase, CheckCircle, Camera, FileText, Loader2, Upload, User, Mail, Phone, User2, ExternalLink, Eye, X } from "lucide-react";
+import { BadgeCheck, BadgeAlert, Briefcase, CheckCircle, Camera, FileText, Loader2, Upload, User, Mail, Phone, User2, ExternalLink, Eye, X, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { getToken } from "@/lib/auth-client";
 import { uploadFileToR2 } from "@/lib/upload-r2";
@@ -175,6 +175,11 @@ export default function DashboardOverview({
                   <p className="text-lg md:text-xl font-medium text-muted-foreground tracking-tight">
                     {student?.course}
                   </p>
+                  {student?.collegeName && (
+                    <p className="text-sm font-medium text-muted-foreground flex items-center gap-1.5 justify-center md:justify-start mt-1">
+                      <Building2 className="w-4 h-4 text-brand" /> {student.collegeName}
+                    </p>
+                  )}
                 </div>
 
                 {/* Horizontal Grid Stats */}
@@ -296,6 +301,10 @@ export default function DashboardOverview({
               <div className="space-y-3">
                 <h3 className="text-xs font-black uppercase tracking-wider text-brand">Academic Records</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <div className="bg-muted/40 p-3.5 rounded-lg border border-border/30">
+                    <span className="block text-[10px] uppercase font-bold text-muted-foreground">College</span>
+                    <span className="text-sm font-bold text-foreground leading-tight">{student?.collegeName || "N/A"}</span>
+                  </div>
                   <div className="bg-muted/40 p-3.5 rounded-lg border border-border/30">
                     <span className="block text-[10px] uppercase font-bold text-muted-foreground">Course</span>
                     <span className="text-sm font-bold text-foreground">{student?.course || "N/A"}</span>

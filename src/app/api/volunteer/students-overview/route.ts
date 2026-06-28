@@ -96,7 +96,8 @@ export async function GET(req: NextRequest) {
               semester: true,
               cgpa: true,
               profileImageUrl: true,
-              batch: true
+              batch: true,
+              collegeName: true
             }
           },
           externalStudent: {
@@ -121,7 +122,8 @@ export async function GET(req: NextRequest) {
               branch: true,
               batch: true,
               profileImageUrl: true,
-              cgpa: true
+              cgpa: true,
+              collegeName: true
             }
           }
         },
@@ -145,7 +147,7 @@ export async function GET(req: NextRequest) {
       const cgpa = reg.student?.cgpa ?? reg.externalStudent?.cgpa ?? reg.alumni?.cgpa ?? 0;
       const semester = reg.student?.semester ?? reg.externalStudent?.semester ?? 0;
       const profileImageUrl = reg.student?.profileImageUrl ?? reg.externalStudent?.profileImageUrl ?? reg.alumni?.profileImageUrl ?? undefined;
-      const collegeName = reg.externalStudent?.collegeName ?? (reg.alumni ? "Alumni" : "RGI");
+      const collegeName = reg.student?.collegeName ?? reg.externalStudent?.collegeName ?? reg.alumni?.collegeName ?? "RGI";
 
       return {
         registrationId: reg.id,

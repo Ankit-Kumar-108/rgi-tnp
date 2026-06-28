@@ -32,6 +32,7 @@ export async function GET(req: NextRequest) {
         linkedInUrl: true, phoneNumber: true, isProfileComplete: true,
         isVerified: true, about: true, branch: true, batch: true,
         course: true, profileImageUrl: true, privacyJson: true,
+        collegeName: true,
         cgpa: true, gender: true, tenthPercentage: true, twelfthPercentage: true,
         resumeUrl: true,
       },

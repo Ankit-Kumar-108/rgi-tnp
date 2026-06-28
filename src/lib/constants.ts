@@ -34,3 +34,8 @@ export const isPassout = (course: string, semester: number): boolean => {
   const maxSems = getMaxSemestersForCourse(course);
   return semester >= maxSems;
 };
+
+export const COLLEGE_OPTIONS = [
+  "Radharaman Engineering College",
+  "Radharaman Institute of Technology and Science",
+] as const;

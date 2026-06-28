@@ -18,12 +18,14 @@ import {
     Loader2,
     Eye,
     EyeOff,
+    Building2,
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { getRegistrationUploadToken, uploadFileToR2 } from "@/lib/upload-r2";
 import { toast } from "sonner";
+import { COLLEGE_OPTIONS } from "@/lib/constants";
 
 export default function AlumniRegister() {
     const router = useRouter();
@@ -34,7 +36,7 @@ export default function AlumniRegister() {
     const [success, setSuccess] = useState("");
     const [form, setForm] = useState({
         name: "", personalEmail: "", enrollmentNumber: "",
-        course: "", batch: "", branch: "",
+        collegeName: "", course: "", batch: "", branch: "",
         gender: "", cgpa: "",
         password: "", confirmPassword: "",
     });
@@ -326,6 +328,19 @@ export default function AlumniRegister() {
                                 </div>
                             </div>
                             
+                            <div className="space-y-1">
+                                <label className="text-xs sm:text-sm font-semibold text-foreground">College Name</label>
+                                <div className="relative">
+                                    <div className={iconClass}><Building2 className="w-4 h-4 sm:w-5 sm:h-5" /></div>
+                                    <select className={inputClass} required value={form.collegeName} onChange={update("collegeName")}>
+                                        <option value="">Select College</option>
+                                        {COLLEGE_OPTIONS.map(c => (
+                                            <option key={c} value={c}>{c}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <div className="space-y-1">
                                     <label className="text-xs sm:text-sm font-semibold text-foreground">Course</label>
