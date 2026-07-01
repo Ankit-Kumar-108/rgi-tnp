@@ -8,7 +8,6 @@ import {
   Stethoscope,
   Heart,
   Leaf,
-  BookOpen,
   Users,
   Trophy,
   MapPin,
@@ -144,7 +143,7 @@ export default function RGIProfile() {
       <div className="bg-background text-foreground antialiased font-sans">
         <main>
           {/* HERO SECTION */}
-          <section className="relative min-h-[520px] md:min-h-[620px] flex items-end overflow-hidden bg-foreground mt-16 md:mt-20">
+          <section className="relative min-h-[520px] md:min-h-[620px] flex items-end overflow-hidden bg-foreground mt-20">
             {/* Background Image */}
             <div className="absolute inset-0">
               <img

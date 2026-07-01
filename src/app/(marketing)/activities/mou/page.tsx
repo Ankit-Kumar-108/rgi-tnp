@@ -95,7 +95,7 @@ export default function StrategicAlliances() {
             <div className="bg-background text-foreground antialiased font-sans flex flex-col min-h-screen">
                 <main className="flex-1 w-full">
                     {/* HERO SECTION */}
-                    <section className="relative min-h-[480px] md:min-h-[640px] flex items-end overflow-hidden bg-foreground mt-16 md:mt-20">
+                    <section className="relative min-h-[480px] md:min-h-[640px] flex items-end overflow-hidden bg-foreground mt-20">
                         <div className="absolute inset-0">
                             <Image
                                 fill

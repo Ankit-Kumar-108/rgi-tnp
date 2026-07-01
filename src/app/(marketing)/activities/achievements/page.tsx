@@ -172,7 +172,7 @@ export default function AchievementsPage() {
       <div className="bg-background text-foreground antialiased font-sans">
         <main>
           {/* HERO SECTION */}
-          <section className="relative min-h-[480px] md:min-h-[640px] flex items-end overflow-hidden bg-foreground mt-16 md:mt-20">
+          <section className="relative min-h-[480px] md:min-h-[640px] flex items-end overflow-hidden bg-foreground mt-20">
             {/* Background */}
             <div className="absolute inset-0">
               <img

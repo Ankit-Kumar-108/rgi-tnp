@@ -493,7 +493,7 @@ Verify Token + Role Authorization
 - [ ] **Broadcast (add broadcast email for all students, alumni and external student in user Management tab)  (to change on 5/06/2026 [Done])**
 - add broadcast email for all students, alumni and external student for better communication and understanding of status of broadcast also remove compose from notification management
 
-- [ ] **Auto transfer student to alumni (add feature)  (to change on 5/06/2026 [to be Done])**
+- [ ] **Auto transfer student to alumni (add feature)  (to change on 5/06/2026 [Done])**
 - add feature to auto transfer student to alumni after completion of course for better visibility and understanding of profile and also add notification for that 
 
 - [ ] **Admin Panel (in drive management section add custom email function so admin can send custom email to all applicants of drive or selected applicants of drive)  (to change on 10/06/2026 [Done])**
@@ -502,28 +502,29 @@ Verify Token + Role Authorization
 - [ ] **Notification Center (add send mail to all students, alumni, recruiters and course specific students)  (to change on 25/06/2026 [Done])**
  - add notification center in admin panel where admin can send mail to all students, alumni, recruiters and course specific students for better communication and understanding of status of drive and also add template for that email
 
-- [ ] **Backend (add linkedin api and googleSheet api integration)  (to change on 15/06/2026 [to be Done])**
-- add linkedin api to post drive in linkedin and google sheet api to maintain record of drives, applicants, students batch wise, alumni, referrals etc. for better visibility and understanding of data and also add automation for that
-
-- [ ] **Referral (add a page where referral are posted by alumni and also appears in the students dashboard)  (to change on 20/06/2026 [to be Done])**
- - add a page where referral are posted by alumni for better visibility and understanding of referral and also add filter in that page for better visibility only logged in student and alumni can see that page
-
 - [ ] **Site (improve site content)  (to change on 25/06/2026 [Done])** 
   - improve content of site and add more content in home page and about us page for better visibility and understanding of site
 
-- [ ] **Alumni ( alumni drive eligibility addition and basic alumni passing and data like cgpa gender etc) (to be done)**
+- [ ] **Alumni ( alumni drive eligibility addition and basic alumni passing and data like cgpa gender etc [Done])**
   - add feature to add alumni drive eligibility and basic alumni passing and data like cgpa gender etc for better visibility and understanding of profile of alumni
 
-- [ ] **Alumin, Student, Exernal Dashboard (add memories images Modal) (to be done)**
+- [ ] **Alumin, Student, Exernal Dashboard (add memories images Modal [Done])**
   - add memories images Modal in alumni, student, external dashboard for better visibility and understanding of memories
+
+- [ ] **forgot password, memory upload ui, etc.. (ui/ux improvement [Done])**
+  - forgot password, memory upload ui, etc.. (ui/ux improvement) for better visibility and understanding of profile and also check why cgpa 12th, 10th and back is default 0
+  
+
+- [ ] **Backend (add linkedin api and googleSheet api integration)  (to change on 15/06/2026 [to be Done])**
+- add linkedin api to post drive in linkedin and google sheet api to maintain record of drives, applicants, students batch wise, alumni, referrals etc. for better visibility and understanding of data and also add automation for that
 
 - [ ] **Recruiter (add better ui for applicants) (to be done)**
   - add better ui for applicants in recruiter dashboard for better visibility and understanding of applicants
 
-- [ ] **forgot password, memory upload ui, etc.. (ui/ux improvement) (to be done)**
-  - forgot password, memory upload ui, etc.. (ui/ux improvement) for better visibility and understanding of profile and also check why cgpa 12th, 10th and back is default 0
+- [ ] **Referral (add a page where referral are posted by alumni and also appears in the students dashboard)  (to change on 20/06/2026 [to be Done])**
+ - add a page where referral are posted by alumni for better visibility and understanding of referral and also add filter in that page for better visibility only logged in student and alumni can see that page
 
-- [ ] **Take Suggestion from sir about final selection and mail notification**
+- [ ] **Take Suggestion from sir about final selection and mail notification (to be Done)**
 
 ### Phase 2 (Next Quarter)
 - [ ] **Advanced Analytics Dashboard**
